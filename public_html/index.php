@@ -61,11 +61,6 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
 USES_evlist_functions();
 USES_evlist_views();
 
-if (GVERSION < '1.3.0') {
-    $_POST = EVLIST_stripslashes($_POST);
-    $_GET = EVLIST_stripslashes($_GET);
-}
-
 //var_dump($_GET);die;
 /*
 *   MAIN 

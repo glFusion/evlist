@@ -214,6 +214,7 @@ case 'delfuture':
     $R->DeleteFuture();
     break;
 
+// DEPRECATED
 case 'savereminder':
     USES_evlist_class_repeat();
     $Ev = new evRepeat($_POST['rp_id']);
@@ -238,6 +239,7 @@ case 'savereminder':
     }
     break;
 
+// DEPRECATED
 case 'delreminder':
     USES_evlist_class_repeat();
     $Ev = new evRepeat($_POST['rp_id']);

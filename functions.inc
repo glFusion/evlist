@@ -499,7 +499,7 @@ function plugin_getheadercss_evlist()
 {
     global $_CONF;
 
-    $pi_path = $_CONF['path_html'] . 'evlist/css/';
+    $pi_path = EVLIST_PI_PATH . '/css/';
     $styles = array();
     $files = array(
         'style.css',
@@ -532,8 +532,24 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 {
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
+    // overloading the previously-boolean enable_centerblock option to
+    // indicate the centerblock format.
+    switch ($_EV_CONF['enable_centerblock']) {
+    case 1:     // table format
+        $dup_chk = 'rp_id';
+        $tpl_file = 'centerblock.thtml';
+        break;
+    case 2:     // story format
+        $dup_chk = 'rp_ev_id';
+        $tpl_file = 'cblock_stories.thtml';
+        break;
+    case 0:     // disabled
+    default:
+        return '';
+    }
+ 
     if ( (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') ||
-        $_EV_CONF['enable_centerblock'] != 1 ) {
+        $_EV_CONF['pos_centerblock'] != $where ) {
         return '';
     }
 
@@ -560,11 +576,6 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         if (!empty($topic) && $_EV_CONF['topic_centerblock'] != $topic) {
             return '';
         }
-    }
-
-    // display in selected position or not at all.
-    if ($_EV_CONF['pos_centerblock'] != $where) {
-        return '';
     }
 
     // If we got this far, we're going to display something as long
@@ -622,9 +633,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     }
 
     $T = new Template(EVLIST_PI_PATH . '/templates/');
-    $T->set_file(array(
-        'centerblock' => 'centerblock.thtml',
-    ) );
+    $T->set_file('centerblock', $tpl_file);
 
     $T->set_var(array(
         'startblock' => COM_startBlock($LANG_EVLIST['ranges'][$range]),
@@ -640,9 +649,9 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         foreach ($day as $A) {
 
             // Make sure we only show each event once for multiday
-            if (array_key_exists($A['rp_id'], $rp_shown))
+            if (array_key_exists($A[$dup_chk], $rp_shown))
                 continue;
-            $rp_shown[$A['rp_id']] = 1;
+            $rp_shown[$A[$dup_chk]] = 1;
 
             // Prepare the summary for display. Remove links and autotags
             $summary = empty($A['summary']) ? $A['title'] : $A['summary'];
@@ -852,7 +861,7 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
     if ($F['topic'] == 0) {
         $link = EVLIST_URL . '/index.php?view=' . $view;
     } else {
-        $link = EVLIST_URL . "/index.php?view={$view}&cat={$F['topic']}";
+        $link = EVLIST_URL . "/index.php?view={$view}&amp;cat={$F['topic']}";
     }
 
     if (count($eids) > 0 ) {
@@ -1460,7 +1469,7 @@ function EVLIST_getCatLinks($eid, $andrange)
         while ($C = DB_fetchArray($cresult, false)) {
             $catlinks[] = '<a href="' .
                 COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange . 
-                '&cat=' . $C['id']) . '">' . COM_stripslashes($C['name']) . 
+                '&amp;cat=' . $C['id']) . '">' . COM_stripslashes($C['name']) . 
                 '</a>';
         }
         $retval = implode('&nbsp;|&nbsp;', $catlinks);
@@ -1519,6 +1528,7 @@ function EVLIST_formattedDate($timestamp)
 /**
 *   Returns a formatted time given a timestamp.
 *   Converts the timestamp parameter to an actual timestamp if non-numeric
+*   Uses the global time format configuration
 *
 *   @param  mixed   $timestamp  Timestamp to return as formatted.
 *   @return string      Formatted date
@@ -1915,7 +1925,7 @@ function plugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 */
 function plugin_getconfigelementhelp_evlist($element, $doclang )
 {
-    return array('http://www.glfusion.org/wiki/doku.php/evlist:start#configuration_options',2);
+    return array('http://www.glfusion.org/wiki/evlist:start#configuration_options',2);
 }
 
 
@@ -2273,6 +2283,13 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     return $events;
 }
 
+
+function EVLIST_getEvents_json($start='', $end='', $opts=array())
+{
+    $events = EVLIST_getEvents($start, $end, $opts);
+    $events = json_encode($events);
+    return events;
+}
 
 /**
 *   Replace quotes and apostrophes with HTML entities.

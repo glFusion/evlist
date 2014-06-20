@@ -193,6 +193,12 @@ function evlist_upgrade()
             // but was never removed via upgrading
             DB_query("ALTER TABLE {$_TABLES['evlist_events']} DROP rec_option", 1);
 
+        case '1.3.5':
+            DB_query("UPDATE {$_TABLES['conf_values']}
+                    SET selectionArray = 9
+                    WHERE name = 'enable_centerblock'
+                    AND group_name = '{$_EV_CONF['pi_name']}'");
+
         default:
             DB_query("UPDATE {$_TABLES['plugins']}
                     SET 

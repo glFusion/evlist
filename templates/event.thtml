@@ -1,31 +1,4 @@
 {# begin {templatelocation} #}
-<script type="text/javascript">
-function clickEditButton() {
-    closedialogs();
-    var action = document.getElementById('action_dialog');
-    action.style.display="block";
-    action.style.visibility="visible";
-    return;
-}
-
-function clickSubscribeButton() {
-    closedialogs();
-    var div = document.getElementById('subscribe_dialog');
-    div.style.display = "block";
-    div.style.visibility = "visible";
-}
-
-function closedialogs() {
-    var div = document.getElementById('action_dialog');
-    //if (div) div.style.display="none";
-    if (div) div.style.visibility="hidden";
-    var div = document.getElementById('subscribe_dialog');
-    if (div) div.style.visibility="hidden";
-    return;
-}
-
-</script>
-
 <div id="evlistEventHeader">
   <h2 class="evlist_header">
     {title}
@@ -103,7 +76,7 @@ function closedialogs() {
       </div>
     </div>
   {!endif}
-    <a href="{pi_url}/event.php?print=x&rp_id={rp_id}" target="_new"
+    <a href="{pi_url}/event.php?print=x&amp;rp_id={rp_id}" target="_new"
         title="Print"><img src="{layout_url}/images/print.png" alt="Print" 
         width="16" height="16" /></a>
   </div>
@@ -127,7 +100,7 @@ function closedialogs() {
 
   {!if summary}
   <div>
-    <label for="what"><strong>{$LANG_EVLIST['what']}:</strong></label>
+    <label><strong>{$LANG_EVLIST['what']}:</strong></label>
     <div class="evdata" id="what">
       {summary}
     </div>
@@ -136,7 +109,7 @@ function closedialogs() {
 
   {!if datetime_info}
   <div>
-    <label for="when"><strong>{$LANG_EVLIST['when']}:</strong></label>
+    <label><strong>{$LANG_EVLIST['when']}:</strong></label>
     <div class="evdata" id="when">
       {datetime_info}
     </div>
@@ -145,7 +118,7 @@ function closedialogs() {
 
   {!if address_info}
   <div>
-    <label for="where"><strong>{$LANG_EVLIST['where']}:</strong></label>
+    <label><strong>{$LANG_EVLIST['where']}:</strong></label>
     <div class="evdata" id="where">
       {address_info}
     </div>
@@ -154,7 +127,7 @@ function closedialogs() {
 
   {!if contact_info}
   <div>
-    <label for="contact"><strong>{$LANG_EVLIST['ev_contact']}:</strong></label>
+    <label><strong>{$LANG_EVLIST['ev_contact']}:</strong></label>
     <div class="evdata" id="contact">
     {contact_info}
     </div>
@@ -162,13 +135,13 @@ function closedialogs() {
   {!endif}
 
   <div>
-    <label for="calendar"><strong>{$LANG_EVLIST['calendar']}</strong></label>
+    <label"><strong>{$LANG_EVLIST['calendar']}</strong></label>
     <div class="evdata" id="calendar">{cal_name}</div>
   </div>
 
   {!if category_link}
   <div>
-    <label for="categories"><strong>{$LANG_EVLIST['categories']}</strong></label>
+    <label><strong>{$LANG_EVLIST['categories']}</strong></label>
     <div class="evdata" id="categories">{category_link}</div>
   </div>
   {!endif}
@@ -210,6 +183,41 @@ function closedialogs() {
   {reminder}
   </div>
 
+  {!if show_reminderform}
+  <div id="container">
+  <div id="reminder_no" class="reminder_div" style="visibility:hidden;">
+    <fieldset>
+    <strong>{$LANG_EVLIST['email']}</strong>
+    <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
+    <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
+    <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
+    <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
+    <input type="submit" name="savereminder" value="{$LANG_ACCESS['submit']}" />
+    <br />
+    {rem_note}<br />
+    <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
+    <!--<input type="hidden" name="eid" value="{eid}" />
+    <!--<input type="hidden" name="rp_id" value="{rp_id}" />-->
+    <input type="hidden" name="action" value="addreminder" />
+    </form>
+  </div>
+  <div id="reminder_yes" class="reminder_div" style="visibility:hidden;">
+    <form id="evRemDel" onsubmit="updateReminder(this);return false;">
+    <fieldset>
+    {$LANG_EVLIST['you_are_subscribed']}
+    <input type="submit" name="delreminder" value="{$LANG_ACCESS['remove']}" />
+    <input type="hidden" name="eid" value="{eid}" />
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    <input type="hidden" name="action" value="delreminder" />
+    <input type="hidden" name="rem_email" value="" />
+    <input type="hidden" name="notice" value="0" />
+    </fieldset>
+    </form> 
+    </fieldset>
+  </div>
+  </div>
+  {!endif}
+
   {!if weather}
     <div style="clear:both;text-align:center">
     {weather}
@@ -229,4 +237,81 @@ function closedialogs() {
     </div>
   {!endif}
 </div>
+
+<script type="text/javascript">
+function clickEditButton() {
+    closedialogs();
+    var action = document.getElementById('action_dialog');
+    action.style.display="block";
+    action.style.visibility="visible";
+    return;
+}
+
+function clickSubscribeButton() {
+    closedialogs();
+    var div = document.getElementById('subscribe_dialog');
+    div.style.display = "block";
+    div.style.visibility = "visible";
+}
+
+function closedialogs() {
+    var div = document.getElementById('action_dialog');
+    //if (div) div.style.display="none";
+    if (div) div.style.visibility="hidden";
+    var div = document.getElementById('subscribe_dialog');
+    if (div) div.style.visibility="hidden";
+    return;
+}
+
+// Show the add-reminder or remove-reminder form
+function showReminder(status) {
+    var addform = document.getElementById('reminder_no');
+    var remform = document.getElementById('reminder_yes');
+    if (status) {
+      // have a reminder set, show the "delete" form
+      remform.style.visibility = "";
+      addform.style.visibility = "hidden";
+    } else {
+      // don't have a reminder set, show the "add" form
+      addform.style.visibility = "";
+      remform.style.visibility = "hidden";
+    }
+}
+
+// Save or delete the event reminder
+function updateReminder(el) {
+  var email = escape(el.rem_email.value);
+  var action = escape(el.action.value);
+  var notice = escape(el.notice.value);
+  var http = createRequestObject();
+  var url = "{site_url}/evlist/ajax.php?action="+action+"&eid={ev_id}&rp_id={rp_id}&rem_email="+email+"&notice="+notice;
+  http.open("get", url, true);
+  http.onreadystatechange = function() {
+    if (http.readyState == 4) { //Finished loading the response
+      if (http.status == 200) {
+        var obj = JSON.parse(http.responseText);
+        showReminder(obj.reminder_set);
+      }
+    }
+  };
+  http.send(null);
+}
+
+function createRequestObject() {
+  var request;
+  var browser = navigator.appName;
+  if (browser == "Microsoft Internet Explorer") {
+    request = new ActiveXObject("Microsoft.XMLHTTP");
+  } else {
+    request = new XMLHttpRequest();
+  }
+  return request;
+}
+
+window.addEvent('load', function() {
+  // update the add/del reminder section depending on whether one is set
+  showReminder({reminder_set});
+});
+
+</script>
 {# end {templatelocation} #}

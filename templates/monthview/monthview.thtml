@@ -15,7 +15,7 @@
 <div id="evlistCalCheckboxes">
   <span onclick="clickCalendarButton()" 
     title="{$LANG_EVLIST['select_cals']}">{$LANG_EVLIST['calendars']}
-    <img src="{site_url}/evlist/images/downarrow.png" border="0" 
+    <img src="{site_url}/evlist/images/downarrow.png"
         width="16" height="16" alt="{$LANG_EVLIST['select_cals']}" />
   </span>
   <div id="calendar_dialog">
@@ -27,26 +27,26 @@
 </div>
 {!endif}
 
-<table cellpadding="5" cellspacing="1" border="0" class="evlist_month">
+<table style="padding:5px;margin:1px;" class="evlist_month">
   <tr class="daynames">
-    <td width="2%">&nbsp;</td>
-    <td width="14%">{$LANG_WEEK[1]}</td>
-    <td width="14%">{$LANG_WEEK[2]}</td>
-    <td width="14%">{$LANG_WEEK[3]}</td>
-    <td width="14%">{$LANG_WEEK[4]}</td>
-    <td width="14%">{$LANG_WEEK[5]}</td>
-    <td width="14%">{$LANG_WEEK[6]}</td>
-    <td width="14%">{$LANG_WEEK[7]}</td>
+    <td style="width:2%;">&nbsp;</td>
+    <td style="width:14%;">{$LANG_WEEK[1]}</td>
+    <td style="width:14%;">{$LANG_WEEK[2]}</td>
+    <td style="width:14%;">{$LANG_WEEK[3]}</td>
+    <td style="width:14%;">{$LANG_WEEK[4]}</td>
+    <td style="width:14%;">{$LANG_WEEK[5]}</td>
+    <td style="width:14%;">{$LANG_WEEK[6]}</td>
+    <td style="width:14%;">{$LANG_WEEK[7]}</td>
   </tr>
   <!-- BEGIN weekBlock -->
   <tr>
-    <td class="cal-weekpointers" align="center"
+    <td class="cal-weekpointers"
         onclick="window.location.href='{pi_url}/index.php?view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={wyear}&amp;month={wmonth}&amp;day={wday}';"
       ><b><a href="{site_url}/evlist/index.php?mode={mode}&amp;view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;month={wmonth}&amp;day={wday}&amp;year={wyear}">&nbsp;{weeknum}&nbsp;</a></b>
     </td>
 
     <!-- BEGIN dayBlock -->
-    <td valign="top" class="month{cal_day_style}" 
+    <td style="vertical-align:top;" class="month{cal_day_style}" 
       onMouseOver="document.getElementById('cell{month}{day}{year}').style.visibility='visible';"
       onMouseOut="document.getElementById('cell{month}{day}{year}').style.visibility='hidden';"
       onclick="window.location.href='{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}';">
@@ -75,7 +75,7 @@
   <!-- END weekBlock -->
 </table>
 <div id="evlistCalendarPrintLink">
-  <p><a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_new" title="Print"><img 
+  <p><a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print"><img 
         src="{layout_url}/images/print.png" alt="Print" 
         width="16" height="16" /></a>
   </p>

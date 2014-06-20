@@ -3,7 +3,20 @@
 // international standard. Redefine this to 0 if you want weeks to
 // begin on Sunday.
 //define('DATE_CALC_BEGIN_WEEKDAY', 1);
-define('DATE_CALC_BEGIN_WEEKDAY', 0);
+if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
+    global $_EVLIST_CONF;
+    switch ($_EVLIST_CONF['week_begins']) {
+    case 2:
+        // week begins on Monday
+        define('DATE_CALC_BEGIN_WEEKDAY', 1);
+        break;
+    case 0:
+    default:
+        // week begins on Sunday
+        define('DATE_CALC_BEGIN_WEEKDAY', 0);
+        break;
+    }
+}
 
 /**
  * Date calculation class

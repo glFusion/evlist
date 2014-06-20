@@ -157,12 +157,16 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
 
     // Set each day column header to the first letter of the day name
     $T->set_block('smallmonth', 'daynames', 'nBlock');
-    for ($i = 0; $i < 7; $i++) {
+    for ($i = 1; $i <= 7; $i++) {
         $T->set_var('dayname', $LANG_WEEK[$i][0]);
         $T->parse('nBlock', 'daynames', true);
     }
 
     $T->set_block('smallmonth', 'week', 'wBlock');
+
+    USES_class_date();
+    $dt = new Date('now', $_CONF['timezone']);
+
     foreach ($calendarView as $weeknum => $weekdata) {
         list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);
         $T->set_var(array(
@@ -193,9 +197,11 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
                     // Don't show a time for all-day events
                     if ($event['allday'] == 0 && 
                             $event['rp_date_start'] == $event['rp_date_end']) {
-                        $popup .= strftime($_CONF['timeonly'], 
-                                strtotime($event['rp_date_start'] . ' ' . 
-                                    $event['rp_time_start1'])) . ': ';
+                        $dt->setTimestamp(strtotime($event['rp_date_start'] . 
+                                ' ' . $event['rp_time_start1']));
+                        // Time is a localized string, not a timestamp, so 
+                        // don't adjust for the timezone
+                        $popup = $dt->format($_CONF['timeonly'], false) . ': ';
                     }
                     $popup .= htmlentities($event['title']);
                 }
@@ -411,26 +417,6 @@ function EVLIST_deleteImageLink($A, $token)
     }
 
     return $retval;
-}
-
-
-/**
-*   Strips slashes if magic_quotes_gpc is on.
-*
-*   @param  mixed   $var    Value or array of values to strip.
-*   @return mixed           Stripped value or array of values.
-*/
-function EVLIST_stripslashes($var)
-{
-    if (get_magic_quotes_gpc()) {
-        if (is_array($var)) {
-            return array_map('EVLIST_stripslashes', $var);
-        } else {
-            return stripslashes($var);
-        }
-    } else {
-        return $var;
-    }
 }
 
 

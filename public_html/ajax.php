@@ -12,7 +12,7 @@
 */
 
 /** Include required glFusion common functions */
-require_once '../lib-common.php';
+require_once dirname(__FILE__) . '/../lib-common.php';
 
 $content = '';
 
@@ -51,6 +51,47 @@ case 'getloc':
         }
     }
     break;
+
+case 'addreminder':
+    $rp_id = (int)$_GET['rp_id'];
+    $status = array();
+    USES_evlist_class_repeat();
+    $Ev = new evRepeat($rp_id);
+    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess()) {
+        $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
+            (eid, rp_id, uid, email, days_notice)
+        VALUES (
+            '{$Ev->Event->id}', 
+            '{$Ev->rp_id}', 
+            '" . (int)$_USER['uid']. "',
+            '" . DB_escapeString($_GET['rem_email']) . "',
+            '" . (int)$_GET['notice']. "')";
+        //COM_errorLog($sql);
+        DB_query($sql, 1);
+        if (!DB_error()) {
+            $status['reminder_set'] = true;
+        } else {
+            $status['reminder_set'] = false;
+        }
+    }
+    echo json_encode($status);
+    exit;
+    break;
+
+case 'delreminder':
+    $rp_id = (int)$_GET['rp_id'];
+    $uid = (int)$_USER['uid'];
+    if (!COM_isAnonUser() && $rp_id > 0) {
+        USES_evlist_class_repeat();
+        $Ev = new evRepeat($rp_id);
+        DB_delete($_TABLES['evlist_remlookup'],
+            array('eid', 'uid', 'rp_id'),
+            array($Ev->Event->id, $uid, $rp_id) );
+    }
+    echo json_encode(array('reminder_set' => false));
+    exit;
+    break;
+
 }
 
 if (!empty($content)) {

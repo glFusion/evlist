@@ -735,6 +735,7 @@ $LANG_configselects['evlist'] = array(
         ),
     7 => array('Oben auf Seite'=>1,'Nach Hauptartikel'=>2,'Unten auf Seite'=>3,'Gesamte Seite'=>0),
     8 => array('vergangen'=>1,'bevorstehend'=>2,'diese Woche'=>3,'diesen Monat'=>4),
+    9 => array('disabled' => 0, 'table' => 1, 'story' => 2),
     12 => array('Kein Zugriff' => 0, 'Nur-Lesen' => 2, 'Lesen-Schreiben' => 3),
     13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
     14 => array('Tag' => 'day', 'Woche' => 'week', 'Monat' => 'month', 'Jahr' => 'year', 'List' => 'list'),

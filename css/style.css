@@ -100,17 +100,23 @@
     visibility: hidden;
     z-index:999;
 }
-#action_dialog,
+
+#action_dialog a,
 #subscribe_dialog a {
     text-decoration: none;
 }
 
-#action_dialog,
+#action_dialog img,
 #subscribe_dialog img {
     width: 16px;
     height: 16px;
     border: 0px;
     margin-right: 1em;
+}
+
+#evlistCategoryLinks {
+    text-align: center;
+    margin-bottom: 2em;
 }
 
 .evlistRedNote {
@@ -132,12 +138,11 @@
 }
 
 .evdata {
-  position: inline;
-  margin-left:10em;
-  margin-bottom:8px;
+  position: relative;
+  margin-left: 8em;
+  margin-bottom: 8px;
 }
 
-/* Calendar Plugin */
 h2.evlist_header {
     text-align: center;
     color: #656567;
@@ -259,6 +264,7 @@ a.cal-event {
   color:#666666;
   font-weight:bold;
   font-size:1.0em;
+  vertical-align:bottom;
 }
 .cal-dayx-body {
   background:#E7E7E7
@@ -280,6 +286,8 @@ a.cal-event {
   border-bottom:#FFFFFF 1px solid;
   border-left:#FFFFFF 1px solid;
   border-right:#FFFFFF 1px solid;
+  width:1%;
+  vertical-align:top;
 }
 .cal-dayx-times2 {
   background:#FFFFFF
@@ -289,6 +297,8 @@ a.cal-event {
   border-left:#FFFFFF 1px dashed;
   border-right:#FFFFFF 1px dashed;
   border-top:#E7E7E7 1px solid;
+  white-space:nowrap;
+  width:1%;
 }
 
 .cal-header {
@@ -351,6 +361,8 @@ a.cal-event {
   font-weight:bold;
   font-size:.8em;
   padding:4px;
+  text-align:right;
+  white-space:nowrap;
 }
 .cal-weekview-caltitle {
   background:#FFFFFF;
@@ -572,5 +584,9 @@ table.smallmonthtable a.day-events, .day-events {
 
 table.smallmonthtable a.day-noevents {
 	color: #000;
+}
+
+.reminder_div {
+    position: absolute;
 }
 

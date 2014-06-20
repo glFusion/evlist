@@ -440,7 +440,7 @@ class evEvent
      *  @param  boolean $forceNew   Hack to force this record to be "new"
      *  @return boolean         True if no errors, False otherwise
      */
-    function Save($A = '', $table = 'evlist_submissions', $forceNew=false)
+    public function Save($A = '', $table = 'evlist_submissions', $forceNew=false)
     {
         global $_TABLES, $LANG_EVLIST, $_EV_CONF, $_USER, $_CONF;
 
@@ -515,12 +515,27 @@ class evEvent
             // update the repeat tables.  If we do, any customizations will
             // be lost.
             if ($this->NeedRepeatUpdate($A)) {
-                // Delete all detail records except the master
-                DB_query("DELETE FROM {$_TABLES['evlist_detail']}
-                        WHERE ev_id = '{$this->id}'
-                        AND det_id <> '{$this->det_id}'");
-                // This function sets the rec_data value.
-                $this->UpdateRepeats();
+                if ($this->old_schedule['recurring'] || $this->recurring) {
+                    // If this was, or is now, a recurring event then clear
+                    // out the repeats and update with new ones.
+                    // First, delete all detail records except the master
+                    DB_query("DELETE FROM {$_TABLES['evlist_detail']}
+                            WHERE ev_id = '{$this->id}'
+                            AND det_id <> '{$this->det_id}'");
+                    // This function sets the rec_data value.
+                    $this->UpdateRepeats();
+                } else {
+                    // this is a one-time event, update the existing instance
+                    $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+                            rp_date_start = '{$this->date_start1}',
+                            rp_date_end = '{$this->date_end1}',
+                            rp_time_start1 = '{$this->time_start1}',
+                            rp_time_end1 = '{$this->time_end1}',
+                            rp_time_start2 = '{$this->time_start2}',
+                            rp_time_end2 = '{$this->time_end2}'
+                        WHERE rp_ev_id = {$this->id}";
+                    DB_query($sql, 1);
+                }
             }
 
         } else {
@@ -1004,20 +1019,20 @@ class evEvent
             'cancel_url'    => $cancel_url,
             'eid'           => $this->id,
             'rp_id'         => $rp_id,
-            'title'         => htmlentities($this->Detail->title),
-            'summary'       => htmlentities($summary),
-            'description'   => htmlentities($full_description),
-            'location'      => htmlentities($location),
+            'title'         => $this->Detail->title,
+            'summary'       => $summary,
+            'description'   => $full_description,
+            'location'      => $location,
             'status_checked' => $this->status == 1 ? EVCHECKED : '',
-            'url'           => htmlentities($this->Detail->url),
-            'street'        => htmlentities($this->Detail->street),
-            'city'          => htmlentities($this->Detail->city),
-            'province'      => htmlentities($this->Detail->province),
-            'country'       => htmlentities($this->Detail->country),
-            'postal'        => htmlentities($this->Detail->postal),
-            'contact'       => htmlentities($this->Detail->contact),
+            'url'           => $this->Detail->url,
+            'street'        => $this->Detail->street,
+            'city'          => $this->Detail->city,
+            'province'      => $this->Detail->province,
+            'country'       => $this->Detail->country,
+            'postal'        => $this->Detail->postal,
+            'contact'       => $this->Detail->contact,
             'email'         => $this->Detail->email,
-            'phone'         => htmlentities($this->Detail->phone),
+            'phone'         => $this->Detail->phone,
             'startdate1'    => $this->date_start1,
             'enddate1'      => $this->date_end1,
             'd_startdate1'  => EVLIST_formattedDate($this->date_start1),
@@ -1322,7 +1337,7 @@ class evEvent
     *   efficient; it might make sense to check all related values, but there
     *   are several.
     */
-    function UpdateRepeats()
+    public function UpdateRepeats()
     {
         global $_TABLES;
 
@@ -1332,6 +1347,7 @@ class evEvent
         }
         if ((int)$this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
 
+        // Delete all existing instances
         DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);
 
         // Get the actual repeat occurrences.
@@ -1567,6 +1583,7 @@ class evEvent
         if (!isset($A['recurring']) ||$A['recurring'] != 1) {
             $this->rec_data['type'] = 0;
             $this->rec_data['stop'] = EV_MAX_DATE;
+            $this->rec_data['freq'] = 1;
             return;
         } else {
             $this->rec_data['type'] = isset($A['format']) ? 

@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<table class="smallmonthtable" width="100%">
+<table class="smallmonthtable">
   <tr>
     <td class="monthheader" colspan="7">
       <a href="{pi_url}/index.php?view=month&amp;year={thisyear}&amp;month={month}">{monthname}, {thisyear}</a>

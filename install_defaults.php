@@ -163,7 +163,7 @@ function plugin_initconfig_evlist()
         $c->add('ev_centerblock', NULL, 'fieldset', 0, 2, NULL, 0, true,
                 'evlist');
         $c->add('enable_centerblock',$CONF_EVLIST_DEFAULT['enable_centerblock'], 'select',
-                0, 2, 0, 10, true, 'evlist');
+                0, 2, 9, 10, true, 'evlist');
         $c->add('pos_centerblock',$CONF_EVLIST_DEFAULT['pos_centerblock'], 'select',
                 0, 2, 7, 20, true, 'evlist');
         $c->add('topic_centerblock',$CONF_EVLIST_DEFAULT['topic_centerblock'], 'select',

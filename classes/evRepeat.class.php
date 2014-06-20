@@ -35,7 +35,7 @@ class evRepeat
      *
      *  @param integer $id Optional type ID
      */
-    function __construct($rp_id=0)
+    public function __construct($rp_id=0)
     {
         global $_USER;
 
@@ -71,7 +71,7 @@ class evRepeat
     *   @param  string  $var    Name of property to set.
     *   @param  mixed   $value  New value for property.
     */
-    function __set($var, $value='')
+    public function __set($var, $value='')
     {
         switch ($var) {
         case 'ev_id':
@@ -110,7 +110,7 @@ class evRepeat
     *   @param  boolean $db     True if string values should be escaped for DB.
     *   @return mixed           Value of property, NULL if undefined.
     */
-    function __get($var)
+    public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
             return $this->properties[$var];
@@ -126,7 +126,7 @@ class evRepeat
      *  @param  array   $row        Array of values, from DB or $_POST
      *  @param  boolean $fromDB     True if read from DB, false if from $_POST
      */
-    function SetVars($row, $fromDB=false)
+    public function SetVars($row, $fromDB=false)
     {
         if (!is_array($row)) return;
 
@@ -187,7 +187,7 @@ class evRepeat
      *  @param  integer $id Optional ID.  Current ID is used if zero.
      *  @return boolean     True if a record was read, False on failure.
      */
-    function Read($rp_id = 0)
+    public function Read($rp_id = 0)
     {
         global $_TABLES;
 
@@ -285,7 +285,7 @@ class evRepeat
     /**
      *  Delete the current instance from the database
      */
-    function Delete()
+    public function Delete()
     {
         global $_TABLES;
 
@@ -311,7 +311,7 @@ class evRepeat
     *   @param  string  $tpl    Optional template filename, e.g. 'event_print'
     *   @return string      HTML for the product page.
     */
-    function Detail($rp_id=0, $query='', $tpl='')
+    public function Detail($rp_id=0, $query='', $tpl='')
     {
         global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK;
 
@@ -599,7 +599,7 @@ class evRepeat
         }
 
         if (!empty($cat)) {
-            $andcat = '&cat=' . $cat;
+            $andcat = '&amp;cat=' . $cat;
         } else {
             $andcat = '';
         }
@@ -624,18 +624,20 @@ class evRepeat
             $_EV_CONF['reminder_days'] = 1;
         }
 
+        $hasReminder = 0;
         if ($_EV_CONF['enable_reminders'] == '1' && 
                 $this->Event->enable_reminders == '1' && 
                 time() < strtotime("-".$_EV_CONF['reminder_days']." days", 
                     strtotime($this->date_start))) {
             //form will not appear within XX days of scheduled event.
+            $show_reminders = true;
 
             // Let's see if we have already asked for a reminder...
             if ($_USER['uid'] > 1) {
                 $hasReminder = DB_count($_TABLES['evlist_remlookup'],
                         array('eid', 'uid', 'rp_id'),
                         array($this->ev_id, $_USER['uid'], $this->rp_id) );
-                if ($hasReminder > 0) {
+                /*if ($hasReminder > 0) {
                     $T->set_file('rem_form', 'reminder_delete_form.thtml');
                     $T->set_var(array(
                         'action' => EVLIST_URL . '/event.php',
@@ -654,8 +656,10 @@ class evRepeat
                         'user_email' => $_USER['email'],
                     ) );
                     $T->parse('reminder', 'rem_form');
-                }
+                }*/
             }
+        } else {
+            $show_reminders = false;
         }
 
         if ($this->Event->options['contactlink'] == 1) {
@@ -667,6 +671,12 @@ class evRepeat
         }
         $T->set_var(array(
             'owner_link' => $ownerlink,
+            'reminder_set' => $hasReminder ? 'true' : 'false',
+            'reminder_email' => $_USER['email'],
+            'notice' => 1,
+            'rp_id' => $this->rp_id,
+            'eid' => $this->ev_id,
+            'show_reminderform' => $show_reminders ? 'true' : '',
         ) );
 
         if ($_EV_CONF['enable_rsvp'] == 1 &&
@@ -687,7 +697,7 @@ class evRepeat
     *   @param  integer $uid    User ID to register, 0 for current user
     *   @return integer         Message code, zero for success
     */
-    function Register($uid = 0)
+    public function Register($uid = 0)
     {
         global $_TABLES, $_USER, $_EV_CONF;
 
@@ -737,7 +747,7 @@ class evRepeat
     *   
     *   @param  integer $uid    Optional User ID to remove, 0 for current user
     */
-    function CancelRegistration($uid = 0)
+    public function CancelRegistration($uid = 0)
     {
         global $_TABLES, $_USER, $_EV_CONF;
 
@@ -763,7 +773,7 @@ class evRepeat
     *   @param  integer $uid    Optional user ID to check, current user by default
     *   @return boolean         True if the user is registered, false if not
     */
-    function isRegistered($uid = 0)
+    public function isRegistered($uid = 0)
     {
         global $_TABLES, $_USER, $_EV_CONF;
 
@@ -793,7 +803,7 @@ class evRepeat
     *   @param  mixed   $rp_id  Optional ID of event or repeat to check
     *   @return integer         Total registrations
     */
-    function TotalRegistrations($rp_id = '')
+    public function TotalRegistrations($rp_id = '')
     {
         global $_TABLES, $_EV_CONF;
 
@@ -818,7 +828,7 @@ class evRepeat
     *
     *   @return array   Array of uid's and dates, sorted by date
     */
-    function Registrations()
+    public function Registrations()
     {
         global $_TABLES, $_EV_CONF;
 

@@ -1,0 +1,11 @@
+{# begin {templatelocation} #}
+<!-- BEGIN eventRow -->
+<div class="story">
+   <h1><a href="{site_url}/evlist/event.php?eid={eid}">{title} {startdate}</a></h1>
+   <div class="story-body">
+        {summary}
+    </div>
+</div>
+<div class="block-divider"> </div>
+<!-- END eventRow -->
+{# end {templatelocation} #}

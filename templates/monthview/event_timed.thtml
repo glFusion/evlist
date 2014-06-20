@@ -1,0 +1,7 @@
+{# begin {templatelocation} #}
+<div class="gl_mootip monthview_timed show_cal{cal_id}"
+    title="{ev_hover}">
+  <a href="{pi_url}/event.php?eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}"
+    style="color:{fgcolor};">{ev_title}</a>
+</div>
+{# end {templatelocation} #}

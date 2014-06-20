@@ -1,0 +1,119 @@
+{# begin {templatelocation} #}
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css"
+    media="print" />
+</head>
+<body>
+<h2>{site_name}</h2>
+<center>
+  <h2 class="evlist_header">{currentday}</h2>
+</center>
+<table cellpadding="2" cellspacing="1" border="0" width="100%" class="cal-dayx-body">
+    <tr>
+        <td width="1%" class="cal-dayx-weekevent" nowrap="nowrap"><div align="right"><?php global $LANG_EVLIST; echo $LANG_EVLIST['periods']['week'];?> {week_num}</div></td>
+        <td>{allday_events}</td>
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{0_hour}</div></td>
+        {0_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{1_hour}</div></td>
+        {1_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{2_hour}</div></td>
+        {2_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{3_hour}</div></td>
+        {3_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{4_hour}</div></td>
+        {4_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{5_hour}</div></td>
+        {5_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{6_hour}</div></td>
+        {6_cols}
+    </tr>
+
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{7_hour}</div></td>
+        {7_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{8_hour}</div></td>
+        {8_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{9_hour}</div></td>
+        {9_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{10_hour}</div></td>
+        {10_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{11_hour}</div></td>
+        {11_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{12_hour}</div></td>
+        {12_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{13_hour}</div></td>
+        {13_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{14_hour}</div></td>
+        {14_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{15_hour}</div></td>
+        {15_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{16_hour}</div></td>
+        {16_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{17_hour}</div></td>
+        {17_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{18_hour}</div></td>
+        {18_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{19_hour}</div></td>
+        {19_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{20_hour}</div></td>
+        {20_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{21_hour}</div></td>
+        {21_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{22_hour}</div></td>
+        {22_cols}
+    </tr>
+    <tr>
+        <td width="1%" valign="top" class="cal-dayx-times"><div align="right">{23_hour}</div></td>
+        {23_cols}
+    </tr>
+</table>
+<br/>
+<i>{site_slogan}</i>
+</body>
+</html>
+{# end {templatelocation} #}

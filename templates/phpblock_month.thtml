@@ -1,0 +1,30 @@
+{# begin {templatelocation} #}
+<table class="smallmonthtable" width="100%">
+  <tr>
+    <td class="monthheader" colspan="7">
+      <a href="{pi_url}/index.php?view=month&amp;year={thisyear}&amp;month={month}">{monthname}, {thisyear}</a>
+    </td>
+  </tr>
+  <tr class="daynames">
+    <!-- BEGIN daynames -->
+    <td>{dayname}</td>
+    <!-- END daynames -->
+  </tr>
+
+  <!-- BEGIN week -->
+  <tr>
+    <!-- BEGIN day -->
+    <td class="{dayclass}">
+      <span class="gl_mootip" title="{popup}">
+        {!if no_day_link}
+        <span class="{daylinkclass}">{day}</span>
+        {!else}
+        <a class="{daylinkclass}" href="{pi_url}/index.php?view=day&amp;year={thisyear}&amp;month={month}&amp;day={day}">{day}</a>
+        {!endif}
+      </span>
+    </td>
+    <!-- END day -->    
+  </tr>
+  <!-- END week -->
+</table>
+{# end {templatelocation} #}

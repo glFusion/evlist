@@ -1,0 +1,80 @@
+{# begin {templatelocation} #}
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
+</head>
+<body>
+<div class="evlist" id="evlistEventHeader">
+  <h2>{site_name}</h2>
+  <h2 class="evlist_header">{title}</h2>
+
+  {!if map}
+    <div id="evlistMapOuter">
+    {map}
+    </div>
+  {!endif}
+
+  <div id="evlistEventDetail">
+  {# event detail elements #}
+  <div style="margin-top:2em;"></div>
+
+    {!if summary}
+    <p>
+      <strong>{$LANG_EVLIST['what']}:</strong>&nbsp;&nbsp;
+      {summary}
+    </p>
+    {!endif}
+
+    {!if datetime_info}
+    <p>
+      <strong>{$LANG_EVLIST['when']}:</strong>&nbsp;&nbsp;
+      {datetime_info}
+    </p>
+    {!endif}
+
+    {!if address_info}
+    <p>
+      <strong>{$LANG_EVLIST['where']}:</strong>&nbsp;&nbsp;
+      {address_info}
+    </p>
+    {!endif}
+
+    {!if contact_info}
+    <p>
+      <strong>{$LANG_EVLIST['ev_contact']}:</strong>&nbsp;&nbsp;
+      {contact_info}
+    </p>
+    {!endif}
+
+    <p>
+      <strong>{$LANG_EVLIST['calendar']}</strong>&nbsp;&nbsp;
+      {cal_name}
+    </p>
+
+    {!if category_link}
+    <p>
+      <strong>{$LANG_EVLIST['categories']}</strong>&nbsp;&nbsp;
+      {category_link}
+    </p>
+    {!endif}
+
+    <p>{full_description}</p>
+
+    {!if owner_link}
+    <p class="pluginSmallText">{owner_link}</p>
+    {!endif}
+    {reminder}
+
+    {!if weather}
+    <p id="weather">
+      {weather}
+    </p>
+    {!endif}
+
+  </div>
+
+</div>
+<p><i>{site_slogan}</i></p>
+</body>
+</html>
+{# end {templatelocation} #}

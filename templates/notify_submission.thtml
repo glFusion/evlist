@@ -1,0 +1,10 @@
+<p>{$LANG_EVLIST['notify_submission']}</p>
+<p>
+{$LANG_EVLIST['title']}: {title}<br />
+{$LANG_EVLIST['event_summary']}: {summary}<br />
+{$LANG_EVLIST['start_date']}: {start_date} {start_time}<br />
+{$LANG_EVLIST['submitted_by']}: {submitter}<br />
+</p>
+<p>
+{site_url}
+</p>

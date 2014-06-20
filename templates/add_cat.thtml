@@ -1,0 +1,6 @@
+
+        <br /><br />
+            <span style="">{addcat_note}</span><br /><br />
+            <label for="addcat"><strong>{addcat_label}</strong>:</label>
+                <input type="text" name="category[]" id="addcat" size="32" maxlength="32" />
+                

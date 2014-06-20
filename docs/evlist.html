@@ -1,0 +1,586 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html style="direction: ltr;" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+
+
+
+
+
+
+
+
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="layout/style.css" />
+
+
+
+
+
+
+
+
+
+  <meta name="robots" content="noindex,nofollow" />
+
+
+
+
+
+
+
+
+  <title>evList Plugin - glFusion CMS</title>
+</head>
+
+
+<body style="direction: ltr;">
+
+
+
+
+
+<div id="gl_container_fluid">
+<div id="gl_header"> <span style="color: rgb(255, 255, 255); float: left; padding-left: 10px; padding-top: 5px; vertical-align: middle;">glFusion
+Documentation Project </span> <a style="float: right; padding-right: 10px; padding-top: 5px; vertical-align: middle;" href="http://www.glfusion.org/wiki/doku.php">glFusion Wiki</a>
+</div>
+
+
+
+
+
+<div id="gl_wrapper">
+<div class="body-container">
+<h1>evList Configuration</h1>
+
+
+
+
+
+<table class="inline">
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+    <tr class="row0">
+
+
+
+
+
+      <td class="col0 leftalign">Allow anonymous users to view events? </td>
+
+
+
+
+
+      <td class="col1 leftalign">Set this to TRUE to allow non-logged in users to view events. &nbsp;Set to FALSE to require that users login to see events. </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr class="row1">
+
+
+
+
+
+      <td class="col0 leftalign">Allow anonymous submissions? </td>
+
+
+
+
+
+      <td class="col1 leftalign">Set to TRUE to allow non-logged-in
+users to submit events. &nbsp;All events from non-logged-in users will
+go into the submission queue. &nbsp;Set to FALSE to disable
+non-logged-in users submitting events.</td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr class="row2">
+
+
+
+
+
+      <td class="col0 leftalign">Allow logged in user submissions? </td>
+
+
+
+
+
+      <td class="col1 leftalign">Set to TRUE to allow normal,
+logged-in users to submit events. All events from logged-in users will
+go into the submission queue. &nbsp;Set to FALSE to disable event
+submission for logged-in users.
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr class="row3">
+
+
+
+
+
+      <td class="col0 leftalign">Allow HTML when posting? </td>
+
+
+
+
+
+      <td class="col1">Set to TRUE to allow HTML use in the event
+description and the event summaries. &nbsp;ALL HTML will be filtered
+through the glFusion HTML filtering engine. &nbsp;Set to FALSE to
+disable the use of HTML. </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+    <tr>
+      <td>Enable Categories</td>
+      <td>Set to TRUE to enable category support.</td>
+    </tr>
+    <tr>
+      <td>Reminder Speedlimit</td>
+      <td>How often, in seconds, you can select to be reminded of an event.</td>
+    </tr>
+    <tr>
+      <td>Posting Speedlimit</td>
+      <td>How often, in seconds, you can post a new event.</td>
+    </tr>
+    <tr>
+
+
+
+
+
+      <th class="col0 leftalign" colspan="2">GUI Settings </th>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Enable the menu item</td>
+
+
+
+
+
+      <td>Set this to TRUE to enable a link for evList to be placed in the User Menu. &nbsp;See <span style="font-weight: bold;">User menu link option</span> for more options.<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>User menu link option</td>
+
+
+
+
+
+      <td>Select if the User Menu link is; Add Event or List Events<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Week begins on...<br />
+
+
+
+      </td>
+
+
+
+
+
+      <td>Select which day the week should begin, Sundary or Monday.<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Date Format<br />
+
+
+
+      </td>
+
+
+
+
+
+      <td>Select the date format to display dates in evList.<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Time Format<br />
+
+
+
+      </td>
+
+
+
+
+
+      <td>Select the time format to display times in evList.<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>An event ceases to be upcoming...<br />
+
+
+
+      </td>
+
+
+
+
+
+      <td>Select when an event falls off the 'Upcoming' list:<br />
+
+&nbsp; - as soon as the start date has passed, i.e.; the next day<br />
+
+&nbsp; - as soon as the start time has passed<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+    <tr>
+
+
+
+
+
+      <td>Number of events to display per page.<br />
+
+
+
+      </td>
+
+
+
+
+
+      <td>Number of events to display per page.<br />
+
+
+
+      </td>
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tr>
+
+
+
+      <th class="col0 leftalign" colspan="2">Centerblock Settings </th>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td>Enable Centerblock?</td>
+
+
+
+      <td>Set to TRUE to enable the evList centerblock.</td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td>Centerblock Position</td>
+
+
+
+      <td>Select the position of the centerblock.</td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td>Topic</td>
+
+
+
+      <td>Which topic should the centerblock be displayed</td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td>Select an event range to display</td>
+
+
+
+      <td>Select which event range to include in the centerblock.</td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td>Number of events to display</td>
+
+
+
+      <td>Number of events to display in the centerblock.</td>
+
+
+
+    </tr>
+
+
+
+    <tr>
+
+
+
+      <td>Number of characters to display in event summary</td>
+
+
+
+      <td>Number of characters (width) of the centerblock.</td>
+
+
+
+    </tr>
+
+
+
+
+
+
+  </tbody>
+</table>
+
+
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+</body>
+</html>

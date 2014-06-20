@@ -1,0 +1,11 @@
+{# begin {templatelocation} #}
+    <label for="cat">
+      <span style="color:white;">{$LANG_EVLIST['or_choose_cat']}:</span>
+      &nbsp;&nbsp;
+    </label>
+    <select name="cat" id="cat" onchange="this.form.submit();">
+      <option value="0">--</option>
+      {category_options}
+    </select>
+    <input value="{$LANG_EVLIST['go']}" type="submit"/>
+{# begin {templatelocation} #}

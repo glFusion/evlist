@@ -1,0 +1,32 @@
+{# begin {templatelocation} #}
+<table width="100%" border="0" cellspacing="0" cellpadding="0" 
+    style="border: 1px solid #CCC; margin-bottom:10px;">
+  <tr style="vertical-align:middle;">
+    <td class="pluginTitle alignleft" style="padding:4px;">
+        <b>{$LANG_EVLIST['event_title']}</b>
+    </td>
+    <td class="pluginTitle alignleft" style="padding:4px;">
+        <b>{$LANG_EVLIST['event_summary']}</b>
+    </td>
+    <td class="pluginTitle alignleft" style="padding:4px;width:12em;">
+        <b>{$LANG_EVLIST['start_date']}</b>
+    </td>
+  </tr>
+
+  <!-- BEGIN eventRow -->
+  <tr class="pluginRow{cssid}">
+    <td class="" style="padding-left:6px; height:20px;">
+        <b><a class="gf_mootip" alt="xyz" title="{summary}::{startdate}"
+            href="{pi_url}/event.php?eid={eid}">{title}</a>
+    </td>
+    <td class="pluginLinks" style="padding-left:6px; height:20px;">
+        {summary}
+    </td>
+    <td class="pluginLinks">
+        {startdate}
+    </td>
+  </tr>
+  <!-- END eventRow -->
+
+</table>
+{# end {templatelocation} #}

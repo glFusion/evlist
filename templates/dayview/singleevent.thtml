@@ -1,0 +1,13 @@
+{# begin {templatelocation} #}
+<div class="show_cal{cal_id}">
+  {delete_imagelink}&nbsp;{event_time} <span class="gl_mootip" style="color:{fgcolor};" title="{event_summary}">
+  {!if bgcolor}
+  <span style="color:#FFFFFF;background-color:{bgcolor};">
+  {!endif}
+    <a class="cal-event" style="color:{fgcolor};" href="{site_url}/evlist/event.php?eid={rp_id}">{event_title}</a>
+  </span>{br}
+  {!if bgcolor}
+  </span>
+  {!endif}
+</div>
+{# end {templatelocation} #}

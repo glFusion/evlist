@@ -1,0 +1,8 @@
+<form action="{action}" method="post">
+    <fieldset>
+    {$LANG_EVLIST['you_are_subscribed']}
+    <input type="submit" name="delreminder" value="{$LANG_ACCESS['remove']}" />
+    <input type="hidden" name="eid" value="{eid}" />
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    </fieldset>
+</form>

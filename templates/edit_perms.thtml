@@ -1,0 +1,12 @@
+{# begin {templatelocation} #}
+    <fieldset><legend>{access_legend}</legend>
+        <label for="owner">{$LANG_ACCESS['owner']}:</label>&nbsp;<span>{owner_username}</span>
+            <input type="hidden" name="owner_id" value="{owner_id}" /><br />
+        <label for="group">{$LANG_ACCESS['group']}:</label>&nbsp;
+            {group_dropdown}
+            <br /><br />
+        <p>{$LANG_EVLIST['perms_desc']}</p>
+{permissions_editor}
+        <p>{$LANG_ACCESS['permmsg']}</p>
+    </fieldset>
+{# end {templatelocation} #}

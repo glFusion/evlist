@@ -1,0 +1,108 @@
+{# begin {templatelocation} #}
+<div id="evlist_nav_right">
+  <a href="{pi_url}/index.php?view={thisview}&amp;year={thisyear}&amp;month={thismonth}&amp;day={thisday}&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class="evlist_nav_img" title="{$LANG_EVLIST['jump_today']}"><img src="{pi_url}/images/today_off.png" alt="{$LANG_EVLIST['jump_today']}" title="{$LANG_EVLIST['jump_today']}" width="27" height="20" class="gl_mootip" /></a>
+  <a href="{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['day_view']}"><img src="{pi_url}/images/{day_img}" alt="{$LANG_EVLIST['day_view']}" title="{$LANG_EVLIST['day_view']}" width="27" height="20" class="gl_mootip" /></a>
+  <a href="{pi_url}/index.php?view=week&amp;year={year}&amp;month={month}&amp;day={day}&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['week_view']}"><img src="{pi_url}/images/{week_img}" alt="{$LANG_EVLIST['week_view']}" title="{$LANG_EVLIST['week_view']}" width="27" height="20" class="gl_mootip" /></a>
+  <a href="{pi_url}/index.php?view=month&amp;year={year}&amp;month={month}&amp;day={day}&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['month_view']}"><img src="{pi_url}/images/{month_img}" alt="{$LANG_EVLIST['month_view']}" title="{$LANG_EVLIST['month_view']}" width="27" height="20" class="gl_mootip" /></a>
+  <a href="{pi_url}/index.php?view=year&amp;year={year}&amp;month={month}&amp;day={day}&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['year_view']}"><img src="{pi_url}/images/{year_img}" alt="{$LANG_EVLIST['year_view']}" title="{$LANG_EVLIST['year_view']}" width="27" height="20" class="gl_mootip" /></a>
+  <a href="{pi_url}/index.php?{range_url}&amp;view=list&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['list_view']}"><img src="{pi_url}/images/{list_img}" alt="{$LANG_EVLIST['list_view']}" title="{$LANG_EVLIST['list_view']}" width="27" height="20" class="gl_mootip" /></a>
+
+  {!if add_event_link}
+    <form method="post" action="{add_event_link}">
+    {!if feed_icons}
+      {feed_icons}&nbsp;
+    {!endif}
+
+      <!--<input type="hidden" name="op" value="new">-->
+      {!if addlink_day}
+      <input type="hidden" name="day" value="{addlink_day}" />
+      {!endif}
+      {!if addlink_month}
+      <input type="hidden" name="month" value="{addlink_month}" />
+      {!endif}
+      {!if addlink_year}
+      <input type="hidden" name="year" value="{addlink_year}" />
+      {!endif}
+      <input type="submit" name="edit" value="{add_event_text}"/>
+    </form>
+  {!endif}
+
+</div>
+
+{!if showing_detail}
+{!else}
+<div id="evlist_nav_left">
+<form action="{action_url}" method="get" name="hdrform" id="evlistHdrForm"
+    enctype="application/x-www-form-urlencoded">
+  <select name="cat" onchange="this.form.submit();">
+    <option value="0">{$LANG_EVLIST['all_categories']}</option>
+    {event_type_select}
+  </select>
+  {!if cal_select}
+    &nbsp;&nbsp;
+    <select name="cal" onchange="this.form.submit();">
+      <option value="0">{$LANG_EVLIST['all_calendars']}</option>
+      {cal_select}
+    </select>
+  {!endif}
+  <br />
+  {!if month_select}
+    <select name="month">
+        {month_select}
+    </select>
+    <select name="day">
+        {day_select}
+    </select>
+    <select name="year">
+        {year_select}
+    </select>
+    <select name="view">
+        {view_select}
+    </select>
+    <input type="submit" name="hdrsubmit" value="Jump" />
+    <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+        class="evlistDateTrigger"
+        id="jumpdate_trigger"
+        />
+    <input type="hidden" name="jumpdate" id="f_jumpdate"
+        value="{curdate}" />
+    <script type="text/javascript">
+
+        function jump2date(cal)
+        {
+            if (cal.dateClicked) {
+                var d = cal.date.getDate();
+                var m = cal.date.getMonth() + 1;
+                var y = cal.date.getFullYear();
+                window.location="{pi_url}/index.php?view={view}&year="+y+"&month="+m+"&day="+d;
+            }
+        }
+
+        var dt = new Date({year},{month},{day});
+
+        Calendar.setup({
+            inputField  :   "f_jumpdate",
+            ifFormat    :   "%Y-%m-%d",
+            showsTime   :   false,
+            timeFormat  :   "24",
+            button      :   "jumpdate_trigger",
+            onSelect    :   jump2date,
+            //onClose     :   jump2date,
+            date        :   dt
+        });
+
+    </script>
+
+  {!else}
+    {$LANG_EVLIST['select_range']}:&nbsp;
+    <input type="hidden" name="view" value="list" />
+    <select name="range" id="range" onchange="this.form.submit();">
+        {range_options}
+    </select>
+    <input value="{$LANG_ADMIN['submit']}" type="submit" />
+  {!endif}
+</form>
+</div>
+{!endif}
+<div style="clear:both;"></div>
+{# end {templatelocation} #}

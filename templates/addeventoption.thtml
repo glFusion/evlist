@@ -1,0 +1,6 @@
+{# begin {templatelocation} #}
+<form method="get" action="http://dogbert.leegarner.com/dev/evlist/event.php?op=new">
+  <input type="hidden" name="op" value="new" />
+  <input type="submit" value="Add Event" />
+</form>
+{# end {templatelocation} #}

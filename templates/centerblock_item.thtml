@@ -1,0 +1,8 @@
+
+    <tr class="pluginRow{cssid}">
+        <td width="55%" class="" style="padding-left:6px; height:20px;">{title}</td>
+        <td width="45%" class="pluginLinks">{startdate}</td>
+    </tr>
+    <tr class="pluginRow{cssid}">
+        <td colspan="2" class="pluginLinks" style="padding-left:6px; height:20px;">{summary}</td>
+    </tr>

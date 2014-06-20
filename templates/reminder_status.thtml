@@ -1,0 +1,6 @@
+
+            <div style="text-align:right;">
+                <label for="rem_status"><strong>{rem_status_label}</strong></label>
+                <input type="checkbox" name="rem_status" value="1" id="rem_status"{rem_status_checked} /><br />
+                <span class="pluginSmallText warning">{rem_note}</span>
+            </div>

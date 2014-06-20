@@ -1,0 +1,42 @@
+{# begin {templatelocation} #}
+<script type="text/javascript">
+<!--
+window.addEvent('domready',function() {
+    var myValidator = new fValidator("calendaredit");
+});
+-->
+</script>
+
+<form id="calendaredit" method="post"
+    action="{site_admin_url}/plugins/evlist/index.php">
+  <table border=0>
+
+    <tr>
+      <td>
+        <b>{$LANG_EVLIST['cat_name']}:</b>
+      </td>
+      <td>
+        <input type="text" id="cat_name" class="fValidate['required']" 
+            name="name" length="50" size="20" value="{cat_name}" />
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_EVLIST['enabled']}: </b></td>
+      <td><input type="checkbox" name="status" value="1" {stat_chk} />
+    </tr>
+
+  </table>
+  <p>
+    <div style="float:right;">
+      <input type="submit" name="delcat" value="{$LANG_ADMIN['delete']}" />
+    </div>
+    <input type="hidden" name="id" value="{cat_id}" />
+    <input type="submit" name="savecat" value="{$LANG_ADMIN['save']}" />
+    <input type="reset" value="{$LANG_EVLIST['reset']}" />
+    <input type="reset" value="{$LANG_ADMIN['cancel']}" name="cancel" 
+        onclick="javascript: document.location.href='{cancel_url}'" />
+  </p>
+  <hr />
+</form>
+{# begin {templatelocation} #}

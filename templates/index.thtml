@@ -1,0 +1,10 @@
+<div class="evlist">
+<h2 class="evlist_header">
+  {$LANG_EVLIST['pi_title']}
+  {!if rangetext}
+    &nbsp;&nbsp;--&nbsp;&nbsp;{rangetext}
+  {!endif}
+</h2>
+{empty_listmsg}
+{event_item}
+</div>

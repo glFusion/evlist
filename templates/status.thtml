@@ -1,0 +1,4 @@
+{# begin {templatelocation} #}
+            <div style="text-align:right;"><label for="status"><strong>{$LANG_EVLIST['enable']}</strong></label>
+                <input type="checkbox" name="status" value="1" id="status"{status_checked} /></div>
+{# end {templatelocation} #}

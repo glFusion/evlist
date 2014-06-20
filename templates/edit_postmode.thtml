@@ -1,0 +1,19 @@
+
+<script>
+<!--
+    function showhidepostmode(option) {
+        if (option == 2) {
+            document.getElementById("div4").style.display="";
+	} else {
+	    document.getElementById("div4").style.display="none";
+	}
+    }
+//-->
+</script>
+
+            <label for="postmode"><strong>{postmode_label}</strong>:</label>
+                <select name="postmode" id="postmode" onchange="showhidepostmode(this.value)">
+                    {postmode_options}
+                </select>
+            <div id="div4"{postmode_show}>{allowed_html}<br />
+            <span style="font-size:small">{location_note}</span></div>

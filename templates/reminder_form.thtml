@@ -1,0 +1,16 @@
+{# begin {templatelocation} #}
+<form action="{action}" method="post">
+    <fieldset>
+    <strong>{$LANG_EVLIST['email']}</strong>
+    <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{user_email}" />
+    <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
+    <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
+    <input type="submit" name="savereminder" value="{$LANG_ACCESS['submit']}" />
+    <br />
+    {rem_note}<br />
+    <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
+    <input type="hidden" name="eid" value="{eid}" />
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    </fieldset>
+</form>
+{# end {templatelocation} #}

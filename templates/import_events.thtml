@@ -1,0 +1,44 @@
+{# begin {templatelocation} #}
+<div class="block-box">
+  <h2>Batch Import of Events</h2>
+  <span class="alert"><b>Be sure to back up your database before importing!</b></span>
+  <p>You can import a batch of events into evList from a comma-separated text file.
+  The import file must have the fields in the following order:</p>
+  <p>
+  <ol>
+    <li>Starting Date <span class="required">* required</span></li>
+    <li>Ending Date <span class="required">* required</span></li>
+    <li>Starting Time <span class="required">* required</span> ("00:00:00" for allday events)</li>
+    <li>Ending Time <span class="required">* required</span> ("00:00:00" for allday events)</li>
+    <li>Title <span class="required">* required</span></li>
+    <li>Summary</li>
+    <li>Full Description</li>
+    <li>URL</li>
+    <li>Location</li>
+    <li>Street</li>
+    <li>City</li>
+    <li>Province</li>
+    <li>Country</li>
+    <li>Postal</li>
+    <li>Contact</li>
+    <li>E-Mail</li>
+    <li>Phone</li>
+  </ol>
+  </p>
+  <p>Only the first 5 fields are required, the rest may be blank or missing if they&apos;re not needed.
+  <br />
+  <ol><li>All fields must be enclosed in double quotes (&quot;), must not contain quotes, and must be separated by commas (,).</li>
+  <li>Date fields must be given as &quot;YYYY-MM-DD&quot; and time fields must be &quot;HH:MM:SS&quot using 24-hour time.</li>
+  <li>Recurring and Split events are not supported.</li>
+  </ol>
+  </p>
+  <p><form action="{site_admin_url}/plugins/evlist/index.php" method="post" 
+    enctype="multipart/form-data">
+  <div>
+    Path: <input type="file" dir="ltr" name="importfile" size="40" />
+    <input type="submit" name="importexec" value="Import" />
+  </div>
+  </form>
+  </p>
+</div>
+{# end {templatelocation} #}

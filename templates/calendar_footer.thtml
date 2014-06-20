@@ -1,0 +1,18 @@
+{# begin {templatelocation} #}
+<div style="clear:both;">
+  {!if feed_links}
+    <img src="{layout_url}/images/rss_small.png" width="16" height="16" 
+        alt="RSS" />
+    RSS:&nbsp;
+    {feed_links}
+  {!endif}
+</div>
+{!if ical_links}
+  <div style="clear:both;">
+    <img src="{pi_url}/images/ical.png" width="16" height="16" 
+        alt="ICal" />&nbsp;
+    ICal:&nbsp;<a href="{webcal_url}/ical.php">{$LANG_EVLIST['all_calendars']}</a>&nbsp;&nbsp;
+    {ical_links}
+  </div>
+{!endif}
+{# end {templatelocation} #}

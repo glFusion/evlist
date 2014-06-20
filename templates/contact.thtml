@@ -1,0 +1,11 @@
+{# begin {templatelocation} #}
+      {!if name}
+      {name}<br />
+      {!endif}
+      {!if email}
+      <a href="mailto:{email}">{email}</a><br />
+      {!endif}
+      {!if phone}
+      {phone}<br />
+      {!endif}
+{# end {templatelocation} #}

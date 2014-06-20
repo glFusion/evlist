@@ -1,0 +1,26 @@
+<span class="alert">
+{blk_header}
+<form action="{site_admin_url}/plugins/evlist/index.php" 
+    method="post" style="color:#FF0000;">
+  <input type=hidden name="cal_id" value="{cal_id}" />
+  <p><b>{$LANG_EVLIST['deleting_cal']}: {cal_name}</b></p>
+  {$LANG_EVLIST['del_cal_msg1']}
+  <hr />
+  {!if has_events}
+  {has_events}<br />
+  <select name="newcal">
+    <option value="0">{$LANG_EVLIST['none_delete']}</option>
+    {newcal_select}
+  </select>
+  <hr />
+  {!endif}
+  {$LANG_EVLIST['confirm_del']}
+  <input type=radio name="confirmdel" value="1" />{$LANG_EVLIST['yes']}
+  <input type=radio name="confirmdel" value="0" checked="checked" />{$LANG_EVLIST['no']}
+  <p />
+  <input type="submit" name="delcalconfirm" value="{$LANG_ADMIN['submit']}" />
+  <input type="submit" name="cancel" value="{$LANG_ADMIN['cancel']}" />
+</form>
+
+</span>
+

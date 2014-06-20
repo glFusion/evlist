@@ -1,0 +1,25 @@
+{# begin {templatelocation} #}
+{start_date} 
+{!if start_time1}
+  @ {start_time1} 
+{!endif}
+{!if end_date}
+  - {end_date}
+  {!if end_time1}
+    @ {end_time1}
+  {!endif}
+{!else}
+  {!if end_time1}
+    - {end_time1}
+  {!endif}
+  {!if start_time2}
+    ; {start_time2} - {end_time2}
+  {!endif}
+{!endif}
+{!if allday_event}
+<br />{$LANG_EVLIST['allday']}
+{!endif}
+{!if recurring_event}
+<p>{recurring_event}</p>
+{!endif}
+{# end {templatelocation} #}

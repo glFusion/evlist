@@ -1,0 +1,24 @@
+{# begin {templatelocation} #}
+{cal_header}
+<h2 class="evlist_header">
+  <a href="{pi_url}/index.php?view=year&amp;year={prevyear}{urlfilt_event_type}">&lt;&lt;</a>
+  {thisyear}
+  <a href="{pi_url}/index.php?view=year&amp;year={nextyear}{urlfilt_event_type}">&gt;&gt;</a>
+</h2>
+
+<div class="calcontainer">
+  <table id="evlist_yearview">
+    <!-- BEGIN month -->
+    {!if st_row}
+      <tr>
+    {!endif}
+    <td class="evlist_yearview_panel">
+      {month}
+    </td>
+    {!if end_row}
+      </tr>
+    {!endif}
+    <!-- END month -->
+  </table>
+</div>
+{# end {templatelocation} #}

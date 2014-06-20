@@ -1,0 +1,10 @@
+
+        <fieldset>
+        <legend>{category_legend}</legend>
+        <div style="padding:5px;">
+            <span for="category"><strong>{category_label}</strong>.</span><br />
+            <span style="font-size:small;color:red;">{category_note}</span><br /><br />
+{cat_item}
+{add_cat_input}
+        </div>
+        </fieldset>

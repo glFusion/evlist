@@ -1,0 +1,7 @@
+
+<tr class="pluginRow{cssid}">
+    <td class="admin-list-field"><input type="text" name="cats[{cid}]" value="{name}" size="32" maxlength="64" /></td>
+    <td class="admin-list-field">{cid}</td>
+    <td class="admin-list-field"><input type="checkbox" name="delete{cid}" value="1" /></td>
+    <td class="admin-list-field"><input type="checkbox" name="enable{cid}" value="1"{checked} /></td>
+</tr>

@@ -1,0 +1,34 @@
+{# begin {templatelocation} #}
+<table class="smallmonthtable">
+  <tr>
+    <td class="monthheader" colspan="8">
+      <a href="{pi_url}/index.php?view=month&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={thisyear}&amp;month={month}">{monthname}</a>
+    </td>
+  </tr>
+  <tr class="daynames">
+    <td>&nbsp;</td>
+    <!-- BEGIN daynames -->
+    <td>{dayname}</td>
+    <!-- END daynames -->
+  </tr>
+
+  <!-- BEGIN week -->
+  <tr>
+    <td class="weeklink">
+      <a href="{pi_url}/index.php?view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={weekyear}&amp;month={weekmonth}&amp;day={weekday}">&gt;&gt;</a>
+    </td>
+    <!-- BEGIN day -->
+    <td class="month{dayclass}">
+      <span class="gl_mootip" title="{popup}">
+        {!if no_day_link}
+        <span class="{daylinkclass}">{day}</span>
+        {!else}
+        <a class="{daylinkclass}" href="{pi_url}/index.php?view=day&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={thisyear}&amp;month={month}&amp;day={day}{urlfilt_event_type}">{day}</a>
+        {!endif}
+      </span>
+    </td>
+    <!-- END day -->    
+  </tr>
+  <!-- END week -->
+</table>
+{# end {templatelocation} #}

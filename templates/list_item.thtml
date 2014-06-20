@@ -1,0 +1,16 @@
+{# begin {templatelocation} #}
+<div class="evlist">
+    <div class="floatright">
+      <span style="color:{cal_fgcolor};">{cal_name}</span>
+    </div>
+    <h1>{title}</h1>
+    <p>{summary}</p>
+    {date_summary}<br />
+    {more_link} | {contact_link}
+    {edit_links}<br />
+    <div class="clearboth"></div>
+</div>
+<div id="evlistCategoryLinks">
+    {category_links}<br />
+</div>
+{# end {templatelocation} #}

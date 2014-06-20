@@ -1,0 +1,43 @@
+
+<form action="{action}" method="post">
+<table class="admin-list-table">
+    <tr style="background:#FFFFFF;">
+        <th class="admin-list-headerfield">{name_label}</th>
+        <th class="admin-list-headerfield">{cid_label}</th>
+        <th class="admin-list-headerfield">{delete_label}</th>
+        <th class="admin-list-headerfield">{enable_label}</th>
+    </tr>
+{category_row}
+    <tr>
+        <td colspan="4">{createnew_label}</td>
+    </tr>
+    <tr class="pluginRow1">
+        <td class="admin-list-field" colspan="3"><input type="text" name="newcats[1]" value="" size="32" maxlength="64" /></td>
+        <td class="admin-list-field"><input type="checkbox" name="ncenable1" value="1" checked="checked" /></td>
+    </tr>
+    <tr class="pluginRow2">
+        <td class="admin-list-field" colspan="3"><input type="text" name="newcats[2]" value="" size="32" maxlength="64" /></td>
+        <td class="admin-list-field"><input type="checkbox" name="ncenable2" value="1" checked="checked" /></td>
+    </tr>
+    <tr class="pluginRow1">
+        <td class="admin-list-field" colspan="3"><input type="text" name="newcats[3]" value="" size="32" maxlength="64" /></td>
+        <td class="admin-list-field"><input type="checkbox" name="ncenable3" value="1" checked="checked" /></td>
+    </tr>
+    <tr class="pluginRow2">
+        <td class="admin-list-field" colspan="3"><input type="text" name="newcats[4]" value="" size="32" maxlength="64" /></td>
+        <td class="admin-list-field"><input type="checkbox" name="ncenable4" value="1" checked="checked" /></td>
+    </tr>
+    <tr class="pluginRow1">
+        <td class="admin-list-field" colspan="3"><input type="text" name="newcats[5]" value="" size="32" maxlength="64" /></td>
+        <td class="admin-list-field"><input type="checkbox" name="ncenable5" value="1" checked="checked" /></td>
+    </tr>
+</table>
+<p class="pluginSmallText">{delete_note}<br />
+{disable_note}</p>
+<p>
+    <input type="submit" name="updateallcats" value="{$LANG_EVLIST['update_cats']}" />
+    <input type="reset" value="{$LANG_EVLIST['reset']}" />
+    <input type="submit" name="cancel" value="{$LANG_ADMIN['cancel']}" />
+</p>
+</form>
+    

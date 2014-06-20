@@ -1,0 +1,1062 @@
+{# begin {templatelocation} #}
+<script type="text/javascript">
+<!--
+window.addEvent('domready',function() {
+    var myValidator = new fValidator("eventeditor");
+    toggleRSVPdetail({use_rsvp});
+    showhiderecurringoptions();
+    showhideformatoptions({format_opt});
+});
+
+var ts1 = {ts_start} * 1000;
+var ts2 = {ts_end} * 1000;
+//var days_diff = {days_interval};
+var days_diff = ts2 - ts1;
+//var disp_format = "%B %e, %Y";
+var disp_format = "{display_format}";
+var fld_format = "%Y-%m-%d";
+
+Date.prototype.dateFromYMD = function(ymd){
+    parts = ymd.split("-");
+    temp = new Date(parts[0],parts[1]-1,parts[2],0,0,0,0);
+    return temp;
+};
+
+function checkDate2()
+{
+    var d_end = document.getElementById("f_enddate1");
+    var tmp = new Date();
+    var dt2 = tmp.dateFromYMD(d_end.value);
+    ts2 = dt2.getTime();
+
+    if (ts1 > 0 && ts1 <= ts2) {
+        // Just update the time difference
+        days_diff = (ts2 - ts1);
+    } else {
+        // Update date1 if it was empty before
+        ts1 = ts2 - days_diff;
+        tmp = new Date(ts1);
+        field = document.getElementById("f_startdate1");
+        field.value = tmp.print(fld_format);
+    }
+
+    // Disable split on multi-day events
+    if (ts2 != ts1) {
+        showhidesplit(0);
+    } else {
+        showhidesplit(1);
+    }
+}
+
+function showhideEventDiv(selected, selindex)
+{
+    // Reset the current selected navbar tab
+    var cnavbar = document.getElementById('current');
+    if (cnavbar) cnavbar.id = '';
+
+    // Cycle thru the navlist child elements - buiding an array of just
+    // the link items
+    var navbar = document.getElementById('navlist');
+    var menuitems = new Array(navbar.childNodes.length);
+    var item = 0;
+    for (var i=0 ;i < navbar.childNodes.length ; i++ ) {
+        if (navbar.childNodes[i].nodeName.toLowerCase() == 'li') {
+            menuitems[item] = navbar.childNodes[i];
+            item++;
+        }
+    }
+    // Now that I have just the link items I can set the selected tab
+    // using the passed selected Item number.
+    // Set the <a tag to have an id called 'current'
+    var menuitem = menuitems[selindex];
+    for (var j=0 ;j < menuitem.childNodes.length ; j++ ) {
+        if (menuitem.childNodes[j].nodeName.toLowerCase() == 'a')
+            menuitem.childNodes[j].id = 'current';
+    }
+
+    // Reset or show all the main divs - editor tab sections
+    // Object eventpanels defined after page is generated
+    for (var divid in eventpanels) {
+        if (selected != divid) {
+            document.getElementById(divid).style.display = 'none';
+        } else {
+            document.getElementById(divid).style.display = '';
+        }
+    }
+}
+
+function showhideallday()
+{
+    // If event is split, hide allday and show 2nd time fields
+    if (document.getElementById("split").checked){
+        document.getElementById("div1").style.display="none";
+        document.getElementById("div3").style.display="";
+    } else {
+        document.getElementById("div1").style.display="";
+        document.getElementById("div3").style.display="none";
+    }
+}
+
+function chk_allday()
+{
+    // If allday is checked, hide the split checkbox & time fields.  Can't
+    // be both split and allday
+    if (document.getElementById("allday").checked) {
+        showhidesplit(0);
+        document.getElementById("starttime1").style.display="none";
+        document.getElementById("endtime1").style.display="none";
+    } else {
+        // Not an all-day event.  Check start & end dates to see if it
+        // can be a split (split only allowed on 1-day events.
+        var dtstart = document.getElementById("f_enddate1").value;
+        var dtend = document.getElementById("f_startdate1").value;
+        if (dtstart != dtend) {
+            showhidesplit(0);
+        } else {
+            showhidesplit(1);
+        }
+        document.getElementById("starttime1").style.display="";
+        document.getElementById("endtime1").style.display="";
+    }
+}
+
+// Show or hide the split-event elements if appropriate.
+// Multi-day events can't be split, for instance
+function showhidesplit(status)
+{
+    if (status == 0) {      // disable split checkbox
+        document.getElementById("div0").style.display="none";
+        document.getElementById("div3").style.display="none";
+    } else {
+        var is_split = document.getElementById("split");
+            document.getElementById("div0").style.display="";
+        if (is_split.checked) {
+            document.getElementById("div3").style.display="";
+        } else {
+            document.getElementById("div3").style.display="none";
+        }
+    }
+}
+
+// Only show the recurring event options if it is a recurring event
+function showhiderecurringoptions()
+{
+    if (document.getElementById("recurring").checked) {
+        document.getElementById("div2").style.display = "";
+{!if enable_rsvp}
+        document.getElementById("rsvp_repeat").style.display = "";
+{!endif}
+    } else {
+        document.getElementById("div2").style.display = "none";
+{!if enable_rsvp}
+        document.getElementById("rsvp_repeat").style.display = "none";
+{!endif}
+    }
+}
+
+// Show the options for the selected recurring format
+function showhideformatoptions(option) {
+    //var option = obj.selectedIndex;
+
+    // Unused formats, to be removed
+    //document.getElementById("format5").style.display="none";
+
+    switch (option) {
+    case 0:             // no selection
+        document.getElementById("stopdate_div").style.display="none";
+        document.getElementById("format1").style.display="none";
+        document.getElementById("format2").style.display="none";
+        //document.getElementById("format3").style.display="none";
+        document.getElementById("format4").style.display="none";
+        document.getElementById("format5").style.display="none";
+        document.getElementById("format6").style.display="none";
+        document.getElementById("freq_div").style.display="none";
+        document.getElementById("freq_type").innerHTML="";
+        document.getElementById("monthday_sel").style.display="none";
+        break;
+    case 1:             // daily by date
+        document.getElementById("stopdate_div").style.display="";
+        document.getElementById("format1").style.display="";
+        document.getElementById("format2").style.display="none";
+        //document.getElementById("format3").style.display="none";
+        document.getElementById("format4").style.display="none";
+        document.getElementById("format5").style.display="none";
+        document.getElementById("format6").style.display="none";
+        document.getElementById("freq_div").style.display="none";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['day']}(s)";
+        document.getElementById("monthday_sel").style.display="none";
+        break;
+    case 2:             // monthly by date
+        document.getElementById("stopdate_div").style.display="";
+        document.getElementById("format1").style.display="";
+        document.getElementById("format2").style.display="";
+        //document.getElementById("format3").style.display="none";
+        document.getElementById("format4").style.display="none";
+        document.getElementById("format5").style.display="none";
+        document.getElementById("format6").style.display="none";
+        document.getElementById("freq_div").style.display="";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['month']}(s)";
+        document.getElementById("monthday_sel").style.display="";
+        break;
+    case 3:             // yearly by date
+        document.getElementById("stopdate_div").style.display="";
+        document.getElementById("format1").style.display="";
+        document.getElementById("format2").style.display="";
+        //document.getElementById("format3").style.display="";
+        document.getElementById("format4").style.display="none";
+        document.getElementById("format5").style.display="none";
+        document.getElementById("format6").style.display="none";
+        document.getElementById("freq_div").style.display="";
+        document.getElementById("freq_type").innerHTML="{$LANG_EVLIST['year']}(s)";
+        document.getElementById("monthday_sel").style.display="none";
+        break;
+    case 4:             // weekly by day
+        document.getElementById("stopdate_div").style.display="";
+        document.getElementById("format1").style.display="none";
+        document.getElementById("format2").style.display="none";
+        //document.getElementById("format3").style.display="none";
+        document.getElementById("format4").style.display="";
+        document.getElementById("format5").style.display="none";
+        document.getElementById("format6").style.display="none";
+        document.getElementById("freq_div").style.display="";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['week']}(s)";
+        document.getElementById("monthday_sel").style.display="none";
+        break;
+    case 5:             // monthly by day
+        document.getElementById("stopdate_div").style.display="";
+        document.getElementById("format1").style.display="none";
+        document.getElementById("format2").style.display="none";
+        //document.getElementById("format3").style.display="none";
+        document.getElementById("format4").style.display="none";
+        document.getElementById("format5").style.display="";
+        document.getElementById("format6").style.display="none";
+        document.getElementById("freq_div").style.display="";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['month']}(s)";
+        document.getElementById("monthday_sel").style.display="none";
+        break;
+    case 6:             // specific dates
+        document.getElementById("stopdate_div").style.display="none";
+        document.getElementById("format1").style.display="none";
+        document.getElementById("format2").style.display="none";
+        //document.getElementById("format3").style.display="none";
+        document.getElementById("format4").style.display="none";
+        document.getElementById("format5").style.display="none";
+        document.getElementById("format6").style.display="";
+        document.getElementById("freq_div").style.display="none";
+        document.getElementById("monthday_sel").style.display="none";
+        break;
+    }
+}
+
+{!if use_locator}
+var xmlHttp;
+function EVupdateLoc(locId)
+{
+  if (locId == '') return;
+
+  xmlHttp=EVgetXmlHttpObject();
+  if (xmlHttp==null) {
+    //alert ("Browser does not support HTTP Request");
+    return;
+  }
+  var url="{site_url}/evlist/ajax.php?action=getloc&id=" + locId;
+  xmlHttp.onreadystatechange=EVstateChanged;
+  xmlHttp.open("GET",url,true);
+  xmlHttp.send(null);
+}
+
+function EVstateChanged()
+{
+  var newstate;
+
+  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+  {
+    xmlDoc = xmlHttp.responseXML;
+    locId = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
+
+    if (xmlDoc.getElementsByTagName("title")[0].hasChildNodes())
+      loc = xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+    else
+      loc = '';
+
+    //address = xmlDoc.getElementsByTagName("address")[0].childNodes[0].nodeValue;
+
+    if (xmlDoc.getElementsByTagName("street")[0].hasChildNodes())
+      street = xmlDoc.getElementsByTagName("street")[0].childNodes[0].nodeValue;
+    else
+      street = '';
+
+    if (xmlDoc.getElementsByTagName("city")[0].hasChildNodes())
+      city = xmlDoc.getElementsByTagName("city")[0].childNodes[0].nodeValue;
+    else
+      city = '';
+
+    if (xmlDoc.getElementsByTagName("province")[0].hasChildNodes())
+      province = xmlDoc.getElementsByTagName("province")[0].childNodes[0].nodeValue;
+    else
+      province = '';
+
+    if (xmlDoc.getElementsByTagName("postal")[0].hasChildNodes())
+      postal = xmlDoc.getElementsByTagName("postal")[0].childNodes[0].nodeValue;
+    else
+      postal = '';
+
+    if (xmlDoc.getElementsByTagName("country")[0].hasChildNodes())
+      country = xmlDoc.getElementsByTagName("country")[0].childNodes[0].nodeValue;
+    else
+      country = '';
+
+    if (typeof(xmlDoc.getElementsByTagName("lat")[0]) !== "undefined") {
+      if (xmlDoc.getElementsByTagName("lat")[0].hasChildNodes())
+        lat = xmlDoc.getElementsByTagName("lat")[0].childNodes[0].nodeValue;
+      else
+        lat = 0;
+
+      if (xmlDoc.getElementsByTagName("lng")[0].hasChildNodes())
+        lng = xmlDoc.getElementsByTagName("lng")[0].childNodes[0].nodeValue;
+      else
+        lng = 0;
+    } else {
+      lat = 0;
+      lng = 0;
+    }
+
+    document.getElementById("location").value = loc;
+    document.getElementById("street").value = street;
+    document.getElementById("city").value = city;
+    document.getElementById("province").value = province;
+    document.getElementById("postal").value = postal;
+    document.getElementById("country").value = country;
+    document.getElementById("lat").value = lat;
+    document.getElementById("lng").value = lng;
+  }
+
+}
+
+function EVgetXmlHttpObject()
+{
+  var objXMLHttp=null
+  if (window.XMLHttpRequest)
+  {
+    objXMLHttp=new XMLHttpRequest()
+  }
+  else if (window.ActiveXObject)
+  {
+    objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+  }
+  return objXMLHttp
+}
+
+{!endif}
+
+
+function toggleRSVPdetail(val)
+{
+{!if enable_rsvp}
+    if (val > 0) {
+        document.getElementById("rsvp_detail").style.display = "";
+    } else {
+        document.getElementById("rsvp_detail").style.display = "none";
+    }
+{!endif}
+}
+
+-->
+</script>
+
+<div id="pe_navbar" style="display:none">
+  {navbar}
+</div>
+
+{alert_msg}
+<div>
+  <form action="{action_url}" method="post"
+      name="eventeditor" id="eventeditor" class="evlisteditor">
+    <input type="hidden" name="src" value="{src}" />
+    <input type="hidden" name="owner_id" value="{owner_id}" />
+
+    <div id="ev_info" class="jsenabled_show">
+    <fieldset>
+      <legend>{$LANG_EVLIST['gen_evt_info']}</legend>
+      <div style="padding:5px;">
+        <p>
+        <label for="cal_id">
+          {$LANG_EVLIST['calendar']}:
+        </label>
+        {!if cal_name}
+          {cal_name}
+        {!else}
+        <select name="cal_id" id="cal_id">
+          {cal_select}
+        </select>
+        {!endif}
+        </p>
+
+        <p>
+        <label for="title">
+          {$LANG_EVLIST['event_title']}:
+        </label>
+        <input class="fValidate['required']" type="text" name="title"
+            id="title" style="width:50%;" maxlength="255"
+            value="{title}" />
+        <span style="font-size:small;color:red;">{title_note}</span>
+        </p>
+
+        <p>
+        <label for="summary">
+            {$LANG_EVLIST['event_summary']}:
+        </label>
+        <textarea name="summary" id="summary" style="width:80%;"
+            cols="80" rows="2">{summary}</textarea>
+        </p>
+
+        <p>
+        <label for="description">
+          {$LANG_EVLIST['full_desc']}:
+        </label>
+        <textarea name="full_description" id="description" style="width:80%;"
+            cols="80" rows="3">{description}</textarea>
+        </p>
+
+        {!if event_postmode}
+        <p>
+        <label for="postmode">
+          {$LANG_EVLIST['postmode']}:
+        </label>
+        <select name="postmode" id="postmode" onchange="showhidepostmode(this.value)">
+          {postmode_options}
+        </select><br />
+        {allowed_html}
+        </p>
+        {!endif}
+
+        <p>
+        <label for="url">{$LANG_EVLIST['url']}:</label>
+        <input type="text" name="url" id="url" style="width:80%"
+            maxlength="255" value="{url}" />
+        </p>
+
+        <p>
+        <label for="status">{$LANG_EVLIST['enabled']}</label>
+        <input type="checkbox" name="status" value="1" id="status" {status_checked} />
+        </p>
+
+        {!if enable_reminders}
+        <p>
+          <label for="enable_reminders">
+            {$LANG_EVLIST['enable_reminders_q']}
+          </label>
+          <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} /><br />
+          <span class="pluginSmallText warning">{$LANG_EVLIST['submit_email_note']}</span>
+        {!endif}
+        </p>
+
+      </div>
+    </fieldset>
+
+    {!if category_section}
+    <fieldset>
+      <legend>{$LANG_EVLIST['categories']}</legend>
+      <div style="padding:5px;">
+        <span><strong>{$LANG_EVLIST['add_to_cats']}</strong>.</span>
+        <br />
+        <span style="font-size:small;color:red;">{$LANG_EVLIST['cats_not_req']}</span>
+        <br /><br />
+        {!if 0}
+        <!-- BEGIN CatItemBlk -->
+        <input type="checkbox" name="categories[]" value="{category_id}"
+            {cat_checked} />&nbsp;{category_name}&nbsp;&nbsp;
+        <!-- END CatItemBlk -->
+        {!endif}
+        {catlist}
+        {!if add_cat_input}
+        <p>
+          <span style="">{$LANG_EVLIST['cat_note1']}</span><br /><br />
+          <label for="addcat"><strong>{$LANG_EVLIST['new_category']}</strong>:</label>
+          <input type="text" name="newcat" id="addcat" size="32" maxlength="32" />
+        </p>
+        {!endif}
+        </div>
+    </fieldset>
+
+    {!endif}
+
+    <fieldset>
+      <legend>{$LANG_EVLIST['date_time_info']}</legend>
+      <div style="padding:5px;">
+        <label for="f_startdate1">
+          {$LANG_EVLIST['start_date']}:
+        </label>
+        <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+            id="startdt1_trigger"
+            style="cursor: pointer;"
+        />
+        <input type="text" name="date_start1" id="f_startdate1"
+            size="10" value="{startdate1}"
+            onchange="checkDate1();" />
+        {# <div id="d_startdate1" style="float:left;width:10em;">{d_startdate1}</div> #}
+
+        &nbsp;&nbsp;
+        <span id="starttime1" {starttime1_show}>
+        <select name="starthour1" id="starthour1">
+          <option value="">--</option>
+          {start_hour_options1}
+        </select>
+        <select name="startminute1" id="startminute1">
+          <option value="">--</option>
+          {start_minute_options1}
+        </select>
+        {startdate1_ampm}
+        </span>
+        <br /><br />
+
+        <label for="f_enddate1">
+          {$LANG_EVLIST['end_date']}:
+        </label>
+        <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+            id="enddate1_trigger"
+            style="cursor: pointer;"
+        />
+        <input type="text" name="date_end1" id="f_enddate1" 
+            size="10" value="{enddate1}" onchange="checkDate2();" />
+        {# <div id="d_enddate1" style="float:left;width:10em;">{d_enddate1}</div> #}
+        &nbsp;&nbsp;
+
+        <span id="endtime1" {endtime1_show}>
+        <select name="endhour1" id="endhour1">
+          <option value="">--</option>
+          {end_hour_options1}
+          </select>
+        <select name="endminute1" id="endminute1">
+          <option value="">--</option>
+          {end_minute_options1}
+        </select>
+        {enddate1_ampm}
+        </span>
+        <br /><br />
+
+        <span {split_show} id="div0">
+          {$LANG_EVLIST['split_q']}
+          <input type="checkbox" name="split" value="1" 
+                id="split" {split_checked} onclick="showhideallday()" />
+          &nbsp;&nbsp;
+        </span>
+
+        <span {allday_show} id="div1">
+          {$LANG_EVLIST['allday']}
+          <input type="checkbox" name="allday" value="1" 
+            id="allday" {allday_checked} onclick="chk_allday()" />
+        </span>
+        <br /><br />
+
+        <p {datetime2_show} id="div3">
+        <!--<span {datetime2_show} id="div3">-->
+          <label for="starthour2">
+            {$LANG_EVLIST['start_time']}:
+          </label>
+          <select name="starthour2" id="starthour2">
+            <option value="">--</option>
+            {start_hour_options2}
+          </select>
+          <select name="startminute2" id="startminute2">
+            <option value="">--</option>
+            {start_minute_options2}
+          </select>
+          {startdate2_ampm}
+          <br /><br />
+          <label for="endtime2">
+            {$LANG_EVLIST['end_time']}:
+          </label>
+          <select id="endtime2" name="endhour2">
+            <option value="">--</option>
+            {end_hour_options2}
+          </select>
+          <select name="endminute2" id="endminute2">
+            <option value="">--</option>
+            {end_minute_options2}
+          </select>
+          {enddate2_ampm}
+        </p>
+
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>{$LANG_EVLIST['rec_event_info']}</legend>
+      <div style="padding:5px;">
+        <label for="recurring" style="width:16em;">{$LANG_EVLIST['rec_event_q']}</label>
+        <input type="checkbox" name="recurring" value="1" 
+                id="recurring"{recurring_checked} 
+                onclick="showhiderecurringoptions()" />
+
+        <!--<span {recurring_show} id="div2"><br/><br/>-->
+        <div {recurring_show} id="div2">
+          <br /><br />
+          <label for="format">{$LANG_EVLIST['event_recurs']}:</label>
+          <select name="format" id="format" 
+                onchange="(showhideformatoptions(this.selectedIndex))">
+            <option value="0">{$LANG_EVLIST['select_format']}</option>
+            {recurring_format_options}
+          </select>
+
+          <p {stopshow} id="stopdate_div">
+            <br />
+          <!--<div {stopshow} id="stopdate_div"><br/>-->
+            <label for="f_stopdate" style="width:50%;text-align:left;">
+              {dailystop_label}:
+            </label>
+            <input type="text" name="stopdate" id="f_stopdate"
+                size="10" value="{stopdate}" />
+            {# <div id="d_stopdate" style="float:left;width:10em;">{d_stopdate}&nbsp;
+            </div> #}
+            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+                id="stopdate_trigger"
+                style="cursor: pointer;"
+                />
+          <!--</div>-->
+          </p>
+
+          <div {monthday_sel_show} id="monthday_sel"><br />
+          <!--<p {monthday_sel_show} id="monthday_sel">-->
+            <br />
+            {$LANG_EVLIST['sel_monthdays']}<br />
+            <table border="0">
+            <tr>
+            <td><input type="checkbox" name="mdays[]" value="1" {mdchk1} /> 1</td>
+            <td><input type="checkbox" name="mdays[]" value="2" {mdchk2} /> 2</td>
+            <td><input type="checkbox" name="mdays[]" value="3" {mdchk3} /> 3</td>
+            <td><input type="checkbox" name="mdays[]" value="4" {mdchk4} /> 4</td>
+            <td><input type="checkbox" name="mdays[]" value="5" {mdchk5} /> 5</td>
+            <td><input type="checkbox" name="mdays[]" value="6" {mdchk6} /> 6</td>
+            <td><input type="checkbox" name="mdays[]" value="7" {mdchk7} /> 7</td>
+            <td><input type="checkbox" name="mdays[]" value="8" {mdchk8} /> 8</td>
+            <td><input type="checkbox" name="mdays[]" value="9" {mdchk9} /> 9</td>
+            <td><input type="checkbox" name="mdays[]" value="10" {mdchk10} /> 10</td>
+            <td><input type="checkbox" name="mdays[]" value="11" {mdchk11} /> 11</td>
+            <td><input type="checkbox" name="mdays[]" value="12" {mdchk12} /> 12</td>
+            <td><input type="checkbox" name="mdays[]" value="13" {mdchk13} /> 13</td>
+            <td><input type="checkbox" name="mdays[]" value="14" {mdchk14} /> 14</td>
+            <td><input type="checkbox" name="mdays[]" value="15" {mdchk15} /> 15</td>
+            <td><input type="checkbox" name="mdays[]" value="16" {mdchk16} /> 16</td>
+            </tr><tr>
+            <td><input type="checkbox" name="mdays[]" value="17" {mdchk17} /> 17</td>
+            <td><input type="checkbox" name="mdays[]" value="18" {mdchk18} /> 18</td>
+            <td><input type="checkbox" name="mdays[]" value="19" {mdchk19} /> 19</td>
+            <td><input type="checkbox" name="mdays[]" value="20" {mdchk20} /> 20</td>
+            <td><input type="checkbox" name="mdays[]" value="21" {mdchk21} /> 21</td>
+            <td><input type="checkbox" name="mdays[]" value="22" {mdchk22} /> 21</td>
+            <td><input type="checkbox" name="mdays[]" value="23" {mdchk23} /> 23</td>
+            <td><input type="checkbox" name="mdays[]" value="24" {mdchk24} /> 24</td>
+            <td><input type="checkbox" name="mdays[]" value="25" {mdchk25} /> 25</td>
+            <td><input type="checkbox" name="mdays[]" value="26" {mdchk26} /> 26</td>
+            <td><input type="checkbox" name="mdays[]" value="27" {mdchk27} /> 27</td>
+            <td><input type="checkbox" name="mdays[]" value="28" {mdchk28} /> 28</td>
+            <td><input type="checkbox" name="mdays[]" value="29" {mdchk29} /> 29</td>
+            <td><input type="checkbox" name="mdays[]" value="30" {mdchk30} /> 30</td>
+            <td><input type="checkbox" name="mdays[]" value="31" {mdchk31} /> 31</td>
+            <td><input type="checkbox" name="mdays[]" value="32" {mdchk32} /> {last}</td>
+            </tr>
+            </table>
+          </div>
+          <!--</p>-->
+
+          <p {format1show} id="format1"><br/>
+          <!--<div {format1show} id="format1"><br/>-->
+            <label for="skipnext">
+              {$LANG_EVLIST['skip_weekends']}
+            </label>
+            <input id="skipnext" type="radio" name="skipnext" value="0" 
+                {skipnext0_checked} />
+            {$LANG_EVLIST['no']}&nbsp;&nbsp;
+            <input type="radio" name="skipnext" value="1" 
+                    {skipnext1_checked} />
+            {$LANG_EVLIST['yes']}&nbsp;&nbsp;
+            <span {format2show} id="format2">
+            <input type="radio" name="skipnext" value="2" 
+                    {skipnext2_checked} />
+            {$LANG_EVLIST['next_bus_day']}
+            </span>
+            <span style="font-size:small;color:red;">{skipnext_note}</span>
+          <!--</div>-->
+          </p>
+
+          <p {format4show} id="format4">
+            <br />
+          <!--<div {format4show} id="format4"><br/>-->
+            <label style="width:50%;text-align:left;">{listdays_label}:</label><br/>
+            <input name="listdays[]" type="checkbox" value="1" {daychk1} />
+            {$LANG_WEEK[1]}&nbsp;
+            <input name="listdays[]" type="checkbox" value="2" {daychk2} />
+            {$LANG_WEEK[2]}&nbsp;
+            <input name="listdays[]" type="checkbox" value="3" {daychk3} />
+            {$LANG_WEEK[3]}&nbsp;
+            <input name="listdays[]" type="checkbox" value="4" {daychk4} />
+            {$LANG_WEEK[4]}&nbsp;
+            <input name="listdays[]" type="checkbox" value="5" {daychk5} />
+            {$LANG_WEEK[5]}&nbsp;
+            <input name="listdays[]" type="checkbox" value="6" {daychk6} />
+            {$LANG_WEEK[6]}&nbsp;
+            <input name="listdays[]" type="checkbox" value="7" {daychk7} />
+            {$LANG_WEEK[7]}&nbsp;
+          <!--</div>-->
+          </p>
+
+          <p {format5show} id="format5">
+          <!--<div {format5show} id="format5">-->
+            <br />
+            <label style="width:50%;text-align:left;">
+            {$LANG_EVLIST['interval_label']}:<br />
+            {$LANG_EVLIST['interval_note']}</label>
+              {recurring_interval_options}
+            <input type="checkbox" value="1" name="interval[]" {dom_int_chk_1} />&nbsp;{dom_int_txt_1}&nbsp;&nbsp;
+            <input type="checkbox" value="2" name="interval[]" {dom_int_chk_2} />&nbsp;{dom_int_txt_2}&nbsp;&nbsp;
+            <input type="checkbox" value="3" name="interval[]" {dom_int_chk_3} />&nbsp;{dom_int_txt_3}&nbsp;&nbsp;
+            <input type="checkbox" value="4" name="interval[]" {dom_int_chk_4} />&nbsp;{dom_int_txt_4}&nbsp;&nbsp;
+            <input type="checkbox" value="5" name="interval[]" {dom_int_chk_5} />&nbsp;{dom_int_txt_5}&nbsp;&nbsp;
+            <select name="weekday" id="weekday">
+              {recurring_weekday_options}
+            </select>
+            <br/><br/>
+          <!--</div>-->
+          </p>
+
+          <p {freq_div_show} id="freq_div">
+          <!--<div {freq_div_show} id="freq_div">-->
+            <br/>
+            <label for="rec_freq" style="width:50%;text-align:left;">
+              {$LANG_EVLIST['recur_freq_txt']}
+            </label>
+            <input type="text" size="3" maxlength="3" name="rec_freq"
+                id="rec_freq" value="{rec_freq}" />
+            <span id="freq_type">{freq_text}</span>
+          <!--</div>-->
+          </p>
+
+          <p {format6show} id="format6">
+          <!--<div {format6show} id="format6">-->
+            <br/>
+            <label for="custom" style="width:90%;text-align:left;">
+              {custom_label} {$LANG_EVLIST['recur_cust_ignoredates']}:
+            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+                id="custom_trigger"
+                style="cursor: pointer;"
+                />
+            </label>
+            <br />
+            <input type="text" name="custom" id="custom" size="" 
+                style="width:80%" maxlength="255" value="{custom_val}" />
+            <br />
+            <span style="font-size:small;color:red;">{$LANG_EVLIST['recur_cust_format']}</span>
+          <!--</div>-->
+          </p>
+        <!--</span>-->
+        </div>
+
+      </div>
+    </fieldset>
+
+    {!if is_repeat}
+    {!else}
+    <fieldset>
+      <legend>{$LANG_EVLIST['misc']}</legend>
+      <label for="show_upcoming" style="width:16em;">
+        {$LANG_EVLIST['show_upcoming']}?
+      </label>
+      <input id="show_upcoming" name="show_upcoming" type="checkbox" 
+            value="1" {upcoming_chk} />
+    </fieldset>
+    {!endif}
+
+    {!if enable_rsvp}
+    <fieldset>
+      <legend>Registration</legend>
+      <p>
+        <label for="use_rsvp">{$LANG_EVLIST['use_rsvp']}:</label>
+        <input id="use_rsvp" type="radio" name="use_rsvp" value="0" {reg_chk0} 
+            onclick="javascript:toggleRSVPdetail(0);" />
+        {$LANG_EVLIST['rsvp_none']}
+        <input type="radio" name="use_rsvp" value="1" {reg_chk1} 
+           onclick="javascript:toggleRSVPdetail(1);" />
+        {$LANG_EVLIST['rsvp_event']}
+        <span id="rsvp_repeat">
+        <input type="radio" name="use_rsvp" value="2" {reg_chk2}
+           onclick="javascript:toggleRSVPdetail(2);" />
+        {$LANG_EVLIST['rsvp_repeat']}
+        </span>
+      </p>
+      <div id="rsvp_detail">
+      <p>
+        <label for="max_rsvp">{$LANG_EVLIST['max_rsvp']}:</label>
+        <input type="text" id="max_rsvp" name="max_rsvp" maxlength="5" 
+            value="{max_rsvp}" />
+        &nbsp;&nbsp;{$LANG_EVLIST['rsvp_waitlist']}
+        <input type="checkbox" name="rsvp_waitlist" value="1" {rsvp_wait_chk} />
+      </p>
+      <p>
+        <label for="rsvp_cutoff">{$LANG_EVLIST['rsvp_cutoff']}:</label>
+        <input type="text" name="rsvp_cutoff" maxlength="5" 
+            id="rsvp_cutoff" value="{rsvp_cutoff}" />
+      </p>
+      </div>
+    </fieldset>
+    {!endif}
+
+    </div>
+
+    <div id="ev_location" class="jsenabled_hide">
+    <fieldset>
+      <legend>{$LANG_EVLIST['ev_location']}</legend>
+      <div style="padding:5px;">
+        {!if use_locator}
+        <label for="loc_sel">{$LANG_EVLIST['select_location']}</label>
+        <select id="loc_sel" name="loc_sel" 
+            onchange="javascript:EVupdateLoc(this.value);" >
+          <option value=''>{$LANG_EVLIST['select_location']}</option>
+          {loc_selection}
+        </select>&nbsp;<i>{$LANG_EVLIST['instr_sel_loc']}</i>
+        <br/><br/>
+        {!endif}
+
+        <label for="location">{$LANG_EVLIST['ev_location']}:</label>
+        <textarea name="location" id="location" style="width:80%;"
+            cols="80" rows="1">{location}</textarea>
+        <br/><br/>
+
+        <label for="street">{$LANG_EVLIST['street_address']}:</label>
+        <input type="text" name="street" id="street" style="width:80%;"
+            maxlength="64" value="{street}" />
+        <br /><br />
+
+        <label for="city">{$LANG_EVLIST['city']}:</label>
+        <input type="text" name="city" id="city" style="width:80%;" 
+            maxlength="64" value="{city}" /><br />
+        <br />
+
+        <label for="province">{$LANG_EVLIST['state']}:</label>
+        <input type="text" name="province" id="province" style="width:80%;"
+            maxlength="64" value="{province}" />
+        <br /><br />
+
+        <label for="country">{$LANG_EVLIST['country']}:</label>
+        <input type="text" name="country" id="country" style="width:80%;" 
+            maxlength="64" value="{country}" />
+        <br /><br />
+
+        <label for="postal">{$LANG_EVLIST['zip']}:</label>
+        <input type="text" name="postal" id="postal" size="10" maxlength="25" 
+            value="{postal}" />
+        <br /><br />
+
+        <label for="lat">{$LANG_EVLIST['coordinates']}:</label>
+        <input type="text" name="lat" id="lat" size="10" maxlength="10"
+            value="{lat}" /> {$LANG_EVLIST['latitude']},
+        &nbsp;&nbsp;
+        <input type="text" name="lng" id="lng" size="10" maxlength="10"
+            value="{lng}" /> {$LANG_EVLIST['longitude']}
+      </div>
+    </fieldset>
+    </div>
+
+    <div id="ev_contact" class="jsenabled_hide">
+    {!if contact_section}
+    <fieldset>
+      <legend>{$LANG_EVLIST['ev_contact']}</legend>
+      <div style="padding:5px;">
+        <label for="contact" style="width:16em;">{$LANG_EVLIST['for_more_info']}:</label>
+        <input type="text" name="contact" id="contact" style="width:50%;" 
+            maxlength="64" value="{contact}" />
+        <br /><br />
+
+        <label for="email" style="width:16em;">{$LANG_EVLIST['email']}</label>
+        <input type="text" name="email" id="email" style="width:50%;" 
+            maxlength="64" value="{email}" />
+        <br/><br/>
+
+        <label for="phone" style="width:16em;">{$LANG_EVLIST['phone']}</label>
+        <input type="text" name="phone" id="phone" maxlength="32" 
+            value="{phone}" />
+        <br />
+
+        <label for="contactlink" style="width:16em;">
+            {$LANG_EVLIST['show_contactlink']}?
+        </label>
+        <input type="checkbox" name="contactlink" id="contactlink" 
+            {contactlink_chk} />
+      </div>
+    </fieldset>
+    {!endif}
+    </div>
+
+    <div id="ev_perms" class="jsenabled_hide">
+    {!if permissions_editor}
+      <fieldset><legend>{$LANG_ACCESS['accessrights']}</legend>
+        <label for="owner">{$LANG_ACCESS['owner']}:</label>&nbsp;
+        <select id="owner" name="owner_id">
+        {owner_dropdown}
+        </select>
+        <br />
+        <label>{$LANG_ACCESS['group']}:</label>&nbsp;
+        {group_dropdown}
+        <br /><br />
+
+        <p>{$LANG_EVLIST['perms_desc']}</p>
+        {permissions_editor}
+        <p>{perm_msg}</p>
+      </fieldset>
+    {!else}
+        <input type="hidden" name="group_id" value="{group_id}" />
+    {!endif}
+    </div>
+
+    <input type="hidden" name="eid" value="{eid}" />
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    {submission}
+
+    <p style="text-align:left;">
+      <input type="submit" name="{saveaction}" value="{$LANG_ADMIN['save']}" />
+      <input type="reset" name="reset" value="{$LANG_EVLIST['reset']}" />
+      {!if del_button}
+        <input type="submit" name="{delaction}" value="{$LANG_ADMIN['delete']}" />
+      {!endif}
+      <input type="reset" name="cancel" value="{$LANG_ADMIN['cancel']}" 
+           onclick="javascript: document.location.href='{cancel_url}'" />
+    </p>
+  </form>
+</div>
+
+<script type="text/javascript">
+    Calendar.setup({
+        inputField  :   "f_startdate1",
+        //displayArea :   "d_startdate1",
+        //daFormat    :   disp_format,
+        ifFormat    :   fld_format,
+        showsTime   :   false,
+        timeFormat  :   "{hour_mode}",
+        //eventName   :   "focus",
+        //onUpdate    :   calcdate,
+        button      :   "startdt1_trigger"
+    });
+    Calendar.setup({
+        inputField  :   "f_enddate1",
+        //displayArea :   "d_enddate1",
+        //daFormat    :   disp_format,
+        ifFormat    :   fld_format,
+        showsTime   :   false,
+        timeFormat  :   "{hour_mode}",
+//        eventName   :   "focus",
+        //onUpdate    :   calcdate2,
+        button      :   "enddate1_trigger"
+    });
+
+    function calcdate(cal)
+    {
+        ts1 = cal.date.getTime();
+        ts2 = ts1 + days_diff;
+        var tmp = new Date(ts2);
+        /*var field = document.getElementById("d_enddate1");
+        field.innerHTML = tmp.print(disp_format);*/
+        field = document.getElementById("f_enddate1");
+        field.value = tmp.print(fld_format);
+    }
+
+    // Dummy calendar object to make the prototype functions available
+    var dummy = Calendar(0, null);
+
+    // Update the end date based on the start date.
+    function checkDate1()
+    {
+        var d_start = document.getElementById("f_startdate1");
+        var tmp = new Date();
+        var dt1 = tmp.dateFromYMD(d_start.value);
+        ts1 = dt1.getTime();
+
+        var ts2 = ts1 + days_diff;
+        tmp = new Date(ts2);
+        field = document.getElementById("f_enddate1");
+        field.value = tmp.print(fld_format);
+    }
+
+
+    function calcdate2(cal)
+    {
+        ts2 = cal.date.getTime();
+        if (ts1 > 0 && ts1 <= ts2) {
+            // Just update the time difference
+            days_diff = (ts2 - ts1);
+
+        } else {
+            // Update date1 if it was empty before
+            ts1 = ts2 - (days_diff * 86400000);
+            tmp = new Date(ts1);
+            /*var field = document.getElementById("d_startdate1");
+            field.innerHTML = tmp.print(disp_format);*/
+            field = document.getElementById("f_startdate1");
+            field.value = tmp.print(fld_format);
+        }
+
+        // Disable split on multi-day events
+        if (ts2 != ts1) {
+            showhidesplit(0);
+        } else {
+            showhidesplit(1);
+        }
+    }
+
+    // Update the custom recurring date field.
+    function updatecustom(cal)
+    {
+        var el = document.getElementById("custom");
+        var d = cal.date;
+
+        if (cal.dateClicked && d) {
+            if (el.value == "") {
+                el.value = d.print(fld_format);
+            } else {
+                el.value += "," + d.print(fld_format);
+            }
+        }
+        return true;
+    }
+
+    // Date picker for custom recurring dates
+    Calendar.setup({
+        inputField  :   "custom",
+        ifFormat    :   fld_format,
+        showsTime   :   false,
+        timeFormat  :   "{hour_mode}",
+        //multiple    :   MA,
+        //onUpdate    :   updatecustom,
+        onSelect    :   updatecustom,
+        button      :   "custom_trigger"
+    });
+
+
+    // Date picker for custom recurring dates
+    Calendar.setup({
+        inputField  :   "f_stopdate",
+        //displayArea :   "d_stopdate",
+        //daFormat    :   disp_format,
+        ifFormat    :   fld_format,
+        showsTime   :   false,
+        button      :   "stopdate_trigger"
+    });
+
+/* Initially the navbar is hidden - in case JS is disabled. Enable it now */
+document.getElementById('pe_navbar').style.display='';
+var eventpanels = new Object;
+var el;
+el=document.getElementsByTagName('div');
+for (i = 0; i < el.length; i++) {
+  var divname = el[i].id
+  if (el[i].className == 'jsenabled_show') {
+    el[i].style.display = '';
+    eventpanels[divname] = 'show';
+  } else if(el[i].className == 'jsenabled_hide') {
+    el[i].style.display = 'none';
+    eventpanels[divname] = 'hidden';
+  }
+}
+
+</script>
+
+{# end {templatelocation} #}

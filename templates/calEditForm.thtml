@@ -1,0 +1,93 @@
+{# begin {templatelocation} #}
+<script type="text/javascript" 
+    src="{site_url}/evlist/js/colorpicker.js">
+</script>
+<script type="text/javascript">
+<!--
+window.addEvent('domready',function() {
+    var myValidator = new fValidator("calendaredit");
+});
+-->
+</script>
+
+<form id="calendaredit" method="post"
+    action="{site_admin_url}/plugins/evlist/index.php">
+  <table border=0>
+
+    <tr>
+      <td>
+        <b>{$LANG_EVLIST['cal_name']}:</b>
+      </td>
+      <td>
+        <input type="text" id="cal_name" class="fValidate['required']" 
+            name="cal_name" length="50" size="20" value="{cal_name}" />
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_EVLIST['colors']}: </b></td>
+      <td>
+        <label for="fgcolor">{$LANG_EVLIST['foreground']}: </label>
+        <input name="fgcolor" type="text" id="fgcolor" size="7" maxlength="7" 
+            value="{fgcolor}" style="background:{fgcolor}" /> 
+        <span onclick="openPicker('fgcolor')">
+          <img src="{site_url}/evlist/images/colors.png">
+        </span>
+        <label for="bgcolor">{$LANG_EVLIST['background']}: </label>
+        <input name="bgcolor" type="text" id="bgcolor" size="7" maxlength="7" 
+            value="{bgcolor}" style="background:{bgcolor}" /> 
+        <span onclick="openPicker('bgcolor')">
+          <img src="{site_url}/evlist/images/colors.png" />
+        </span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_EVLIST['enabled']}: </b></td>
+      <td><input type="checkbox" name="cal_status" value="1" {stat_chk} />
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_EVLIST['ical_enabled']}: </b></td>
+      <td><input type="checkbox" name="cal_ena_ical" value="1" {ical_chk} />
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_ACCESS['owner']}:</b></td>
+      <td align="left">
+        {ownername}
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_ACCESS['group']}:</b></td>
+      <td align="left">
+        {group_dropdown}
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_ACCESS['permissions']}:</b></td>
+      <td align="left">
+        {permissions_editor}
+      </td>
+    </tr>
+
+  </table>
+  <p>
+    <input type="hidden" name="owner_id" value="{owner_id}" />
+    {!if can_delete}
+    <div style="float:right;">
+      <input type="submit" name="deletecal" value="{$LANG_ADMIN['delete']}" />
+    </div>
+    {!endif}
+    <input type="hidden" name="cal_id" value="{cal_id}" />
+    <input type="submit" name="savecal" value="{$LANG_ADMIN['save']}" />
+    <input type="reset" value="{$LANG_EVLIST['reset']}" />
+    <input type="reset" value="{$LANG_ADMIN['cancel']}" name="cancel" 
+        onclick="javascript: document.location.href='{cancel_url}'" />
+  </p>
+  <hr />
+</form>
+
+{# begin {templatelocation} #}

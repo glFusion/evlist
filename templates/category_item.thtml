@@ -1,0 +1,1 @@
+<label for="category" style="display:inline;">{category_name}</label><input type="checkbox" name="category[]" value="{category_id}"{cat_checked} />&nbsp;&nbsp;

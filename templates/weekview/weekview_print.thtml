@@ -1,0 +1,38 @@
+{# begin {templatelocation} #}
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
+</head>
+<body>
+<h2>{site_name}</h2>
+<center>
+  <h2 class="evlist_header">{date_range}</h2>
+</center>
+<table width="100%" cellspacing="0" border="0">
+<!-- BEGIN dayBlock -->
+  <tr class="{dayclass}">
+    <td width="80%" class="cal-weekview-dayformat">{dayinfo}</td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="bottom" class="cal-dayview-times">
+      <!-- BEGIN eventBlock -->
+      <div class="show_cal{cal_id}" style="border-bottom:1px solid white;">
+        {event_times}
+        <span class="cal-event" style="color:{fgcolor};">{event_title}</span>
+      </div>
+      <!-- END eventBlock -->
+      {events_day}
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+<!-- END dayBlock -->
+<tr><td colspan="2">&nbsp;</td></tr>
+
+</table>
+<br/>
+{site_slogan}
+</body>
+</html>
+{# end {templatelocation} #}

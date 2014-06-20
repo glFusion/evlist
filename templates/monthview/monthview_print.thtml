@@ -1,0 +1,47 @@
+{# begin {templatelocation} #}
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
+</head>
+<body>
+<h2>{site_name}</h2>
+<center>
+  <h2 class="evlist_header">{thismonth_str}, {thisyear}</h2>
+</center>
+
+<table cellpadding="5" cellspacing="1" border="1" class="evlist_month">
+  <tr class="daynames">
+    <td width="2%">&nbsp;</td>
+    <td width="14%">{$LANG_WEEK[1]}</td>
+    <td width="14%">{$LANG_WEEK[2]}</td>
+    <td width="14%">{$LANG_WEEK[3]}</td>
+    <td width="14%">{$LANG_WEEK[4]}</td>
+    <td width="14%">{$LANG_WEEK[5]}</td>
+    <td width="14%">{$LANG_WEEK[6]}</td>
+    <td width="14%">{$LANG_WEEK[7]}</td>
+  </tr>
+  <!-- BEGIN weekBlock -->
+  <tr>
+    <td class="cal-weekpointers" align="center" >
+    <b>{weeknum}&nbsp;</b>
+    </td>
+
+    <!-- BEGIN dayBlock -->
+    <td valign="top" class="month{cal_day_style}" >
+      <div class="monthview_daterow">
+        <span class="date_number">
+          {cal_day_anchortags}
+        </span>
+      </div>
+      <div class="monthview_events">
+        {cal_day_entries}
+      </div>
+    </td>
+    <!-- END dayBlock -->
+  </tr>
+  <!-- END weekBlock -->
+</table>
+<i>{site_slogan}</i>
+</body>
+</html>
+{# end {templatelocation} #}

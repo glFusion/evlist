@@ -742,6 +742,28 @@ function plugin_user_delete_evlist($uid)
 
 
 /**
+*   Support merging local accounts into remote accounts
+*
+*   @param  integer $origUID    Original (remote) user ID
+*   @param  integer $destUID    Merged (local) user ID
+*/
+function plugin_user_move_evlist($origUID, $destUID)
+{
+    global $_TABLES;
+
+    $origUID = (int)$origUID;
+    $destUID = (int)$destUID;
+
+    DB_query("UPDATE {$_TABLES['evlist_events']}
+            SET owner_id = $destUID WHERE owner_id = $origUID", 1);
+    DB_query("UPDATE {$_TABLES['evlist_submissions']}
+            SET owner_id = $destUID WHERE owner_id = $origUID", 1);
+    DB_query("UPDATE {$_TABLES['evlist_remlookup']}
+            SET uid = $destUID WHERE uid = $origUID", 1);
+}
+
+
+/**
 *   Get the plugin's icon
 *
 *   @return string  URL to icon image

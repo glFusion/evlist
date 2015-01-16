@@ -614,8 +614,13 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     //$ending_date = sprintf('%4d-%02d-%02d', $year, $month, $lastday);
     $starting_date = $calendarView[0][0];
     $ending_date = $calendarView[$x][$y];
-    $events = EVLIST_getEvents($starting_date, $ending_date,
-            array('cat'=>$cat, 'cal'=>$cal));
+    if ($_EV_CONF['cal_templ'] == 'json') {
+        $events = EVLIST_getEvents_json($starting_date, $ending_date,
+                array('cat'=>$cat, 'cal'=>$cal));
+    } else {
+        $events = EVLIST_getEvents($starting_date, $ending_date,
+                array('cat'=>$cat, 'cal'=>$cal));
+    }
 
     $nextmonth = $month + 1;
     $nextyear = $year;
@@ -635,6 +640,8 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $tpl = 'monthview';
     if ($opt == 'print') {
         $tpl .= '_print';
+    } elseif ($_EV_CONF['cal_templ'] == 'json') {
+        $tpl .= '_json';
     }
     $T = new Template($tplpath);
     $T->set_file(array(
@@ -853,7 +860,8 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0)
         $M->set_var('monthname', $LANG_MONTH[$monthnum+1]);
 
         $M->set_block('smallmonth', 'daynames', 'nBlock');
-        for ($i = 0; $i < 7; $i++) {
+        // $LANG_WEEK starts with element 1, not zero
+        for ($i = 1; $i < 8; $i++) {
             $M->set_var('dayname', $LANG_WEEK[$i][0]);
             $M->parse('nBlock', 'daynames', true);
         }

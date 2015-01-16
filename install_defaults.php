@@ -62,9 +62,6 @@ $CONF_EVLIST_DEFAULT['can_add']            = EV_USER_CAN_ADD;
 $CONF_EVLIST_DEFAULT['allow_html']         = 1;
 $CONF_EVLIST_DEFAULT['usermenu_option']    = 1;
 $CONF_EVLIST_DEFAULT['enable_menuitem']    = 1;
-$CONF_EVLIST_DEFAULT['week_begins']        = 1;
-$CONF_EVLIST_DEFAULT['date_format']        = '%a %b %d, %Y';
-$CONF_EVLIST_DEFAULT['time_format']        = '%I:%M %p';
 $CONF_EVLIST_DEFAULT['enable_categories']  = 1;
 $CONF_EVLIST_DEFAULT['enable_centerblock'] = 0;
 $CONF_EVLIST_DEFAULT['pos_centerblock']    = 2;
@@ -139,12 +136,6 @@ function plugin_initconfig_evlist()
                 0, 1, 2, 20, true, 'evlist');
         $c->add('displayblocks',$CONF_EVLIST_DEFAULT['displayblocks'], 'select',
                 0, 1, 13, 25, true, 'evlist');
-        $c->add('week_begins',$CONF_EVLIST_DEFAULT['week_begins'], 'select',
-                0, 1, 3, 30, true, 'evlist');
-        $c->add('date_format',$CONF_EVLIST_DEFAULT['date_format'], 'select',
-                0, 1, 4, 40, true, 'evlist');
-        $c->add('time_format',$CONF_EVLIST_DEFAULT['time_format'], 'select',
-                0, 1, 5, 50, true, 'evlist');
         $c->add('event_passing',$CONF_EVLIST_DEFAULT['event_passing'], 'select',
                 0, 1, 6, 60, true, 'evlist');
         $c->add('limit_list',$CONF_EVLIST_DEFAULT['limit_list'], 'text',

@@ -42,7 +42,7 @@ class evRecurBase
     *
     *   @param  object  $event  Event object
     */
-    function __construct($event)
+    public function __construct($event)
     {
         global $_EV_CONF;
 
@@ -177,7 +177,7 @@ class evRecurBase
     *   Figures out the ending date based on the duration.
     *   The events array is keyed by start date to avoid duplicates.
     */
-    function storeEvent($start)
+    public function storeEvent($start)
     {
         if ($this->duration > 0) {
             $enddate = strtotime("+$duration day" , strtotime($start)) ;

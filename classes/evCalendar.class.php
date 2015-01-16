@@ -27,7 +27,7 @@ class evCalendar
     *
     *   @param  integer $cal_id     Calendar ID to read
     */
-    function __construct($cal_id = 0)
+    public function __construct($cal_id = 0)
     {
         global $_EV_CONF, $_USER;
 
@@ -57,7 +57,7 @@ class evCalendar
     *
     *   @param  integer $cal_id Optional calendar ID, $this->cal_id used if 0
     */
-    function Read($cal_id = 0)
+    public function Read($cal_id = 0)
     {
         global $_TABLES;
 
@@ -81,7 +81,7 @@ class evCalendar
     }
 
 
-    function __set($key, $value)
+    public function __set($key, $value)
     {
         switch ($key) {
         case 'cal_id':
@@ -115,7 +115,7 @@ class evCalendar
     *   @param  string  $var    Name of property to retrieve.
     *   @return mixed           Value of property, NULL if undefined.
     */
-    function __get($key)
+    public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
             return $this->properties[$key];
@@ -131,7 +131,7 @@ class evCalendar
     *   @param  array   $A      Array of fields
     *   @param  boolean $fromDB True if $A is from the database, false for form
     */
-    function SetVars($A, $fromDB=false)
+    public function SetVars($A, $fromDB=false)
     {
         if (isset($A['cal_id']) && !empty($A['cal_id']))
             $this->cal_id = $A['cal_id'];
@@ -178,7 +178,7 @@ class evCalendar
     *
     *   @return string  HTML for editing form
     */
-    function Edit()
+    public function Edit()
     {
 
         $T = new Template(EVLIST_PI_PATH . '/templates');
@@ -214,7 +214,7 @@ class evCalendar
     *
     *   @param array    $A  Array of data to save, typically from form
     */
-    function Save($A=array())
+    public function Save($A=array())
     {
         global $_TABLES, $_EV_CONF;
 
@@ -267,7 +267,7 @@ class evCalendar
     *
     *   @param  integer $newcal ID of new calendar to use for events, etc.
     */
-    function Delete($newcal = 0)
+    public function Delete($newcal = 0)
     {
         global $_TABLES;
 
@@ -315,7 +315,7 @@ class evCalendar
     *
     *   @return string      HTML for confirmation form.
     */
-    function DeleteForm()
+    public function DeleteForm()
     {
         global $_TABLES, $LANG_EVLIST;
 
@@ -377,7 +377,7 @@ class evCalendar
     *
     *   @return mixed   Number of events using the calendar, false if unused.
     */
-    function isUsed()
+    public function isUsed()
     {
         global $_TABLES;
 

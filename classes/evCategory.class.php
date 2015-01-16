@@ -26,7 +26,7 @@ class evCategory
     *
     *   @param  integer $cat_id     Calendar ID to read
     */
-    function __construct($cat_id = 0)
+    public function __construct($cat_id = 0)
     {
         global $_EV_CONF, $_USER;
 
@@ -46,7 +46,7 @@ class evCategory
     *
     *   @param  integer $cat_id Optional calendar ID, $this->cat_id used if 0
     */
-    function Read($cat_id = 0)
+    public function Read($cat_id = 0)
     {
         global $_TABLES;
 
@@ -70,7 +70,7 @@ class evCategory
     }
 
 
-    function __set($key, $value)
+    public function __set($key, $value)
     {
         switch ($key) {
         case 'cat_id':
@@ -90,12 +90,11 @@ class evCategory
 
     /**
     *   Get the value of a property.
-    *   Emulates the behaviour of __get() function in PHP 5.
     *
     *   @param  string  $var    Name of property to retrieve.
     *   @return mixed           Value of property, NULL if undefined.
     */
-    function __get($key)
+    public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
             return $this->properties[$key];
@@ -111,7 +110,7 @@ class evCategory
     *   @param  array   $A      Array of fields
     *   @param  boolean $fromDB True if $A is from the database, false for form
     */
-    function SetVars($A)
+    public function SetVars($A)
     {
         $this->cat_id = isset($A['id']) ? $A['id'] : 0;
         $this->cat_name = $A['name'];
@@ -124,7 +123,7 @@ class evCategory
     *
     *   @return string  HTML for editing form
     */
-    function Edit()
+    public function Edit()
     {
         $T = new Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('modify', 'catEditForm.thtml');
@@ -148,7 +147,7 @@ class evCategory
     *
     *   @param array    $A  Array of data to save, typically from form
     */
-    function Save($A=array())
+    public function Save($A=array())
     {
         global $_TABLES, $_EV_CONF;
 
@@ -192,7 +191,7 @@ class evCategory
     *
     *   @param  integer $newcal ID of new calendar to use for events, etc.
     */
-    function Delete($cat_id=0)
+    public function Delete($cat_id=0)
     {
         global $_TABLES;
 

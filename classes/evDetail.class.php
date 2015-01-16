@@ -44,7 +44,7 @@ class evDetail
      *
      *  @param integer $id Optional type ID
      */
-    function __construct($det_id='', $ev_id='')
+    public function __construct($det_id='', $ev_id='')
     {
         $this->isNew = true;
 
@@ -82,7 +82,7 @@ class evDetail
     *   @param  string  $var    Name of property to set.
     *   @param  mixed   $value  New value for property.
     */
-    function __set($var, $value='')
+    public function __set($var, $value='')
     {
         switch ($var) {
         case 'det_id':
@@ -128,7 +128,7 @@ class evDetail
     *   @param  string  $var    Name of property to retrieve.
     *   @return mixed           Value of property, NULL if undefined.
     */
-    function __get($var)
+    public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
             return $this->properties[$var];
@@ -144,7 +144,7 @@ class evDetail
      *  @param  array   $row        Array of values, from DB or $_POST
      *  @param  boolean $fromDB     True if read from DB, false if from $_POST
      */
-    function SetVars($row, $fromDB=false)
+    public function SetVars($row, $fromDB=false)
     {
         if (!is_array($row)) return;
 
@@ -164,7 +164,7 @@ class evDetail
      *  @param  integer $id Optional ID.  Current ID is used if zero.
      *  @return boolean     True if a record was read, False on failure.
      */
-    function Read($det_id = '')
+    public function Read($det_id = '')
     {
         global $_TABLES;
 
@@ -193,7 +193,7 @@ class evDetail
      *  @param  array   $A      Optional array of values from $_POST
      *  @return boolean         True if no errors, False otherwise
      */
-    function Save($A = '')
+    public function Save($A = '')
     {
         global $_TABLES, $_EV_CONF;
 
@@ -272,7 +272,7 @@ class evDetail
     /**
      *  Delete the current detail record from the database
      */
-    function Delete()
+    public function Delete()
     {
         global $_TABLES;
 

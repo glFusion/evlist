@@ -24,8 +24,8 @@ SYSTEM REQUIREMENTS
 
 evList has the following system requirements:
 
-    * PHP 5.1 and higher.
-    * glFusion v1.2.0 or newer
+    * PHP 5.3 and higher.
+    * glFusion v1.4.0 or newer
 
 INSTALLATION
 
@@ -41,65 +41,46 @@ the distribution from the Plugin Administration page.
 CONFIGURATION SETTINGS
 
 Allow anonymous users to view events?
-
     Set this to TRUE to allow non-logged in users to view events.  Set to
     FALSE to require that users log in to see events.
 
-Allow anonymous submissions?
-
-    Set to TRUE to allow non-logged-in users to submit events.  All events
-    from non-logged-in users will go into the submission queue.
-    Set to FALSE to disable non-logged-in users submitting events.
-
 Allow logged in user submissions?
-
     Set to TRUE to allow normal, logged-in users to submit events. All events
     from logged-in users will go into the submission queue.
     Set to FALSE to disable event submission for logged-in users.
 
 Allow HTML when posting?
-
     Set to TRUE to allow HTML use in the event description and the event
     summaries.  ALL HTML will be filtered through the glFusion HTML filtering
     engine.  Set to FALSE to disable the use of HTML.
 
 Enable Categories
-
     Set to TRUE to enable category support.
 
 Reminder Speedlimit
-
     How often, in seconds, you can select to be reminded of an event.
 
 Posting Speedlimit
-
     How often, in seconds, you can post a new event.
+
+Enable email reminders?
+    Select whether email event reminders will be enabled globall.
+    Reminders can still be disabled for a given event.
+
+Number of days prior to an event to allow reminders
+    Enter the minimum number of days before an event for someone to 
+    enter their email address for a reminder. Default = 1.
 
 GUI SETTINGS
 
 Enable the menu item
-
     Set this to TRUE to enable a link for evList to be placed in the User Menu.
     See User menu link option for more options.
 
 User menu link option
-
-    Select if the User Menu link is; Add Event or List Events
-
-Week begins on...
-
-	Select which day the week should begin, Sunday or Monday.
-
-Date Format
-
-	Select the date format to display dates in evList.
-
-Time Format
-
-	Select the time format to display times in evList.
+    Select if the User Menu link is "Add Event" or "List Events"
 
 An event ceases to be upcoming...
-
 	Select when an event falls off the 'Upcoming' list:
   - as soon as the start date has passed, i.e. the next day
   - as soon as the start time has passed
@@ -107,39 +88,37 @@ An event ceases to be upcoming...
   - as soon as the end date has passed, i.e. the next day
 
 Number of events to display per page.
-
 	Number of events to display per page.
 
 CENTERBLOCK SETTINGS
 
-Enable Centerblock?
-
-    Set to TRUE to enable the evList centerblock.
+Centerblock Type
+    Select the type of centerblock to use, if any.
+    - "disabled" - no centerblock is shown
+    - "table" - a table of events is shown
+    - "story" - upcoming events are shown as stories
 
 Centerblock Position
-
     Select the position of the centerblock.
 
 Topic
-
     Which topic should the centerblock be displayed
 
 Select an event range to display
-
     Select which event range to include in the centerblock.
 
 Number of events to display
-
     Number of events to display in the centerblock.
 
 Number of characters to display in event summary
-
     Number of characters (width) of the centerblock.
 
 
 QUIRKS AND ISSUES
-The selected starting date for a repeating event is always used, even if if
+The selected starting date for a repeating event is always used, even if it
 would normally not be included.  For example, creating an event to occur
 every third Tuesday, but selecting a Monday as the start date, causes the
 event to occur on that Monday as well as the following Tuesdays.
+
+When the JSON calendar is used the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
 

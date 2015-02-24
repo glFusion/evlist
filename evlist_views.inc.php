@@ -12,6 +12,7 @@
 *   @filesource
 */
 
+USES_evlist_functions();
 
 /**
 *   Display the common header for all calendar views.
@@ -33,9 +34,10 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
     $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('calendar_header', 'calendar_header.thtml');
 
-    $thisyear = date('Y');
-    $thismonth = date('m');
-    $thisday = date('d');
+    $today = new Date($_EV_CONF['_today_ts'], $_CONF['timezone']);
+    $thisyear = $today->format('Y', true);
+    $thismonth = $today->format('m', true);
+    $thisday = $today->format('d', true);
 
     // Determine if the current user is allowed to add an event, and borrow
     // some space in $_EV_CONF to store a flag for other functions to use.
@@ -202,6 +204,120 @@ function EVLIST_calFooter($calendars = '')
 
 
 /**
+*   Set the view information into a session variable.
+*   Used to keep track of the last calendar viewed by a visitor so they
+*   can be returned to the same view after viewing an event detail or
+*   when returning to the site.
+*
+*   @uses   SESS_setVar()
+*   @param  string  $type   Type of view, 'day', 'month', etc.
+*   @param  integer $year   Year number
+*   @param  integer $month  Month number
+*   @param  integer $day    Day number
+*/
+function EVLIST_setViewSession($type, $year, $month, $day)
+{
+    SESS_setVar('evlist.current', array(
+        'view' => $type,
+        'date' => array($year, $month, $day),
+    ) );
+}
+
+
+/**
+*   Prepare variables for view functions using JSON templates
+*   Reads values from the session, if available. If no session present,
+*   get values from parameters or current date
+*
+*   @param  string  $type   Type of view. 'month', 'day', 'list', 'year'
+*   @param  integer $year   Year override
+*   @param  integer $month  Month override
+*   @param  integer $day    Day override
+*   @param  integer $cat    Category pass-through
+*   @param  mixed   $opt    Calendar options pass=through
+*   @return string      Complete HTML for requested calendar
+*/
+function EVLIST_view_json($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
+{
+    global $_EV_CONF;
+
+    $T = new Template(EVLIST_PI_PATH . '/templates/' . $type . 'view');
+    $T->set_file(array(
+        'view'  => $type . 'view_wrapper.thtml',
+    ) );
+    $function = "EVLIST_{$type}view";
+    if (!function_exists($function)) {
+        return '<span class="alert">Failure loading calendar</span>';
+    }
+
+    $T->set_var(array(
+        'calendar_content' => $function($year, $month, $day, $cat, $cal, $opt),
+        'urlfilt_cal' => (int)$cal,
+        'urlfilt_cat' => (int)$cat,
+    ) );
+    $T->parse('output', 'view');
+    return $T->finish($T->get_var('output'));
+}
+
+
+/**
+*   Prepare variables for view functions when called from a URL (not AJAX).
+*   Reads values from the session, if available. If no session present,
+*   get values from parameters or current date
+*
+*   @uses   SESS_getVar()
+*   @uses   EVLIST_view_json()
+*   @uses   EVLIST_{xxx}view() functions
+*   @param  string  $type   Type of view. 'month', 'day', 'list', 'year'
+*   @param  integer $year   Year override
+*   @param  integer $month  Month override
+*   @param  integer $day    Day override
+*   @param  integer $cat    Category pass-through
+*   @param  mixed   $opt    Calendar options pass=through
+*   @return string      Complete HTML for requested calendar
+*/
+function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
+{
+    global $_EV_CONF;
+
+    $current_view = SESS_getVar('evlist.current');
+    if ($current_view !== 0) {
+        if ($type == '') $type = $current_view['view'];
+        if ($year == 0) $year = $current_view['date'][0];
+        if ($month == 0) $month = $current_view['date'][1];
+        if ($day == 0) $day = $current_view['date'][2];
+    } else {
+        // no previous session created, default to the current date
+        // unless other values provided
+        list($cyear, $cmonth, $cday) = explode('-', $_EV_CONF['_today']);
+        if ($year == 0) $year = $currentyear;
+        if ($month == 0) $month = $currentmonth;
+        if ($day == 0) $day = $curentday;
+    }
+
+    // catch missing or incorrect view types, set to 'month'
+    if (!in_array($type, array('day','week','month','year','list'))) {
+        $type = isset($_EV_CONF['default_view']) ?
+                $_EV_CONF['default_view'] : 'month';
+    }
+
+    // If the JSON calendar is enabled, call the JSON wrapper to create
+    // the calendar within the JSON template. Otherwise return the simple
+    // HTML version of the calendar.
+    if ($_EV_CONF['cal_tmpl'] == 'json') {
+        return EVLIST_view_json($type, $year, $month, $day, $cal, $opt);
+    } else {
+        $function = "EVLIST_{$type}view";
+        if (!function_exists($function)) {
+            // last-ditch error if $type isn't valid
+            return '<span class="alert">Failure loading calendar</span>';
+        }
+        return $function($year, $month, $day, $cat, $cal, $opt);
+    }
+}
+
+
+/**
 *   Display a single-day calendar view.
 *
 *   @param  integer $year   Year to display, default is current year
@@ -215,6 +331,10 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
     global $_CONF, $_EV_CONF, $LANG_WEEK, $LANG_EVLIST;
 
+    USES_class_date();
+
+    EVLIST_setViewSession('day', $year, $month, $day);
+
     $retval = '';
     list($currentyear, $currentmonth, $currentday) = 
         explode('-', $_EV_CONF['_today']);
@@ -226,17 +346,21 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $cat = (int)$cat;
     $cal = (int)$cal;
 
-    $starting_date = date('Y-m-d', mktime(0, 0, 0, $month, $day, $year));
-    $ending_date = $starting_date;
-    $prevstamp = mktime(0, 0, 0,$month, $day - 1, $year);
-    $nextstamp = mktime(0, 0, 0,$month, $day + 1, $year);
-    $thedate = COM_getUserDateTimeFormat(mktime(0,0,0,$month,$day,$year));
+    $today = sprintf("%04d-%02d-%02d", $year, $month, $day);
+    $dtToday = new Date(strtotime($today), $_CONF['timezone']);
+    $dtPrev = new Date($dtToday->toUnix() - 86400, $_CONF['timezone']);
+    $dtNext = new Date($dtToday->toUnix() + 86400, $_CONF['timezone']);
+    $thedate = COM_getUserDateTimeFormat($dtToday->toUnix());
     $monthname = $LANG_MONTH[$month];
     $dow = Date_Calc::dayOfWeek($day, $month, $year) + 1;
-    $dayname = $LANG_WEEK[$dow];
+    $dayname = $dtToday->format('l', true);
 
     $tpl = 'dayview';
-    if ($opt == 'print') $tpl .= '_print';
+    if ($opt == 'print') {
+        $tpl .= '_print';
+    } elseif ($_EV_CONF['cal_tmpl'] == 'json') {
+        $tpl .= '_json';
+    }
     $T = new Template(EVLIST_PI_PATH . '/templates/dayview');
     $T->set_file(array(
         'column'    => 'column.thtml',
@@ -244,7 +368,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'dayview'   => $tpl . '.thtml',
     ) );
 
-    $events = EVLIST_getEvents($starting_date, $ending_date, 
+    $events = EVLIST_getEvents($today, $today,
             array('cat'=>$cat, 'cal'=>$cal));
     $calendars_used = array();
     list($allday, $hourly) = EVLIST_getDayViewData($events, $starting_date);
@@ -273,7 +397,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'cal_id'        => $A['cal_id'],
             ) );
             if ($i < $alldaycount) {
-                $T->set_var('br', '<br' . XHTML . '>');
+                $T->set_var('br', '<br />');
             } else {
                 $T->set_var('br', '');
             }
@@ -284,8 +408,26 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         $T->set_var('allday_events', '&nbsp;');
     }
 
+    for ($i = 0; $i < 24; $i++) {
+        $link = date($_CONF['timeonly'], mktime($i, 0));
+        if ($_EV_CONF['_can_add']) {
+            $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
+                        $month . '&amp;day=' . $day . '&amp;year=' . $year .
+                        '&amp;hour=' . $i . '">' . $link . '</a>';
+        }
+        $T->set_var ($i . '_hour',$link);
+    } 
+
+
     // Get hourly events
+    /*$times = array();
+    foreach ($hourly as $event) {
+        if (!isset($times[$event['starthour']]))
+            $times[$event['starthour']] = array();
+        $times[$event['starthour']][] = $event;
+    }*/
     for ($i = 0; $i <= 23; $i++) {
+
         $hourevents = $hourly[$i];
         $numevents = count($hourevents);
         if ($numevents > 0) {
@@ -313,7 +455,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                             $A['time_start']));
                 }
 
-                if ($A['data']['rp_date_end'] == $ending_date) {
+                if ($A['data']['rp_date_end'] == $_EV_CONF['today']) {
                     $end_time = date($_CONF['timeonly'],
                             strtotime($A['data']['rp_date_end'] . ' ' .
                                 $A['time_end']));
@@ -339,7 +481,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     'cal_id'        => $A['data']['cal_id'],
                 ) );
                 if ($j < $numevents) {
-                    $T->set_var('br', '<br' . XHTML . '>');
+                    $T->set_var('br', '<br />');
                 } else {
                     $T->set_var('br', '');
                 }
@@ -356,28 +498,26 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                         $month . '&amp;day=' . $day . '&amp;year=' . $year .
                         '&amp;hour=' . $i . '">' . $link . '</a>';
         }
-        $T->set_var ($i . '_hour',$link);
+    //    $T->set_var ($i . '_hour',$link);
         $T->parse ($i . '_cols', 'column', true);
     }
-
     $T->set_var(array(
         'month'         => $month,
         'day'           => $day,
         'year'          => $year,
-        'prevmonth'     => strftime('%m', $prevstamp),
-        'prevday'       => strftime('%d', $prevstamp),
-        'prevyear'      => strftime('%Y', $prevstamp),
-        'nextmonth'     => strftime('%m', $nextstamp),
-        'nextday'       => strftime('%d', $nextstamp),
-        'nextyear'      => strftime('%Y', $nextstamp),
+        'prevmonth'     => $dtPrev->format('n', false),
+        'prevday'       => $dtPrev->format('j', false),
+        'prevyear'      => $dtPrev->format('Y', false),
+        'nextmonth'     => $dtNext->format('n', false),
+        'nextday'       => $dtNext->format('j', false),
+        'nextyear'      => $dtNext->format('Y', false),
         'urlfilt_cal'   => $cal,
         'urlfilt_cat'   => $cat,
         'cal_header'    => EVLIST_calHeader($year, $month, $day, 'day', 
                             $cat, $cal),
         'cal_footer'    => EVLIST_calFooter($calendars_used),
         'pi_url'        => EVLIST_URL,
-        'currentday'    => $dayname. ', ' .
-                strftime('%x', mktime(0, 0, 0, $month, $day, $year)),
+        'currentday'    => $dayname. ', ' . $dtToday->format($_CONF['shortdate'], true),
         'week_num'      => @strftime('%V', $thedate[1]),
         'cal_checkboxes', EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
@@ -403,6 +543,9 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
     global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK, $LANG_EVLIST;
 
+    USES_class_date();
+    EVLIST_setViewSession('week', $year, $month, $day);
+
     $retval = '';
     list($currentyear, $currentmonth, $currentday) = 
         explode('-', $_EV_CONF['_today']);
@@ -418,25 +561,33 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $calendarView = Date_Calc::getCalendarWeek($day, $month, $year, '%Y-%m-%d');
     $start_date = $calendarView[0];
     $end_date = $calendarView[6];
-    $events = EVLIST_getEvents($start_date, $end_date,
-            array('cat'=>$cat, 'cal'=>$cal));
     $calendars_used = array();
+
+    $dtStart= new Date(strtotime($start_date), $_CONF['timezone']);
+    $week_secs = 86400 * 7;
+    $dtPrev = new Date($dtStart->toUnix() - $week_secs, $_CONF['timezone']);
+    $dtNext = new Date($dtStart->toUnix() + $week_secs, $_CONF['timezone']);
 
     // Set up next and previous week links
     list($sYear, $sMonth, $sDay) = explode('-', $start_date);
-    $prevstamp = mktime(0, 0, 0, $sMonth, $sDay-7, $sYear);
-    $nextstamp = mktime(0, 0, 0, $sMonth, $sDay+7, $sYear);
 
     $tpl = 'weekview';
     $T = new Template(EVLIST_PI_PATH . '/templates/weekview');
-    if ($opt == 'print') $tpl .= '_print';
+    if ($opt == 'print') {
+        $tpl .= '_print';
+    } elseif ($_EV_CONF['cal_tmpl'] == 'json') {
+        $tpl .= '_json';
+    }
     $T->set_file(array(
         'week'      => $tpl . '.thtml',
         //'events'    => 'weekview/events.thtml',
     ) );
 
+    $events = EVLIST_getEvents($start_date, $end_date,
+                array('cat'=>$cat, 'cal'=>$cal));
+
     $start_mname = $LANG_MONTH[(int)$sMonth];
-    $last_date = getdate(mktime(0, 0, 0, $sMonth, $sDay + 6, $sYear));
+    $last_date = getdate($dtStart->toUnix() + (86400 * 6));
     $end_mname = $LANG_MONTH[$last_date['mon']];
     $end_ynum = $last_date['year'];
     $end_dnum = sprintf('%02d', $last_date['mday']);
@@ -555,12 +706,12 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'cal_header'    => EVLIST_calHeader($year, $month, $day, 'week',
                             $cat, $cal),
         'cal_footer'    => EVLIST_calFooter($calendars_used),
-        'prevmonth'     => strftime('%m', $prevstamp),
-        'prevday'       => date('j', $prevstamp),
-        'prevyear'      => strftime('%Y', $prevstamp),
-        'nextmonth'     => strftime('%m', $nextstamp),
-        'nextday'       => date('j', $nextstamp),
-        'nextyear'      => strftime('%Y', $nextstamp),
+        'prevmonth'     => $dtPrev->format('n', false),
+        'prevday'       => $dtPrev->format('j', false),
+        'prevyear'      => $dtPrev->format('Y', false),
+        'nextmonth'     => $dtNext->format('n', false),
+        'nextday'       => $dtNext->format('j', false),
+        'nextyear'      => $dtNext->format('Y', false),
         'urlfilt_cat'   => $cat,
         'urlfilt_cal'   => $cal,
         'cal_checkboxes' => EVLIST_cal_checkboxes($calendars_used),
@@ -590,6 +741,8 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
     global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK;
 
+    EVLIST_setViewSession('month', $year, $month, $day);
+
     $retval = '';
     list($currentyear, $currentmonth, $currentday) = 
             explode('-', $_EV_CONF['_today']);
@@ -609,19 +762,10 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $calendarView = Date_Calc::getCalendarMonth($month, $year, '%Y-%m-%d');
     $x = count($calendarView) - 1;
     $y = count($calendarView[$x]) - 1;
-    //$starting_date = sprintf('%4d-%02d-%02d', $year, $month, 1);
-    //$lastday = Date_Calc::daysInMonth($month, $year);
-    //$ending_date = sprintf('%4d-%02d-%02d', $year, $month, $lastday);
     $starting_date = $calendarView[0][0];
     $ending_date = $calendarView[$x][$y];
-    if ($_EV_CONF['cal_templ'] == 'json') {
-        $events = EVLIST_getEvents_json($starting_date, $ending_date,
+    $events = EVLIST_getEvents($starting_date, $ending_date,
                 array('cat'=>$cat, 'cal'=>$cal));
-    } else {
-        $events = EVLIST_getEvents($starting_date, $ending_date,
-                array('cat'=>$cat, 'cal'=>$cal));
-    }
-
     $nextmonth = $month + 1;
     $nextyear = $year;
     if ($nextmonth > 12) {
@@ -640,9 +784,10 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $tpl = 'monthview';
     if ($opt == 'print') {
         $tpl .= '_print';
-    } elseif ($_EV_CONF['cal_templ'] == 'json') {
+    } elseif ($_EV_CONF['cal_tmpl'] == 'json') {
         $tpl .= '_json';
     }
+
     $T = new Template($tplpath);
     $T->set_file(array(
         'monthview'  => $tpl . '.thtml',
@@ -685,7 +830,6 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     "cat={$cat}&amp;cal={$cal}" .
                     "&amp;day=$d&amp;month=$m&amp;year=$y",
                     array('class'=>'cal-date'))
-                //. '<hr' . XHTML . '>'
             );
 
             if (!isset($events[$daydata])) {
@@ -786,8 +930,8 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'prevyear'      => $prevyear,
         'nextmonth'     => $nextmonth,
         'nextyear'      => $nextyear,
-        'urlfilt_cat'   => $cat,
-        'urlfilt_cal'   => $cal,
+        'urlfilt_cat'   => (int)$cat,
+        'urlfilt_cal'   => (int)$cal,
         'cal_header'    => $cal_header,
         'cal_footer'    => EVLIST_calFooter($calendars_used),
         'cal_checkboxes' => EVLIST_cal_checkboxes($calendars_used),
@@ -812,9 +956,11 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 *   @param  integer $cal    Calendar to show
 *   @return string          HTML for calendar page
 */
-function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0)
+function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_CONF_EVLIST, $LANG_MONTH, $LANG_WEEK;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK;
+
+    EVLIST_setViewSession('year', $year, $month, $day);
 
     $retval = '';
 
@@ -833,8 +979,14 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0)
             array('cat'=>$cat, 'cal'=>$cal));
 
     $T = new Template(EVLIST_PI_PATH . '/templates/yearview');
+    $tpl = 'yearview';
+    if ($opt == 'print') {
+        $tpl .= '_print';
+    } elseif ($_EV_CONF['cal_tmpl'] == 'json') {
+        $tpl .= '_json';
+    }
     $T->set_file(array(
-        'yearview'  => 'yearview.thtml',
+        'yearview'  => $tpl . '.thtml',
     ) );
 
     $count = 0;
@@ -896,7 +1048,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0)
                             'nolink-events' : 'day-events';
                     foreach ($events[$daydata] as $event) {
                         // Separate events by a line (if more than one)
-                        if (!empty($popup)) $popup .= '<hr' . XHTML . '>' . LB;
+                        if (!empty($popup)) $popup .= '<hr />' . LB;
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0) {
                             $popup .= date($_CONF['timeonly'], 
@@ -967,6 +1119,8 @@ function EVLIST_listview($range = '', $category = '', $calendar = '',
         $block_title='')
 {
     global $_CONF, $_EV_CONF, $_USER, $_TABLES, $LANG_EVLIST;
+
+    EVLIST_setViewSession('list', $year, $month, $day);
 
     $retval = '';
     $T = new Template(EVLIST_PI_PATH . '/templates/');
@@ -1114,6 +1268,26 @@ function EVLIST_listview($range = '', $category = '', $calendar = '',
     $retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
 
     return $retval;
+}
+
+
+/**
+*   Get an array of all available calendars for use in the on/off switches
+*
+*   @return array   Indexed array of calendars.
+*/
+function EVLIST_getCalendars()
+{
+    global $_TABLES;
+    $sql = "SELECT cal_id, cal_name, cal_ena_ical, bgcolor, fgcolor
+            FROM {$_TABLES['evlist_calendars']}
+            WHERE cal_status = 1 " . COM_getPermSQL('AND');
+    $res = DB_query($sql);
+    $cals = array();
+    while ($A = DB_fetchArray($res, false)) {
+        $cals[] = $A;
+    }
+    return $cals;
 }
 
 ?>

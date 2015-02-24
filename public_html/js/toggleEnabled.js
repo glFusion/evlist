@@ -26,6 +26,21 @@ function EV_stateChanged()
 {
   var newstate;
 
+  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") {
+    jsonObj = JSON.parse(xmlHttp.responseText)
+
+    id = jsonObj.id;
+    baseurl = jsonObj.baseurl;
+    type = jsonObj.type;
+    component = jsonObj.component;
+    // Set the span ID of the updated checkbox
+    var spanid = jsonObj.component + "_" + jsonObj.id;
+    if (jsonObj.newval == 1) {
+        document.getElementById(spanid).checked = true;
+    } else {
+        document.getElementById(spanid).checked = false;
+    }
+/*
   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
   {
     xmlDoc=xmlHttp.responseXML;
@@ -40,8 +55,9 @@ function EV_stateChanged()
         document.getElementById("togenabled"+id).checked=false;
         newval = 0;
     }
-  }
+  }*/
 
+}
 }
 
 function EV_getXmlHttpObject()

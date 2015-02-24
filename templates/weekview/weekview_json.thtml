@@ -1,0 +1,135 @@
+{# begin {templatelocation} #}
+{cal_header}
+<h2 class="evlist_header">
+  <a id="prev_href" onclick="javascript:ChangeWeek({prevmonth},{prevday},{prevyear});" href="#">&lt;&lt;</a>
+  <span id="date_range">{date_range}</span>
+  <a id="next_href" onclick="javascript:ChangeWeek({nextmonth},{nextday},{nextyear});" href="#">&gt;&gt;</a>
+</h2>
+{!if cal_checkboxes}
+<div id="evlistCalCheckboxes">
+  <span onclick="javascript:clickCalendarButton()" 
+    title="{$LANG_EVLIST['calendars']}">{$LANG_EVLIST['calendars']}
+    <img src="{site_url}/evlist/images/downarrow.png" border="0" 
+        width="16" height="16" alt="{$LANG_EVLIST['select_cals']}" />
+  </span>
+  <div id="calendar_dialog">
+    <div class="evlistCalendarDialogClose">
+      <a href="javascript:void(0)" onclick="closedialog()">x</a>
+    </div>
+    {cal_checkboxes}
+  </div>
+</div>
+{!endif}
+
+<table style="width:100%;">
+<!-- BEGIN dayBlock -->
+  <tr class="{dayclass}">
+    <td style="width:80%;" class="cal-weekview-dayformat">{dayinfo}</td>
+    <td class="cal-weekview-addevent">
+      {!if can_add}
+        <a href="{site_url}/evlist/event.php?edit=x&amp;type=calendar&amp;day={curday}&amp;month={curmonth}&amp;year={curyear}">
+        <img src="{layout_url}/images/admin/add.png"
+            class="gl_mootip"
+            title="{$LANG_EVLIST['add_event']}"
+            alt="{$LANG_EVLIST['add_event']}"
+            width="16" height="16"
+            >
+        </a>
+      {!endif}
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="cal-dayview-times">
+      <!-- BEGIN eventBlock -->
+      <div class="show_cal{cal_id} evlistWeeklyEvent">
+        {delete_imagelink} {event_times}
+        <a class="cal-event" style="color:{fgcolor};" 
+            href="{pi_url}/event.php?eid={event_id}">{event_title}</a>
+      </div>
+      <!-- END eventBlock -->
+      {events_day}
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+<!-- END dayBlock -->
+
+<!--
+<tr class="{class1}">
+  <td style="width:80%;" class="cal-weekview-dayformat">{day1}</td>
+  <td class="cal-weekview-addevent">{langlink_addevent1}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day1}</td>
+</tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+
+<tr class="{class2}">
+  <td class="cal-weekview-dayformat">{day2}</td>
+  <td class="cal-weekview-addevent">{langlink_addevent2}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day2}</td>
+</tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+
+<tr class="{class3}">
+  <td class="cal-weekview-dayformat">{day3}</td>
+  <td class="cal-weekview-addevent">{langlink_addevent3}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day3}</td>
+</tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+
+<tr class="{class4}">
+  <td class="cal-weekview-dayformat">{day4}</td><td class="cal-weekview-addevent">{langlink_addevent4}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day4}</td>
+</tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+
+<tr class="{class5}">
+  <td class="cal-weekview-dayformat">{day5}</td>
+  <td class="cal-weekview-addevent">{langlink_addevent5}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day5}</td>
+</tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+
+<tr class="{class6}">
+  <td class="cal-weekview-dayformat">{day6}</td>
+  <td class="cal-weekview-addevent">{langlink_addevent6}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day6}</td>
+</tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+
+<tr class="{class7}">
+  <td class="cal-weekview-dayformat">{day7}</td>
+  <td class="cal-weekview-addevent">{langlink_addevent7}</td>
+</tr>
+<tr>
+  <td colspan="2" class="cal-dayview-times">{events_day7}</td>
+</tr>
+-->
+
+<tr><td colspan="2">&nbsp;</td></tr>
+
+</table>
+<br/>
+{quickadd_form}
+<div id="evlistCalendarPrintLink">
+  <p><a href="{pi_url}/index.php?view=pweek&amp;year={year}&amp;month={month}&amp;day={day}" target="_blank" title="Print"><img 
+        src="{layout_url}/images/print.png" alt="Print" 
+        width="16" height="16" /></a>
+  </p>
+</div>
+<div id="evlistCalendarFooter">
+  {cal_footer}
+</div>
+{# end {templatelocation} #}

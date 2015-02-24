@@ -1,0 +1,39 @@
+{# begin {templatelocation} #}
+<script type="text/javascript"
+    src="{site_url}/evlist/js/calselect.js">
+</script>
+<script>
+function Update(data)
+{
+    document.getElementById("evlist_content").innerHTML = data;
+}
+
+var xmlHttp;
+var cat = {urlfilt_cat};
+var cal = {urlfilt_cal};
+function ChangeYear(year)
+{
+  xmlHttp = EV_getXmlHttpObject();
+  if (xmlHttp==null) {
+    alert ("Browser does not support HTTP Request");
+    return;
+  }
+  var url = "{site_url}/evlist/ajax.php?action=getCalYear&cat=" + cat +
+        "&cal=" + cal + "&year=" + year;
+  xmlHttp.onreadystatechange=Year_stateChanged;
+  xmlHttp.open("GET",url,true);
+  xmlHttp.send(null);
+}
+
+function Year_stateChanged()
+{
+  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") {
+    Update(xmlHttp.responseText);
+  }
+}
+</script>
+
+<div id="evlist_content">
+  {calendar_content}
+</div>
+{# end {templatelocation} #}

@@ -74,9 +74,9 @@ if (isset($_GET['view'])) {
     $view = COM_applyFilter(COM_getArgument('view'));
 }
 
-if (empty($view)) {
+/*if (empty($view)) {
     $view = isset($_EV_CONF['default_view']) ? $_EV_CONF['default_view'] : '';
-}
+}*/
 
 if (isset($_GET['range'])) {
     $range = COM_applyFilter($_GET['range'], true);
@@ -117,21 +117,33 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
     list($year, $month, $day) = explode('-', $_GET['date']);
 }
 // Fill in any missing values
-if (empty($year))
+/*if (empty($year))
     $year = isset($_REQUEST['year']) ? (int)$_REQUEST['year'] : date('Y');
 if (empty($month))
     $month = isset($_REQUEST['month']) ? (int)$_REQUEST['month'] : date('m');
 if (empty($day))
     $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : date('d');
+*/
+if (empty($year))
+    $year = isset($_REQUEST['year']) ? (int)$_REQUEST['year'] : 0;
+if (empty($month))
+    $month = isset($_REQUEST['month']) ? (int)$_REQUEST['month'] : 0;
+if (empty($day))
+    $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
 
 switch ($view) {
+case 'today':
+    list ($year, $month, $day) = explode('-', $_EV_CONF['_today']);
+    $content = EVLIST_view('', $year, $month, $day);
+    break;
+
 case 'pday':
     $content = EVLIST_dayview($year, $month, $day, $category, $calendar, 'print');
     echo $content;
     exit;
 
 case 'day':
-    $content .= EVLIST_dayview($year, $month, $day, $category, $calendar);
+    $content .= EVLIST_view('day', $year, $month, $day, $category, $calendar);
     break;
 
 case 'pweek':
@@ -140,7 +152,7 @@ case 'pweek':
     exit;
 
 case 'week':
-    $content .= EVLIST_weekview($year, $month, $day, $category, $calendar);
+    $content .= EVLIST_view('week', $year, $month, $day, $category, $calendar);
     break;
 
 case 'pmonth':
@@ -149,17 +161,18 @@ case 'pmonth':
     exit;
 
 case 'month':
-    $content .= EVLIST_monthview($year, $month, $day, $category, $calendar);
+    $content .= EVLIST_view('month', $year, $month, $day, $category, $calendar);
     break;
 
 case 'pyear':
     $tpl = 'yearview_print';
+    break;
+
 case 'year':
-    $content .= EVLIST_yearview($year, $month, $day, $category, $calendar);
+    $content .= EVLIST_view('year', $year, 1, 1, $category, $calendar);
     break;
 
 case 'list':
-default:
     switch ($range) {
     case 1:         // Past events
         $block_title = $LANG_EVLIST['past_events'];
@@ -184,6 +197,10 @@ default:
     $content .= EVLIST_calHeader($year, $month, $day, 'list', $category, 
                     $calendar, $range);
     $content .= EVLIST_listview($range, $category, $calendar, $block_title);
+    break;
+
+default:
+    $content = EVLIST_view('', 0, 0, 0);
     break;
 }
 

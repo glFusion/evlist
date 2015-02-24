@@ -92,6 +92,55 @@ case 'delreminder':
     exit;
     break;
 
+case 'getCalDay':
+    USES_evlist_views();
+    $month = (int)$_GET['month'];
+    $day = (int)$_GET['day'];
+    $year = (int)$_GET['year'];
+    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
+    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
+    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $content = EVLIST_dayview($year, $month, $day, $cat, $cal, $opt);
+    echo $content;
+    exit;
+    break;
+
+case 'getCalWeek':
+    USES_evlist_views();
+    $month = (int)$_GET['month'];
+    $day = (int)$_GET['day'];
+    $year = (int)$_GET['year'];
+    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
+    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
+    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $content = EVLIST_weekview($year, $month, $day, $cat, $cal, $opt);
+    echo $content;
+    exit;
+    break;
+
+case 'getCalMonth':
+    USES_evlist_views();
+    $month = (int)$_GET['month'];
+    $year = (int)$_GET['year'];
+    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
+    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
+    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $content = EVLIST_monthview($year, $month, 1, $cat, $cal, $opt);
+    echo $content;
+    exit;
+    break;
+
+case 'getCalYear':
+    USES_evlist_views();
+    $year = (int)$_GET['year'];
+    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
+    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
+    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $content = EVLIST_yearview($year, 1, 1, $cat, $cal, $opt);
+    echo $content;
+    exit;
+    break;
+
 }
 
 if (!empty($content)) {

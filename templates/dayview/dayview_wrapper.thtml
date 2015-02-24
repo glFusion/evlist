@@ -1,0 +1,31 @@
+{# begin {templatelocation} #}
+<script type="text/javascript" src="{site_url}/evlist/js/calselect.js"></script>
+<script type="text/javascript">
+
+var xmlHttp;
+function ChangeDay(month, day, year)
+{
+  xmlHttp = EV_getXmlHttpObject();
+  if (xmlHttp==null) {
+    alert ("Browser does not support HTTP Request");
+    return;
+  }
+  var url = "{site_url}/evlist/ajax.php?action=getCalDay&month=" + month +
+        "&day=" + day + "&year=" + year;
+  xmlHttp.onreadystatechange=Day_stateChanged;
+  xmlHttp.open("GET",url,true);
+  xmlHttp.send(null);
+}
+
+function Day_stateChanged()
+{
+  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") {
+    document.getElementById("evlist_content").innerHTML = xmlHttp.responseText;
+  }
+}
+</script>
+
+<div id="evlist_content">
+  {calendar_content}
+</div>
+{# end {templatelocation} #}

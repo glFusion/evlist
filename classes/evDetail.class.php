@@ -206,8 +206,7 @@ class evDetail
         // If integrating with the Locator plugin, try to get and save
         // the coordinates to be used when displaying the event.
         // At least a city and state/province is required.
-        if ($_EV_CONF['use_locator'] == 1 && 
-                function_exists('GEO_getCoords') &&
+        if ($_EV_CONF['use_locator'] == 1 &&
                 $this->city != '' && 
                 $this->province != '') {
             $address = $this->street . ' ' . $this->city . ', ' .
@@ -216,18 +215,11 @@ class evDetail
             $lat = $this->lat;
             $lng = $this->lng;
             if ($lat == 0 && $lng == 0) {
-                /*
-                TODO: For next release, after Locator has been updated to
-                    support service calls, replace GEO_getCoords with this
-                $status = PLG_invokeService('locator', 'getCoords',
+                $status = LGLIB_invokeService('locator', 'getCoords',
                     $address, $output, $svc_msg);
                 if ($status == PLG_RET_OK) {
                     $this->lat = $output['lat'];
                     $this->lng = $output['lng'];
-                }*/
-                if (GEO_getCoords($address, $lat, $lng) == 0) {
-                    $this->lat = $lat;
-                    $this->lng = $lng;
                 }
             }
         }

@@ -382,6 +382,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="cal_id">
           {$LANG_EVLIST['calendar']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_calendar', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         {!if cal_name}
           {cal_name}
@@ -395,6 +396,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="title">
           {$LANG_EVLIST['event_title']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <input class="fValidate['required']" type="text" name="title"
             id="title" style="width:50%;" maxlength="255"
@@ -405,6 +407,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="summary">
             {$LANG_EVLIST['event_summary']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_summary', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <textarea name="summary" id="summary" style="width:80%;"
             cols="80" rows="2">{summary}</textarea>
@@ -413,6 +416,8 @@ function toggleRSVPdetail(val)
         <p>
         <label for="description">
           {$LANG_EVLIST['full_desc']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        </label>
         </label>
         <textarea name="full_description" id="description" style="width:80%;"
             cols="80" rows="3">{description}</textarea>
@@ -431,13 +436,17 @@ function toggleRSVPdetail(val)
         {!endif}
 
         <p>
-        <label for="url">{$LANG_EVLIST['url']}:</label>
+        <label for="url">{$LANG_EVLIST['url']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_url', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        </label>
         <input type="text" name="url" id="url" style="width:80%"
             maxlength="255" value="{url}" />
         </p>
 
         <p>
-        <label for="status">{$LANG_EVLIST['enabled']}</label>
+        <label for="status">{$LANG_EVLIST['enabled']}
+        <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        </label>
         <input type="checkbox" name="status" value="1" id="status" {status_checked} />
         </p>
 
@@ -445,6 +454,7 @@ function toggleRSVPdetail(val)
         <p>
           <label for="enable_reminders">
             {$LANG_EVLIST['enable_reminders_q']}
+        <a href="#" onclick="popupWindow('{doc_url}#desc_reminders', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           </label>
           <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} /><br />
           <span class="pluginSmallText warning">{$LANG_EVLIST['submit_email_note']}</span>
@@ -486,6 +496,7 @@ function toggleRSVPdetail(val)
       <div style="padding:5px;">
         <label for="f_startdate1">
           {$LANG_EVLIST['start_date']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
             id="startdt1_trigger"
@@ -512,6 +523,7 @@ function toggleRSVPdetail(val)
 
         <label for="f_enddate1">
           {$LANG_EVLIST['end_date']}:
+        <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
             id="enddate1_trigger"
@@ -537,6 +549,7 @@ function toggleRSVPdetail(val)
 
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
+        <a href="#" onclick="popupWindow('{doc_url}#desc_split', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           <input type="checkbox" name="split" value="1" 
                 id="split" {split_checked} onclick="showhideallday()" />
           &nbsp;&nbsp;
@@ -544,6 +557,7 @@ function toggleRSVPdetail(val)
 
         <span {allday_show} id="div1">
           {$LANG_EVLIST['allday']}
+        <a href="#" onclick="popupWindow('{doc_url}#desc_allday', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           <input type="checkbox" name="allday" value="1" 
             id="allday" {allday_checked} onclick="chk_allday()" />
         </span>
@@ -797,6 +811,38 @@ function toggleRSVPdetail(val)
         <input type="text" name="rsvp_cutoff" maxlength="5" 
             id="rsvp_cutoff" value="{rsvp_cutoff}" />
       </p>
+      <p>
+        <label for="max_user_rsvp">{$LANG_EVLIST['max_user_rsvp']}:</label>
+        <input type="text" name="max_user_rsvp" maxlength="5" 
+            id="max_user_rsvp" value="{max_user_rsvp}" />
+      </p>
+      <div style="clear:both;"></div>
+      <p>
+        <label>{$LANG_EVLIST['ticket_types']}:</label>
+        <div class="evdata">
+        <table>
+        <th>{$LANG_EVLIST['enabled']}</th>
+        <th>{$LANG_EVLIST['type']}</th>
+        <th>{$LANG_EVLIST['fee']}</th>
+        {tick_opts}
+        {!if 0}
+        <!-- BEGIN Tickets -->
+        <tr><td><input name="tickets[]" type="checkbox" {tick_enabled} value="{tick_id}" /></td>
+        <td>{tick_desc}</td>
+        <td><input type="text" value="{tick_fee}" size="8" /></td></tr>
+        <!-- END Tickets -->
+        {!endif}
+        </table>
+        </div>
+      </p>
+      {!if rsvp_print}
+      <p>
+        <label>Allow Ticket Printing?:</label>
+        <input type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}> No
+        <input type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}> Paid Only
+        <input type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}> Paid or Unpaid
+      </p>
+     {!endif}
       </div>
     </fieldset>
     {!endif}
@@ -913,12 +959,12 @@ function toggleRSVPdetail(val)
     {submission}
 
     <p style="text-align:left;">
-      <input type="submit" name="{saveaction}" value="{$LANG_ADMIN['save']}" />
-      <input type="reset" name="reset" value="{$LANG_EVLIST['reset']}" />
+      <input type="submit" class="lgButton green" name="{saveaction}" value="{$LANG_ADMIN['save']}" />
+      <input type="reset" class="lgButton grey" name="reset" value="{$LANG_EVLIST['reset']}" />
       {!if del_button}
-        <input type="submit" name="{delaction}" value="{$LANG_ADMIN['delete']}" />
+        <input type="submit" class="lgButton red" name="{delaction}" value="{$LANG_ADMIN['delete']}" />
       {!endif}
-      <input type="reset" name="cancel" value="{$LANG_ADMIN['cancel']}" 
+      <input type="reset" class="lgButton blue" name="cancel" value="{$LANG_ADMIN['cancel']}" 
            onclick="javascript: document.location.href='{cancel_url}'" />
     </p>
   </form>

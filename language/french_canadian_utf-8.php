@@ -94,6 +94,11 @@ $LANG_EVLIST = array(
 'categories'            => 'Catégories',
 'category'             => 'Catégorie',
 'new_category'          => 'Nouvelle catégorie',
+'ticket_types'      => 'Ticket Types',
+'type'              => 'Type',
+'fee'               => 'Fee',
+'new_ticket_type'   => 'New Ticket Type',
+'print_tickets'     => 'Print Tickets',
 'import_calendar'       => 'Importer à partir de Calendrier',
 'import_from_csv'       => 'Importer de CSV',
 'title'             => 'titre',
@@ -260,12 +265,16 @@ $LANG_EVLIST = array(
 23              => 'Il y a eu une erreur de traitement de votre demande. ',
 24              => 'Vous avez été enregistré pour cet événement. ',
 25              => 'Votre inscription a été annulée. ',
+    26  => 'Payment is required, click <a href="%s">here</a> to check out',
+    50  => 'Not Paid',
+    51  => 'Already Used',
 ),
 
 'admin_instr'           => array(
-'catégories'            => "Suppression de catégories <strong>pas< /strong> supprimer les événements appartenant à ces catégories. <br / >La désactivation d'une catégorie <strong>pas< /strong> désactiver ses événements. Ces événements continueront d'apparaître dans la liste d'événements. ",
+'categories'            => "Suppression de catégories <strong>pas< /strong> supprimer les événements appartenant à ces catégories. <br / >La désactivation d'une catégorie <strong>pas< /strong> désactiver ses événements. Ces événements continueront d'apparaître dans la liste d'événements. ",
 'calendars'            => "Tous les événements doivent être associées à un calendrier. <br / >La désactivation d'un calendrier empêche ses événements d'être affiché. La suppression d'un calendrier, il faut que les événements appartenant à la déplacer dans un autre calendrier. <br / >Calendrier numéro 1 ne peut pas être supprimé, mais elle peut être désactivée. ",
-'événements'            => "Pour créer un nouvel événement, cliquez sur 'Nouvel événement' ci-dessus. <br / >Pour modifier ou supprimer un événement, cliquez sur cet événement\'s modifier icône ci-dessous. Pour activer/désactiver un événement, cochez la case appropriée ci-dessous. ",
+'events'            => "Pour créer un nouvel événement, cliquez sur 'Nouvel événement' ci-dessus. <br / >Pour modifier ou supprimer un événement, cliquez sur cet événement\'s modifier icône ci-dessous. Pour activer/désactiver un événement, cochez la case appropriée ci-dessous. ",
+    'tickettypes' => 'Tickets can be created for free or paid admission, and to cover one event occurrence or all occurrences (event pass). Tickets are only used if the global &quot;Enable RSVP&quot; setting is enabled.<br />Ticket Types can only be deleted if they haven&apos; been used for any events.',
 ),
 
 'current_events'        => 'événements en cours',
@@ -299,6 +308,7 @@ $LANG_EVLIST = array(
 'instr_sel_loc'         => 'Sélectionnez un emplacement dans la liste, ou remplissez les détails. ',
 'use_rsvp'          => 'Activer inscriptions? ',
 'max_rsvp'          => 'Max. Les participants',
+'max_user_rsvp' => 'Max. Registrations per User',
 'signup'            => 'vous inscrire à cet événement',
 'cancelreg'             => 'annuler votre inscription',
 'rsvp_none'             => 'inscriptions Désactivé',
@@ -309,9 +319,24 @@ $LANG_EVLIST = array(
 'rsvp_date'             => "Date d'enregistrement",
 'rsvp_waitlist'         => "Accepter sur liste d'attente réserves? ",
 'rsvp_cutoff'           => 'RSVP Cutoff (jours) ',
+'registration'  => 'Registration',
+'rsvp_waitlist' => 'Accept waitlisted reservations?',
+'rsvp_cutoff'   => 'RSVP Cutoff (days)',
 'sel_monthdays'         => "Sélectionnez les jours chaque mois lorsque l'événement se produira",
 'sub_this_instance'         => 'cette Instance',
 'sub_all_instances'         => 'toutes les occurrences',
+'description'   => 'Description',
+'event_pass'    => 'Event Pass',
+'cancel_free'   => 'Free registrations can be cancelled here if you will not be attending.',
+'free_rsvp'     => 'Free Registrations',
+'ticket_num'    => 'Ticket Number',
+'date_used'     => 'Date Used',
+'paid'          => 'Paid',
+'login_to_register' => 'You need to log into the site to register for this event',
+'conf_reset'    => 'Are your sure you want to reset this item?',
+'reset_usage'   => 'Reset Usage',
+'conf_reset'    => 'Are your sure you want to reset this item?',
+'reset_usage'   => 'Reset Usage',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";
@@ -356,6 +381,7 @@ $LANG_confignames[ 'evlist'] = array(
 'max_upcoming_days'         => 'Max. Les prochains jours à afficher dans la liste',
 'use_locator'           => 'intégrer avec le Locator plugin ? ',
 'use_weather'           => 'intégrer avec la météo plugin ? ',
+    'cal_tmpl'              => 'Use HTML or JSON templates',
 );
 
 $LANG_configsubgroups[ 'evlist'] = array(
@@ -446,6 +472,9 @@ $LANG_configselects[ 'evlist'] = array(
 'Admins uniquement'         => 0,
 'connecté les utilisateurs'     => 1,
 'connecté +Anon Utilisateurs'   => 2),
+    16 => array('HTML' => 'html', 'JSON' => 'json'),
+    17 => array('No' => 0, 'Default No' => 1, 'Default Paid Only' => 2,
+                'Default Paid or Unpaid' => 3),
 );
 
 ?>

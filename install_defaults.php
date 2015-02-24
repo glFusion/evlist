@@ -54,33 +54,36 @@ if (!defined ('GVERSION')) {
 */
 
 global $CONF_EVLIST_DEFAULT;
-$CONF_EVLIST_DEFAULT = array();
-
-$CONF_EVLIST_DEFAULT['allow_anon_view']    = 1;
+$CONF_EVLIST_DEFAULT = array(
+    'allow_anon_view'   => 1,    // allow anonymous to view calendars
 // Which users can add events: 1 = users, 2 = anon, 3 = both
-$CONF_EVLIST_DEFAULT['can_add']            = EV_USER_CAN_ADD; 
-$CONF_EVLIST_DEFAULT['allow_html']         = 1;
-$CONF_EVLIST_DEFAULT['usermenu_option']    = 1;
-$CONF_EVLIST_DEFAULT['enable_menuitem']    = 1;
-$CONF_EVLIST_DEFAULT['enable_categories']  = 1;
-$CONF_EVLIST_DEFAULT['enable_centerblock'] = 0;
-$CONF_EVLIST_DEFAULT['pos_centerblock']    = 2;
-$CONF_EVLIST_DEFAULT['topic_centerblock']  = 'home';
-$CONF_EVLIST_DEFAULT['range_centerblock']  = 2;
-$CONF_EVLIST_DEFAULT['limit_list']         = 5;
-$CONF_EVLIST_DEFAULT['limit_block']        = 5;
-$CONF_EVLIST_DEFAULT['limit_summary']      = 128;
-$CONF_EVLIST_DEFAULT['enable_reminders']   = 1;
-$CONF_EVLIST_DEFAULT['event_passing']      = 2;
-$CONF_EVLIST_DEFAULT['default_permissions'] = array (3, 2, 2, 2);
-$CONF_EVLIST_DEFAULT['reminder_speedlimit'] = 30;
-$CONF_EVLIST_DEFAULT['post_speedlimit']     = $_CONF['speedlimit'];
-$CONF_EVLIST_DEFAULT['reminder_days']       = 1;
-$CONF_EVLIST_DEFAULT['displayblocks']       = 1;
-$CONF_EVLIST_DEFAULT['default_view']        = 'month';
-$CONF_EVLIST_DEFAULT['max_upcoming_days']   = 90;
-$CONF_EVLIST_DEFAULT['use_locator']         = 0;
-$CONF_EVLIST_DEFAULT['use_weather']         = 0;
+    'can_add'           => EV_USER_CAN_ADD;,
+    'allow_html'        = 1,    // allow html in posts
+    'usermenu_option'   => 1,   // add to the glfusion user menu
+    'enable_menuitem'   => 1,   // add to the glfusion main menu
+    'enable_categories' => 1,   // enable event categories
+    'enable_centerblock' => 0,  // set as centerblock
+    'pos_centerblock'   => 2,   // centerblock position
+    'topic_centerblock' => 'home',  // centerblock topic
+    'range_centerblock' => 2,   // event range for centerblock
+    'limit_list'        => 5,   // number of events shown in list view
+    'limit_block'       => 5,   // number of events shown in upcoming block
+    'limit_summary'     => 128, // number of characters in summaries
+    'enable_reminders'  => 1,   // enable email reminders
+    'event_passing'     => 2,   // when has an evern passed
+    'default_permissions' => array (3, 2, 2, 2),
+    'reminder_speedlimit' => 30,    // max frequency for reminder submissions
+    'post_speedlimit'   => $_CONF['speedlimit'],    // max freq. for posts
+    'reminder_days'     => 1,   // min number of days for reminders
+    'displayblocks'     => 1,   // display glfusion blocks
+    'default_view'      => 'month',
+    'max_upcoming_days' => 90,  // max days in future for list and block
+    'use_locator'       => 0,   // integrate with locater plugin
+    'use_weather'       => 0,   // integrate with westher plugin
+    'cal_tmpl'          => 'json'   // json or html calendar display
+    'enable_rsvp'       => 0,   // 0=false, 1=default no, 2=default yes
+    'rsvp_print'        => 0,   // 0=false, 1=default no, 2=default yes paid, 3=default yes all
+);
 
 /**
 * Initialize evList plugin configuration
@@ -150,6 +153,8 @@ function plugin_initconfig_evlist()
                 0, 1, 0, 110, true, 'evlist');
         $c->add('use_weather', $CONF_EVLIST_DEFAULT['use_weather'], 'select',
                 0, 1, 0, 120, true, 'evlist');
+        $c->add('cal_tmpl', $CONF_EVLIST_DEFAULT['cal_tmpl'], 'select',
+                0, 1, 16, 130, true, 'evlist');
 
         $c->add('ev_centerblock', NULL, 'fieldset', 0, 2, NULL, 0, true,
                 'evlist');
@@ -170,6 +175,15 @@ function plugin_initconfig_evlist()
                 'evlist');
         $c->add('default_permissions', $CONF_EVLIST_DEFAULT['default_permissions'],
                 '@select', 0, 3, 12, 10, true, 'evlist');
+
+        $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
+        $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
+        $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
+                20, 10, 17, 10, true, 'evlist');
+        $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
+                20, 10, 17, 10, true, 'evlist');
+        $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
+                20, 10, 17, 20, true, 'evlist');
     }
 
     return true;

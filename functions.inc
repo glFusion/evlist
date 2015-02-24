@@ -65,9 +65,8 @@ $_EV_CONF['_today_ts'] = strtotime($_EV_CONF['_today']);
 // Check the version of the locator plugin and reset the use_locator
 // config value if it's inadequate.
 if ($_EV_CONF['use_locator'] == 1) {
-    $loc_ver = DB_getItem($_TABLES['plugins'], 'pi_version',
-        "pi_name='locator'");
-    if (empty($loc_ver) || $loc_ver < $EV_CONF['min_locator_ver']) {
+    if (!isset($_PLUGIN_INFO['locator']) ||
+        !COM_checkVersion($_PLUGIN_INFO['locator'], $EV_CONF['min_locator_ver'])) {
         $_EV_CONF['use_locator'] = 0;
     }
 }
@@ -102,7 +101,9 @@ function USES_evlist_views()
 {    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
 
 function USES_evlist_class_datecalc()
-{   require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php'; }
+{   //require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php';
+    require_once 'Date/Calc.php';
+}
 
 function USES_evlist_class_event()
 {   require_once EVLIST_PI_PATH . '/classes/evEvent.class.php'; }
@@ -121,6 +122,12 @@ function USES_evlist_class_category()
 
 function USES_evlist_class_recur()
 {   require_once EVLIST_PI_PATH . '/classes/evRecur.class.php'; }
+
+function USES_evlist_class_tickettype()
+{   require_once EVLIST_PI_PATH . '/classes/evTicketType.class.php'; }
+
+function USES_evlist_class_ticket()
+{   require_once EVLIST_PI_PATH . '/classes/evTicket.class.php'; }
 
 // Define values for whether RSVP can be per repeat or only for a whole event
 // This is basically ignored for one-time events.
@@ -1111,7 +1118,7 @@ function plugin_moderationvalues_evlist()
 */
 function plugin_ismoderator_evlist()
 {
-    return SEC_hasRights('evlist.submit');
+    return SEC_hasRights('evlist.admin');
 }
 
 
@@ -1952,6 +1959,36 @@ function plugin_getconfigelementhelp_evlist($element, $doclang )
 
 
 /**
+*   Get the link to a documentation file.
+*
+*   Returns the URL to the file, or to the directory if no file requested.
+*
+*   @param  string  $file       HTML file
+*   @param  string  $doclang    Documentation language
+*   @return string              URL to document directory or file
+*/
+function EVLIST_getDocURL($file='', $doclang='english')
+{
+    $doc_path = EVLIST_PI_PATH . "/docs/$doclang/";
+    $doc_url = '';
+
+    if ($file != '') {
+        if (!file_exists($doc_path . $file)) {
+            $doclang = 'english';
+        }
+        $doc_url = EVLIST_URL . "/docs/$doclang/$file";
+    } else {
+        if (!is_dir($doc_path)) {
+            $doclang = 'english';
+        }
+        $doc_url = EVLIST_URL . "/docs/$doclang/";
+    }
+
+    return $doc_url;
+}
+
+ 
+/**
 *   Get the site header, with or without left blocks according to config.
 *
 *   @see    function COM_siteHeader()
@@ -2309,9 +2346,25 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 function EVLIST_getEvents_json($start='', $end='', $opts=array())
 {
     $events = EVLIST_getEvents($start, $end, $opts);
-    $events = json_encode($events);
-    return events;
+    $json_events = array();
+    // convert to simple array from key->value, add the date as a
+    // value within each event array
+    $counter = 0;
+    foreach ($events as $dt=>$data) {
+        foreach ($data as $key=>$event) {
+            // some massaging for json
+            // remove serialized values, messes with json text formatting
+            unset($data[$key]['rec_data']);
+            unset($data[$key]['options']);
+        }
+        $json_events[$counter]['date'] = $dt;
+        $json_events[$counter]['events'] = $data;
+        $counter++;
+    }
+    $events = json_encode($json_events);
+    return $events;
 }
+
 
 /**
 *   Replace quotes and apostrophes with HTML entities.
@@ -2324,6 +2377,56 @@ function EVLIST_getEvents_json($start='', $end='', $opts=array())
 function EVLIST_noquotes($str)
 {
     return str_replace(array("'", '"'), array('&apos;', '&quot;'), $str);
+}
+
+if ($_EV_CONF['enable_rsvp']) {
+    include_once dirname(__FILE__) . '/services.inc.php';
+}
+
+
+/**
+*   Log activity to a plugin-specific log file
+*
+*   @param string $logentry Text to log
+*/
+function EVLIST_Log($logentry = '')
+{
+    global $_CONF, $_USER, $LANG01;
+
+    if (function_exists('LGLIB_log')) {
+        LGLIB_log('evlist', $logentry);
+        return;
+    }
+
+    if ($logentry == '')
+        return '';
+
+    // A little sanitizing
+    $logentry = str_replace(
+            array('<?', '?>'), 
+            array('(@', '@)'),
+            $logentry);
+
+    $timestamp = strftime( '%c' );
+    $logfile = $_CONF['path_log'] . 'evlist.log';
+
+    // Can't open the log file?  Return an error
+    if (!$file = fopen($logfile, 'a')) {
+        return $LANG01[33] . $logfile . ' (' . $timestamp . ')' . PHBR;
+    }
+
+    // Get the user name if it's not anonymous
+    if (isset($_USER['uid'])) {
+        $byuser = $_USER['uid'] . '-'. 
+            COM_getDisplayName($_USER['uid'], 
+                $_USER['username'], $_USER['fullname']);
+    } else {
+        $byuser = 'anon';
+    }
+    $byuser .= '@' . $_SERVER['REMOTE_ADDR'];
+
+    // Write the log entry to the file
+    fputs($file, "$timestamp ($byuser) - $logentry\n");
 }
 
 

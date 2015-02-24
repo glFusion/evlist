@@ -105,10 +105,34 @@ case 'toggle':
         echo "</info>\n";*/
         break;
 
+    case 'tickettype':
+        USES_evlist_class_tickettype();
+        switch ($_GET['type']) {
+        case 'enabled':
+        case 'event_pass':
+            $newval = evTicketType::Toggle($_GET['type'], $_REQUEST['oldval'], $_REQUEST['id']);
+            break;
+
+         default:
+            exit;
+        }
+
+         break;
+
     default:
         exit;
     }
 
+    $response = array(
+        'newval' => $newval,
+        'id'    => $_REQUEST['id'],
+        'type'  => $_REQUEST['type'],
+        'component' => $_REQUEST['component'],
+        'baseurl'   => EVLIST_ADMIN_URL,
+    );
+    echo json_encode($response);
+    break;
+/* 
         header('Content-Type: text/xml');
         header("Cache-Control: no-cache, must-revalidate");
         //A date in the past
@@ -123,7 +147,7 @@ case 'toggle':
         echo "<baseurl>" . EVLIST_ADMIN_URL . "</baseurl>\n";
         echo "</info>\n";
         break;
-
+*/
 
 }
 

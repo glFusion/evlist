@@ -74,6 +74,7 @@ $expected = array('edit', 'cancel',
     'delevent', 'delrepeat', 'delfuture',
     'savereminder', 'delreminder', 'clone',
     'register', 'cancelreg', 'search', 'print',
+    'printtickets',
 );
 $action = 'view';
 $view = '';
@@ -90,8 +91,13 @@ foreach($expected as $provided) {
 }
 
 // Set variables that are almost always used
-$rp_id = isset($_POST['rp_id']) ? (int)$_POST['rp_id'] :
-        isset($_GET['rp_id']) ? (int)$_GET['rp_id'] : 0;
+if (isset($_POST['rp_id'])) {
+    $rp_id = (int)$_POST['rp_id'];
+} elseif (isset($_GET['rp_id'])) {
+    $rp_id = (int)$_GET['rp_id'];
+} else {
+    $rp_id = 0;
+}
 //$eid = isset($_POST['eid']) ? COM_applyFilter($_POST['eid']) :
 //        isset($_GET['eid']) ? COM_applyFilter($_GET['eid']) : '';
 $cal_id = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -115,6 +121,7 @@ case 'edit':
 case 'view':
 case 'clone':
 case 'print':
+case 'printtickets':
     $view = $action;
     break;
 
@@ -142,7 +149,6 @@ case 'search':
 
 case 'saverepeat':
 case 'savefuturerepeat':
-    $rp_id = isset($_POST['rp_id']) ? (int)$_POST['rp_id'] : 0;
     if ($rp_id > 0) {
         USES_evlist_class_repeat();
         $R = new evRepeat($rp_id);
@@ -217,11 +223,11 @@ case 'delfuture':
 // DEPRECATED
 case 'savereminder':
     USES_evlist_class_repeat();
-    $Ev = new evRepeat($_POST['rp_id']);
+    $Ev = new evRepeat($rp_id);
     if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess()) {
         // eid is normally main event id.  This keeps us from being redirected
         // to index.php after saving the reminder.
-        $eid = (int)$_POST['rp_id'];
+        $eid = (int)$rp_id;
         $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
             (eid, rp_id, uid, email, days_notice)
         VALUES (
@@ -239,36 +245,47 @@ case 'savereminder':
     }
     break;
 
-// DEPRECATED
 case 'delreminder':
+// DEPRECATED
     USES_evlist_class_repeat();
-    $Ev = new evRepeat($_POST['rp_id']);
+    $Ev = new evRepeat($rp_id);
     if (!COM_isAnonUser() && $Ev->rp_id > 0) {
         DB_delete($_TABLES['evlist_remlookup'],
             array('eid', 'uid', 'rp_id'),
-            array($_POST['eid'], $_USER['uid'], $_POST['rp_id']) );
+            array($_POST['eid'], $_USER['uid'], $rp_id) );
     }
-    $eid = (int)$_POST['rp_id'];
+    $eid = (int)$rp_id;
     break;
 
 case 'register':
+    if ($rp_id < 1) {
+        break;
+    } elseif (COM_isAnonUser()) {
+        $display = EVLIST_siteHeader();
+        $display .= SEC_loginRequiredForm();
+        $display .= EVLIST_siteFooter();
+        echo $display;
+        exit;
+    }
+    USES_evlist_class_repeat();
+    $Ev = new evRepeat($rp_id);
+    $msg = $Ev->Register($_POST['tick_count'], $_POST['tick_type']);
+    //if ($msg == 0) $msg = 24;   // Set "success" message.
+    //LGLIB_storeMessage($LANG_EVLIST['messages'][$msg]);
+    echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
+    break;
+
+case 'cancelreg':
     if ($rp_id < 1 || COM_isAnonUser()) {
         // Anonymous users can't register
         break;
     }
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
-    $msg = $Ev->Register();
-    if ($msg == 0) $msg = 24;   // Set "success" message.
-    $eid = $rp_id;      // Set eid for the event view
-    break;
-
-case 'cancelreg':
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
-    $msg = $Ev->CancelRegistration();
-    if ($msg == 0) $msg = 25;   // Set "success" message.
-    $eid = $rp_id;      // Set eid for the event view
+    $status = $Ev->CancelRegistration(0, $_POST['num_cancel']);
+    $msg = $status == true ? 25 : 23;
+    LGLIB_storeMessage($LANG_EVLIST['messages'][$msg]);
+    echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;
  
 case 'cancel':
@@ -339,6 +356,18 @@ case 'print':
         exit;
     }
     break; 
+
+case 'printtickets':
+    if ($_EV_CONF['enable_rsvp'] && !COM_isAnonUser()) {
+        USES_evlist_class_ticket();
+        $eid = COM_sanitizeID($_GET['eid'], false);
+        $doc = evTicket::PrintTickets($eid, 0, $_USER['uid']);
+        echo $doc;
+        exit;
+    } else {
+        $content .= 'Function not available';
+    }
+    break;
 
 case 'view':
 default:

@@ -587,6 +587,7 @@ table.smallmonthtable a.day-noevents {
 }
 
 .reminder_div {
-    position: absolute;
+    clear:both;
+    width:50%;
 }
 

@@ -1,0 +1,4 @@
+<html><body>
+<h1 style="font-size:60px;color:{color};">{text}</h1>
+<span style="font-size:12px;">{timestamp}</span>
+</body></html>

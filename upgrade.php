@@ -49,8 +49,11 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-global $_DB_dbms;    
+global $_DB_dbms, $c, $_CONF, $CONF_EVLIST_DEFAULT;
 require_once EVLIST_PI_PATH . "/sql/{$_DB_dbms}_install.php";
+require_once $_CONF['path'] . 'system/classes/config.class.php';
+require_once $_CONF['path'] . 'plugins/evlist/install_defaults.php';
+$c = config::get_instance();
 
 /**
 *   Upgrade the evList plugin
@@ -59,7 +62,7 @@ require_once EVLIST_PI_PATH . "/sql/{$_DB_dbms}_install.php";
 */
 function evlist_upgrade()
 {
-    global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms;
+    global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c;
 
     $currentVersion = DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'");
 
@@ -106,14 +109,11 @@ function evlist_upgrade()
         case '1.1.1.fusion' :
         case '1.1.3.fusion' :
             // need to migrate the configuration to our new online configuration.
-            require_once $_CONF['path'] . 'plugins/evlist/install_defaults.php';
             plugin_initconfig_evlist();
             include $_CONF['path'].'plugins/evlist/evlist.php';
             DB_query("DROP TABLE {$_TABLES['evlist_settings']}",1);
             DB_query("UPDATE {$_TABLES['plugins']} SET pi_version = '1.1.4.fusion', pi_gl_version='1.1.0',pi_homepage='http://www.glfusion.org' WHERE pi_name = '$pi_name'");
         case '1.1.4.fusion' :
-            require_once $_CONF['path'] . 'system/classes/config.class.php';
-            $c = config::get_instance();
             $c->add('enable_reminders',1, 'select',0, 0, 0, 80, true, 'evlist');
             $c->add('reminder_days',7, 'text',0, 0, NULL, 90, true, 'evlist');
 
@@ -127,8 +127,6 @@ function evlist_upgrade()
         case '1.2.3' :
         case '1.2.4' :
         case '1.2.5' :
-            require_once $_CONF['path'] . 'system/classes/config.class.php';
-            $c = config::get_instance();
             $c->add('displayblocks',0, 'select',0, 1, 13, 25, true, 'evlist');
             // no db or config changes
             DB_query("UPDATE {$_TABLES['groups']} SET grp_gl_core=2 WHERE grp_name='evList Admin'",1);
@@ -201,12 +199,23 @@ function evlist_upgrade()
 
         case '1.3.6':
             // Remove date and time formats, global configs are used instead.
-            require_once $_CONF['path'] . 'system/classes/config.class.php';
-            $c = config::get_instance();
             $c->del('week_begins', 'evlist');
             $c->del('date_format', 'evlist');
             $c->del('time_format', 'evlist');
- 
+            $c->add('cal_tmpl', 'html', 'select',
+                    0, 1, 16, 130, true, 'evlist');
+            $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
+            $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
+            $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
+                20, 10, 17, 10, true, 'evlist');
+            $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
+                20, 10, 17, 10, true, 'evlist');
+            $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
+                20, 10, 17, 20, true, 'evlist');
+             DB_query("UPDATE {$_TABLES['features']} SET
+                    ft_descr = 'Allowed to submit events'
+                WHERE ft_name='evlist.submit'", 1);
+
         default:
             DB_query("UPDATE {$_TABLES['plugins']}
                     SET 
@@ -236,16 +245,9 @@ function evlist_upgrade()
 */
 function evlist_upgrade_1_3_0()
 {
-    global $_CONF, $_EV_CONF, $_TABLES, $_DB_dbms;
+    global $_CONF, $_EV_CONF, $_TABLES, $_DB_dbms, $c, $CONF_EVLIST_DEFAULT;
 
-    require_once $_CONF['path'] . 'system/classes/config.class.php';
-    //require_once EVLIST_PI_PATH . "/sql/{$_DB_dbms}_install.php";
-    // Need the default values for the new calendars table
-    require_once $_CONF['path'] . 'plugins/evlist/install_defaults.php';
-    //require_once $_CONF['path'] . 'plugins/evlist/sql/def_events.php';
-    
     USES_evlist_class_event();
-    $c = config::get_instance();
     $c->add('default_view', $CONF_EVLIST_DEFAULT['default_view'], 'select',
                 0, 1, 14, 90, true, 'evlist');
     $c->add('max_upcoming_days', $CONF_EVLIST_DEFAULT['max_upcoming_days'], 'text',

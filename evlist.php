@@ -69,6 +69,9 @@ $_TABLES['evlist_repeat']       = $_DB_table_prefix . 'evlist_repeat';
 $_TABLES['evlist_detail']       = $_DB_table_prefix . 'evlist_detail';
 $_TABLES['evlist_calendars']    = $_DB_table_prefix . 'evlist_calendars';
 $_TABLES['evlist_rsvp']         = $_DB_table_prefix . 'evlist_rsvp';
+$_TABLES['evlist_tickettypes']  = $_DB_table_prefix . 'evlist_tickettypes';
+$_TABLES['evlist_tickets']      = $_DB_table_prefix . 'evlist_tickets';
+$_TABLES['evlist_tickets_used'] = $_DB_table_prefix . 'evlist_tickets_used';
 
 // Deprecated tables, but needed to do the upgrade
 $_TABLES['evlist_dateformat']   = $_DB_table_prefix . 'evlist_dateformat';
@@ -95,6 +98,7 @@ define('EV_USER_CAN_ADD',   1);
 define('EV_ANON_CAN_ADD',   2);
 
 $_EV_CONF['min_locator_ver'] = '1.0.3'; // minimum locator version required
+$_EV_CONF['min_lglib_ver'] = '0.0.7';   // minimum lglib version required
 $_EV_CONF['max_repeats'] = 1000;    // Max repeats created for events
 $_EV_CONF['enable_rsvp'] = 0;       // Future feature- TODO: remove when ready
 

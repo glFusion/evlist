@@ -97,6 +97,16 @@ function EVLIST_adminHeader($page)
             'text' => $LANG_EVLIST['categories']);
     }
 
+    if ($_EV_CONF['enable_rsvp']) {
+        if ($page == 'tickettypes') {
+            $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editticket=0',
+                'text' => $LANG_EVLIST['new_ticket_type']);
+        } else {
+            $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?tickettypes',
+                'text' => $LANG_EVLIST['ticket_types']);
+        }
+    }
+
     $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?importcalendar=x',
             'text' => $LANG_EVLIST['import_calendar']);
     $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?import=x',
@@ -164,6 +174,109 @@ function EVLIST_adminlist_categories()
     );
 
     $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_cat', 
+            $header_arr, $text_arr, $query_arr, $defsort_arr);
+    return $retval;
+}
+
+
+/**
+*   Get the list of ticket types
+*
+*   @return string      HTML for admin list
+*/
+function EVLIST_adminlist_tickettypes()
+{
+    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+
+    USES_lib_admin();
+
+    $retval = '';
+
+    $header_arr = array(
+        array('text' => $LANG_EVLIST['edit'], 
+                'field' => 'edit', 'sort' => false),
+        array('text' => $LANG_EVLIST['id'], 
+                'field' => 'id', 'sort' => true),
+        array('text' => $LANG_EVLIST['description'], 
+                'field' => 'description', 'sort' => true),
+        array('text' => $LANG_EVLIST['enabled'],
+                'field' => 'enabled', 'sort' => false),
+        array('text' => $LANG_EVLIST['event_pass'],
+                'field' => 'event_pass', 'sort' => false),
+        array('text' => $LANG_ADMIN['delete'],
+                'field' => 'delete', 'sort' => false),
+    );
+
+    $defsort_arr = array('field' => 'id', 'direction' => 'ASC');
+
+    $text_arr = array('has_menu'     => false,
+                      'has_extras'   => false,
+                      'title'        => $LANG_EVLIST['pi_title'].': ' .
+                                        $LANG_EVLIST['categories'],
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'help_url'     => ''
+    );
+
+    $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']} WHERE 1=1 ";
+
+    $query_arr = array('table' => 'evlist_tickettypes',
+            'sql' => $sql,
+            'query_fields' => array('description'),
+    );
+
+    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickettypes', 
+            $header_arr, $text_arr, $query_arr, $defsort_arr);
+    return $retval;
+}
+
+
+/**
+*   Get the list of ticket types
+*
+*   @return string      HTML for admin list
+*/
+function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
+{
+    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+
+    USES_lib_admin();
+
+    $retval = '';
+
+    $header_arr = array(
+        array('text' => $LANG_EVLIST['id'], 
+                'field' => 'tick_id', 'sort' => true),
+        array('text' => $LANG_EVLIST['registrant'], 
+                'field' => 'uid', 'sort' => false),
+        array('text' => $LANG_EVLIST['fee'],
+                'field' => 'fee', 'sort' => false),
+        array('text' => $LANG_EVLIST['event_pass'],
+                'field' => 'event_pass', 'sort' => false),
+        array('text' => $LANG_ADMIN['delete'],
+                'field' => 'delete', 'sort' => false),
+    );
+
+    $defsort_arr = array('field' => 'tick_id', 'direction' => 'ASC');
+
+    $text_arr = array('has_menu'     => false,
+                      'has_extras'   => false,
+                      'title'        => $LANG_EVLIST['pi_title'].': ' .
+                                        $LANG_EVLIST['tickets'],
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'help_url'     => ''
+    );
+
+    $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE ev_id='" .
+            DB_escapeString($ev_id) . "'";
+    if ($rp_id != 0) {
+        $sql .= " AND rp_id = " . (int)$rp_id;
+    }
+    $query_arr = array('table' => 'evlist_tickets',
+            'sql' => $sql,
+            'query_fields' => array(),
+    );
+
+    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickets', 
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -276,6 +389,101 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
         default:
             $retval = $fieldvalue;
             break;
+    }
+    return $retval;
+}
+
+
+/**
+*   Return the display value for a ticket type field
+*
+*   @param  string  $fieldname  Name of the field
+*   @param  mixed   $fieldvalue Value of the field
+*   @param  array   $A          Name-value pairs for all fields
+*   @param  array   $icon_arr   Array of system icons
+*   @return string      HTML to display for the field
+*/
+function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $icon_arr)
+{
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+
+    switch($fieldname) {
+        case 'edit':
+            $retval = '<a href="' . EVLIST_ADMIN_URL . 
+                '/index.php?editticket=' . $A['id'].
+                '" title="' . $LANG_ADMIN['edit'] . '" />' .
+                $icon_arr['edit'] . '</a>';
+            break;
+        case 'enabled':
+        case 'event_pass':
+            if ($fieldvalue == '1') {
+                $switch = EVCHECKED;
+                $enabled = 1;
+            } else {
+                $switch = '';
+                $enabled = 0;
+            }
+            $retval .= "<input type=\"checkbox\" $switch value=\"1\" 
+                name=\"cat_check\" 
+                id=\"tog{$fieldname}{$A['id']}\"
+                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"{$fieldname}\",".
+                "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
+            break;
+        case 'delete':
+            if (!evTicketType::isUsed($A['id'])) {
+                $retval = COM_createLink(
+                    $icon_arr['delete'],
+                    EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
+                    array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                        'title' => $LANG_ADMIN['delete'],
+                    ) 
+                );
+            }
+            break;
+        default:
+            $retval = $fieldvalue;
+            break;
+    }
+    return $retval;
+}
+
+
+/**
+*   Return the display value for a ticket fields
+*
+*   @param  string  $fieldname  Name of the field
+*   @param  mixed   $fieldvalue Value of the field
+*   @param  array   $A          Name-value pairs for all fields
+*   @param  array   $icon_arr   Array of system icons
+*   @return string      HTML to display for the field
+*/
+function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_arr)
+{
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+
+    switch($fieldname) {
+    case 'event_pass':
+        if ($A['rp_id'] == 0) {
+            $retval = 'Yes';
+        } else {
+            $retval = 'No';
+        }
+        break;
+    case 'delete':
+        $retval = COM_createLink(
+            $icon_arr['delete'],
+            EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
+            array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+            'title' => $LANG_ADMIN['delete'],
+            ) 
+        );
+        break;
+    case 'uid':
+        $retval = COM_getDisplayName($fieldvalue);
+        break;
+    default:
+        $retval = $fieldvalue;
+        break;
     }
     return $retval;
 }
@@ -683,13 +891,19 @@ function EVLIST_importEvents()
 
 
 /*
- * Main function
- */
-$expected = array('savecal', 'editcal', 'moderate',
+*   Main function
+*/
+$expected = array(
+    // Actions to perform
+    'savecal', 'editcal', 'moderate',
     'deletecal', 'delcalconfirm', 'approve', 'disapprove',
-    'categories', 'updateallcats', 'delcat', 'editcat', 'savecat',
-    'view', 'delevent', 'importcalendar', 'clone', 'rsvp', 'delrsvp',
-    'import', 'importexec', 'edit',
+    'categories', 'updateallcats', 'delcat', 'savecat',
+    'saveticket', 'deltickettype', 'delticket', 'printtickets',
+    'tickreset_x', 'tickdelete_x',
+    // Views to display
+    'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
+    'import', 'importexec', 'edit', 'editcat', 'editticket', 'tickettypes',
+    'tickets',
 );
 $action = 'view';
 $view = '';
@@ -716,6 +930,22 @@ case 'edit':
     $view = 'edit';
     break;
  
+case 'tickdelete_x':
+    if (is_array($_POST['delrsvp'])) {
+        USES_evlist_class_ticket();
+        evTicket::Delete($_POST['delrsvp']);
+    }
+    COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
+    exit;
+
+case 'tickreset_x':
+    if (is_array($_POST['delrsvp'])) {
+        USES_evlist_class_ticket();
+        evTicket::Reset($_POST['delrsvp']);
+    }
+    COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
+    exit;
+
 case 'delcalconfirm':
     $view = 'calendars';
     if (!isset($_POST['confirmdel']) || $_POST['confirmdel'] != '1') {
@@ -742,6 +972,17 @@ case 'savecat':
     $C = new evCategory($_POST['id']);
     $status = $C->Save($_POST);
     $view = 'categories';
+    break;
+
+case 'saveticket':
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_tickettype();
+        $C = new evTicketType($_POST['id']);
+        $status = $C->Save($_POST);
+        $view = 'tickettypes';
+    } else {
+        $view = '';
+    }
     break;
 
 case 'delcat':
@@ -822,6 +1063,19 @@ case 'importexec':
     $view = '';
     break;
 
+case 'printtickets':
+    // Print all tickets for an event, for all users
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_ticket();
+        $eid = COM_sanitizeID($_GET['eid'], false);
+        $doc = evTicket::PrintTickets($eid);
+        echo $doc;
+        exit;
+    } else {
+        $content .= 'Function not available';
+    }
+    break;
+
 default:
     $view = $action;
     break;
@@ -858,10 +1112,30 @@ case 'categories':
     $content .= EVLIST_adminlist_categories();
     break;
 
+case 'tickettypes':
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_tickettype();
+        $content .= EVLIST_adminlist_tickettypes();
+    }
+    break;
+
+case 'tickets':
+    $ev_id = isset($_GET['ev_id']) ? $_GET['ev_id'] : '';
+    $content .= EVLIST_adminlist_tickets($ev_id);
+    break;
+
 case 'editcat':
     USES_evlist_class_category();
     $C = new evCategory($_GET['id']);
     $content .= $C->Edit();
+    break;
+
+case 'editticket':
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_tickettype();
+        $Tic = new evTicketType($actionval);
+        $content .= $Tic->Edit();
+    }
     break;
 
 case 'rsvp':

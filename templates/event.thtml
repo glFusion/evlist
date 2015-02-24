@@ -88,7 +88,7 @@
       <form action="http://maps.google.com/maps" method="GET" target="_blank">
         <input onfocus="this.value='';" type="text" size="40" maxlength="40"
         name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
-        <input value="{$LANG_GEO['get_directions']}" type="submit" />
+        <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
         <input type="hidden" name="daddr" value="{lat},{lng}" />
       </form>
     </div>
@@ -146,24 +146,105 @@
   </div>
   {!endif}
 
+{!if 0}
+  <input type="button" class="lgButton orange"
+    name="addcartitem" value="Registration" onclick="EV_toggleRegDiv();" />
+{!endif}
+
   {!if register_link}
+  <div id="regdiv" class="evdata" style="margin-top:15px;">
+ 
+  <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    {!if register_multi}
+    <select name="tick_count">
+      <!-- BEGIN tickCntBlk -->
+      <option value="{tick_cnt}">{tick_cnt}</option>
+      <!-- END tickCntBlk -->
+    </select>
+    {!else}
+      <input type="hidden" name="tick_cnt" value="1" />
+      Qty. 1
+    {!endif}
+
+    {!if ticket_types_multi}
+    <select name="tick_type">
+      <!-- BEGIN tickTypeBlk -->
+      <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
+      <!-- END tickTypeBlk -->
+    </select>
+    {!else}
+    <input type="hidden" name="tick_type" value="{tick_type}" />
+    {tick_descr} - {tick_fee}
+    {!endif}
+
+    <input type="submit" class="lgButton orange" name="register"
+        value="Register" />
+  </form>
+  </div>
+  {!endif}
+
+  {!if login_to_register}
+    <div style="width:40%">
+    <p><span class="info">{$LANG_EVLIST['login_to_register']}</span></p>
+    </div>
+  {!endif}
+
+  {!if is_registered}
   <div>
     <div class="evdata">
-      {!if register_multi}
-      <select name="rsvp_count">
-        {register_multi}
-      </select>
-      {!endif}
-      <a href="{pi_url}/event.php?register=x&amp;rp_id={rp_id}">{$LANG_EVLIST['signup']}</a>
+        Your Regisrations:<br />
+      <!-- BEGIN regBlock -->
+        {reg_qty} {reg_desc}<br />
+      <!-- END regBlock -->
     </div>
   </div>
   {!endif}
 
   {!if unregister_link}
-  <div>
-    <div class="evdata">
-      <a href="{pi_url}/event.php?cancelreg=x&amp;rp_id={rp_id}">{$LANG_EVLIST['cancelreg']}</a>
-    </div>
+  <div class="evdata">
+    {$LANG_EVLIST['cancel_free']}<br />
+        <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
+        <input type="hidden" name="rp_id" value="{rp_id}" />
+        <input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
+        <input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
+        </form>
+  </div>
+  {!endif}
+  {!if have_tickets}
+    <p><a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a></p>
+  {!endif}
+
+  {!if show_reminderform}
+  <div id="reminder_no" class="reminder_div" style="display:none;">
+    <strong>{$LANG_EVLIST['email']}</strong>
+    <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
+    <fieldset>
+    <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
+    <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
+    <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
+    <input type="submit" name="savereminder" class="lgButton blue" value="{$LANG_ACCESS['submit']}" />
+    <br />
+    {rem_note}<br />
+    <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
+    <!--<input type="hidden" name="eid" value="{eid}" />
+    <!--<input type="hidden" name="rp_id" value="{rp_id}" />-->
+    <input type="hidden" name="action" value="addreminder" />
+    </fieldset>
+    </form>
+  </div>
+  <div id="reminder_yes" class="reminder_div" style="display:none;">
+    <form id="evRemDel" onsubmit="updateReminder(this);return false;">
+    <fieldset>
+    {$LANG_EVLIST['you_are_subscribed']}
+    <input type="submit" name="delreminder" class="lgButton red" value="{$LANG_ACCESS['remove']}" />
+    <input type="hidden" name="eid" value="{eid}" />
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    <input type="hidden" name="action" value="delreminder" />
+    <input type="hidden" name="rem_email" value="" />
+    <input type="hidden" name="notice" value="0" />
+    </fieldset>
+    </form> 
   </div>
   {!endif}
 
@@ -183,8 +264,7 @@
   {reminder}
   </div>
 
-  {!if show_reminderform}
-  <div id="container">
+  {!if Xshow_reminderform}
   <div id="reminder_no" class="reminder_div" style="visibility:hidden;">
     <fieldset>
     <strong>{$LANG_EVLIST['email']}</strong>
@@ -201,7 +281,7 @@
     <input type="hidden" name="action" value="addreminder" />
     </form>
   </div>
-  <div id="reminder_yes" class="reminder_div" style="visibility:hidden;">
+  <div id="reminder_yes" class="reminder_div" style="display:hidden;">
     <form id="evRemDel" onsubmit="updateReminder(this);return false;">
     <fieldset>
     {$LANG_EVLIST['you_are_subscribed']}
@@ -214,7 +294,6 @@
     </fieldset>
     </form> 
     </fieldset>
-  </div>
   </div>
   {!endif}
 
@@ -239,6 +318,16 @@
 </div>
 
 <script type="text/javascript">
+var showregdiv = 0;
+function EV_toggleRegDiv() {
+    showregdiv = showregdiv == 1 ? 0 : 1;
+    if (showregdiv == 1) {
+        document.getElementById("regdiv").style.display="";
+    } else {
+        document.getElementById("regdiv").style.display="none";
+    }
+}
+
 function clickEditButton() {
     closedialogs();
     var action = document.getElementById('action_dialog');
@@ -269,12 +358,12 @@ function showReminder(status) {
     var remform = document.getElementById('reminder_yes');
     if (status) {
       // have a reminder set, show the "delete" form
-      remform.style.visibility = "";
-      addform.style.visibility = "hidden";
+      remform.style.display = "";
+      addform.style.display = "none";
     } else {
       // don't have a reminder set, show the "add" form
-      addform.style.visibility = "";
-      remform.style.visibility = "hidden";
+      addform.style.display = "";
+      remform.style.display = "none";
     }
 }
 

@@ -80,6 +80,7 @@ class evRepeat
 
         case 'rp_id':
         case 'det_id':
+        case 'uid':
             $this->properties[$var] = (int)$value;
             break;
 
@@ -130,17 +131,16 @@ class evRepeat
     {
         if (!is_array($row)) return;
 
-        $fields = array('rp_ev_id', 'rp_det_id', 
-                'rp_date_start', 'rp_date_end',
-                'rp_time_start1', 'rp_time_end1', 
-                'rp_time_start2', 'rp_time_end2', 
+        $fields = array('ev_id', 'det_id', 
+                'date_start', 'date_end',
+                'time_start1', 'time_end1', 
+                'time_start2', 'time_end2', 
                 );
         foreach ($fields as $field) {
             if (isset($row['rp_' . $field])) {
                 $this->$field = $row['rp_' . $field];
             }
         }
-
         // Join or split the date values as needed
         if ($fromDB) {      // Read from the database
 
@@ -198,9 +198,8 @@ class evRepeat
         $sql = "SELECT *
                 FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_id='{$this->rp_id}'";
-        //echo $sql;die;
         $result = DB_query($sql);
-        if (!$result || DB_numRows($result != 1)) {
+        if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
             $A = DB_fetchArray($result, false);
@@ -330,6 +329,10 @@ class evRepeat
 
         if ($rp_id != 0) {
             $this->Read($rp_id);
+        }
+
+        if ($this->rp_id == 0) {
+            return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
         }
 
         //update hit count
@@ -478,31 +481,91 @@ class evRepeat
         ) );
 
         if ($_EV_CONF['enable_rsvp'] == 1 &&
-                $this->Event->options['use_rsvp'] == 1) {
-            if ($this->isRegistered()) {
-                // If the user is already register, show the cancel link
-                $T->set_var('unregister_link', 'true');
-            } else {
-                // If event isn't full, or waitlisting is allowed,
-                // show the registration link.
-                if ($this->Event->options['max_rsvp'] == 0 ||
-                        $this->Event->options['rsvp_waitlist'] == 1 ||
-                        $this->Event->options['max_rsvp'] > 
-                        $this->TotalRegistrations() ) {
-                    if ($this->Event->options['max_user_rsvp'] > 1) {
-                        $rsvp_user_count = '';
-                        for ($i = 1; 
-                            $i <= $this->Event->options['max_user_rsvp'];
-                            $i++) {
-                            $rsvp_user_count .= '<option value="'.$i.'">'.$i.
-                                    '</option>'.LB;
-                        }
-                        $T->set_var('register_multi', $rsvp_user_count);
-                    }
-                    $T->set_var('register_link', 'true');
+                $this->Event->options['use_rsvp'] > 0) {
+            if ($this->Event->options['rsvp_cutoff'] > 0) {
+                $dt = new Date($this->event->date_start1 . ' ' . $this->Event->time_start1, $_CONF['timezone']);
+                if (time() > $dt->toUnix() - ($this->Event->options['rsvp_cutoff'] * 86400)) {
+                    $past_cutoff = false;
+                } else {
+                    $past_cutoff = true;
                 }
             }
-        }
+            if (COM_isAnonUser()) {
+                // Just show a must-log-in message
+                $T->set_var('login_to_register', 'true');
+            } elseif (!$past_cutoff) {
+                $num_free_tickets = $this->isRegistered(0, true);
+                $total_tickets = $this->isRegistered(0, false);
+                if ($num_free_tickets > 0) {
+                    // If the user is already registered for any free tickets,
+                    // show the cancel link
+                    $T->set_var(array(
+                        'unregister_link' => 'true',
+                        'num_free_reg' => $num_free_tickets,
+                    ) );
+               }
+               if (    ($this->Event->options['max_rsvp'] == 0 ||
+                        $this->Event->options['rsvp_waitlist'] == 1 ||
+                        $this->Event->options['max_rsvp'] > 
+                        $this->TotalRegistrations() )
+                        &&
+                        $total_tickets < $this->Event->options['max_user_rsvp'] ) {
+                    USES_evlist_class_tickettype();
+                    $Ticks = evTicketType::GetTicketTypes();
+                    if ($this->Event->options['max_user_rsvp'] > 1) {
+                        $T->set_block('event', 'tickCntBlk', 'tcBlk');
+                        $T->set_var('register_multi', true);
+                        //$rsvp_user_count = '';
+                        $avail_tickets = $this->Event->options['max_user_rsvp'] -
+                                    $total_tickets;
+                        for ($i = 1; $i <= $avail_tickets; $i++) {
+                            $T->set_var('tick_cnt', $i);
+                            $T->parse('tcBlk', 'tickCntBlk', true);
+                            //$rsvp_user_count .= '<option value="'.$i.'">'.$i.
+                            //        '</option>'.LB;
+                        }
+                        //$T->set_var('register_multi', $rsvp_user_count);
+                    }
+                    $T->set_block('event', 'tickTypeBlk', 'tBlk');
+                    foreach ($this->Event->options['tickets'] as $tick_id=>$data) {
+                        /*$options .= '<option value="' . $tick_id . '">' .
+                            $Ticks[$tick_id]->description;
+                        if ($data['fee'] > 0) {
+                            $options .= ' - ' . COM_numberFormat($data['fee'], 2);
+                        }
+                        $options .= '</option>' . LB;*/
+                        $status = LGLIB_invokeService('paypal', 'formatAmount',
+                                array('amount' => $data['fee']), $pp_fmt_amt, $svc_msg);
+                        $fmt_amt = $status == PLG_RET_OK ?
+                                $pp_fmt_amt : COM_numberFormat($data['fee'], 2);
+                        $T->set_var(array(
+                            'tick_type' => $tick_id,
+                            'tick_descr' => $Ticks[$tick_id]->description,
+                            'tick_fee' => $data['fee'] > 0 ? $fmt_amt : 'FREE',
+                        ) );
+                        $T->parse('tBlk', 'tickTypeBlk', true);
+                    }
+                    $T->set_var(array(
+                        'register_link' => 'true',
+                        'ticket_options' => $options,
+                        'ticket_types_multi' => count($this->Event->options['tickets']) > 1 ? 'true' : '',
+                    ) );
+
+                }
+
+            }
+
+                // If ticket printing is enabled for this event, see if the
+                // current user has any tickets to print.
+                if ($this->Event->options['rsvp_print'] > 0) {
+                    $paid = $this->Event->options['rsvp_print'] == 1 ? 'paid' : '';
+                    USES_evlist_class_ticket();
+                    $tickets = evTicket::GetTickets($this->ev_id, '', $this->uid, $paid);
+                    if (count($tickets) > 0) {
+                        $T->set_var('have_tickets', 'true');
+                    }
+                }
+        }   // if enable_rsvp
 
         if (!empty($date_start) || !empty($date_end)) {
             $T->parse('datetime_info', 'datetime');
@@ -550,24 +613,18 @@ class evRepeat
         // Get a map from the Locator plugin, if configured and available
         if ($_EV_CONF['use_locator'] == 1 &&
                 $this->Event->Detail->lat != 0 &&
-                $this->Event->Detail->lng != 0 &&
-                function_exists('GEO_showMap')) {
-            /* TODO: After Locator has been updated to support service calls,
-                Replace GEO_showMap with this...
-            $status = PLG_invokeService('locator', 'getMap',
+                $this->Event->Detail->lng != 0) {
+            $status = LGLIB_invokeService('locator', 'getMap',
                     array('lat' => $this->Event->Detail->lat,
                             'lng' => $this->Event->Detail->lng),
                     $map, $svc_msg);
             if ($status == PLG_RET_OK) {
-            */
-                $map = GEO_showMap($this->Event->Detail->lat,
-                        $this->Event->Detail->lng);
                 $T->set_var(array(
                     'map'   => $map,
                     'lat'   => number_format($this->Event->Detail->lat, 8, '.', ''),
                     'lng'   => number_format($this->Event->Detail->lng, 8, '.', ''),
                 ) );
-            /* } */
+            }
         }
 
         //put contact info here: contact, email, phone#
@@ -679,10 +736,25 @@ class evRepeat
             'show_reminderform' => $show_reminders ? 'true' : '',
         ) );
 
+        USES_evlist_class_tickettype();
+        $tick_types = evTicketType::GetTicketTypes();
+        $T->set_block('event', 'registerBlock', 'rBlock');
+        if (is_array($this->Event->options['tickets'])) {
+            foreach ($this->Event->options['tickets'] as $tic_type=>$info) {
+                $T->set_var(array(
+                    'tic_description' => $tick_types[$tic_type]->description,
+                    'tic_fee' => COM_numberFormat($info['fee'], 2),
+                ) );
+                $T->parse('rBlock', 'registerBlock', true);
+            }
+        }
+
+        // Show the "manage reservations" link to the event owner
         if ($_EV_CONF['enable_rsvp'] == 1 &&
-                $this->isOwner && 
                 $this->Event->options['use_rsvp'] == 1) {
-            $T->set_var('admin_rsvp', EVLIST_adminRSVP($this->rp_id));
+            if ($this->isOwner) {
+                $T->set_var('admin_rsvp', EVLIST_adminRSVP($this->rp_id));
+            }
         }
 
         $T->parse ('output','event');
@@ -694,12 +766,13 @@ class evRepeat
     /**
     *   Register a user for an event.
     *
+    *   @param  integer $num_attendees  Number of attendees, default 1
     *   @param  integer $uid    User ID to register, 0 for current user
     *   @return integer         Message code, zero for success
     */
-    public function Register($uid = 0)
+    public function Register($num_attendees = 1, $tick_type = 0, $uid = 0)
     {
-        global $_TABLES, $_USER, $_EV_CONF;
+        global $_TABLES, $_USER, $_EV_CONF, $LANG_EVLIST;
 
         if ($_EV_CONF['enable_rsvp'] != 1) {
             return 0;
@@ -710,33 +783,81 @@ class evRepeat
         // registering another user, don't check access
         if ($this->Event->options['use_rsvp'] == 0 ||
             ($uid == 0 && !$this->Event->hasAccess(2))) {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][20]);
             return 20;
+        } elseif ($this->Event->options['use_rsvp'] == 1) {
+            // Registering for entire event, all repeats
+            $rp_id = 0;
+        } else {
+            // Registering for a single occurance
+            $rp_id = $this->rp_id;
+        }
+
+        if (!isset($this->Event->options['tickets'][$tick_type])) {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][24]);
+            return 24;
         }
 
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
+        $num_attendees = (int)$num_attendees;
+        $fee = (float)$this->Event->options['tickets'][$tick_type]['fee'];
 
         // Check that the current user isn't already registered
-        if ($this->isRegistered()) {
-            return 21;
-        }
+        // TODO: Allow registrations up to max count, or to waitlist
+        //if ($this->isRegistered()) {
+        //    return 21;
+        //}
 
         // Check that the event isn't already full, or that
-        // waitlisting is disableda
-        if ($this->Event->options['max_rsvp'] > 0 &&
-            $this->Event->options['rsvp_waitlist'] == 0 &&
-            $this->Event->options['max_rsvp'] <= $this->TotalRegistrations()) {
-            return 22;       // too many already signed up
+        // waitlisting is disabled
+        if ($this->Event->options['max_rsvp'] <= $this->TotalRegistrations()) {
+            if ($this->Event->options['max_rsvp'] > 0 &&
+                    $this->Event->options['rsvp_waitlist'] == 0 && 1) {
+                LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
+                return 22;       // too many already signed up
+            }
+            if ($fee > 0) {
+                LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
+                return 22;      // can't waitlist paid tickets
+            }
         }
 
-        DB_query("INSERT INTO {$_TABLES['evlist_rsvp']}
-                    (ev_id, rp_id, uid, dt_reg)
-                VALUES (
-                    '{$this->Event->id}', 
-                    '{$this->rp_id}', 
-                    '$uid', 
-                    " . time() . ")", 1);
+        if ($fee > 0) {
+            // add tickes to the shopping cart. Tickets will be created
+            // when paid.
+            $this->AddToCart($tick_type, $num_attendees);
+            LGLIB_storeMessage($LANG_EVLIST['messages']['24']);
+            $status = LGLIB_invokeService('paypal', 'getURL',
+                array('type'=>'checkout'), $url, $msg);
+            if ($status == PLG_RET_OK) {
+                LGLIB_storeMessage(sprintf($LANG_EVLIST['messages']['26'],
+                    $url), '', true);
+            }
+        }
+        // for free tickets, just create the ticket records
+        USES_evlist_class_tickettype();
+        USES_evlist_class_ticket();
+        $TickType = new evTicketType($tick_type);
+        if ($TickType->event_pass) {
+            $t_rp_id = 0;
+        } else {
+            $t_rp_id = $this->rp_id;
+        }
+        for ($i = 0; $i < $num_attendees; $i++) {
+            evTicket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid);
+        }
+        /*if ($fee < .01) {
+        DB_query("INSERT INTO {$_TABLES['evlist_rsvp']} SET
+                    ev_id = '{$this->Event->id}',
+                    rp_id = '{$rp_id}',
+                    uid = '{$uid}',
+                    num_attendees = '{$num_attendees}',
+                    dt_reg = " . time());
         if (DB_error())
             return 23;
+        } else {
+            $this->AddToCart($tick_type, $num_attendees);
+        }*/
 
         return 0;
     }
@@ -744,44 +865,49 @@ class evRepeat
 
     /**
     *   Cancel a user's registration for an event.
+    *   Delete the newer records first, to preserve waitlist position for the user.
     *   
     *   @param  integer $uid    Optional User ID to remove, 0 for current user
+    *   @param  integer $num    Number of reservations to cancel, 0 for all
     */
-    public function CancelRegistration($uid = 0)
+    public function CancelRegistration($uid = 0, $num = 0)
     {
         global $_TABLES, $_USER, $_EV_CONF;
 
-        if ($_EV_CONF['enable_rsvp'] != 1) return;
+        if ($_EV_CONF['enable_rsvp'] != 1) return false;
+
+        $num = (int)$num;
 
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
-        if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
-            DB_delete($_TABLES['evlist_rsvp'],
-                array('ev_id', 'uid'),
-                array($this->Event->id, $uid));
-        } else {
-            // Look it up by repeat ID
-            DB_delete($_TABLES['evlist_rsvp'],
-                array('ev_id', 'rp_id', 'uid'),
-                array($this->Event->id, $this->rp_id, $uid));
-        }
+        $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE
+                ev_id = '" . $this->Event->id . "'
+                AND uid = $uid
+                AND fee = 0
+                ORDER BY dt DESC";
+        if ($num > 0) $sql .= " LIMIT $num";
+        DB_query($sql, 1);
+        return DB_error() ? false : true;
     }
 
 
     /**
     *   Determine if the user is registered for this event/repeat.
     *
-    *   @param  integer $uid    Optional user ID to check, current user by default
-    *   @return boolean         True if the user is registered, false if not
+    *   @param  integer $uid    Optional user ID, current user by default
+    *   @param  boolean $free_only  True to get count of only free tickets
+    *   @return mixed   Number of registrations, or False if rsvp disabled
     */
-    public function isRegistered($uid = 0)
+    public function isRegistered($uid = 0, $free_only = false)
     {
         global $_TABLES, $_USER, $_EV_CONF;
 
+        static $counter = array();
         if ($_EV_CONF['enable_rsvp'] != 1) return false;
 
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
+        $key = $free_only ? 1 : 0;
 
-        if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
+        /*if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
             $count = DB_count($_TABLES['evlist_rsvp'], 
                     array('ev_id', 'uid'),
                     array($this->Event->id, $uid));
@@ -789,9 +915,22 @@ class evRepeat
             $count = DB_count($_TABLES['evlist_rsvp'],
                 array('ev_id', 'rp_id', 'uid'),
                 array($this->Event->id, $this->rp_id, $uid));
+        }*/
+        if (!isset($counter[$key])) {
+            $counter[$key] = array();
         }
-
-        return $count > 0 ? true : false;
+        if (!isset($counter[$key][$uid])) {
+            $sql = "SELECT count(*) AS c FROM {$_TABLES['evlist_tickets']}
+                    WHERE ev_id = '{$this->Event->id}'
+                    AND (rp_id = 0 OR rp_id = {$this->rp_id})
+                    AND uid = $uid";
+            // check for fee = 0 if free_only is set
+            if ($key == 1) $sql .= ' AND fee = 0';
+            $res = DB_query($sql);
+            $A = DB_fetchArray($res, false);
+            $counter[$key][$uid] = isset($A['c']) ? (int)$A['c'] : 0;
+        }
+        return $counter[$key][$uid];
     }
 
 
@@ -909,6 +1048,77 @@ class evRepeat
             }
         }
     }   // function DeleteFuture()
+
+
+    /**
+    *   Get one or all occurences of an event.
+    *   If $rp_id is zero, return all repeats. Otherwise return only the
+    *   requested one.
+    *
+    *   @param  string  $ev_id  Event ID
+    *   @param  integer $rp_id  Repeat ID
+    *   @return array       Array of occurrences
+    */
+    public static function GetRepeats($ev_id, $rp_id=0)
+    {
+        global $_TABLES;
+
+        $repeats = array();
+        $where = array();
+        $ev_id = DB_escapeString($ev_id);
+        $rp_id = (int)$rp_id;
+
+        $where = "rp_ev_id = '$ev_id'";
+        if ($rp_id > 0) {
+            $where .= " AND rp_id = $rp_id";
+        }
+        if (!empty($where)) {
+            $sql = "SELECT * FROM {$_TABLES['evlist_repeat']} WHERE $where";
+            $res = DB_query($sql, 1);
+            while ($A = DB_fetchArray($res, false)) {
+                $repeats[$A['rp_id']] = new evRepeat();
+                $repeats[$A['rp_id']]->SetVars($A, true);
+            }
+        }
+        return $repeats;
+    }
+
+
+    /**
+    *   Add the event fee to the shopping cart
+    *   No checking is done here to see if it's paid, that must be done
+    *   by the caller.
+    *
+    *   @param  boolean $info   True to just return vars, False to add to cart
+    *   @return array           Array of cart vars
+    */
+    public function AddToCart($tick_type, $qty=1)
+    {
+        global $LANG_EVLIST, $_CONF;
+
+        USES_evlist_class_tickettype();
+        $TickType = new evTicketType($tick_type);
+        $fee = $this->Event->options['tickets'][$tick_type]['fee'];
+        $rp_id = $TickType->event_pass ? 0 : $this->rp_id;
+
+        $evCart = array(
+            'item_number' => 'evlist:eventfee:' . $this->Event->id . '/' . 
+                    $tick_type . '/' . $rp_id,
+            'item_name' => $TickType->description . ': ' . $LANG_EVLIST['event_fee'] . ' - ' .
+                    $this->Event->Detail->title . ' ' . $this->start_date1 . 
+                    ' ' . $this->start_time1,
+            'short_description' => $TickType->description . ': ' . 
+                    $this->Event->Detail->title . ' ' . $this->start_date1 . 
+                    ' ' . $this->start_time1,
+
+            'amount' => sprintf("%5.2f", (float)$fee),
+            'quantity' => $qty,
+            'extras' => array('shipping' => 0),
+        );
+        LGLIB_invokeService('paypal', 'addCartItem', $evCart, $output, $msg);
+        return $evCart;
+     }
+
 
 }   // class evRepeat
 

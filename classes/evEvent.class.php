@@ -62,7 +62,7 @@ class evEvent
      *  @param  string  $ev_id  Optional event ID
      *  @param  integer $detail Optional detail record ID for single repeat
      */
-    function __construct($ev_id='', $detail=0)
+    public function __construct($ev_id='', $detail=0)
     {
         global $_EV_CONF, $_USER;
 
@@ -128,8 +128,14 @@ class evEvent
                     'max_rsvp'   => 0,
                     'rsvp_cutoff' => 0,
                     'rsvp_waitlist' => 0,
+                    'ticket_types' => array(),
                     'contactlink' => '',
-                );
+            );
+            if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
+                $this->options['rsvp_print'] = 0;
+            } else {
+                $this->options['rsvp_print'] = $_EV_CONF['rsvp_print'] - 1;
+            }
 
             $this->Detail = new evDetail();
 
@@ -163,7 +169,7 @@ class evEvent
     *   @param  string  $var    Name of property to set.
     *   @param  mixed   $value  New value for property.
     */
-    function __set($var, $value='')
+    public function __set($var, $value='')
     {
         switch ($var) {
         case 'id':
@@ -242,7 +248,7 @@ class evEvent
     *   @param  boolean $db     True if string values should be escaped for DB.
     *   @return mixed           Value of property, NULL if undefined.
     */
-    function __get($var)
+    public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
             return $this->properties[$var];
@@ -258,7 +264,7 @@ class evEvent
      *  @param  array   $row        Array of values, from DB or $_POST
      *  @param  boolean $fromDB     True if read from DB, false if from $_POST
      */
-    function SetVars($row, $fromDB=false)
+    public function SetVars($row, $fromDB=false)
     {
         global $_EV_CONF;
 
@@ -363,17 +369,32 @@ class evEvent
             $this->owner_id = $row['owner_id'];
             $this->group_id = $row['group_id'];
             $this->options['contactlink'] = isset($row['contactlink']) ? 1 : 0;
+
+            $this->options['tickets'] = array();
             if ($_EV_CONF['enable_rsvp']) {
                 $this->options['use_rsvp'] = (int)$row['use_rsvp'];
                 $this->options['max_rsvp'] = (int)$row['max_rsvp'];
                 $this->options['rsvp_waitlist'] = isset($row['rsvp_waitlist']) ? 1 : 0;
                 $this->options['rsvp_cutoff'] = (int)$row['rsvp_cutoff'];
                 if ($this->options['max_rsvp'] < 0) $this->options['max_rsvp'] = 0;
+                $this->options['max_user_rsvp'] = (int)$row['max_user_rsvp'];
+                if (isset($row['tickets']) && is_array($row['tickets'])) {
+                    foreach ($row['tickets'] as $tick_id=>$tick_data) {
+                        $tick_fee = isset($row['tick_fees'][$tick_id]) ?
+                            (float)$row['tick_fees'][$tick_id] : 0;
+                        $this->options['tickets'][$tick_id] = array(
+                            'fee' => $tick_fee,
+                        );
+                    }
+                }
+                $this->options['rsvp_print'] = $row['rsvp_print'];
             } else {
                 $this->options['use_rsvp'] = 0;
                 $this->options['max_rsvp'] = 0;
                 $this->options['rsvp_cutoff'] = 0;
                 $this->options['rsvp_waitlist'] = 0;
+                $this->options['max_user_rsvp'] = 0;
+                $this->options['rsvp_print'] = 0;
             }
         }
 
@@ -386,7 +407,7 @@ class evEvent
      *  @param  integer $id Optional ID.  Current ID is used if zero.
      *  @return boolean     True if a record was read, False on failure.
      */
-    function Read($ev_id = '', $table = 'evlist_events')
+    public function Read($ev_id = '', $table = 'evlist_events')
     {
         global $_TABLES;
 
@@ -461,6 +482,8 @@ class evEvent
                 'rec_data'      => $this->rec_data,
             );
         } else {
+            // submit privilege required to submit new events
+            if (!$this->isSubmitter) return false;
             $this->old_schedule = array();
         }
 
@@ -476,7 +499,7 @@ class evEvent
         }
 
         // Authorized to bypass the queue
-        if ($this->isAdmin || $this->isSubmitter) {
+        if ($this->isAdmin) {
             $table = 'evlist_events';
         }
         $this->table = $table;
@@ -533,7 +556,7 @@ class evEvent
                             rp_time_end1 = '{$this->time_end1}',
                             rp_time_start2 = '{$this->time_start2}',
                             rp_time_end2 = '{$this->time_end2}'
-                        WHERE rp_ev_id = {$this->id}";
+                        WHERE rp_ev_id = '{$this->id}'";
                     DB_query($sql, 1);
                 }
             }
@@ -662,7 +685,7 @@ class evEvent
     /**
      *  Delete the current event record and all repeats.
      */
-    function Delete($eid = '')
+    public function Delete($eid = '')
     {
         global $_TABLES, $_PP_CONF;
 
@@ -693,7 +716,7 @@ class evEvent
      *
      *  @return boolean     True if ok, False when first test fails.
      */
-    function isValidRecord()
+    private function isValidRecord()
     {
         global $LANG_EVLIST;
 
@@ -741,7 +764,10 @@ class evEvent
         // editing a repeat and already have the info we need.
         // This probably needs to change, since we should always read event
         // data during construction.
-        if ($eid != ''  && $rp_id == 0 && is_object($this)) {
+        if (!$this->isSubmitter) {
+            // At least submit privilege required
+            return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
+        } elseif ($eid != ''  && $rp_id == 0 && is_object($this)) {
             // If an id is passed in, then read that record
             if (!$this->Read($eid)) {
                 return 'Invalid object ID';
@@ -751,7 +777,7 @@ class evEvent
             $this->SetVars($_POST);
 
             // Make sure the current user has access to this event.
-            if (!$this->hasAccess()) return $LANG_EVLIST['access_denied'];
+            if (!$this->hasAccess()) return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
 
         }
 
@@ -769,7 +795,7 @@ class evEvent
 
         if ($rp_id > 0) {
             // Make sure the current user has access to this event.
-            if (!$this->hasAccess()) return $LANG_EVLIST['access_denied'];
+            if (!$this->hasAccess()) return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
 
             if ($saveaction == 'savefuturerepeat') {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_future'],
@@ -1090,20 +1116,61 @@ class evEvent
             'lng'           => $this->Detail->lng,
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
-         ) );
+            'doc_url'       => EVLIST_getDocURL('event.html'),
+        ) );
 
         if ($_EV_CONF['enable_rsvp']) {
+            USES_evlist_class_tickettype();
+            $TickTypes = evTicketType::GetTicketTypes();
+            //$T->set_block('editor', 'Tickets', 'tTypes');
+            $tick_opts = '';
+            foreach ($TickTypes as $tick_id=>$tick_obj) {
+                if (isset($this->options['tickets'][$tick_id])) {
+                    $checked = 'checked="checked"';
+                    $fee = (float)$this->options['tickets'][$tick_id]['fee'];
+                } else {
+                    $checked = '';
+                    $fee = 0;
+                }
+                $tick_opts .= '<tr><td><input name="tickets[' . $tick_id . 
+                    ']" type="checkbox" ' . $checked .
+                    ' value="' . $tick_id . '" /></td>' .
+                    '<td>' . $tick_obj->description . '</td>' .
+                    '<td><input type="text" name="tick_fees[' . $tick_id . 
+                    ']" value="' . $fee . '" size="8" /></td></tr>' . LB;
+                /*$T->set_var(array(
+                    'tick_id' => $tic['id'],
+                    'tick_desc' => $tic['description'],
+                    'tick_fee' => $fee,
+                    'tick_enabled' => $enabled ? 'checked="checked"' : '',
+                ) ) ;
+                //$T->parse('tTypes', 'Tickets', true);*/
+            }
+
+            if ($_EV_CONF['rsvp_print'] > 0) {
+                $rsvp_print_chk  = 'rsvp_print_chk' . $this->options['rsvp_print'];
+                $rsvp_print = 'true';
+            } else {
+                $rsvp_print = '';
+                $rsvp_print_chk = 'no_rsvp_print';
+            }
+
             $T->set_var(array(
                 'enable_rsvp' => 'true',
                 'reg_chk'.$this->options['use_rsvp'] => EVCHECKED,
                 'rsvp_wait_chk' => $this->options['rsvp_waitlist'] == 1 ?
                                 EVCHECKED : '',
                 'max_rsvp'   => $this->options['max_rsvp'],
+                'max_user_rsvp' => $this->options['max_user_rsvp'],
                 'rsvp_cutoff' => $this->options['rsvp_cutoff'],
                 'use_rsvp' => $this->options['use_rsvp'], // for javascript
                 'rsvp_waitlist' => $this->options['rsvp_waitlist'],
+                'tick_opts'     => $tick_opts,
+                'rsvp_print'    => $rsvp_print,
+                $rsvp_print_chk => 'checked="checked"',
             ) );
-        }
+
+        }   // if rsvp_enabled
 
         // Split & All-Day settings
         if ($this->allday == 1) {   // allday, can't be split, no times
@@ -1222,7 +1289,7 @@ class evEvent
      *  @param  integer $value New value to set
      *  @return         New value, or old value upon failure
      */
-    function _toggle($oldvalue, $varname, $ev_id='')
+    private function _toggle($oldvalue, $varname, $ev_id='')
     {
         global $_TABLES;
 
@@ -1257,7 +1324,7 @@ class evEvent
      *  @param  integer $value New value to set
      *  @return         New value, or old value upon failure
      */
-    function toggleEnabled($oldvalue, $ev_id='')
+    public function toggleEnabled($oldvalue, $ev_id='')
     {
         $oldvalue = $oldvalue == 0 ? 0 : 1;
         if ($ev_id == '') {
@@ -1279,7 +1346,7 @@ class evEvent
     *
     *   @return array           Array of matching events, keyed by date
     */
-    function MakeRecurrences()
+    public function MakeRecurrences()
     {
         USES_evlist_class_recur();
 
@@ -1376,7 +1443,7 @@ class evEvent
     *
     *   @return string      Formatted error messages.
     */
-    function PrintErrors()
+    public function PrintErrors()
     {
         $retval = '';
         foreach($this->Errors as $key=>$msg) {
@@ -1393,7 +1460,7 @@ class evEvent
     *   @param  string  $time   Time (HH:MM)
     *   @return array   Array of values.
     */
-    function DateParts($date, $time)
+    public function DateParts($date, $time)
     {
         $month = '';
         $day = '';
@@ -1423,7 +1490,7 @@ class evEvent
     *   @param  integer $level  Access level required
     *   @return boolean         True = has sufficieng access, False = not
     */
-    function hasAccess($level=3)
+    public function hasAccess($level=3)
     {
         // Admin & editor has all rights
         if ($this->isAdmin)
@@ -1443,7 +1510,7 @@ class evEvent
     *
     *   @return array   Array of categories
     */
-    function GetCategories()
+    public function GetCategories()
     {
         global $_TABLES;
 
@@ -1471,7 +1538,7 @@ class evEvent
     *   @param  string  $cat_name   New category name.
     *   @return integer     ID of category
     */
-    function SaveCategory($cat_name)
+    public function SaveCategory($cat_name)
     {
         global $_TABLES;
 
@@ -1504,7 +1571,7 @@ class evEvent
     *   @param  array   $A  Array of values (e.g. $_POST)
     *   @return boolean     True if an update is needed, false if not
     */
-    function NeedRepeatUpdate($A)
+    public function NeedRepeatUpdate($A)
     {
         // Just check each relevant value in $A against our value.
         // If any matches, return true
@@ -1574,7 +1641,7 @@ class evEvent
     *
     *   @param  array   $A      Array of data, default to $_POST
     */
-    function MakeRecData($A = '')
+    public function MakeRecData($A = '')
     {
         if ($A == '') $A = $_POST;
 
@@ -1670,7 +1737,7 @@ class evEvent
     *   @param  integer $interval   Interval, one to six
     *   @return string      Friendly text describing the interval
     */
-    function RecurDescrip($freq = '', $interval = '')
+    public function RecurDescrip($freq = '', $interval = '')
     {
         global $LANG_EVLIST;
 

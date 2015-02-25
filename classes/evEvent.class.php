@@ -130,6 +130,7 @@ class evEvent
                     'rsvp_waitlist' => 0,
                     'ticket_types' => array(),
                     'contactlink' => '',
+                    'max_user_rsvp' => 1,
             );
             if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
                 $this->options['rsvp_print'] = 0;
@@ -393,7 +394,7 @@ class evEvent
                 $this->options['max_rsvp'] = 0;
                 $this->options['rsvp_cutoff'] = 0;
                 $this->options['rsvp_waitlist'] = 0;
-                $this->options['max_user_rsvp'] = 0;
+                $this->options['max_user_rsvp'] = 1;
                 $this->options['rsvp_print'] = 0;
             }
         }

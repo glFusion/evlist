@@ -90,6 +90,7 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
         'curdate'   => sprintf("%d-%02d-%02d", $year, $month, $day),
         'urlfilt_cal' => $cal,
         'urlfilt_cat' => $cat,
+        'use_json' => $_EV_CONF['cal_tmpl'] == 'json'? 'true' : '',
     ) );
 
     $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;

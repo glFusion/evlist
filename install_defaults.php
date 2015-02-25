@@ -57,8 +57,8 @@ global $CONF_EVLIST_DEFAULT;
 $CONF_EVLIST_DEFAULT = array(
     'allow_anon_view'   => 1,    // allow anonymous to view calendars
 // Which users can add events: 1 = users, 2 = anon, 3 = both
-    'can_add'           => EV_USER_CAN_ADD;,
-    'allow_html'        = 1,    // allow html in posts
+    'can_add'           => EV_USER_CAN_ADD,
+    'allow_html'        => 1,    // allow html in posts
     'usermenu_option'   => 1,   // add to the glfusion user menu
     'enable_menuitem'   => 1,   // add to the glfusion main menu
     'enable_categories' => 1,   // enable event categories
@@ -80,7 +80,7 @@ $CONF_EVLIST_DEFAULT = array(
     'max_upcoming_days' => 90,  // max days in future for list and block
     'use_locator'       => 0,   // integrate with locater plugin
     'use_weather'       => 0,   // integrate with westher plugin
-    'cal_tmpl'          => 'json'   // json or html calendar display
+    'cal_tmpl'          => 'json',   // json or html calendar display
     'enable_rsvp'       => 0,   // 0=false, 1=default no, 2=default yes
     'rsvp_print'        => 0,   // 0=false, 1=default no, 2=default yes paid, 3=default yes all
 );
@@ -177,11 +177,9 @@ function plugin_initconfig_evlist()
                 '@select', 0, 3, 12, 10, true, 'evlist');
 
         $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
-        $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
+        $c->add('ev_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
         $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                20, 10, 17, 10, true, 'evlist');
-        $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                20, 10, 17, 10, true, 'evlist');
+                20, 10, 0, 10, true, 'evlist');
         $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
                 20, 10, 17, 20, true, 'evlist');
     }

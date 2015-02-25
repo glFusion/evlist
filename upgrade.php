@@ -198,6 +198,9 @@ function evlist_upgrade()
                     AND group_name = '{$_EV_CONF['pi_name']}'");
 
         case '1.3.6':
+            $error = EVLIST_do_upgrade_sql('1.3.7');
+            if ($error) break;
+
             // Remove date and time formats, global configs are used instead.
             $c->del('week_begins', 'evlist');
             $c->del('date_format', 'evlist');

@@ -953,9 +953,9 @@ class evRepeat
         }
 
         if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
-            $count = (int)DB_count($_TABLES['evlist_rsvp'], 'ev_id', $rp_id);
+            $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $rp_id);
         } else {
-            $count = (int)DB_count($_TABLES['evlist_rsvp'], 'rp_id', $rp_id);
+            $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $rp_id);
         }
         return $count;
 

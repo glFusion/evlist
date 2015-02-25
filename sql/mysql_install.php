@@ -229,7 +229,33 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_calendars']}
         ADD `cal_ena_ical` tinyint(1) unsigned DEFAULT '1' AFTER `cal_status`",
     ),
+'1.3.7' => array(
+    "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
+      `tic_id` varchar(255) NOT NULL,
+      `tic_type` int(11) unsigned NOT NULL DEFAULT '0',
+      `ev_id` varchar(20) NOT NULL,
+      `rp_id` int(11) unsigned NOT NULL DEFAULT '0',
+      `fee` float(6,2) unsigned NOT NULL DEFAULT '0.00',
+      `paid` float(6,2) unsigned NOT NULL DEFAULT '0.00',
+      `uid` int(11) unsigned NOT NULL,
+      `used` int(11) unsigned NOT NULL DEFAULT '0',
+      `dt` int(11) unsigned DEFAULT '0',
+      PRIMARY KEY (`tic_id`),
+      KEY `evt_rep` (`ev_id`,`rp_id`),
+      KEY `user` (`uid`,`ev_id`),
+      KEY `ev_dt` (`ev_id`,`dt`) )",
+    "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
+      `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+      `description` varchar(255) DEFAULT NULL,
+      `event_pass` tinyint(1) unsigned NOT NULL DEFAULT '0',
+      `enabled` tinyint(1) NOT NULL DEFAULT '1',
+      PRIMARY KEY (`id`) )",
+    "INSERT INTO {$_TABLES['evlist_tickettypes']} VALUES (
+        0, 'General Admission', 0, 1)",
+    ),
 );
 
+$_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];
+$_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
 
 ?>

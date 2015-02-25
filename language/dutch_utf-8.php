@@ -729,15 +729,19 @@ $LANG_confignames['evlist'] = array(
     'use_locator'           => 'Integrate with the Locator plugin?',
     'use_weather'           => 'Integrate with the Weather plugin?',
     'cal_tmpl'              => 'Use HTML or JSON templates',
+    'enable_rsvp'           => 'Enable Registration/Ticketing?',
+    'rsvp_print'            => 'Enable Ticket Printing?',
 );
 $LANG_configsubgroups['evlist'] = array(
-    'sg_main'               => 'Hoofd Instellingen'
+    'sg_main'               => 'Hoofd Instellingen',
+    'sg_rsvp'               => 'RSVP/Ticketing',
 );
 $LANG_fs['evlist'] = array(
     'ev_access'             => 'Toegangscontrole',
     'ev_gui'                => 'GUI Instellingen',
     'ev_centerblock'        => 'Centerblok Instellingen',
     'ev_permissions'        => 'Standaard Rechten',
+    'ev_rsvp'               => 'Registration and Ticketing',
 );
 $LANG_configselects['evlist'] = array(
     0 => array('Ja' => 1, 'Nee' => 0),

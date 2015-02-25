@@ -92,6 +92,16 @@ $INSTALL_plugin['evlist'] = array(
             'sql' => $_SQL['evlist_calendars'],
         ),
 
+    array(  'type' => 'table',
+            'table' => $_TABLES['evlist_tickets'],
+            'sql' => $_SQL['evlist_tickets'],
+        ),
+
+    array(  'type' => 'table',
+            'table' => $_TABLES['evlist_tickettypes'],
+            'sql' => $_SQL['evlist_tickettypes'],
+        ),
+
     array(  'type' => 'group', 
             'group' => 'evList Admin', 
             'desc' => 'Administrator of the evList Plugin',
@@ -130,6 +140,7 @@ $INSTALL_plugin['evlist'] = array(
     array('type' => 'sql', 'sql' => $DEFVALUES['evlist_calendars']),
     array('type' => 'sql', 'sql' => $DEFVALUES['evlist_submissions']),
     array('type' => 'sql', 'sql' => $DEFVALUES['evlist_repeat']),
+    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_tickettypes']),
 
     array(  'type' => 'block', 
             'name' => 'evlist_upcoming', 

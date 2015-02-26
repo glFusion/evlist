@@ -1,4 +1,5 @@
 {# begin {templatelocation} #}
+{cal_header}
 <script type="text/javascript"
     src="{site_url}/evlist/js/calselect.js">
 </script>

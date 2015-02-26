@@ -27,7 +27,7 @@ function Week_stateChanged()
   }
 }
 </script>
-
+{cal_header}
 <div id="evlist_content">
   {calendar_content}
 </div>

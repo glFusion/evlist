@@ -252,6 +252,7 @@ function EVLIST_view_json($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $
     }
 
     $T->set_var(array(
+        'cal_header'    => EVLIST_calHeader($year, $month, $day, $type), 
         'calendar_content' => $function($year, $month, $day, $cat, $cal, $opt),
         'urlfilt_cal' => (int)$cal,
         'urlfilt_cat' => (int)$cat,

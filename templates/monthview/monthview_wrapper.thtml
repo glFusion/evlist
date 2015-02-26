@@ -3,9 +3,9 @@
     src="{site_url}/evlist/js/calselect.js">
 </script>
 <script>
-function Update(data)
+function JumpTo(year, month, day)
 {
-    document.getElementById("evlist_content").innerHTML = data;
+  ChangeMonth(month, year);
 }
 
 var xmlHttp;
@@ -29,10 +29,12 @@ function ChangeMonth(month, year)
 function Month_stateChanged()
 {
   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") {
-    Update(xmlHttp.responseText);
+    document.getElementById("evlist_content").innerHTML = xmlHttp.responseText;
   }
 }
 </script>
+
+{cal_header}
 
 <div id="evlist_content">
   {calendar_content}

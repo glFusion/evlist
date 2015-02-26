@@ -1,5 +1,4 @@
 {# begin {templatelocation} #}
-{cal_header}
 <h2 class="evlist_header">
   <a id="prev_href" onclick="javascript:ChangeMonth({prevmonth}, {prevyear});" href="#">&lt;&lt;</a>
   <span id="date_range">{thismonth_str}, {thisyear}</span>

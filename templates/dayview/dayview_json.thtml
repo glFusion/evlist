@@ -1,5 +1,4 @@
 {# begin {templatelocation} #}
-{cal_header}
 <h2 class="evlist_header">
   <a id="prev_href" onclick="javascript:ChangeDay({prevmonth},{prevday},{prevyear});" href="#">&lt;&lt;</a>
   <span id="currentday">{currentday}</span>

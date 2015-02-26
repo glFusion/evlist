@@ -56,10 +56,10 @@ class evRecurBase
         $this->skip = isset($event->rec_data['skip']) ?
                 (int)$event->rec_data['skip'] : 0;
 
-        $this->dt_start = $this->event->dt_start1 == '' ? 
+        $this->dt_start = $this->event->date_start1 != '' ? 
                     $this->event->date_start1 : $_EV_CONF['_today'];
-        $this->dt_end = $this->event->dt_end1 > $this->event->dt_start1 ? 
-                    $this->event->dt_end1 : $this->event->dt_start1;
+        $this->dt_end = $this->event->date_end1 > $this->event->date_start1 ? 
+                    $this->event->date_end1 : $this->event->date_start1;
 
         if ($this->dt_start != $this->dt_end) {
             list($syear, $smonth, $sday) = explode('-', $this->dt_start);

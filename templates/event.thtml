@@ -163,7 +163,7 @@
       <!-- END tickCntBlk -->
     </select>
     {!else}
-      <input type="hidden" name="tick_cnt" value="1" />
+      <input type="hidden" name="tick_count" value="1" />
       Qty. 1
     {!endif}
 

@@ -1,8 +1,8 @@
 {# begin {templatelocation} #}
 <h2 class="evlist_header">
-  <a id="prev_href" onclick="javascript:ChangeYear({prevyear});" href="#">&lt;&lt;</a>
+  <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, 1, 1, 'year');" href="#">&lt;&lt;</a>
   <span id="date_range">{thisyear}</span>
-  <a id="next_href" onclick="javascript:ChangeYear({nextyear});" href="#">&gt;&gt;</a>
+  <a id="next_href" onclick="javascript:ChangeDate({nextyear}, 1, 1, 'year');" href="#">&gt;&gt;</a>
 </h2>
 
 <div class="calcontainer">

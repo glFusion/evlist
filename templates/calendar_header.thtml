@@ -1,4 +1,6 @@
 {# begin {templatelocation} #}
+{!if use_json}
+{!endif}
 <div id="evlist_nav_right">
   <a href="{pi_url}/index.php?view=today&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class="evlist_nav_img" title="{$LANG_EVLIST['jump_today']}"><img src="{pi_url}/images/today_off.png" alt="{$LANG_EVLIST['jump_today']}" title="{$LANG_EVLIST['jump_today']}" width="27" height="20" class="gl_mootip" /></a>
 <!--  <a href="{pi_url}/index.php?view={thisview}&amp;year={thisyear}&amp;month={thismonth}&amp;day={thisday}&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class="evlist_nav_img" title="{$LANG_EVLIST['jump_today']}"><img src="{pi_url}/images/today_off.png" alt="{$LANG_EVLIST['jump_today']}" title="{$LANG_EVLIST['jump_today']}" width="27" height="20" class="gl_mootip" /></a>-->
@@ -78,7 +80,12 @@
                 var d = cal.date.getDate();
                 var m = cal.date.getMonth() + 1;
                 var y = cal.date.getFullYear();
+{!if use_json}
+                ChangeDate(y, m, d, "{view}");
+                cal.hide();
+{!else}
                 window.location="{pi_url}/index.php?view={view}&year="+y+"&month="+m+"&day="+d;
+{!endif}
             }
         }
 
@@ -92,7 +99,7 @@
             button      :   "jumpdate_trigger",
             onSelect    :   jump2date,
             //onClose     :   jump2date,
-            date        :   dt
+            date        :   dt,
         });
 
     </script>

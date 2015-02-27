@@ -1,4 +1,4 @@
-evlist
+#evlist
 ======
 
 Event List and calendar plugin for glFusion
@@ -8,37 +8,37 @@ For the latest documentation, please see
 
 	http://www.glfusion.org/wiki/doku.php?id=evlist:start
 
-LICENSE
+#LICENSE
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
 Foundation; either version 2 of the License, or (at your option) any later
 version.
 
-OVERVIEW
+#OVERVIEW
 
 A calendar solution for glFusion. evList supports recurring events, 
 categories, and more.
 
-SYSTEM REQUIREMENTS
+#SYSTEM REQUIREMENTS
 
 evList has the following system requirements:
 
     * PHP 5.3 and higher.
     * glFusion v1.4.0 or newer
 
-INSTALLATION
+#INSTALLATION
 
 The evList  Plugin uses the glFusion automated plugin installer.
 Simply upload the distribution using the glFusion plugin installer located in
 the Plugin Administration page.
 
-UPGRADING
+#UPGRADING
 
 The upgrade process is identical to the installation process, simply upload
 the distribution from the Plugin Administration page.
 
-CONFIGURATION SETTINGS
+#CONFIGURATION SETTINGS
 
 Allow anonymous users to view events?
     Set this to TRUE to allow non-logged in users to view events.  Set to
@@ -71,7 +71,7 @@ Number of days prior to an event to allow reminders
     Enter the minimum number of days before an event for someone to 
     enter their email address for a reminder. Default = 1.
 
-GUI SETTINGS
+#GUI SETTINGS
 
 Enable the menu item
     Set this to TRUE to enable a link for evList to be placed in the User Menu.
@@ -90,7 +90,7 @@ An event ceases to be upcoming...
 Number of events to display per page.
 	Number of events to display per page.
 
-CENTERBLOCK SETTINGS
+#CENTERBLOCK SETTINGS
 
 Centerblock Type
     Select the type of centerblock to use, if any.
@@ -114,11 +114,11 @@ Number of characters to display in event summary
     Number of characters (width) of the centerblock.
 
 
-QUIRKS AND ISSUES
-The selected starting date for a repeating event is always used, even if it
+#QUIRKS AND ISSUES
+*The selected starting date for a repeating event is always used, even if it
 would normally not be included.  For example, creating an event to occur
 every third Tuesday, but selecting a Monday as the start date, causes the
 event to occur on that Monday as well as the following Tuesdays.
-
-When the JSON calendar is used the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
-
+*When the JSON calendar is used:
+**the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
+**the date selector always defaults to the date first viewed.

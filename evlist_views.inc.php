@@ -242,9 +242,10 @@ function EVLIST_view_json($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $
 {
     global $_EV_CONF;
 
-    $T = new Template(EVLIST_PI_PATH . '/templates/' . $type . 'view');
+    $T = new Template(EVLIST_PI_PATH . '/templates/');
+    //$T = new Template(EVLIST_PI_PATH . '/templates/' . $type . 'view');
     $T->set_file(array(
-        'view'  => $type . 'view_wrapper.thtml',
+        'view'  => 'json_cal_wrapper.thtml',
     ) );
     $function = "EVLIST_{$type}view";
     if (!function_exists($function)) {

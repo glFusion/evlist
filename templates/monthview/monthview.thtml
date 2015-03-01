@@ -49,7 +49,7 @@
     <td style="vertical-align:top;" class="month{cal_day_style}" 
       onMouseOver="document.getElementById('cell{month}{day}{year}').style.visibility='visible';"
       onMouseOut="document.getElementById('cell{month}{day}{year}').style.visibility='hidden';"
-      onclick="window.location.href='{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}';">
+      ondblclick="window.location.href='{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}';">
       <div class="monthview_daterow">
         <span class="date_number">
           {cal_day_anchortags}

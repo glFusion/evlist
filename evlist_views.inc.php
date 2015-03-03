@@ -356,7 +356,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $thedate = COM_getUserDateTimeFormat($dtToday->toUnix());
     $monthname = $LANG_MONTH[$month];
     $dow = Date_Calc::dayOfWeek($day, $month, $year) + 1;
-    $dayname = $dtToday->format('l', true);
+    $dayname = $dtToday->format('l');
 
     $tpl = 'dayview';
     if ($opt == 'print') {
@@ -504,6 +504,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     //    $T->set_var ($i . '_hour',$link);
         $T->parse ($i . '_cols', 'column', true);
     }
+var_dump($thedate);die;
     $T->set_var(array(
         'month'         => $month,
         'day'           => $day,
@@ -520,7 +521,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                             $cat, $cal),
         'cal_footer'    => EVLIST_calFooter($calendars_used),
         'pi_url'        => EVLIST_URL,
-        'currentday'    => $dayname. ', ' . $dtToday->format($_CONF['shortdate'], true),
+        'currentday'    => $dayname. ', ' . $dtToday->format($_CONF['shortdate']),
         'week_num'      => @strftime('%V', $thedate[1]),
         'cal_checkboxes', EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
@@ -605,7 +606,6 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     }
     $date_range .= "$end_dnum, $end_ynum";
     $T->set_var('date_range', $date_range);
-    $T->set_var('week_num',$thedate[1]);
 
     $T->set_block('week', 'dayBlock', 'dBlk');
     foreach($calendarView as $idx=>$weekData) {

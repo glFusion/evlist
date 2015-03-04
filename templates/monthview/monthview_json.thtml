@@ -1,8 +1,8 @@
 {# begin {templatelocation} #}
 <h2 class="evlist_header">
-  <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, 1, 'month');" href="#">&lt;&lt;</a>
+  <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, 1, 'month');" href="#!">&lt;&lt;</a>
   <span id="date_range">{thismonth_str}, {thisyear}</span>
-  <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#">&gt;&gt;</a>
+  <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#!">&gt;&gt;</a>
 </h2>
 
 {!if cal_checkboxes}

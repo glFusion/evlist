@@ -25,27 +25,7 @@
 </div>
 {!endif}
 
-<!--<table width="100%" border="0" cellpadding="5" cellspacing="0" class="cal-header">
-  <tr align="center">
-    <td width="33%" align="center"><b>{$LANG_EVLIST['deleting_cal']}</b></td>
-    <td width="33%" align="center"><a href="{pi_url}/index.php?mode={mode}&amp;view=week">{$LANG_EVLIST['periods']['week']}</a></td>
-    <td width="33%" align="center"><a href="{pi_url}/index.php?mode={mode}">{$LANG_EVLIST['periods']['month']}</a></td>
-  </tr>
-</table>
-<br/>-->
 <table style="padding:2px;margin:1px;width:100%;" class="cal-dayx-body">
-<!--    <tr>
-        <td colspan="2" class="cal-dayx-cur"><table style="width:100%;">
-          <tr>
-            <td colspan="2" class="cal-dayx-cur"><a href="{pi_url}/index.php?mode={mode}&amp;view=day&amp;month={prevmonth}&amp;day={prevday}&amp;year={prevyear}">&lt;&lt;</a>&nbsp;&nbsp;{currentday}&nbsp;&nbsp;<a href="{pi_url}/index.php?mode={mode}&amp;view=day&amp;month={nextmonth}&amp;day={nextday}&amp;year={nextyear}">&gt;&gt;</a></td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td colspan="2" class="cal-dayx-subcur">{calendar_title} {calendar_toggle}</td>
-            <td>&nbsp;</td>
-          </tr>
-        </table></td>
-    </tr>-->
     <tr>
         <td class="cal-dayx-weekevent"><div align="right"><?php global $LANG_EVLIST; echo $LANG_EVLIST['periods']['week'];?> {week_num}</div></td>
         <td>{allday_events}</td>

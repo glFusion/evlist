@@ -382,7 +382,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="cal_id">
           {$LANG_EVLIST['calendar']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_calendar', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_calendar', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         {!if cal_name}
           {cal_name}
@@ -396,7 +396,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="title">
           {$LANG_EVLIST['event_title']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <input class="fValidate['required']" type="text" name="title"
             id="title" style="width:50%;" maxlength="255"
@@ -407,7 +407,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="summary">
             {$LANG_EVLIST['event_summary']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_summary', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_summary', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <textarea name="summary" id="summary" style="width:80%;"
             cols="80" rows="2">{summary}</textarea>
@@ -416,7 +416,7 @@ function toggleRSVPdetail(val)
         <p>
         <label for="description">
           {$LANG_EVLIST['full_desc']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         </label>
         <textarea name="full_description" id="description" style="width:80%;"
@@ -437,7 +437,7 @@ function toggleRSVPdetail(val)
 
         <p>
         <label for="url">{$LANG_EVLIST['url']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_url', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_url', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <input type="text" name="url" id="url" style="width:80%"
             maxlength="255" value="{url}" />
@@ -445,7 +445,7 @@ function toggleRSVPdetail(val)
 
         <p>
         <label for="status">{$LANG_EVLIST['enabled']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <input type="checkbox" name="status" value="1" id="status" {status_checked} />
         </p>
@@ -454,7 +454,7 @@ function toggleRSVPdetail(val)
         <p>
           <label for="enable_reminders">
             {$LANG_EVLIST['enable_reminders_q']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_reminders', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_reminders', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           </label>
           <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} /><br />
           <span class="pluginSmallText warning">{$LANG_EVLIST['submit_email_note']}</span>
@@ -496,7 +496,7 @@ function toggleRSVPdetail(val)
       <div style="padding:5px;">
         <label for="f_startdate1">
           {$LANG_EVLIST['start_date']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
             id="startdt1_trigger"
@@ -523,7 +523,7 @@ function toggleRSVPdetail(val)
 
         <label for="f_enddate1">
           {$LANG_EVLIST['end_date']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
             id="enddate1_trigger"
@@ -549,7 +549,7 @@ function toggleRSVPdetail(val)
 
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_split', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_split', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           <input type="checkbox" name="split" value="1" 
                 id="split" {split_checked} onclick="showhideallday()" />
           &nbsp;&nbsp;
@@ -557,7 +557,7 @@ function toggleRSVPdetail(val)
 
         <span {allday_show} id="div1">
           {$LANG_EVLIST['allday']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_allday', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_allday', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           <input type="checkbox" name="allday" value="1" 
             id="allday" {allday_checked} onclick="chk_allday()" />
         </span>

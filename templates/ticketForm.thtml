@@ -11,20 +11,20 @@ window.addEvent('domready',function() {
     action="{site_admin_url}/plugins/evlist/index.php">
   <p>
     <label>{$LANG_EVLIST['description']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
     </label>
     <input type="text" id="description" class="fValidate['required']" 
             name="description" length="50" size="20" value="{description}" />
   </p>
   <p>
     <label>{$LANG_EVLIST['event_pass']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_event_pass', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        <a href="#" onclick="popupWindow('{doc_url}#desc_event_pass', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
 
     <input type="checkbox" name="event_pass" value="1" {event_pass_chk} />
   </p>
   <p>
     <label>{$LANG_EVLIST['enabled']}:
-      <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+      <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
     </label>
     <input type="checkbox" name="enabled" value="1" {enabled_chk} />
   </p>

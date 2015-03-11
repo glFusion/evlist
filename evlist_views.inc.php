@@ -353,7 +353,6 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $dtToday = new Date(strtotime($today), $_CONF['timezone']);
     $dtPrev = new Date($dtToday->toUnix() - 86400, $_CONF['timezone']);
     $dtNext = new Date($dtToday->toUnix() + 86400, $_CONF['timezone']);
-    $thedate = COM_getUserDateTimeFormat($dtToday->toUnix());
     $monthname = $LANG_MONTH[$month];
     $dow = Date_Calc::dayOfWeek($day, $month, $year) + 1;
     $dayname = $dtToday->format('l');
@@ -504,7 +503,6 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     //    $T->set_var ($i . '_hour',$link);
         $T->parse ($i . '_cols', 'column', true);
     }
-var_dump($thedate);die;
     $T->set_var(array(
         'month'         => $month,
         'day'           => $day,
@@ -522,7 +520,7 @@ var_dump($thedate);die;
         'cal_footer'    => EVLIST_calFooter($calendars_used),
         'pi_url'        => EVLIST_URL,
         'currentday'    => $dayname. ', ' . $dtToday->format($_CONF['shortdate']),
-        'week_num'      => @strftime('%V', $thedate[1]),
+        'week_num'      => $dtToday->format('W'),
         'cal_checkboxes', EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
         'site_slogan'   => $_CONF['site_slogan'],
@@ -567,7 +565,8 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $end_date = $calendarView[6];
     $calendars_used = array();
 
-    $dtStart= new Date(strtotime($start_date), $_CONF['timezone']);
+    $dtStart = new Date(strtotime($start_date), $_CONF['timezone']);
+    $dtToday = $dtStart;    // used to update date strings each day
     $week_secs = 86400 * 7;
     $dtPrev = new Date($dtStart->toUnix() - $week_secs, $_CONF['timezone']);
     $dtNext = new Date($dtStart->toUnix() + $week_secs, $_CONF['timezone']);
@@ -609,11 +608,10 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
     $T->set_block('week', 'dayBlock', 'dBlk');
     foreach($calendarView as $idx=>$weekData) {
+        list($curyear, $curmonth, $curday) = explode('-', $weekData);
+        $dtToday->setDateTimestamp($curyear, $curmonth, $curday, 0, 0, 0);
         $T->clear_var('eBlk');
         $dayname = $LANG_WEEK[$idx+1];
-        list($curyear, $curmonth, $curday) = explode('-', $weekData);
-        $thedate = COM_getUserDateTimeFormat(
-                    mktime(0, 0, 0, $curmonth, $curday, $curyear));
         if ($weekData == $_EV_CONF['_today']) {
             $T->set_var('dayclass', 'weekview-curday');
         } else {
@@ -622,7 +620,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
         $monthname = $LANG_MONTH[(int)$curmonth];
         $T->set_var('dayinfo', $dayname . ', ' .
-            COM_createLink(strftime('%x', $thedate[1]),
+            COM_createLink($dtToday->format($_CONF['shortdate']), 
                 EVLIST_URL . "/index.php?view=day&amp;day=$curday" .
                 "&amp;cat={$cat}&amp;cal={$cal}" .
                 "&amp;month=$curmonth&amp;year=$curyear")

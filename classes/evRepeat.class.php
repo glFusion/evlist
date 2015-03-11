@@ -303,12 +303,12 @@ class evRepeat
 
 
     /**
-    *   Display the detail page for the product.
+    *   Display the detail page for the event occurrence.
     *
     *   @param  integer $rp_id  ID of the repeat to display
     *   @param  string  $query  Optional query string, for highlighting
     *   @param  string  $tpl    Optional template filename, e.g. 'event_print'
-    *   @return string      HTML for the product page.
+    *   @return string      HTML for the page.
     */
     public function Detail($rp_id=0, $query='', $tpl='')
     {

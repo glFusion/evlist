@@ -26,7 +26,7 @@ class evRepeat
 
     var $Event;
     var $Detail;
-    var $isOwner;
+    var $isAdmin;   // indicates if the current user can admin this event
 
     /**
      *  Constructor.
@@ -55,7 +55,7 @@ class evRepeat
                 $this->rp_id = '';
             } else {
                 // This gets used a few places, so save on function calls.
-                $this->isOwner = $this->Event->hasAccess(3);
+                $this->isAdmin = $this->Event->hasAccess(3);
             }
         }
 
@@ -460,7 +460,7 @@ class evRepeat
             'title' => $title,
             'summary' => $summary,
             'full_description' => $fulldescription,
-            'can_edit' => $this->isOwner ? 'true' : '',
+            'can_edit' => $this->isAdmin ? 'true' : '',
             'start_time1' => $time_start1,
             'end_time1' => $time_end1,
             'start_time2' => $time_start2,
@@ -752,7 +752,7 @@ class evRepeat
         // Show the "manage reservations" link to the event owner
         if ($_EV_CONF['enable_rsvp'] == 1 &&
                 $this->Event->options['use_rsvp'] == 1) {
-            if ($this->isOwner) {
+            if ($this->isAdmin) {
                 $T->set_var('admin_rsvp', EVLIST_adminRSVP($this->rp_id));
             }
         }

@@ -138,6 +138,12 @@ define('EV_RSVP_REPEAT', 2);
 define('EVCHECKED', 'checked="checked"');
 define('EVSELECTED', 'selected="selected"');
 
+// define date format for Pear Date_Calc as common SQL format.
+// also defined in lglib/functions.inc starting with version 0.0.7
+if (!defined('DATE_CALC_FORMAT')) {
+    define('DATE_CALC_FORMAT', '%Y-%m-%d');
+}
+
 /**
 *   Return the current code (not necessarily installed) version
 *

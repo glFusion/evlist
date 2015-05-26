@@ -899,7 +899,7 @@ $expected = array(
     'deletecal', 'delcalconfirm', 'approve', 'disapprove',
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
-    'tickreset_x', 'tickdelete_x',
+    'tickreset_x', 'tickdelete_x', 'exporttickets',
     // Views to display
     'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
     'import', 'importexec', 'edit', 'editcat', 'editticket', 'tickettypes',
@@ -1069,6 +1069,21 @@ case 'printtickets':
         USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
         $doc = evTicket::PrintTickets($eid);
+        echo $doc;
+        exit;
+    } else {
+        $content .= 'Function not available';
+    }
+    break;
+
+case 'exporttickets':
+    // Print all tickets for an event, for all users
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_ticket();
+        $eid = COM_sanitizeID($_GET['eid'], false);
+        $doc = evTicket::ExportTickets($eid);
+        header('Content-type: text/csv');
+        header('Content-Disposition: attachment; filename="event-'.$ev_id.'.csv');
         echo $doc;
         exit;
     } else {

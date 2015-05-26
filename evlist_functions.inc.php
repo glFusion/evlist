@@ -138,7 +138,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
     if ($month == 0) $month = date('m');
     $monthnum_str = sprintf("%02d", (int)$month);
 
-    // Get all the dates in the year
+    // Get all the dates in the period
     $starting_date = date('Y-m-d', mktime(0, 0, 0, $month, 1, $year));
     $ending_date = date('Y-m-d', mktime(23, 59, 59, $month, 31, $year));
     $calendarView = Date_Calc::getCalendarMonth($month, $year, '%Y-%m-%d');
@@ -671,14 +671,18 @@ function EVLIST_adminRSVP($rp_id)
     $Ev = new evRepeat($rp_id);
     if ($Ev->rp_id == 0) return '';
 
-    $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                     tk.uid, tk.used, tt.description, u.fullname
+    DB_query("SET @tk_count = 0;");
+    $sql = "SELECT @tk_count := @tk_count +1 as tic_count,
+                    tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
+                    tk.uid, tk.used, tt.description, u.fullname,
+                    {$Ev->Event->options['max_rsvp']} as max_rsvp
             FROM {$_TABLES['evlist_tickets']} tk
             LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
                 ON tt.id = tk.tic_type
             LEFT JOIN {$_TABLES['users']} u
                 ON u.uid = tk.uid
             WHERE tk.ev_id = '{$Ev->Event->id}' ";
+
     $title = $LANG_EVLIST['pi_title'] . ': ' . 
         $LANG_EVLIST['admin_rsvp'] . ' -- ' .
         COM_createLink($Ev->Event->Detail->title . ' (' . $Ev->date_start . ')',
@@ -686,6 +690,9 @@ function EVLIST_adminRSVP($rp_id)
     $title .= '&nbsp;&nbsp;&nbsp;<a href="'.$_CONF['site_admin_url'] .
             '/plugins/evlist/index.php?printtickets&eid=' . $Ev->ev_id .
             '" class="lgButton blue" target="_new">' . $LANG_EVLIST['print_tickets'] . '</a>';
+    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.$_CONF['site_admin_url'] .
+            '/plugins/evlist/index.php?exporttickets&eid=' . $Ev->rp_id .
+            '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
  
     if ($Ev->Event->options['use_reg'] == EV_RSVP_REPEAT) {
         $sql .= " AND rp_id = '{$Ev->rp_id}' ";
@@ -705,7 +712,7 @@ function EVLIST_adminRSVP($rp_id)
                 'field' => 'dt', 
                 'sort'  => true,
         ),
-        array(  'text'  => 'Name',
+        array(  'text'  => $LANG_EVLIST['name'],
                 'field' => 'fullname',
                 'sort'  => false,
         ),
@@ -723,6 +730,10 @@ function EVLIST_adminRSVP($rp_id)
         ),
         array(  'text'  => $LANG_EVLIST['date_used'],
                 'field' => 'used',
+                'sort'  => false,
+        ),
+        array(  'text'  => $LANG_EVLIST['waitlisted'],
+                'field' => 'tic_count',
                 'sort'  => false,
         ),
     );
@@ -779,6 +790,14 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
     $retval = '';
 
     switch($fieldname) {
+    case 'tic_count':
+        if ($fieldvalue <= $A['max_rsvp']) {
+            $retval = '';
+        } else {
+            $retval = 'Yes';
+        }
+        break;
+            
     case 'uid':
         $retval = COM_getDisplayName($fieldvalue);
         break;

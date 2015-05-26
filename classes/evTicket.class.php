@@ -35,6 +35,7 @@ class evTicket
         $this->paid         = 0;
         $this->uid          = 0;
         $this->used         = 0;
+        $this->dt           = NULL;
         if ($this->tic_id != '') {
             $this->Read($this->tic_id);
         }
@@ -76,6 +77,7 @@ class evTicket
         case 'rp_id':
         case 'tic_type':
         case 'used':
+        case 'dt':
             $this->properties[$key] = (int)$value;
             break;
 
@@ -125,6 +127,7 @@ class evTicket
         $this->fee = $A['fee'];
         $this->paid = $A['paid'];
         $this->used = $A['used'];
+        $this->dt = $A['dt'];
     }
 
 
@@ -344,7 +347,8 @@ class evTicket
         if (!empty($where)) {
             // Have to have some where clause
             $sql_where = implode(' AND ', $where);
-            $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE $sql_where";
+            $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE $sql_where
+                    ORDER BY dt ASC";
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 // create empty objects and use SetVars to save DB lookups
@@ -364,6 +368,7 @@ class evTicket
     *   @param  string  $ev_id  Event ID
     *   @param  integer $rp_id  Repeat ID
     *   @param  integer $uid    User ID
+    *   @return string          PDF Document containing tickets
     */
     public static function PrintTickets($ev_id='', $rp_id=0, $uid=0)
     {
@@ -497,6 +502,61 @@ class evTicket
         $pdf->Output();
 
     }   // end func PrintTickets()
+
+
+    /**
+    *   Export tickets to a CSV file for a single occurrence
+    *
+    *   @param  integer $rp_id  Repeat ID
+    *   @return string  CSV file containing all tickets
+    */
+    public static function ExportTickets($rp_id='')
+    {
+        global $_CONF, $LANG_EVLIST;
+
+        $retval = '';
+        // get the tickets, paid and unpaid. Need event id and uid.
+        $tickets = self::GetTickets($ev_id, $rp_id, $uid);
+
+        USES_evlist_class_repeat();
+        USES_evlist_class_tickettype();
+
+        $Rp = new evRepeat($rp_id);
+
+        $header = array(
+            $LANG_EVLIST['ticket_num'],
+            $LANG_EVLIST['rsvp_date'],
+            $LANG_EVLIST['name'],
+            $LANG_EVLIST['fee'],
+            $LANG_EVLIST['paid'],
+            $LANG_EVLIST['date_used'],
+            $LANG_EVLIST['waitlisted'],
+        );
+        $retval .= '"' . implode('","', $header) . '"' . "\n";
+
+        //$tic_types = array();
+        $counter = 0;
+        $dt_tick = new Date('now', $_CONF['timezone']);
+        $dt_used = new Date('now', $_CONF['timezone']);
+        foreach ($tickets as $tic_id=>$ticket) {
+            $counter++;
+            $dt_tick->setTimestamp($ticket->dt);
+            $dt_used->setTimestamp($ticket->used);
+
+            $values = array(
+                $tic_id,
+                $dt_tick->toMySQL(),
+                str_replace('"', "'", COM_getDisplayName($ticket->uid)),
+                $ticket->fee,
+                $ticket->paid,
+                $ticket->used > $ticket->dt ? $dt_used->toMySQL(): '',
+                ($counter > $Rp->Event->options['max_rsvp']) ? 'Yes': 'No',
+            );
+            $retval .= '"' . implode('","', $values) . '"' . "\n";
+        }
+        return $retval;
+ 
+    }   // end func ExportTickets()
 
 
     /**

@@ -333,8 +333,9 @@ You may either move existing events to a new calendar, or delete those events.',
 'login_to_register' => 'You need to log into the site to register for this event',
 'conf_reset'    => 'Are your sure you want to reset this item?',
 'reset_usage'   => 'Reset Usage',
-'conf_reset'    => 'Are your sure you want to reset this item?',
-'reset_usage'   => 'Reset Usage',
+'export_list'   => 'Export List',
+'waitlisted'    => 'Waitlisted',
+'name'          => 'Name',
 );
 
 

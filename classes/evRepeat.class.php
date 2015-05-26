@@ -509,7 +509,9 @@ class evRepeat
                         $this->Event->options['max_rsvp'] > 
                         $this->TotalRegistrations() )
                         &&
-                        $total_tickets < $this->Event->options['max_user_rsvp'] ) {
+                        ( $this->Event->options['max_user_rsvp'] == 0 ||
+                          $total_tickets < $this->Event->options['max_user_rsvp']  )
+                ) {
                     USES_evlist_class_tickettype();
                     $Ticks = evTicketType::GetTicketTypes();
                     if ($this->Event->options['max_user_rsvp'] > 1) {
@@ -751,7 +753,7 @@ class evRepeat
 
         // Show the "manage reservations" link to the event owner
         if ($_EV_CONF['enable_rsvp'] == 1 &&
-                $this->Event->options['use_rsvp'] == 1) {
+                $this->Event->options['use_rsvp'] > 0) {
             if ($this->isAdmin) {
                 $T->set_var('admin_rsvp', EVLIST_adminRSVP($this->rp_id));
             }

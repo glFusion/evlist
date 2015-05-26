@@ -33,7 +33,7 @@
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @package    evlist
-*   @version    1.3.0
+*   @version    1.4.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -55,8 +55,8 @@ if (!defined ('GVERSION')) {
 
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'evList Event Calendar';
-$_EV_CONF['pi_version']      = '1.3.7';
-$_EV_CONF['gl_version']      = '1.3.0';
+$_EV_CONF['pi_version']      = '1.4.0';
+$_EV_CONF['gl_version']      = '1.4.0';
 $_EV_CONF['pi_url']          = 'http://www.glfusion.org';
 
 

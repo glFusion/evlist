@@ -1014,7 +1014,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
         $M->set_block('smallmonth', 'daynames', 'nBlock');
         // $LANG_WEEK starts with element 1, not zero
-        for ($i = 0; $i < 7; $i++) {
+        for ($i = 1; $i < 8; $i++) {
             $M->set_var('dayname', $LANG_WEEK[$i][0]);
             $M->parse('nBlock', 'daynames', true);
         }

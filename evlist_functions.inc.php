@@ -829,4 +829,35 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 
 }
 
+
+/**
+*   Get the day names for a week based on week start day of Sun or Mon.
+*   Used to create calendar headers for weekly, monthly and yearly views.
+*
+*   @param  integer $letters    Optional number of letters to return
+*   @return array       Array of day names for a week, 0-indexed
+*/
+function EVLIST_getDayNames($letters = 0)
+{
+    global $_CONF, $LANG_WEEK;
+
+    $retval = array();
+
+    if ($_CONF['week_start'] == 'Sun') {
+        $keys = array(1, 2, 3, 4, 5, 6, 7);
+    } else {
+        $keys = array(2, 3, 4, 5, 6, 7, 1);
+    }
+
+    for ($i = 0; $i < 7; $i++) {
+        if ($letters > 0) {
+            $retval[$i] = substr($LANG_WEEK[$keys[$i]], 0, $letters);
+        } else {
+            $retval[$i] = $LANG_WEEK[$keys[$i]];
+        }
+    }
+    return $retval;
+}
+
+
 ?>

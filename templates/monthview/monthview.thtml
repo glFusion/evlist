@@ -30,13 +30,13 @@
 <table style="padding:5px;margin:1px;" class="evlist_month">
   <tr class="daynames">
     <td style="width:2%;">&nbsp;</td>
-    <td style="width:14%;">{$LANG_WEEK[1]}</td>
-    <td style="width:14%;">{$LANG_WEEK[2]}</td>
-    <td style="width:14%;">{$LANG_WEEK[3]}</td>
-    <td style="width:14%;">{$LANG_WEEK[4]}</td>
-    <td style="width:14%;">{$LANG_WEEK[5]}</td>
-    <td style="width:14%;">{$LANG_WEEK[6]}</td>
-    <td style="width:14%;">{$LANG_WEEK[7]}</td>
+    <td style="width:14%;">{dayname0}</td>
+    <td style="width:14%;">{dayname1}</td>
+    <td style="width:14%;">{dayname2}</td>
+    <td style="width:14%;">{dayname3}</td>
+    <td style="width:14%;">{dayname4}</td>
+    <td style="width:14%;">{dayname5}</td>
+    <td style="width:14%;">{dayname6}</td>
   </tr>
   <!-- BEGIN weekBlock -->
   <tr>

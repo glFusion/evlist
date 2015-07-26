@@ -332,7 +332,7 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
 */
 function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_WEEK, $LANG_EVLIST;
+    global $_CONF, $_EV_CONF, $LANG_EVLIST;
 
     USES_class_date();
 
@@ -543,7 +543,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK, $LANG_EVLIST;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST;
 
     USES_class_date();
     EVLIST_setViewSession('week', $year, $month, $day);
@@ -586,6 +586,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         //'events'    => 'weekview/events.thtml',
     ) );
 
+    $daynames = EVLIST_getDayNames();
     $events = EVLIST_getEvents($start_date, $end_date,
                 array('cat'=>$cat, 'cal'=>$cal));
 
@@ -611,7 +612,6 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         list($curyear, $curmonth, $curday) = explode('-', $weekData);
         $dtToday->setDateTimestamp($curyear, $curmonth, $curday, 0, 0, 0);
         $T->clear_var('eBlk');
-        $dayname = $LANG_WEEK[$idx+1];
         if ($weekData == $_EV_CONF['_today']) {
             $T->set_var('dayclass', 'weekview-curday');
         } else {
@@ -619,7 +619,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         }
 
         $monthname = $LANG_MONTH[(int)$curmonth];
-        $T->set_var('dayinfo', $dayname . ', ' .
+        $T->set_var('dayinfo', $daynames[$idx] . ', ' .
             COM_createLink($dtToday->format($_CONF['shortdate']), 
                 EVLIST_URL . "/index.php?view=day&amp;day=$curday" .
                 "&amp;cat={$cat}&amp;cal={$cal}" .
@@ -740,7 +740,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK;
+    global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     EVLIST_setViewSession('month', $year, $month, $day);
 
@@ -765,6 +765,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $y = count($calendarView[$x]) - 1;
     $starting_date = $calendarView[0][0];
     $ending_date = $calendarView[$x][$y];
+    $daynames = EVLIST_getDayNames();
     $events = EVLIST_getEvents($starting_date, $ending_date,
                 array('cat'=>$cat, 'cal'=>$cal));
     $nextmonth = $month + 1;
@@ -795,6 +796,10 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'allday_event' => 'event_allday.thtml',
         'timed_event' => 'event_timed.thtml',
     ) );
+
+    foreach ($daynames as $key=>$dayname) {
+        $T->set_var('dayname'.$key, $dayname);
+    }
 
     list($y, $m, $d) = explode('-', $starting_date);
     $weekOfYear = Date_Calc::weekOfYear($d, $m, $y);
@@ -959,7 +964,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK;
+    global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     EVLIST_setViewSession('year', $year, $month, $day);
 
@@ -976,6 +981,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $starting_date = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year));
     $ending_date = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year + 1));
     $calendarView = Date_Calc::getCalendarYear($year, '%Y-%m-%d');
+    $daynames = EVLIST_getDayNames(1);
     $events = EVLIST_getEvents($starting_date, $ending_date,
             array('cat'=>$cat, 'cal'=>$cal));
 
@@ -1013,9 +1019,8 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         $M->set_var('monthname', $LANG_MONTH[$monthnum+1]);
 
         $M->set_block('smallmonth', 'daynames', 'nBlock');
-        // $LANG_WEEK starts with element 1, not zero
-        for ($i = 1; $i < 8; $i++) {
-            $M->set_var('dayname', $LANG_WEEK[$i][0]);
+        for ($i = 0; $i < 7; $i++) {
+            $M->set_var('dayname', $daynames[$i]);
             $M->parse('nBlock', 'daynames', true);
         }
 

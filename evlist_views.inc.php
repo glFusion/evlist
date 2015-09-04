@@ -293,9 +293,9 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
         // no previous session created, default to the current date
         // unless other values provided
         list($cyear, $cmonth, $cday) = explode('-', $_EV_CONF['_today']);
-        if ($year == 0) $year = $currentyear;
-        if ($month == 0) $month = $currentmonth;
-        if ($day == 0) $day = $curentday;
+        if ($year == 0) $year = $cyear;
+        if ($month == 0) $month = $cmonth;
+        if ($day == 0) $day = $cday;
     }
 
     // catch missing or incorrect view types, set to 'month'
@@ -338,14 +338,14 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
     EVLIST_setViewSession('day', $year, $month, $day);
 
-    $retval = '';
+   $retval = '';
     list($currentyear, $currentmonth, $currentday) = 
         explode('-', $_EV_CONF['_today']);
 
     // Default to the current day
     if ($year == 0) $year = $currentyear;
     if ($month == 0) $month = $currentmonth;
-    if ($day == 0) $day = $curentday;
+    if ($day == 0) $day = $currentday;
     $cat = (int)$cat;
     $cal = (int)$cal;
 
@@ -555,7 +555,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     // Default to the current month
     if ($year == 0) $year = $currentyear;
     if ($month == 0) $month = $currentmonth;
-    if ($day == 0) $day = $curentday;
+    if ($day == 0) $day = $currentday;
     $cat = (int)$cat;
     $cal = (int)$cal;
 
@@ -751,7 +751,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     // Default to the current month
     if ($year == 0) $year = $currentyear;
     if ($month == 0) $month = $currentmonth;
-    if ($day == 0) $day = $curentday;
+    if ($day == 0) $day = $currentday;
     $cat = (int)$cat;
     $cal = (int)$cal;
 

@@ -101,8 +101,8 @@ function USES_evlist_views()
 {    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
 
 function USES_evlist_class_datecalc()
-{   //require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php';
-    require_once 'Date/Calc.php';
+{   require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php';
+    //require_once 'Date/Calc.php';
 }
 
 function USES_evlist_class_event()

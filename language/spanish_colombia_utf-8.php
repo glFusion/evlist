@@ -4,9 +4,7 @@
 // +--------------------------------------------------------------------------+
 // | spanish_colombia_utf-8.php                                               |
 // |                                                                          |
-// | Sapanish (Colombia) language file for evList                             |
-// +--------------------------------------------------------------------------+
-// | $Id::                                                                   $|
+// | Spanish (Colombia) language file for evList                              |
 // +--------------------------------------------------------------------------+
 // | Based on the evList Plugin for Geeklog CMS                               |
 // | Copyright (C) 2007 by the following authors:                             |
@@ -90,12 +88,17 @@ $LANG_EVLIST = array(
 'calendar'          => 'Calendario',
 'calendars'         => 'Calendarios',
 'select_cals'       => 'Select which calendars will be displayed',
-'new_calendar'      => 'Nuevo Calendario',
+'new_calendar'      => 'Crear',
 'events'            => 'Eventos',
-'new_event'         => 'Nuevo Evento',
+'new_event'         => 'Crear',
 'categories'        => 'Categorías',
 'category'          => 'Categoría',
-'new_category'      => 'Nueva Categoría',
+'new_category'      => 'Crear',
+'ticket_types'      => 'Ticket Types',
+'type'              => 'Type',
+'fee'               => 'Fee',
+'new_ticket_type'   => 'New Ticket Type',
+'print_tickets'     => 'Print Tickets',
 'import_calendar'   => 'Importar de Calendario',
 'import_from_csv'   => 'Importar de Archivo CSV',
 'title'             => 'Título',
@@ -169,6 +172,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'where'             => 'Dónde',
 'what'              => 'Qué',
 'click_here'        => 'Clic Aquí',
+'clk_help'         => 'Clic para ayuda',
 'more_info'         => 'Más Información',
 'contact_us'        => 'Please <a href="%s">contact us</a> for more information.',
 'rem_subject' => "An event reminder from {$_CONF['site_name']}",
@@ -267,11 +271,15 @@ You may either move existing events to a new calendar, or delete those events.',
     23  => 'There was an error processing your request.',
     24  => 'You have been registered for this event.',
     25  => 'Your registration has been cancelled.',
+    26  => 'Payment is required, click <a href="%s">here</a> to check out',
+    50  => 'Not Paid',
+    51  => 'Already Used',
 ),
 'admin_instr' => array(
     'categories' => 'Deleting categories <strong>will not</strong> delete events belonging to those categories.<br />Disabling a category <strong>will not</strong> disable its events.  Those events will continue to appear in the event list if it belongs to another category or if no category is selected.',
     'calendars' => 'All events must be associated with a calendar.<br />Disabling a calendar prevents its events from being displayed. Deleting a calendar requires that events belonging to it be moved to another calendar.<br />Calendar number 1 cannot be deleted, but may be disabled.',
     'events' => 'To create a new event, click on "New Event" above.<br />To modify or delete an event, click on that event\'s edit icon below. To enable/disable an event, check the appropriate box below.',
+    'tickettypes' => 'Tickets can be created for free or paid admission, and to cover one event occurrence or all occurrences (event pass). Tickets are only used if the global &quot;Enable RSVP&quot; setting is enabled.<br />Ticket Types can only be deleted if they haven&apos; been used for any events.',
 ),
 
 'current_events'  => 'Current Events',
@@ -305,6 +313,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'instr_sel_loc' => 'Select a location from the list, or fill in the details.',
 'use_rsvp'       => 'Enable signups?',
 'max_rsvp'       => 'Max. Attendees',
+'max_user_rsvp' => 'Max. Registrations per User',
 'signup'        => 'Register for this event',
 'cancelreg'     => 'Cancel your registration',
 'rsvp_none'     => 'Signups Disabled',
@@ -313,11 +322,25 @@ You may either move existing events to a new calendar, or delete those events.',
 'rsvp_mindays'  => 'Min. days to RSVP',
 'admin_rsvp'    => 'Manage RSVP\'s',
 'rsvp_date'      => 'Registration Date',
+'registration'  => 'Registration',
 'rsvp_waitlist' => 'Accept waitlisted reservations?',
 'rsvp_cutoff'   => 'RSVP Cutoff (days)',
 'sel_monthdays' => 'Select the days each month when the event will occur',
 'sub_this_instance' => 'This Instance',
 'sub_all_instances' => 'All occurrences',
+'description'   => 'Descripción',
+'event_pass'    => 'Event Pass',
+'cancel_free'   => 'Free registrations can be cancelled here if you will not be attending.',
+'free_rsvp'     => 'Free Registrations',
+'ticket_num'    => 'Ticket Number',
+'date_used'     => 'Date Used',
+'paid'          => 'Paid',
+'login_to_register' => 'You need to log into the site to register for this event',
+'conf_reset'    => 'Are your sure you want to reset this item?',
+'reset_usage'   => 'Reset Usage',
+'export_list'   => 'Export List',
+'waitlisted'    => 'Waitlisted',
+'name'          => 'Name',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';
@@ -717,15 +740,20 @@ $LANG_confignames['evlist'] = array(
     'max_upcoming_days'     => 'Max. Upcoming days to show in list',
     'use_locator'           => 'Integrate with the Locator plugin?',
     'use_weather'           => 'Integrate with the Weather plugin?',
+    'cal_tmpl'              => 'Use HTML or JSON templates',
+    'enable_rsvp'           => 'Enable Registration/Ticketing?',
+    'rsvp_print'            => 'Enable Ticket Printing?',
 );
 $LANG_configsubgroups['evlist'] = array(
-    'sg_main'               => 'Main Settings'
+    'sg_main'               => 'Main Settings',
+    'sg_rsvp'               => 'RSVP/Ticketing',
 );
 $LANG_fs['evlist'] = array(
     'ev_access'             => 'Access Control',
     'ev_gui'                => 'GUI Settings',
     'ev_centerblock'        => 'Centerblock Settings',
     'ev_permissions'        => 'Default Permissions',
+    'ev_rsvp'               => 'Registration and Ticketing',
 );
 $LANG_configselects['evlist'] = array(
     0 => array('True' => 1, 'False' => 0),
@@ -756,10 +784,14 @@ $LANG_configselects['evlist'] = array(
         ),
     7 => array('Top of page'=>1,'After featured story'=>2,'Bottom of page'=>3,'Entire page'=>0),
     8 => array('past'=>1,'upcoming'=>2,'this week'=>3,'this month'=>4),
+    9 => array('disabled' => 0, 'table' => 1, 'story' => 2),
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
     14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),
     15 => array('Admins Only' => 0, 'Logged-In Users' => 1, 'Logged-In+Anon Users' => 2),
+    16 => array('HTML' => 'html', 'JSON' => 'json'),
+    17 => array('No' => 0, 'Default No' => 1, 'Default Paid Only' => 2,
+                'Default Paid or Unpaid' => 3),
 );
 
 ?>

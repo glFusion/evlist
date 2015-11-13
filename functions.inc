@@ -439,7 +439,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $search = new SearchCriteria('evlist', 'evList');
     $columns = array('d.title', 'd.summary', 'd.full_description',
                     'd.location', 'd.contact');
-    $sql .= $search->getDateRangeSQL('AND', 'UNIX_TIMESTAMP(rp.rp_date_start)', 
+    $sql .= $search->getDateRangeSQL('AND', 'UNIX_TIMESTAMP(r.rp_date_start)', 
                     $datestart, $dateend);
     list($sql,$ftsql) = $search->buildSearchSQL($keyType, $query, 
                     $columns, $sql);

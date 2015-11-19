@@ -4,7 +4,12 @@
 </script>
 <script type="text/javascript">
 <!--
-window.addEvent('domready',function() {
+{!if mootools}
+window.addEvent('domready',
+{!else}
+$(document).ready(
+{!endif}
+function() {
     var myValidator = new fValidator("calendaredit");
 });
 -->

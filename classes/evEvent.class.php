@@ -763,7 +763,7 @@ class evEvent
     public function Edit($eid = '', $rp_id = 0, $saveaction = '')
     {
         global $_CONF, $_EV_CONF, $_TABLES, $_USER, $LANG_EVLIST, $LANG_WEEK,
-                $LANG_ADMIN, $_GROUPS, $LANG_ACCESS;
+                $LANG_ADMIN, $_GROUPS, $LANG_ACCESS, $_SYSTEM;
 
         // If an eid is specified and this is an object, then read the
         // event data- UNLESS a repeat ID is given in which case we're
@@ -1123,6 +1123,7 @@ class evEvent
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event.html'),
+            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         if ($_EV_CONF['enable_rsvp']) {

@@ -136,6 +136,8 @@ class evTicketType
     */
     public function Edit()
     {
+        global $_SYSTEM;
+
         $T = new Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('modify', 'ticketForm.thtml');
 
@@ -145,6 +147,7 @@ class evTicketType
             'event_pass_chk'    => $this->event_pass == 1 ? EVCHECKED : '',
             'enabled_chk'       => $this->enabled == 1 ? EVCHECKED : '',
             'doc_url'           => EVLIST_getDocURL('tickettype.html'),
+            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         $T->parse('output','modify');

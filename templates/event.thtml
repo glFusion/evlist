@@ -397,7 +397,12 @@ function createRequestObject() {
   return request;
 }
 
-window.addEvent('load', function() {
+{!if mootools}
+window.addEvent('load',
+{!else}
+$(document).ready(
+{!endif}
+function() {
   // update the add/del reminder section depending on whether one is set
   showReminder({reminder_set});
 });

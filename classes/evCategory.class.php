@@ -125,6 +125,8 @@ class evCategory
     */
     public function Edit()
     {
+        global $_SYSTEM;
+
         $T = new Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('modify', 'catEditForm.thtml');
 
@@ -133,6 +135,7 @@ class evCategory
             'cat_name'      => $this->cat_name,
             'stat_chk'      => $this->cat_status == 1 ? EVCHECKED : '',
             'cancel_url'    => EVLIST_ADMIN_URL. '/index.php?categories=x',
+            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         $T->parse('output','modify');

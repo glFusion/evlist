@@ -5,13 +5,10 @@
 <script type="text/javascript">
 <!--
 {!if mootools}
-window.addEvent('domready',
-{!else}
-$(document).ready(
-{!endif}
-function() {
+window.addEvent('domready', function() {
     var myValidator = new fValidator("calendaredit");
 });
+{!endif}
 -->
 </script>
 
@@ -24,7 +21,7 @@ function() {
         <b>{$LANG_EVLIST['cal_name']}:</b>
       </td>
       <td>
-        <input type="text" id="cal_name" class="fValidate['required']" 
+        <input required type="text" id="cal_name" class="fValidate['required']" 
             name="cal_name" length="50" size="20" value="{cal_name}" />
       </td>
     </tr>

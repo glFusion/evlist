@@ -338,6 +338,7 @@ $LANG_EVLIST = array(
 'export_list'   => 'Export List',
 'waitlisted'    => 'Waitlisted',
 'name'          => 'Name',
+'quantity'      => 'Quantity',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

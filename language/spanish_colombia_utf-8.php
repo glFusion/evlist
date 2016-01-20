@@ -341,6 +341,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'export_list'   => 'Export List',
 'waitlisted'    => 'Waitlisted',
 'name'          => 'Name',
+'quantity'      => 'Quantity',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

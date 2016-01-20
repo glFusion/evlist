@@ -384,14 +384,18 @@ class evEvent
                 $this->options['rsvp_cutoff'] = (int)$row['rsvp_cutoff'];
                 if ($this->options['max_rsvp'] < 0) $this->options['max_rsvp'] = 0;
                 $this->options['max_user_rsvp'] = (int)$row['max_user_rsvp'];
-                if (isset($row['tickets']) && is_array($row['tickets'])) {
-                    foreach ($row['tickets'] as $tick_id=>$tick_data) {
-                        $tick_fee = isset($row['tick_fees'][$tick_id]) ?
-                            (float)$row['tick_fees'][$tick_id] : 0;
-                        $this->options['tickets'][$tick_id] = array(
-                            'fee' => $tick_fee,
-                        );
-                    }
+                if (!isset($row['tickets']) || !is_array($row['tickets'])) {
+                    // if no ticket specified but rsvp is ensabled, make sure
+                    // the general admission ticket is set for free
+                    $row['tickets'] = array(1);
+                    $row['tick_fees'] = array(0);
+                }
+                foreach ($row['tickets'] as $tick_id=>$tick_data) {
+                    $tick_fee = isset($row['tick_fees'][$tick_id]) ?
+                        (float)$row['tick_fees'][$tick_id] : 0;
+                    $this->options['tickets'][$tick_id] = array(
+                        'fee' => $tick_fee,
+                    );
                 }
                 $this->options['rsvp_print'] = $row['rsvp_print'];
             } else {
@@ -623,7 +627,6 @@ class evEvent
             $sql = "INSERT INTO {$_TABLES['evlist_lookup']}
                     (eid, cid)
                     VALUES " . implode(',', $tmp);
-            //echo $sql;die;
             DB_query($sql);
         }
 
@@ -1132,7 +1135,8 @@ class evEvent
             //$T->set_block('editor', 'Tickets', 'tTypes');
             $tick_opts = '';
             foreach ($TickTypes as $tick_id=>$tick_obj) {
-                if (isset($this->options['tickets'][$tick_id])) {
+                // Check enabled tickets. Ticket type 1 enabled by default
+                if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
                     $checked = 'checked="checked"';
                     $fee = (float)$this->options['tickets'][$tick_id]['fee'];
                 } else {

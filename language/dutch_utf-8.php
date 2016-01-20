@@ -336,6 +336,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'export_list'   => 'Export List',
 'waitlisted'    => 'Waitlisted',
 'name'          => 'Name',
+'quantity'      => 'Quantity',
 );
 
 

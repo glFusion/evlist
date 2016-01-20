@@ -152,19 +152,22 @@
 {!endif}
 
   {!if register_link}
+  <label><strong>{$LANG_EVLIST['signup']}</strong></label>
   <div id="regdiv" class="evdata" style="margin-top:15px;">
  
   <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
     <input type="hidden" name="rp_id" value="{rp_id}" />
-    {!if register_multi}
+    {$LANG_EVLIST['quantity']}:
+    {!if register_unltd}
+    <input type="text" size="3" name="tick_count" value="1" />
+    {!elseif register_multi}
     <select name="tick_count">
       <!-- BEGIN tickCntBlk -->
       <option value="{tick_cnt}">{tick_cnt}</option>
       <!-- END tickCntBlk -->
     </select>
     {!else}
-      <input type="hidden" name="tick_count" value="1" />
-      Qty. 1
+      <input type="hidden" name="tick_count" value="1" />1
     {!endif}
 
     {!if ticket_types_multi}

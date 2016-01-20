@@ -527,6 +527,9 @@ class evRepeat
                             //        '</option>'.LB;
                         }
                         //$T->set_var('register_multi', $rsvp_user_count);
+                    } else {
+                        // max_rsvp == 0 indicates openended registration
+                        $T->set_var('register_unltd', 'true');
                     }
                     $T->set_block('event', 'tickTypeBlk', 'tBlk');
                     foreach ($this->Event->options['tickets'] as $tick_id=>$data) {

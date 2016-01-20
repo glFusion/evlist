@@ -2,13 +2,14 @@
 {!if use_json}
 {!endif}
 <div id="evlist_nav_right">
+<div id="evlist_calendar_buttons">
   <a href="{pi_url}/index.php?view=today&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class="evlist_nav_img" title="{$LANG_EVLIST['jump_today']}"><img src="{pi_url}/images/today_off.png" alt="{$LANG_EVLIST['jump_today']}" title="{$LANG_EVLIST['jump_today']}" width="27" height="20" class="gl_mootip" /></a>
   <a href="{pi_url}/index.php?view=day&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['day_view']}"><img src="{pi_url}/images/{day_img}" alt="{$LANG_EVLIST['day_view']}" title="{$LANG_EVLIST['day_view']}" width="27" height="20" class="gl_mootip" /></a>
   <a href="{pi_url}/index.php?view=week&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['week_view']}"><img src="{pi_url}/images/{week_img}" alt="{$LANG_EVLIST['week_view']}" title="{$LANG_EVLIST['week_view']}" width="27" height="20" class="gl_mootip" /></a>
   <a href="{pi_url}/index.php?view=month&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['month_view']}"><img src="{pi_url}/images/{month_img}" alt="{$LANG_EVLIST['month_view']}" title="{$LANG_EVLIST['month_view']}" width="27" height="20" class="gl_mootip" /></a>
   <a href="{pi_url}/index.php?view=year&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['year_view']}"><img src="{pi_url}/images/{year_img}" alt="{$LANG_EVLIST['year_view']}" title="{$LANG_EVLIST['year_view']}" width="27" height="20" class="gl_mootip" /></a>
   <a href="{pi_url}/index.php?{range_url}&amp;view=list&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='evlist_nav_img' title="{$LANG_EVLIST['list_view']}"><img src="{pi_url}/images/{list_img}" alt="{$LANG_EVLIST['list_view']}" title="{$LANG_EVLIST['list_view']}" width="27" height="20" class="gl_mootip" /></a>
-
+</div>
   {!if add_event_link}
     <form method="post" action="{add_event_link}">
     {!if feed_icons}
@@ -28,7 +29,6 @@
       <input type="submit" name="edit" value="{add_event_text}" class="lgButton green" />
     </form>
   {!endif}
-
 </div>
 
 {!if showing_detail}

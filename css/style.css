@@ -463,6 +463,7 @@ table.evlist_month .monthview_events {
 #evlist_nav_right {
     float: right;
     text-align: right;
+    margin-bottom: 6px;
     /*line-height: 1.8em;*/
 }
 #evlist_nav_right ul,
@@ -497,6 +498,10 @@ a.evlist_nav_text_selected {
 a.evlist_nav_text_selected:hover {
     background-color: #ffffff;
     text-decoration: none;
+}
+
+#evlist_calendar_buttons {
+  margin-bottom: 6px;
 }
 
 .evlist ul {

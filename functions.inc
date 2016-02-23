@@ -519,14 +519,15 @@ function plugin_getheadercss_evlist()
         'style.css',
         'picker.css',
     );
-
+    // For each style, load the included plugin stylesheet, then
+    // custom overrides and layout-specific overrides in that order
     foreach ($files as $file) {
-        if (@file_exists($_CONF['path_layout'].'plugins/evlist/', $file)) {
-            $styles[] = $_CONF['path_layout'].'plugins/evlist/' . $file;
-        } elseif (@file_exists($pi_path. 'custom/' . $file)) {
+        $styles[] = $pi_path . $file;
+        if (@file_exists($pi_path. 'custom/' . $file)) {
             $styles[] = $pi_path . 'custom/' . $file;
-        } else {
-            $styles[] = $pi_path . $file;
+        }
+        if (@file_exists($_CONF['path_layout'].'plugins/evlist/'. $file)) {
+            $styles[] = $_CONF['path_layout'].'plugins/evlist/' . $file;
         }
     }
 

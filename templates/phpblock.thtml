@@ -9,9 +9,4 @@
   <!-- END blkItem -->
 </div>
 <!-- END blkDay -->
-<p style="text-align:center;margin-top:6px;">
-  <a href="{listlink}">
-    <img src="{pi_icon}" alt="{$LANG_EVLIST['pi_title']}" title="{$LANG_EVLIST['pi_title']}" />
-  </a>
-</p>
 {# end {templatelocation} #}

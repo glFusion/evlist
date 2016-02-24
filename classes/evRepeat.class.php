@@ -815,7 +815,8 @@ class evRepeat
 
         // Check that the event isn't already full, or that
         // waitlisting is disabled
-        if ($this->Event->options['max_rsvp'] <= $this->TotalRegistrations()) {
+        if ($this->Event->options['max_rsvp'] > 0 &&
+                $this->Event->options['max_rsvp'] <= $this->TotalRegistrations()) {
             if ($this->Event->options['max_rsvp'] > 0 &&
                     $this->Event->options['rsvp_waitlist'] == 0 && 1) {
                 LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
@@ -984,7 +985,7 @@ class evRepeat
         }
 
         $sql = "SELECT uid, dt_reg
-            FROM {$_TABLES['evlist_rsvp']}
+            FROM {$_TABLES['evlist_tickets']}
             WHERE ev_id = '{$this->ev_id}' ";
 
         if ($this->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {

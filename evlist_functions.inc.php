@@ -440,8 +440,7 @@ function EVLIST_deleteImageLink($A, $token)
             alt=\"{$LANG_ADMIN['delete']}\"
             title=\"{$LANG_ADMIN['delete']}\"
             width=\"14\" height=\"14\"
-            class=\"gl_mootip\" "
-            . XHTML . '>';
+            class=\"gl_mootip\"> ";
 
             $retval = COM_createLink($img, EVLIST_URL .
                     '/event.php?delrepeat=x&amp;rp_id=' . $A['rp_id'] . '&amp;'
@@ -519,8 +518,8 @@ function EVLIST_cal_checkboxes($cals)
             $boxes .= '<div style="float:left;width:100%;' . 
                 'color:' . $cal['fgcolor'] . '">
                 <input checked="checked" type="checkbox" id="cal' . $key .
-                '" onclick="SelectCal(this)"' . XHTML . '>&nbsp;' . 
-                $cal['cal_name'] . '</div><br ' . XHTML . '>' . LB;
+                '" onclick="SelectCal(this)">&nbsp;' . 
+                $cal['cal_name'] . '</div><br >' . LB;
         }
     }
     return $boxes;

@@ -765,7 +765,7 @@ class evEvent
      */
     public function Edit($eid = '', $rp_id = 0, $saveaction = '')
     {
-        global $_CONF, $_EV_CONF, $_TABLES, $_USER, $LANG_EVLIST, $LANG_WEEK,
+        global $_CONF, $_EV_CONF, $_TABLES, $_USER, $LANG_EVLIST,
                 $LANG_ADMIN, $_GROUPS, $LANG_ACCESS, $_SYSTEM;
 
         // If an eid is specified and this is an object, then read the
@@ -1014,8 +1014,6 @@ class evEvent
                 }
                 break;
             case EV_RECUR_DOM:
-                //$T->set_var('recurring_weekday_options',
-                //         EVLIST_GetOptions($LANG_WEEK, $recweekday));
                 $recweekday = $this->rec_data['weekday'];
                 break;
             case EV_RECUR_DATES:
@@ -1087,7 +1085,7 @@ class evEvent
             'recurring_format_options' => 
                     EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $option),
             //'recurring_interval_options' => EVLIST_GetOptions($LANG_EVLIST['rec_intervals'], $recinterval),
-            'recurring_weekday_options' => EVLIST_GetOptions($LANG_WEEK, $recweekday),
+            'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
             'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
             'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'], 

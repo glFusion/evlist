@@ -535,15 +535,18 @@ function EVLIST_cal_checkboxes($cals)
 *
 *   @param  array   $options    value=>description array of elements
 *   @param  mixed   $selected   Optional value to preselect
+*   @param  integer $bias       Amount to add to each value
 *   @return string          HTML for <option></option> elements
 */
-function EVLIST_GetOptions($options, $selected = '')
+function EVLIST_GetOptions($options, $selected = '', $bias=0)
 {
     if (!is_array($options)) return '';
 
     $retval = '';
+    $bias = (int)$bias;
 
     foreach ($options as $value=>$name) {
+        $value += $bias;
         $retval .= '<option value="' . $value . '"';
         if ($value == $selected) {
                 $retval .= ' selected="selected"';

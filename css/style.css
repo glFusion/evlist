@@ -596,3 +596,9 @@ table.smallmonthtable a.day-noevents {
     width:50%;
 }
 
+#rsvp_detail {
+    clear:both;
+}
+#rsvp_detail p {
+    clear:both;
+}

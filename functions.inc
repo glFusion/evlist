@@ -521,12 +521,15 @@ function plugin_getheadercss_evlist()
     );
 
     foreach ($files as $file) {
-        if (@file_exists($_CONF['path_layout'].'plugins/evlist/', $file)) {
-            $styles[] = $_CONF['path_layout'].'plugins/evlist/' . $file;
-        } elseif (@file_exists($pi_path. 'custom/' . $file)) {
+        // Add the default styles
+        $styles[] = $pi_path . $file;
+        // Plugin customization overrides default
+        if (@file_exists($pi_path. 'custom/' . $file)) {
             $styles[] = $pi_path . 'custom/' . $file;
-        } else {
-            $styles[] = $pi_path . $file;
+        }
+        // Theme customization trumps all
+        if (@file_exists($_CONF['path_layout'].'plugins/evlist/'. $file)) {
+            $styles[] = $_CONF['path_layout'].'plugins/evlist/' . $file;
         }
     }
 

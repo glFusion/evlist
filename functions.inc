@@ -519,7 +519,8 @@ function plugin_getheadercss_evlist()
         'style.css',
         'picker.css',
     );
-
+    // For each style, load the included plugin stylesheet, then
+    // custom overrides and layout-specific overrides in that order
     foreach ($files as $file) {
         // Add the default styles
         $styles[] = $pi_path . $file;

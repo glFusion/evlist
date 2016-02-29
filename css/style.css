@@ -174,28 +174,24 @@ h2.evlist_header a {
 }
 
 table.evlist_month {
-/*  background:#FFFFFF;
-  border-bottom:#E7E7E7 1px solid;
-  border-left:#E7E7E7 1px solid;
-  border-right:#E7E7E7 1px solid;
-  border-top:#E7E7E7 1px solid;
-  color:#000000;
-  font-weight:bold;*/
     width: 100%;
     border: 1px solid #BBBBBB;
     border-collapse: collapse;
-
+    margin: 1px;
+    padding: 5px;
 }
 table.evlist_month td {
     border: 1px solid #BBBBBB;
     height: 95px;
     vertical-align: top;
     text-align: left;
+    width: 14%;
 }
 
 table.evlist_month td.cal-weekpointers {
     vertical-align: middle;
     text-align: center;
+    width: 2%;
 }
 
 table.evlist_month tr.daynames td {
@@ -214,12 +210,14 @@ div.evlistWeeklyEvent {
 /*  month display classes.  Values of "on", "off", or "today" are set in the code.
     These appear in the templates as "month{value}", so "month" can be changed to customize. */
 table.evlist_month td.monthon {
+    vertical-align: top;
     background-color: #fcfcfc;
 /*    background-color:#f0f0f0;*/
 }
 table.evlist_month td.monthoff {
     /*background-color: #c0c0c0;*/
-    background-color:#e0e0e0;
+    vertical-align: top;
+    background-color: #e0e0e0;
 }
 table.evlist_month td.monthtoday {
   /*  background-color: #FFFFFF;*/
@@ -268,6 +266,11 @@ a.cal-event {
 }
 .cal-dayx-body {
   background:#E7E7E7
+}
+table.cal-dayx-body {
+    padding: 2px;
+    margin: 1px;
+    width: 100%;
 }
 .cal-dayx-cur {
   background:#FFFFFF;
@@ -428,10 +431,12 @@ table.evlist_month .monthview_daterow .today {
 }
 table.evlist_month .monthview_daterow_today span.new_icon {
     float: right;
+    visibility: hidden;
 }
 
 table.evlist_month .monthview_daterow span.new_icon {
     float: right;
+    visibility: hidden;
 }
 table.evlist_month div.monthview_allday {
     color:#FFFFFF;

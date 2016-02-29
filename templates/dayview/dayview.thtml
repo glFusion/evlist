@@ -25,7 +25,7 @@
 </div>
 {!endif}
 
-<table style="padding:2px;margin:1px;width:100%;" class="cal-dayx-body">
+<table class="cal-dayx-body">
     <tr>
         <td class="cal-dayx-weekevent"><div align="right"><?php global $LANG_EVLIST; echo $LANG_EVLIST['periods']['week'];?> {week_num}</div></td>
         <td>{allday_events}</td>

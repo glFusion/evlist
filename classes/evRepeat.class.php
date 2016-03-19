@@ -734,7 +734,7 @@ class evRepeat
         $T->set_var(array(
             'owner_link' => $ownerlink,
             'reminder_set' => $hasReminder ? 'true' : 'false',
-            'reminder_email' => $_USER['email'],
+            'reminder_email' => isset($_USER['email']) ? $_USER['email'] : '',
             'notice' => 1,
             'rp_id' => $this->rp_id,
             'eid' => $this->ev_id,

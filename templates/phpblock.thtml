@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
 <!-- BEGIN blkDay -->
-<div style="padding-bottom:6px;">
+<div class="evlist_blk_day">
 <h3>{start_date}</h3>
   <!-- BEGIN blkItem -->
   <a class="gl_mootip" title="{title}::{summary}"

@@ -45,7 +45,7 @@
   text-align: right;
   margin-right: 0.5em;
   display: block;
-  /*font-weight:bold;*/
+  font-weight:bold;
 }
 
 .evlisteditor p {
@@ -607,3 +607,20 @@ table.smallmonthtable a.day-noevents {
 #rsvp_detail p {
     clear:both;
 }
+.evlist_blk_day {
+}
+.evlist_blk_day h3 {
+    margin-top: 1em !important;
+    margin-bottom: 0px !important;
+    font-style: italic;
+}
+
+.evFieldNote {
+    font-size: small;
+    color: red;
+}
+
+img.evDatePicker {
+    cursor: pointer;
+}
+

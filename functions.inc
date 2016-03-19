@@ -257,17 +257,21 @@ function plugin_getuseroption_evlist()
         return $retval;
     }
 
-    switch ($_EV_CONF['usermenu_option']) {
-    case 1:
-        $retval = array($LANG_EVLIST['add_event'],
-            EVLIST_URL . '/event.php?edit=x',
-            0);
-        break;
-    case 2:
-        $retval = array($LANG_EVLIST['pi_title'],
-            EVLIST_URL . '/index.php?op=' . $_EV_CONF['default_view'],
-            0);
-        break;
+    // TODO: switch statement not needed since rights are assigned to groups
+    // Need to remove plugin configuration for user menu.
+    if (SEC_hasRights('evlist.submit,evlist.admin', 'OR')) {
+        switch ($_EV_CONF['usermenu_option']) {
+        case 1:
+            $retval = array($LANG_EVLIST['add_event'],
+                EVLIST_URL . '/event.php?edit=x',
+                0);
+            break;
+        case 2:
+            $retval = array($LANG_EVLIST['pi_title'],
+                EVLIST_URL . '/index.php?op=' . $_EV_CONF['default_view'],
+                0);
+            break;
+        }
     }
 
     return $retval;

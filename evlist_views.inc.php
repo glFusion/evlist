@@ -13,6 +13,7 @@
 */
 
 USES_evlist_functions();
+date_default_timezone_set('UTC');
 
 /**
 *   Display the common header for all calendar views.
@@ -610,7 +611,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $T->set_block('week', 'dayBlock', 'dBlk');
     foreach($calendarView as $idx=>$weekData) {
         list($curyear, $curmonth, $curday) = explode('-', $weekData);
-        $dtToday->setDateTimestamp($curyear, $curmonth, $curday, 0, 0, 0);
+        $dtToday->setDateTimestamp($curyear, $curmonth, $curday, 1, 0, 0);
         $T->clear_var('eBlk');
         if ($weekData == $_EV_CONF['_today']) {
             $T->set_var('dayclass', 'weekview-curday');

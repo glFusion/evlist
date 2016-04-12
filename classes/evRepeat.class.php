@@ -582,6 +582,7 @@ class evRepeat
             !empty($city) || !empty($province) || !empty($postal)) {
             $T->set_var(array(
                 'url' => $url,
+                'more_info_link' => sprintf($LANG_EVLIST['click_here'], $url),
                 'location' => $location,
                 'street' => $street,
                 'city' => $city,

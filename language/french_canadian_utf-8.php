@@ -164,7 +164,7 @@ $LANG_EVLIST = array(
 'when'             => 'Quand' ,
 'where'                => 'où',
 'what'                => 'CE',
-'click_here' => 'cliquez ici',
+'click_here' => "<a href=\"%s\">cliquez ici</a> pour plus d'informations",
 'more_info'             => 'plus d informations',
 'contact_us'            => 'Veuillez <a href="%s">nous contacter< /a> pour plus d informations.',
 'rem_subject'           => "un rappel d événement de {$_CONF['site_name']}",

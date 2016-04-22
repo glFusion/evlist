@@ -792,9 +792,11 @@ class evEvent
         }
 
         $T = new Template($_CONF['path'] . 'plugins/evlist/templates/');
-        $T->set_file(array(
-            'editor' => 'editor.thtml',
-        ));
+        if ($_SYSTEM['disable_jquery_slimbox']) {
+            $T->set_file('editor', 'editor.uikit.thtml');
+        } else {
+            $T->set_var('editor', 'editor.thtml');
+        }
 
         // Basic tabs for editing both events and instances, show up on 
         // all edit forms

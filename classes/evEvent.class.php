@@ -163,8 +163,9 @@ class evEvent
         }
 
         $this->isAdmin = SEC_hasRights('evlist.admin') ? 1 : 0;
-        $this->isSubmitter = $this->isAdmin || SEC_hasRights('evlist.submit') ?
-                    1 : 0;
+        //$this->isSubmitter = $this->isAdmin || SEC_hasRights('evlist.submit') ?
+        //            1 : 0;
+        $this->isSubmitter = EVLIST_canSubmit();
     }
 
 
@@ -656,7 +657,7 @@ class evEvent
 
         $sql = $sql1 . $fld_sql . $sql2;
 
-        //echo $sql;die;
+        echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];

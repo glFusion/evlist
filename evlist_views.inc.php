@@ -42,14 +42,14 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
 
     // Determine if the current user is allowed to add an event, and borrow
     // some space in $_EV_CONF to store a flag for other functions to use.
-    $isAnon = COM_isAnonUser();
-    if (($isAnon && ($_EV_CONF['can_add'] & EV_ANON_CAN_ADD)) ||
-            ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) ||
+    /*$isAnon = COM_isAnonUser();
+    if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD ||
+            (!$isAnon && ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) ||
             SEC_hasRights('evlist.admin')) {
         $_EV_CONF['_can_add'] = 1;
     } else {
         $_EV_CONF['_can_add'] = 0;
-    }
+    }*/
 
     $cat = (int)$cat;
     $type_options = COM_optionList($_TABLES['evlist_categories'],
@@ -57,7 +57,8 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
     $range_options = EVLIST_GetOptions($LANG_EVLIST['ranges'], $range);
 
     // Figure out the add event link, depending on the view.
-    if ($_EV_CONF['_can_add'] == 1) {
+    //if ($_EV_CONF['_can_add'] == 1) {
+    if (EVLIST_canSubmit()) {
         $add_event_link = EVLIST_URL . '/event.php';
         switch ($view) {
         case 'day':         // Add the current day
@@ -413,7 +414,8 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
     for ($i = 0; $i < 24; $i++) {
         $link = date($_CONF['timeonly'], mktime($i, 0));
-        if ($_EV_CONF['_can_add']) {
+        //if ($_EV_CONF['_can_add']) {
+        if (EVLIST_canSubmit()) {
             $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
                         $month . '&amp;day=' . $day . '&amp;year=' . $year .
                         '&amp;hour=' . $i . '">' . $link . '</a>';
@@ -496,7 +498,8 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
             $T->set_var('event_entry','&nbsp;');
         }
         $link = date($_CONF['timeonly'], mktime($i, 0));
-        if ($_EV_CONF['_can_add']) {
+//        if ($_EV_CONF['_can_add']) {
+        if (EVLIST_canSubmit()) {
             $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
                         $month . '&amp;day=' . $day . '&amp;year=' . $year .
                         '&amp;hour=' . $i . '">' . $link . '</a>';
@@ -627,7 +630,8 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 "&amp;month=$curmonth&amp;year=$curyear")
         );
 
-        if ($_EV_CONF['_can_add']) {
+        //if ($_EV_CONF['_can_add']) {
+        if (EVLIST_canSubmit()) {
             $T->set_var(array(
                 'can_add'       => 'true',
                 'curday'        => $curday,
@@ -756,8 +760,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $cat = (int)$cat;
     $cal = (int)$cal;
 
-    // Set the calendar header.  Done early because the _can_add value is
-    // set by this function
+    // Set the calendar header.
     $cal_header = EVLIST_calHeader($year, $month, $day, 'month', $cat, $cal);
 
     // Get all the dates in the month
@@ -918,7 +921,8 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'cal_day_entries' => $dayentries,
             ) );
 
-            if ($_EV_CONF['_can_add']) {
+            //if ($_EV_CONF['_can_add']) {
+            if (EVLIST_canSubmit()) {
                 // Add the "Add Event" link for the day
                 $T->set_var('can_add', 'true');
             }
@@ -1133,7 +1137,8 @@ function EVLIST_listview($range = '', $category = '', $calendar = '',
     $T = new Template(EVLIST_PI_PATH . '/templates/');
     $T->set_file('index', 'index.thtml');
 
-    if ($_EV_CONF['_can_add']) {
+    //if ($_EV_CONF['_can_add']) {
+    if (EVLIST_canSubmit()) {
         $add_event_link = EVLIST_URL . '/event.php?edit=x';
     } else {
         $add_event_link = '';

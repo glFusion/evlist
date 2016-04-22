@@ -257,21 +257,17 @@ function plugin_getuseroption_evlist()
         return $retval;
     }
 
-    // TODO: switch statement not needed since rights are assigned to groups
-    // Need to remove plugin configuration for user menu.
-    if (SEC_hasRights('evlist.submit,evlist.admin', 'OR')) {
-        switch ($_EV_CONF['usermenu_option']) {
-        case 1:
-            $retval = array($LANG_EVLIST['add_event'],
+    switch ($_EV_CONF['usermenu_option']) {
+    case 1:
+        $retval = array($LANG_EVLIST['add_event'],
                 EVLIST_URL . '/event.php?edit=x',
                 0);
-            break;
-        case 2:
-            $retval = array($LANG_EVLIST['pi_title'],
+        break;
+    case 2:
+        $retval = array($LANG_EVLIST['pi_title'],
                 EVLIST_URL . '/index.php?op=' . $_EV_CONF['default_view'],
                 0);
-            break;
-        }
+        break;
     }
 
     return $retval;
@@ -2444,5 +2440,36 @@ function EVLIST_Log($logentry = '')
     fputs($file, "$timestamp ($byuser) - $logentry\n");
 }
 
+
+/**
+*   Determine if the current user can submit an event.
+*   Checks config and logged-in status.
+*   Also sets a global $_EV_CONF['_can_add'] for legacy use
+*
+*   @return boolean     True if subbmission is allowed, False if not
+*/
+function EVLIST_canSubmit()
+{
+    global $_EV_CONF;
+
+    static $canSubmit = NULL;
+
+    if ($canSubmit === NULL) {
+        // Determine if the current user is allowed to add an event, and borrow
+        // some space in $_EV_CONF to store a flag for other functions to use.
+    $isAnon = COM_isAnonUser();
+        if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD ||
+            (!COM_isAnonUser() &&
+            ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) ||
+            plugin_ismoderator_evlist()) {
+            $_EV_CONF['_can_add'] = 1;
+            $canSubmit = true;
+        } else {
+            $_EV_CONF['_can_add'] = 0;
+            $canSubmit = false;
+        }
+    }
+    return $canSubmit;
+}
 
 ?>

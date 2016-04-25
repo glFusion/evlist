@@ -795,7 +795,7 @@ class evEvent
         if ($_SYSTEM['disable_jquery_slimbox']) {
             $T->set_file('editor', 'editor.uikit.thtml');
         } else {
-            $T->set_var('editor', 'editor.thtml');
+            $T->set_file('editor', 'editor.thtml');
         }
 
         // Basic tabs for editing both events and instances, show up on 

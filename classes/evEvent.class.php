@@ -657,7 +657,7 @@ class evEvent
 
         $sql = $sql1 . $fld_sql . $sql2;
 
-        echo $sql;die;
+        //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
@@ -867,7 +867,11 @@ class evEvent
 
         $action_url = EVLIST_URL . '/event.php';
         $delaction = 'delevent';
-        $cancel_url = EVLIST_URL . '/index.php';
+        if (isset($_GET['from']) && $_GET['from'] == 'admin') {
+            $cancel_url = EVLIST_ADMIN_URL . '/index.php';
+        } else {
+            $cancel_url = EVLIST_URL . '/index.php';
+        }
         switch ($saveaction) {
         case 'saverepeat':
         case 'savefuturerepeat':
@@ -1221,7 +1225,7 @@ class evEvent
                 while ($C = DB_fetchArray($cresult, false)) {
                     $chk = !is_null($C['eid']) ? EVCHECKED : '';
                     $catlist .= '<input type="checkbox" name="categories[]" ' .
-                        'value="' . $C['id'] . '" ' . $chk . ' ' . XHTML . '>' .
+                        'value="' . $C['id'] . '" ' . $chk . ' />' .
                         '&nbsp;' . $C['name'] . '&nbsp;&nbsp;';
                     /*$T->set_var(array(
                         'category_name' => $C['name'],

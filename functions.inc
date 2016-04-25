@@ -1965,7 +1965,14 @@ function plugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 */
 function plugin_getconfigelementhelp_evlist($element, $doclang )
 {
-    return array('http://www.glfusion.org/wiki/evlist:start#configuration_options',2);
+    $doc_url = EVLIST_getDocURL('config.html', $doclang);
+    if (empty($doc_url))
+        return false;
+
+    if (!empty($option)) {
+        $file .= '#desc_' . $option;
+    }
+    return array($doc_url . $file, 0);
 }
 
 

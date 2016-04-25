@@ -359,7 +359,7 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
                 '/index.php?editcat=x&amp;id=' . $A['id'].
-                '" title="' . $LANG_ADMIN['edit'] . '"' . XHTML . '>' .
+                '" title="' . $LANG_ADMIN['edit'] . '" />' .
                 $icon_arr['edit'] . '</a>';
             break;
         case 'status':
@@ -374,7 +374,7 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
                 name=\"cat_check\" 
                 id=\"togenabled{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
-                "\"category\",\"".EVLIST_ADMIN_URL."\");'".XHTML.'>'.LB;
+                '"category","'.EVLIST_ADMIN_URL."\");' />".LB;
             break;
         case 'delete':
             $retval = COM_createLink(
@@ -506,13 +506,13 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
         case 'edit':
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?edit=event&amp;eid=' . $A['id'] . 
-                '" title="' . $LANG_EVLIST['edit_event'] . '"' . XHTML . '>' .
+                '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '" />' .
                 $icon_arr['edit'] . '</a>';
             break;
         case 'copy':
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?clone=x&amp;eid=' . $A['id'] . 
-                '" title="' . $LANG_EVLIST['copy'] . '"' . XHTML . '>' .
+                '" title="' . $LANG_EVLIST['copy'] . '" />' .
                 $icon_arr['copy'] . '</a>';
             break;
         case 'title':
@@ -533,7 +533,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\" 
                 id=\"togenabled{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
-                "\"event\",\"".EVLIST_ADMIN_URL."\");'".XHTML.'>'.LB;
+                '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
             break;
         case 'delete':
             $retval = COM_createLink(
@@ -632,7 +632,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
                 '/index.php?editcal=' . $A['cal_id'] . 
-                '" title="' . $LANG_EVLIST['edit_calendar'] . '"' . XHTML . '>' .
+                '" title="' . $LANG_EVLIST['edit_calendar'] . '" />' .
                 $icon_arr['edit'] . '</a>';
             break;
         case 'cal_status':
@@ -646,7 +646,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\" 
                 id=\"togenabled{$A['cal_id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
-                "\"calendar\",\"".EVLIST_ADMIN_URL."\");'".XHTML.'>'.LB;
+                '"calendar","'.EVLIST_ADMIN_URL.'"); />'.LB;
             break;
         case 'delete':
             if ($A['cal_id'] > 1) {

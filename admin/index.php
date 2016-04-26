@@ -646,7 +646,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\" 
                 id=\"togenabled{$A['cal_id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
-                '"calendar","'.EVLIST_ADMIN_URL.'"); />'.LB;
+                '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
             break;
         case 'delete':
             if ($A['cal_id'] > 1) {

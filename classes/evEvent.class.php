@@ -1325,7 +1325,7 @@ class evEvent
 
         $sql = "UPDATE {$_TABLES['evlist_events']}
                 SET $varname=$newvalue
-                WHERE id=$ev_id";
+                WHERE id='" . DB_escapeString($ev_id) . "'";
         //echo $sql;die;
         DB_query($sql);
 

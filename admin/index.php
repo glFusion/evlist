@@ -531,7 +531,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
                 $enabled = 0;
             }
             $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\" 
-                id=\"togenabled{$A['id']}\"
+                id=\"event_{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
                 '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
             break;

@@ -2246,7 +2246,7 @@ function EVLIST_getEvents_json($start='', $end='', $opts=array())
 */
 function EVLIST_noquotes($str)
 {
-    return str_replace(array("'", '"'), array('&apos;', '&quot;'), $str);
+    return str_replace(array('"'), array('&quot;'), $str);
 }
 
 if ($_EV_CONF['enable_rsvp']) {

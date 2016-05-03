@@ -12,25 +12,26 @@ $(document).ready(function() {
     showhideformatoptions({format_opt});
 });
 
+// Global variables to track date/time field contents
 var ts1 = {ts_start} * 1000;
 var ts2 = {ts_end} * 1000;
-//var days_diff = {days_interval};
 var days_diff = ts2 - ts1;
-//var disp_format = "%B %e, %Y";
 var disp_format = "{display_format}";
 var fld_format = "%Y-%m-%d";
 
-Date.prototype.dateFromYMD = function(ymd){
+function dateFromYMD(ymd)
+{
     parts = ymd.split("-");
     temp = new Date(parts[0],parts[1]-1,parts[2],0,0,0,0);
     return temp;
 };
 
+// Check whether the start and end dates are the same.
 function checkDate2()
 {
+    var d_start = document.getElementById("f_startdate1");
     var d_end = document.getElementById("f_enddate1");
-    var tmp = new Date();
-    var dt2 = tmp.dateFromYMD(d_end.value);
+    var dt2 = dateFromYMD(d_end.value);
     ts2 = dt2.getTime();
 
     if (ts1 > 0 && ts1 <= ts2) {
@@ -40,12 +41,10 @@ function checkDate2()
         // Update date1 if it was empty before
         ts1 = ts2 - days_diff;
         tmp = new Date(ts1);
-        field = document.getElementById("f_startdate1");
-        field.value = tmp.print(fld_format);
+        d_start.value = tmp.print(fld_format);
     }
-
     // Disable split on multi-day events
-    if (ts2 != ts1) {
+    if (d_start.value != d_end.value) {
         showhidesplit(0);
     } else {
         showhidesplit(1);
@@ -1067,8 +1066,7 @@ function toggleRSVPdetail(val)
     function checkDate1()
     {
         var d_start = document.getElementById("f_startdate1");
-        var tmp = new Date();
-        var dt1 = tmp.dateFromYMD(d_start.value);
+        var dt1 = dateFromYMD(d_start.value);
         ts1 = dt1.getTime();
 
         var ts2 = ts1 + days_diff;

@@ -192,8 +192,8 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
                 $daylinkclass = $dayclass == 'monthoff' ?
                                 'nolink-events' : 'day-events';
                 foreach ($events[$daydata] as $event) {
-                    // Separate events by a line (if more than one)
-                    if (!empty($popup)) $popup .= '<hr />' . LB;
+                    // Show event titles on different lines if more than one
+                    if (!empty($popup)) $popup .= LB;
                     // Don't show a time for all-day events
                     if ($event['allday'] == 0 && 
                             $event['rp_date_start'] == $event['rp_date_end']) {

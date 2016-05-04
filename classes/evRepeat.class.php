@@ -26,7 +26,7 @@ class evRepeat
 
     var $Event;
     var $Detail;
-    var $isAdmin;   // indicates if the current user can admin this event
+    public $isAdmin;   // indicates if the current user can admin this event
 
     /**
      *  Constructor.

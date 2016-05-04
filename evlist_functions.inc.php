@@ -705,7 +705,7 @@ function EVLIST_adminRSVP($rp_id)
         'has_menu'     => false,
         'has_extras'   => false,
         'title'        => $title,
-        'form_url'     => EVLIST_ADMIN_URL . '/index.php?rp_id=' . $rp_id,
+        'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
         'help_url'     => '',
     );
 

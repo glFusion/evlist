@@ -74,7 +74,7 @@ $expected = array('edit', 'cancel',
     'delevent', 'delrepeat', 'delfuture',
     'savereminder', 'delreminder', 'clone',
     'register', 'cancelreg', 'search', 'print',
-    'printtickets',
+    'printtickets', 'tickdelete_x', 'tickreset_x',
 );
 $action = 'view';
 $view = '';
@@ -292,6 +292,31 @@ case 'cancel':
     echo COM_refresh($_CONF['site_admin_url'].'/moderation.php');
     break;
 
+case 'tickdelete_x':
+    // Delete one or more tickets, if admin or owner
+    USES_evlist_class_repeat();
+    $rp = new evRepeat($_GET['rp_id']);
+    if ($rp->isAdmin) {
+        if (is_array($_POST['delrsvp'])) {
+            USES_evlist_class_ticket();
+            evTicket::Delete($_POST['delrsvp']);
+        }
+    }
+    COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
+    exit;
+
+case 'tickreset_x':
+    // Reset the usage flag for one or more tickets if admin or owner
+    USES_evlist_class_repeat();
+    $rp = new evRepeat($_GET['rp_id']);
+    if ($rp->isAdmin) {
+        if (is_array($_POST['delrsvp'])) {
+            USES_evlist_class_ticket();
+            evTicket::Reset($_POST['delrsvp']);
+        }
+    }
+    COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
+    exit;
 }
 
 switch ($view) {

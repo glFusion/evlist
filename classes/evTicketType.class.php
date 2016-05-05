@@ -139,8 +139,11 @@ class evTicketType
         global $_SYSTEM;
 
         $T = new Template(EVLIST_PI_PATH . '/templates');
-        $T->set_file('modify', 'ticketForm.thtml');
-
+        if ($_SYSTEM['disable_jquery_slimbox']) {
+            $T->set_file('modify', 'ticketForm.uikit.thtml');
+        } else {
+            $T->set_file('modify', 'ticketForm.thtml');
+        }
         $T->set_var(array(
             'id'                => $this->id,
             'description'       => $this->description,

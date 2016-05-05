@@ -564,7 +564,7 @@ table.smallmonthtable td.monthoff {
     background-color: #c0c0c0;
 }
 table.smallmonthtable td.monthtoday { /* color assignments for TODAY */
-    background-color: #FFFFAA;
+    background-color: #FFF000;
 }
 table.smallmonthtable tr.daynames td {
     background-color: #cccccc; /* Pale gray */

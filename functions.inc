@@ -228,7 +228,6 @@ function plugin_getadminoption_evlist()
     global $_TABLES, $LANG_EVLIST;
 
     if (SEC_hasRights('evlist.admin')) {
-
         $numevents = DB_count($_TABLES['evlist_events']);
         return array(
                 $LANG_EVLIST['pi_title'],

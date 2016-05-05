@@ -26,6 +26,15 @@ evList has the following system requirements:
 
     * PHP 5.3 and higher.
     * glFusion v1.4.0 or newer
+    * lgLib plugin
+
+evList makes use of the lgLib plugin to handle messages. To ensure that 
+messages are displayed, edit your theme header.thtml file and add
+    {lglib_messages}
+where the messages should be displayed. Placing the tag after the <body> tag
+will put the messages at the top of the screen, or it can be placed at the
+bottom of the template to display the message below the header but before any
+content.
 
 #INSTALLATION
 
@@ -115,10 +124,10 @@ Number of characters to display in event summary
 
 
 #QUIRKS AND ISSUES
-*The selected starting date for a repeating event is always used, even if it
+* The selected starting date for a repeating event is always used, even if it
 would normally not be included.  For example, creating an event to occur
 every third Tuesday, but selecting a Monday as the start date, causes the
 event to occur on that Monday as well as the following Tuesdays.
-*When the JSON calendar is used:
-**the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
-**the date selector always defaults to the date first viewed.
+* When the JSON calendar is used:
+** the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
+** the date selector always defaults to the date first viewed.

@@ -921,8 +921,9 @@ foreach($expected as $provided) {
 
 if (isset($_REQUEST['msg'])){
     $msg = COM_applyFilter($_REQUEST['msg'], true);
-} else $msg = '';
-
+} else {
+    $msg = '';
+}
 $content = '';
 
 switch ($action) {

@@ -813,19 +813,17 @@ class evRepeat
         //if ($this->isRegistered()) {
         //    return 21;
         //}
-
         // Check that the event isn't already full, or that
         // waitlisting is disabled
         if ($this->Event->options['max_rsvp'] > 0 &&
                 $this->Event->options['max_rsvp'] <= $this->TotalRegistrations()) {
-            if ($this->Event->options['max_rsvp'] > 0 &&
-                    $this->Event->options['rsvp_waitlist'] == 0 && 1) {
+            if ($this->Event->options['rsvp_waitlist'] == 0 || $fee > 0) {
+                // Event is full, no waiting list. Can't waitlist paid tickets.
                 LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
-                return 22;       // too many already signed up
-            }
-            if ($fee > 0) {
-                LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
-                return 22;      // can't waitlist paid tickets
+                return 22;
+            } else {
+                // Set message indicating the waiting list and continue to register
+                LGLIB_storeMessage($LANG_EVLIST['messages'][27]);
             }
         }
 
@@ -840,7 +838,10 @@ class evRepeat
                 LGLIB_storeMessage(sprintf($LANG_EVLIST['messages']['26'],
                     $url), '', true);
             }
+        } else {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][24]);
         }
+
         // for free tickets, just create the ticket records
         USES_evlist_class_tickettype();
         USES_evlist_class_ticket();
@@ -946,26 +947,20 @@ class evRepeat
     *   If provided, the $rp_id parameter will be considered an event ID or
     *   a repeat ID, depending on the event's registration option.
     *
-    *   @param  mixed   $rp_id  Optional ID of event or repeat to check
     *   @return integer         Total registrations
     */
-    public function TotalRegistrations($rp_id = '')
+    public function TotalRegistrations()
     {
         global $_TABLES, $_EV_CONF;
 
         if ($_EV_CONF['enable_rsvp'] != 1) return 0;
 
-        if ($rp_id == '' && is_object($this)) {
-            $rp_id = $this->id;
-        }
-
         if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
-            $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $rp_id);
+            $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $this->ev_id);
         } else {
-            $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $rp_id);
+            $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $this->rp_id);
         }
         return $count;
-
     }
 
 

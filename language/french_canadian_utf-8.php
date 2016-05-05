@@ -266,6 +266,7 @@ $LANG_EVLIST = array(
 24              => 'Vous avez été enregistré pour cet événement. ',
 25              => 'Votre inscription a été annulée. ',
     26  => 'Payment is required, click <a href="%s">here</a> to check out',
+    27  => 'This event is full and you have been added to the waiting list',
     50  => 'Not Paid',
     51  => 'Already Used',
 ),

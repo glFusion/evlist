@@ -485,7 +485,7 @@ function toggleRSVPdetail(val)
         <p>
           <span style="">{$LANG_EVLIST['cat_note1']}</span><br /><br />
           <label for="addcat"><strong>{$LANG_EVLIST['new_category']}</strong>:</label>
-          <input type="text" name="newcat" id="addcat" size="32" maxlength="32" />
+          <input type="text" name="newcat" id="addcat" size="32" maxlength="32" value="{newcat}" />
         </p>
         {!endif}
         </div>

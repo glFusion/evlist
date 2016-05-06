@@ -499,7 +499,7 @@ function toggleRSVPdetail(val)
         <div class="uk-form-row">
           <label class="uk-form-label" for="addcat"><strong>{$LANG_EVLIST['new_category']}</strong>:</label>
           <div class="uk-form-controls">
-          <input type="text" name="newcat" id="addcat" size="32" maxlength="32" />
+          <input type="text" name="newcat" id="addcat" size="32" maxlength="32" value="{newcat}" />
           </div>
         </div>
         {!endif}
@@ -813,7 +813,7 @@ function toggleRSVPdetail(val)
         </div>
       </div>
 
-      <div class="uk-form-for" id="rsvp_detail">
+      <div class="uk-form-row" id="rsvp_detail">
         <label class="uk-form-label" for="max_rsvp">{$LANG_EVLIST['max_rsvp']}:</label>
         <div class="uk-form-controls">
           <input type="text" id="max_rsvp" name="max_rsvp" maxlength="5" 

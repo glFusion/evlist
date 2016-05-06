@@ -1210,37 +1210,43 @@ class evEvent
             ) );
         }
 
-        //category info
+        // Category fields. If $_POST['categories'] is set, then this is a
+        // form re-entry due to an error saving. Populate checkboxes from the
+        // submitted form. Include the user-added category, if any.
+        // If not from a form re-entry, get the checked categories from the
+        // evlist_lookup table.
         if ($_EV_CONF['enable_categories'] == '1') {
-            $cresult = DB_query("SELECT DISTINCT tc.id, tc.name, tl.eid
+            if (isset($_POST['categories']) && is_array($_POST['categories'])) {
+                // Coming from a form re-entry
+                $cresult = DB_query("SELECT tc.id, tc.name
+                    FROM {$_TABLES['evlist_categories']} tc 
+                    WHERE tc.status='1' ORDER BY tc.name");
+                while ($A = DB_fetchArray($cresult, false)) {
+                    $chk = in_array($A['id'], $_POST['categories']) ? EVCHECKED : '';
+                    $cats[] = array('id' => $A['id'], 'name' => $A['name'], 'chk' => $chk);
+                }
+            } else {
+                $cresult = DB_query("SELECT DISTINCT tc.id, tc.name, tl.eid
                     FROM {$_TABLES['evlist_categories']} tc 
                     LEFT JOIN {$_TABLES['evlist_lookup']} tl 
                     ON tc.id = tl.cid AND tl.eid = '{$this->id}'
                     WHERE tc.status='1' ORDER BY tc.name");
-
-            $numcats = DB_numRows($cresult);
-            if ($numcats > 0) {
-                $catlist = '';
-                //$T->set_block('editor', 'CatItemBlk', 'catitem');
-                while ($C = DB_fetchArray($cresult, false)) {
+                while ($A = DB_fetchArray($cresult, false)) {
                     $chk = !is_null($C['eid']) ? EVCHECKED : '';
-                    $catlist .= '<input type="checkbox" name="categories[]" ' .
-                        'value="' . $C['id'] . '" ' . $chk . ' />' .
-                        '&nbsp;' . $C['name'] . '&nbsp;&nbsp;';
-                    /*$T->set_var(array(
-                        'category_name' => $C['name'],
-                        'category_id' => $C['id'],
-                    ));
-
-                    if (!is_null($C['eid'])) {
-                        $T->set_var('cat_checked', EVCHECKED);
-                    } else {
-                        $T->clear_var('cat_checked');
-                    }
-                    $T->parse('catitem', 'CatItemBlk', true);*/
+                    $cats[] = array('id' => $A['id'], 'name' => $A['name'], 'chk' => $chk);
                 }
-                $T->set_var('catlist', $catlist);
             }
+            foreach ($cats as $C) {
+                $catlist .= '<input type="checkbox" name="categories[]" ' .
+                    'value="' . $C['id'] . '" ' . $C['chk'] . ' />' .
+                    '&nbsp;' . $C['name'] . '&nbsp;&nbsp;';
+            }
+            $T->set_var('catlist', $catlist);
+
+            if (isset($_POST['newcat'])) {
+                $T->set_var('newcat', $_POST['newcat']);
+            }
+
             if ($_USER['uid'] > 1 && $rp_id == 0) {
                 $T->set_var('category_section', 'true');
                 $T->set_var('add_cat_input', 'true');

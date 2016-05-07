@@ -989,6 +989,8 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $daynames = EVLIST_getDayNames(1);
     $events = EVLIST_getEvents($starting_date, $ending_date,
             array('cat'=>$cat, 'cal'=>$cal));
+    // A date object to handle formatting
+    $dt = new Date('now', $_CONF['timezone']);
 
     $T = new Template(EVLIST_PI_PATH . '/templates/yearview');
     $tpl = 'yearview';
@@ -1058,15 +1060,15 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     $daylinkclass = $dayclass == 'off' ?
                             'nolink-events' : 'day-events';
                     foreach ($events[$daydata] as $event) {
-                        // Separate events by a line (if more than one)
-                        if (!empty($popup)) $popup .= '<hr />' . LB;
+                        // Separate events by a newline if more than one
+                        if (!empty($popup)) $popup .= LB;
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0) {
-                            $popup .= date($_CONF['timeonly'], 
-                                //strtotime($event->date_start . ' ' . 
-                                //    $event->time_start)) . ': ';
-                                strtotime($event['date_start'] . ' ' . 
-                                    $event['time_start1'])) . ': ';
+                            $dt->setTimestamp(strtotime($event['rp_date_start'] . 
+                                ' ' . $event['rp_time_start1']));
+                            // Time is a localized string, not a timestamp, so 
+                            // don't adjust for the timezone
+                            $popup .= $dt->format($_CONF['timeonly'], false) . ': ';
                         }
                         $popup .= htmlentities($event['title']);
                     }

@@ -149,8 +149,6 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
         'smallmonth'  => 'phpblock_month.thtml',
     ) );
 
-    $i = 0;
-
     $T->set_var('thisyear', $year);
     $T->set_var('month', $month);
     $T->set_var('monthname', $LANG_MONTH[(int)$month]);
@@ -158,7 +156,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
     // Set each day column header to the first letter of the day name
     $T->set_block('smallmonth', 'daynames', 'nBlock');
     for ($i = 1; $i <= 7; $i++) {
-        $T->set_var('dayname', $LANG_WEEK[$i][0]);
+        $T->set_var('dayname', $LANG_WEEK[$i + DATE_CALC_BEGIN_WEEKDAY][0]);
         $T->parse('nBlock', 'daynames', true);
     }
 

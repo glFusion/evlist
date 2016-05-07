@@ -129,7 +129,7 @@ function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
 */
 function EVLIST_smallmonth($year=0, $month=0, $opts=array())
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_WEEK;
+    global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     $retval = '';
 
@@ -155,8 +155,9 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
 
     // Set each day column header to the first letter of the day name
     $T->set_block('smallmonth', 'daynames', 'nBlock');
-    for ($i = 1; $i <= 7; $i++) {
-        $T->set_var('dayname', $LANG_WEEK[$i + DATE_CALC_BEGIN_WEEKDAY][0]);
+    $daynames = EVLIST_getDayNames(1);
+    foreach ($daynames as $key=>$dayname) {
+        $T->set_var('dayname', $dayname);
         $T->parse('nBlock', 'daynames', true);
     }
 

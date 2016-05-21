@@ -32,7 +32,7 @@
 * @package evlist
 */
 // ce fichier ne peut pas être utilisé sur son propre
-if ( !définis ( 'GVERSION')) {
+if ( !defined ( 'GVERSION')) {
     die ( 'Ce fichier ne peut pas être utilisé sur son propre. ' );
 }
 
@@ -340,6 +340,19 @@ $LANG_EVLIST = array(
 'waitlisted'    => 'Waitlisted',
 'name'          => 'Name',
 'quantity'      => 'Quantity',
+'alert' => 'Alert',
+'allday' => 'All Day',
+'edit' => 'Edit',
+'end_time' => 'End Time',
+'clk_help' => 'Click for help',
+'each' => 'each',
+'recur_stop_desc' => ' until %s',
+'interval_note' => 'The first occurance will be on the date specified above.',
+'email' => 'E-mail',
+'phone' => 'Phone #',
+'jump_today' => 'Jump to Today',
+'go' => 'Go',
+'all' => 'All',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

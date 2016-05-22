@@ -59,8 +59,9 @@ require_once dirname(__FILE__) . '/evlist.php';
 
 // Some variables are used all over, so get them once to avoid a lot of
 // function calls
-$_EV_CONF['_today'] = date('Y-m-d');
-$_EV_CONF['_today_ts'] = strtotime($_EV_CONF['_today']);
+$dt = new Date('now', $_CONF['timezone']);
+$_EV_CONF['_today'] = $dt->format('Y-m-d', true);
+$_EV_CONF['_today_ts'] = $dt->toUnix();
 
 // Check the version of the locator plugin and reset the use_locator
 // config value if it's inadequate.

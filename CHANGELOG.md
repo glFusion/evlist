@@ -1,5 +1,14 @@
 evList ChangeLog
 
+v1.4.0
+------
+- Add event signups
+- Add uikit-based templates
+
+v1.3.6
+------
+- Added AJAX calendar navigation
+
 v1.3.5
 ------
 - Fixed owner_id and group_id values when importing from CSV

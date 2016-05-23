@@ -196,11 +196,13 @@ function evlist_upgrade()
                     SET selectionArray = 9
                     WHERE name = 'enable_centerblock'
                     AND group_name = '{$_EV_CONF['pi_name']}'");
+    }
 
-        case '1.3.6':
-            $error = EVLIST_do_upgrade_sql('1.3.7');
-            if ($error) break;
-
+    // Recent updates, check for version less than current rather than
+    // exact versions
+    if ($currentVersion < '1.3.7') {    // Update versions less than 1.3.7
+        $error = EVLIST_do_upgrade_sql('1.3.7');
+        if (!$error) {
             // Remove date and time formats, global configs are used instead.
             $c->del('week_begins', 'evlist');
             $c->del('date_format', 'evlist');
@@ -211,26 +213,25 @@ function evlist_upgrade()
             $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
             $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
                 20, 10, 17, 10, true, 'evlist');
-            $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                20, 10, 17, 10, true, 'evlist');
             $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
                 20, 10, 17, 20, true, 'evlist');
              DB_query("UPDATE {$_TABLES['features']} SET
                     ft_descr = 'Allowed to submit events'
                 WHERE ft_name='evlist.submit'", 1);
-
-        default:
-            DB_query("UPDATE {$_TABLES['plugins']}
-                    SET 
-                        pi_version='{$_EV_CONF['pi_version']}',
-                        pi_gl_version='{$_EV_CONF['gl_version']}'
-                    WHERE 
-                        pi_name='evlist' LIMIT 1", 1);
-            break;
+        } else {
+            return false;
+        }
     }
 
     CTL_clearCache();
 
+    DB_query("UPDATE {$_TABLES['plugins']}
+        SET 
+            pi_version='{$_EV_CONF['pi_version']}',
+            pi_gl_version='{$_EV_CONF['gl_version']}'
+        WHERE 
+            pi_name='evlist' LIMIT 1", 1);
+ 
     if ( DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'") == $_EV_CONF['pi_version']) {
         return true;
     } else {

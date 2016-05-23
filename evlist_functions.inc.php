@@ -187,7 +187,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
             }
             $popup = '';
             if (isset($events[$daydata])) {
-                // Create the mootip hover text
+                // Create the tooltip hover text
                 $daylinkclass = $dayclass == 'monthoff' ?
                                 'nolink-events' : 'day-events';
                 foreach ($events[$daydata] as $event) {
@@ -434,7 +434,7 @@ function EVLIST_deleteImageLink($A, $token)
         SEC_hasAccess($A['owner_id'], $A['group_id'], $A['perm_owner'],
                 $A['perm_group'], $A['perm_members'], $A['perm_anon']) == 3) {
 
-        $img = "<img
+        $img = "<img data-uk-tooltip
             src=\"{$_CONF['layout_url']}/images/admin/delete.png\"
             alt=\"{$LANG_ADMIN['delete']}\"
             title=\"{$LANG_ADMIN['delete']}\"
@@ -743,7 +743,7 @@ function EVLIST_adminRSVP($rp_id)
         'chkdelete' => true,
         'chkfield'  => 'tic_id',
         'chkname'   => 'delrsvp',
-        'chkactions' => '<input name="tickdelete" type="image" src="'
+        'chkactions' => '<input data-uk-tooltip name="tickdelete" type="image" src="'
             . $_CONF['layout_url'] . '/images/admin/delete.' . $_IMAGE_TYPE
             . '" style="vertical-align:text-bottom;" title="' . $LANG_ADMIN['delete']
             . '" class="gl_mootip"'
@@ -751,7 +751,7 @@ function EVLIST_adminRSVP($rp_id)
             . '\');" />&nbsp;'
             . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
 
-            '<input name="tickreset" type="image" src="'
+            '<input data-uk-tooltip name="tickreset" type="image" src="'
             . $_CONF['site_url'] . '/evlist/images/reset.png'
             . '" style="vertical-align:text-bottom;" title="'
             . $LANG_EVLIST['reset_usage'] 

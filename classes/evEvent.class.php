@@ -1216,30 +1216,19 @@ class evEvent
         // If not from a form re-entry, get the checked categories from the
         // evlist_lookup table.
         if ($_EV_CONF['enable_categories'] == '1') {
-            if (isset($_POST['categories']) && is_array($_POST['categories'])) {
-                // Coming from a form re-entry
-                $cresult = DB_query("SELECT tc.id, tc.name
-                    FROM {$_TABLES['evlist_categories']} tc 
-                    WHERE tc.status='1' ORDER BY tc.name");
-                while ($A = DB_fetchArray($cresult, false)) {
+            $cresult = DB_query("SELECT tc.id, tc.name
+                FROM {$_TABLES['evlist_categories']} tc 
+                WHERE tc.status='1' ORDER BY tc.name");
+            while ($A = DB_fetchArray($cresult, false)) {
+                if (isset($_POST['categories']) && is_array($_POST['categories'])) {
+                    // Coming from a form re-entry
                     $chk = in_array($A['id'], $_POST['categories']) ? EVCHECKED : '';
-                    $cats[] = array('id' => $A['id'], 'name' => $A['name'], 'chk' => $chk);
+                } else {
+                    $chk = in_array($A['id'], $this->categories) ? EVCHECKED : '';
                 }
-            } else {
-                $cresult = DB_query("SELECT DISTINCT tc.id, tc.name, tl.eid
-                    FROM {$_TABLES['evlist_categories']} tc 
-                    LEFT JOIN {$_TABLES['evlist_lookup']} tl 
-                    ON tc.id = tl.cid AND tl.eid = '{$this->id}'
-                    WHERE tc.status='1' ORDER BY tc.name");
-                while ($A = DB_fetchArray($cresult, false)) {
-                    $chk = !is_null($C['eid']) ? EVCHECKED : '';
-                    $cats[] = array('id' => $A['id'], 'name' => $A['name'], 'chk' => $chk);
-                }
-            }
-            foreach ($cats as $C) {
                 $catlist .= '<input type="checkbox" name="categories[]" ' .
-                    'value="' . $C['id'] . '" ' . $C['chk'] . ' />' .
-                    '&nbsp;' . $C['name'] . '&nbsp;&nbsp;';
+                    'value="' . $A['id'] . '" ' . $chk . ' />' .
+                    '&nbsp;' . $A['name'] . '&nbsp;&nbsp;';
             }
             $T->set_var('catlist', $catlist);
 

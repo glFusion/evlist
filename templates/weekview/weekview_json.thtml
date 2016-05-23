@@ -27,12 +27,12 @@
     <td class="cal-weekview-addevent">
       {!if can_add}
         <a href="{site_url}/evlist/event.php?edit=x&amp;type=calendar&amp;day={curday}&amp;month={curmonth}&amp;year={curyear}">
-        <img src="{layout_url}/images/admin/add.png"
+        <img data-uk-tooltip src="{layout_url}/images/admin/add.png"
             class="gl_mootip"
             title="{$LANG_EVLIST['add_event']}"
             alt="{$LANG_EVLIST['add_event']}"
             width="16" height="16"
-            >
+            />
         </a>
       {!endif}
     </td>

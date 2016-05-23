@@ -15,7 +15,7 @@
   <tr>
     <!-- BEGIN day -->
     <td class="{dayclass}">
-      <span class="gl_mootip" title="{popup}">
+      <span data-uk-tooltip class="gl_mootip" title="{popup}">
         {!if no_day_link}
         <span class="{daylinkclass}">{day}</span>
         {!else}

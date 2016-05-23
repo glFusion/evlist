@@ -15,7 +15,7 @@
   <!-- BEGIN eventRow -->
   <tr class="pluginRow{cssid}">
     <td class="" style="padding-left:6px; height:20px;">
-        <b><a class="gf_mootip" title="{summary}::{startdate}"
+        <b><a data-uk-tooltip class="gl_mootip" title="{summary}::{startdate}"
             href="{pi_url}/event.php?eid={eid}">{title}</a></b>
     </td>
     <td class="pluginLinks" style="padding-left:6px; height:20px;">

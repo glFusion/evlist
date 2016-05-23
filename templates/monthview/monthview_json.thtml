@@ -51,7 +51,7 @@
         <span class="new_icon" id="cell{month}{day}{year}">
         {!if can_add}
           <a href="{pi_url}/event.php?edit=x&amp;src=a&amp;year={year}&amp;month={month}&amp;day={day}">
-            <img src="{layout_url}/images/admin/add.png" 
+            <img data-uk-tooltip src="{layout_url}/images/admin/add.png" 
               class="gl_mootip" 
               title="{$LANG_EVLIST['add_event']}"
               width="14" height="14" alt="{$LANG_EVLIST['add_event']}" />

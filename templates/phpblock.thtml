@@ -3,7 +3,7 @@
 <div class="evlist_blk_day">
 <h3>{start_date}</h3>
   <!-- BEGIN blkItem -->
-  <a class="gl_mootip" title="{title}::{summary}"
+  <a data-uk-tooltip class="gl_mootip" title="{title}::{summary}"
     href="{pi_url}/event.php?eid={rp_id}">{title}</a>
   <br />
   <!-- END blkItem -->

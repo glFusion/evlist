@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div class="gl_mootip monthview_allday show_cal{cal_id}" 
+<div data-uk-tooltip class="gl_mootip monthview_allday show_cal{cal_id}" 
     title="{ev_hover}"
     style="background-color:{bgcolor};">
   <a href="{pi_url}/event.php?eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}" 

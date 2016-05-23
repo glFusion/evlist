@@ -504,6 +504,8 @@ class evRepeat
                         'num_free_reg' => $num_free_tickets,
                     ) );
                }
+
+                // Show the registration link
                if (    ($this->Event->options['max_rsvp'] == 0 ||
                         $this->Event->options['rsvp_waitlist'] == 1 ||
                         $this->Event->options['max_rsvp'] > 
@@ -514,7 +516,7 @@ class evRepeat
                 ) {
                     USES_evlist_class_tickettype();
                     $Ticks = evTicketType::GetTicketTypes();
-                    if ($this->Event->options['max_user_rsvp'] > 1) {
+                    if ($this->Event->options['max_user_rsvp'] > 0) {
                         $T->set_block('event', 'tickCntBlk', 'tcBlk');
                         $T->set_var('register_multi', true);
                         //$rsvp_user_count = '';
@@ -815,15 +817,25 @@ class evRepeat
         //}
         // Check that the event isn't already full, or that
         // waitlisting is disabled
+        $total_reg = $this->TotalRegistrations();
+        $new_total = $total_reg + $num_attendees;
         if ($this->Event->options['max_rsvp'] > 0 &&
-                $this->Event->options['max_rsvp'] <= $this->TotalRegistrations()) {
+                $this->Event->options['max_rsvp'] <= $new_total) {
             if ($this->Event->options['rsvp_waitlist'] == 0 || $fee > 0) {
                 // Event is full, no waiting list. Can't waitlist paid tickets.
                 LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
                 return 22;
             } else {
                 // Set message indicating the waiting list and continue to register
-                LGLIB_storeMessage($LANG_EVLIST['messages'][27]);
+                $waitlist = $new_total - $this->Event->options['max_rsvp'];
+                if ($waitlist == $num_attendees) {
+                    // All tickets are waitlisted
+                    $str = $LANG_EVLIST['all'];
+                } else {
+                    $str = $waitlist;
+                }
+                LGLIB_storeMessage($LANG_EVLIST['messages']['22'] . ' ' . 
+                    sprintf($LANG_EVLIST['messages'][27], $str));
             }
         }
 

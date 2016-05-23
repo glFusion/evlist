@@ -283,8 +283,17 @@ case 'cancelreg':
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
     $status = $Ev->CancelRegistration(0, $_POST['num_cancel']);
-    $msg = $status == true ? 25 : 23;
-    LGLIB_storeMessage($LANG_EVLIST['messages'][$msg]);
+    if ($status) {
+        // success
+        LGLIB_storeMessage($LANG_EVLIST['messages'][25]);
+        // See if there are any other ticket and let the user know
+        $cnt = $Ev->isRegistered();
+        if ($cnt > 0) {
+            LGLIB_storeMessage(sprintf($LANG_EVLIST['messages'][28], $cnt));
+        }
+    } else {
+        LGLIB_storeMessage($LANG_EVLIST['messages'][23]);
+    }
     echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;
  

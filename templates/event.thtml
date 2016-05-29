@@ -355,6 +355,7 @@ function closedialogs() {
     return;
 }
 
+{!if show_reminderform}
 // Show the add-reminder or remove-reminder form
 function showReminder(status) {
     var addform = document.getElementById('reminder_no');
@@ -409,6 +410,7 @@ function() {
   // update the add/del reminder section depending on whether one is set
   showReminder({reminder_set});
 });
+{!endif}
 
 </script>
 {# end {templatelocation} #}

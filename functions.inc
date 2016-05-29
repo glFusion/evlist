@@ -2331,4 +2331,22 @@ function EVLIST_canSubmit()
     return $canSubmit;
 }
 
+
+/**
+*   Return the newline characters to use for the tooltips.
+*   UIkit themes need <br />, Vintage only uses LB
+*
+*   @return string      Newline characters
+*/
+function EVLIST_tooltip_newline()
+{
+    global $_SYSTEM;
+
+    if ($_SYSTEM['framework'] == 'uikit') {
+        return '<br />' . LB;
+    } else {
+        return LB;
+    }
+}
+
 ?>

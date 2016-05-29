@@ -129,7 +129,7 @@ function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
 */
 function EVLIST_smallmonth($year=0, $month=0, $opts=array())
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
 
     $retval = '';
 
@@ -192,7 +192,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
                                 'nolink-events' : 'day-events';
                 foreach ($events[$daydata] as $event) {
                     // Show event titles on different lines if more than one
-                    if (!empty($popup)) $popup .= LB;
+                    if (!empty($popup)) $popup .= EVLIST_tooltip_newline();
                     // Don't show a time for all-day events
                     if ($event['allday'] == 0 && 
                             $event['rp_date_start'] == $event['rp_date_end']) {

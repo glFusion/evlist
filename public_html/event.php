@@ -185,10 +185,11 @@ case 'savefuturerepeat':
         $view = 'none';
     } else {
         $view = 'home';
-        if ($Ev->table == 'evlist_submissions')
-            $msg = 9; // Submission confirmation
-        else
-            $msg = 2;
+        if ($Ev->table == 'evlist_submissions') {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][9]);
+        } else {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
+        }
     }
     break;
 
@@ -240,7 +241,7 @@ case 'savereminder':
         DB_query($sql, 1);
         if (DB_error()) {
             // In case of a duplicate submission or something
-            $msg = 23;      // general error message
+            LGLIB_storeMessage($LANG_EVLIST['messages'][23]);
         }
     }
     break;

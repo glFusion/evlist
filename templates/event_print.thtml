@@ -19,43 +19,55 @@
   <div style="margin-top:2em;"></div>
 
     {!if summary}
-    <p>
-      <strong>{$LANG_EVLIST['what']}:</strong>&nbsp;&nbsp;
+    <div>
+      <label>{$LANG_EVLIST['what']}:</label>
+      <div class="evdata">
       {summary}
-    </p>
+      </div>
+    </div>
     {!endif}
 
     {!if datetime_info}
-    <p>
-      <strong>{$LANG_EVLIST['when']}:</strong>&nbsp;&nbsp;
+    <div>
+      <label>{$LANG_EVLIST['when']}:</label>
+      <div class="evdata">
       {datetime_info}
-    </p>
+      </div>
+    </div>
     {!endif}
 
     {!if address_info}
-    <p>
-      <strong>{$LANG_EVLIST['where']}:</strong>&nbsp;&nbsp;
+    <div>
+      <label>{$LANG_EVLIST['where']}:</label>
+      <div class="evdata">
       {address_info}
-    </p>
+      </div>
+    </div>
     {!endif}
 
     {!if contact_info}
-    <p>
-      <strong>{$LANG_EVLIST['ev_contact']}:</strong>&nbsp;&nbsp;
+    <div>
+      <label>{$LANG_EVLIST['ev_contact']}:</label>
+      <div class="evdata">
       {contact_info}
-    </p>
+      </div>
+    </div>
     {!endif}
 
-    <p>
-      <strong>{$LANG_EVLIST['calendar']}</strong>&nbsp;&nbsp;
+    <div>
+      <label>{$LANG_EVLIST['calendar']}</label>
+      <div class="evdata">
       {cal_name}
-    </p>
+      </div>
+    </div>
 
     {!if category_link}
-    <p>
-      <strong>{$LANG_EVLIST['categories']}</strong>&nbsp;&nbsp;
+    <div>
+      <label>{$LANG_EVLIST['categories']}</label>
+      <div class="evdata">
       {category_link}
-    </p>
+      </div>
+    </div>
     {!endif}
 
     <p>{full_description}</p>

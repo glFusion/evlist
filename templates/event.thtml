@@ -100,7 +100,7 @@
 
   {!if summary}
   <div>
-    <label><strong>{$LANG_EVLIST['what']}:</strong></label>
+    <label>{$LANG_EVLIST['what']}:</label>
     <div class="evdata" id="what">
       {summary}
     </div>
@@ -109,7 +109,7 @@
 
   {!if datetime_info}
   <div>
-    <label><strong>{$LANG_EVLIST['when']}:</strong></label>
+    <label>{$LANG_EVLIST['when']}:</label>
     <div class="evdata" id="when">
       {datetime_info}
     </div>
@@ -118,7 +118,7 @@
 
   {!if address_info}
   <div>
-    <label><strong>{$LANG_EVLIST['where']}:</strong></label>
+    <label>{$LANG_EVLIST['where']}:</label>
     <div class="evdata" id="where">
       {address_info}
     </div>
@@ -127,7 +127,7 @@
 
   {!if contact_info}
   <div>
-    <label><strong>{$LANG_EVLIST['ev_contact']}:</strong></label>
+    <label>{$LANG_EVLIST['ev_contact']}:</label>
     <div class="evdata" id="contact">
     {contact_info}
     </div>
@@ -135,13 +135,13 @@
   {!endif}
 
   <div>
-    <label"><strong>{$LANG_EVLIST['calendar']}</strong></label>
+    <label>{$LANG_EVLIST['calendar']}</label>
     <div class="evdata" id="calendar">{cal_name}</div>
   </div>
 
   {!if category_link}
   <div>
-    <label><strong>{$LANG_EVLIST['categories']}</strong></label>
+    <label>{$LANG_EVLIST['categories']}</label>
     <div class="evdata" id="categories">{category_link}</div>
   </div>
   {!endif}
@@ -152,7 +152,7 @@
 {!endif}
 
   {!if register_link}
-  <label><strong>{$LANG_EVLIST['signup']}</strong></label>
+  <label>{$LANG_EVLIST['signup']}</label>
   <div id="regdiv" class="evdata" style="margin-top:15px;">
  
   <form id="rsvp" action="{site_url}/evlist/event.php" method="post">

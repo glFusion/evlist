@@ -76,6 +76,15 @@
     margin-right: 40px;
 }
 
+#evlistEventDetail div {
+    margin-bottom: 15px;
+}
+
+#evlistEventDetail div label {
+    float:left;
+    font-weight: bold;
+}
+
 #evlistEventEditSelect {
     float: right;
     margin-right: 15px;

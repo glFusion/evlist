@@ -513,7 +513,9 @@ function plugin_getheadercss_evlist()
 {
     global $_CONF;
 
-    $pi_path = EVLIST_PI_PATH . '/css/';
+    // CSS paths are under public_html so they are available to
+    // the "print" templates that don't load lib-common.php
+    $pi_path = $_CONF['path_html'] . 'evlist/css/';
     $styles = array();
     $files = array(
         'style.css',

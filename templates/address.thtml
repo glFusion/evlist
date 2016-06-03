@@ -20,6 +20,6 @@
       {!endif}
       {!if url}
         <br /> 
-        {more_info_link}
+        {$LANG_EVLIST['more_info']}: <a href="{url}" target="_blank">{$LANG_EVLIST['click_here']}</a>
       {!endif}
 {# end {templatelocation} #}

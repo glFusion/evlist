@@ -520,6 +520,7 @@ function plugin_getheadercss_evlist()
     $files = array(
         'style.css',
         'picker.css',
+        'responsive.css',
     );
     // For each style, load the included plugin stylesheet, then
     // custom overrides and layout-specific overrides in that order

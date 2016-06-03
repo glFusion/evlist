@@ -72,8 +72,10 @@
 }
 
 #evlistEventDetail {
+    clear: both;
     position: relative;
-    margin-right: 40px;
+    float: left;
+    min-width: 50%;
 }
 
 #evlistEventDetail div {
@@ -81,7 +83,7 @@
 }
 
 #evlistEventDetail div label {
-    float:left;
+    float: left;
     font-weight: bold;
 }
 
@@ -93,7 +95,7 @@
 
 #evlistMapOuter {
     position: relative;
-    float: right;
+    float: left;
     margin: 15px;
     width: 400px;
 }

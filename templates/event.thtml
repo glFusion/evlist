@@ -9,7 +9,7 @@
     <a href="javascript:void(0)" onclick='clickEditButton()' title="Edit">
       <img src="{layout_url}/images/admin/edit.png" alt="Edit" />
     </a>
-    <div style="position:relative;">
+    <div style="position:relative;display:inline">
       <div id="action_dialog">
         <div class="evlistCalendarDialogClose">
           <a href="javascript:void(0)" onclick="closedialogs()">x</a>
@@ -45,7 +45,7 @@
         title="Subscribe">
       <img src="{pi_url}/images/ical.png" alt="Subscribe" width="24" height="24" />
     </a>
-    <div style="position:relative;">
+    <div style="position:relative;display:inline;">
       <div id="subscribe_dialog">
         <div class="evlistCalendarDialogClose">
           <a href="javascript:void(0)" onclick="closedialogs()">x</a>
@@ -80,20 +80,9 @@
         title="Print"><img src="{layout_url}/images/print.png" alt="Print" 
         width="16" height="16" /></a>
   </div>
- 
-  {!if map}
-    <div id="evlistMapOuter">
-    {map}
-    <div id="directions">
-      <form action="http://maps.google.com/maps" method="GET" target="_blank">
-        <input onfocus="this.value='';" type="text" size="40" maxlength="40"
-        name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
-        <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
-        <input type="hidden" name="daddr" value="{lat},{lng}" />
-      </form>
-    </div>
-    </div>
-  {!endif}
+</div>
+
+<div> 
 <div id="evlistEventDetail">
 {# event detail elements #}
   <div style="margin-top:2em;"></div>
@@ -253,6 +242,20 @@
 
 </div>
 
+  {!if map}
+    <div id="evlistMapOuter">
+    {map}
+    <div id="directions">
+      <form action="http://maps.google.com/maps" method="GET" target="_blank">
+        <input onfocus="this.value='';" type="text" size="40" maxlength="40"
+        name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
+        <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
+        <input type="hidden" name="daddr" value="{lat},{lng}" />
+      </form>
+    </div>
+    </div>
+  {!endif}
+
 </div>
 
 <div style="clear:both;margin-top:1em;">
@@ -266,39 +269,6 @@
   {!endif}
   {reminder}
   </div>
-
-  {!if Xshow_reminderform}
-  <div id="reminder_no" class="reminder_div" style="visibility:hidden;">
-    <fieldset>
-    <strong>{$LANG_EVLIST['email']}</strong>
-    <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
-    <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
-    <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
-    <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
-    <input type="submit" name="savereminder" value="{$LANG_ACCESS['submit']}" />
-    <br />
-    {rem_note}<br />
-    <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
-    <!--<input type="hidden" name="eid" value="{eid}" />
-    <!--<input type="hidden" name="rp_id" value="{rp_id}" />-->
-    <input type="hidden" name="action" value="addreminder" />
-    </form>
-  </div>
-  <div id="reminder_yes" class="reminder_div" style="display:hidden;">
-    <form id="evRemDel" onsubmit="updateReminder(this);return false;">
-    <fieldset>
-    {$LANG_EVLIST['you_are_subscribed']}
-    <input type="submit" name="delreminder" value="{$LANG_ACCESS['remove']}" />
-    <input type="hidden" name="eid" value="{eid}" />
-    <input type="hidden" name="rp_id" value="{rp_id}" />
-    <input type="hidden" name="action" value="delreminder" />
-    <input type="hidden" name="rem_email" value="" />
-    <input type="hidden" name="notice" value="0" />
-    </fieldset>
-    </form> 
-    </fieldset>
-  </div>
-  {!endif}
 
   {!if weather}
     <div style="clear:both;text-align:center">
@@ -355,7 +325,6 @@ function closedialogs() {
     return;
 }
 
-{!if show_reminderform}
 // Show the add-reminder or remove-reminder form
 function showReminder(status) {
     var addform = document.getElementById('reminder_no');
@@ -410,7 +379,6 @@ function() {
   // update the add/del reminder section depending on whether one is set
   showReminder({reminder_set});
 });
-{!endif}
 
 </script>
 {# end {templatelocation} #}

@@ -21,52 +21,31 @@
 </div>
 {!endif}
 
-<table class="evlist_month">
-  <tr class="daynames">
-    <td class="cal-weekpointers">&nbsp;</td>
-    <td>{dayname0}</td>
-    <td>{dayname1}</td>
-    <td>{dayname2}</td>
-    <td>{dayname3}</td>
-    <td>{dayname4}</td>
-    <td>{dayname5}</td>
-    <td>{dayname6}</td>
-  </tr>
-  <!-- BEGIN weekBlock -->
-  <tr>
-    <td class="cal-weekpointers"
-        onclick="window.location.href='{pi_url}/index.php?view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={wyear}&amp;month={wmonth}&amp;day={wday}';"
-      ><b><a href="{site_url}/evlist/index.php?mode={mode}&amp;view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;month={wmonth}&amp;day={wday}&amp;year={wyear}">&nbsp;{weeknum}&nbsp;</a></b>
-    </td>
+<div id="calendar-wrap" style="clear:both;">
+  <div id="calendar">
+    <ul class="weekdays">
+      <li>{dayname0}</li>
+      <li>{dayname1}</li>
+      <li>{dayname2}</li>
+      <li>{dayname3}</li>
+      <li>{dayname4}</li>
+      <li>{dayname5}</li>
+      <li>{dayname6}</li>
+    </ul>
 
-    <!-- BEGIN dayBlock -->
-    <td class="month{cal_day_style}" 
-      onMouseOver="document.getElementById('cell{month}{day}{year}').style.visibility='visible';"
-      onMouseOut="document.getElementById('cell{month}{day}{year}').style.visibility='hidden';"
-      ondblclick="window.location.href='{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}';">
-      <div class="monthview_daterow">
-        <span class="date_number">
-          {cal_day_anchortags}
-        </span>
-        <span class="new_icon" id="cell{month}{day}{year}">
-        {!if can_add}
-          <a href="{pi_url}/event.php?edit=x&amp;src=a&amp;year={year}&amp;month={month}&amp;day={day}">
-            <img data-uk-tooltip src="{layout_url}/images/admin/add.png" 
-              class="gl_mootip" 
-              title="{$LANG_EVLIST['add_event']}"
-              width="14" height="14" alt="{$LANG_EVLIST['add_event']}" />
-          </a>
+    <!-- BEGIN weekBlock -->
+    <ul class="days">
+        <!-- BEGIN dayBlock -->
+      <li class="day {cal_day_style}">
+        <div class="date">{day}</div>
+        {!if cal_day_entries}
+          {cal_day_entries}
         {!endif}
-        </span>
-      </div>
-      <div class="monthview_events">
-        {cal_day_entries}
-      </div>
-    </td>
-    <!-- END dayBlock -->
-  </tr>
-  <!-- END weekBlock -->
-</table>
+      </li>
+        <!-- END dayBlock -->
+    </ul>
+    <!-- END weekBlock -->
+
 <div id="evlistCalendarPrintLink">
   <p><a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print"><img 
         src="{layout_url}/images/print.png" alt="Print" 

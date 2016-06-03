@@ -831,7 +831,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
             } elseif ($m == $month) {
                 $dayclass = 'on';
             } else {
-                $dayclass = 'off';
+                $dayclass = 'other-month';
             }
 
             $T->set_var('cal_day_anchortags',

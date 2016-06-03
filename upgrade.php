@@ -215,9 +215,6 @@ function evlist_upgrade()
                 20, 10, 17, 10, true, 'evlist');
             $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
                 20, 10, 17, 20, true, 'evlist');
-             DB_query("UPDATE {$_TABLES['features']} SET
-                    ft_descr = 'Allowed to submit events'
-                WHERE ft_name='evlist.submit'", 1);
         } else {
             return false;
         }

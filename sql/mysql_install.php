@@ -110,7 +110,7 @@ $_SQL['evlist_remlookup'] = "CREATE TABLE {$_TABLES['evlist_remlookup']} (
   `uid` mediumint(8) NOT NULL DEFAULT '1',
   `email` varchar(96) NOT NULL,
   `days_notice` smallint(3) NOT NULL DEFAULT '7',
-  UNIQUE KEY `eid` (`eid`,`timestamp`,`email`,`days_notice`)
+  UNIQUE KEY `eid` (`eid`,`rp_id`,`email`,`days_notice`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
@@ -252,6 +252,11 @@ $_EV_UPGRADE = array(
       PRIMARY KEY (`id`) )",
     "INSERT INTO {$_TABLES['evlist_tickettypes']} VALUES (
         0, 'General Admission', 0, 1)",
+    "UPDATE {$_TABLES['features']} SET ft_descr = 'Allowed to submit events'
+        WHERE ft_name='evlist.submit'",
+    "ALTER TABLE {$_TABLES['evlist_remlookup']} DROP KEY `eid`",
+    "ALTER TABLE {$_TABLES['evlist_remlookup']}
+        ADD UNIQUE KEY `eid` (`eid`, `rp_id`, `email`, `days_notice`)",
     ),
 );
 

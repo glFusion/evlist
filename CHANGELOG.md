@@ -4,6 +4,8 @@ v1.4.0
 ------
 - Add event signups
 - Add uikit-based templates
+- Add responsive month view calendar
+- Add ticketing and rsvp
 
 v1.3.6
 ------

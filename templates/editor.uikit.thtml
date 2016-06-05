@@ -1024,6 +1024,22 @@ function toggleRSVPdetail(val)
       <button type="reset" class="uk-button uk-button-primary" name="cancel" value="{$LANG_ADMIN['cancel']}" 
            onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
     </p>
+
+    <div class="uk-margin-right-small uk-hidden-small tm-admin-save uk-scrollspy-init-inview uk-scrollspy-inview uk-animation-slide-bottom" data-uk-scrollspy="{cls:'uk-Xanimation-slide-bottom', delay:900}">
+      <ul>
+        <li>
+          <button class="uk-button uk-button-success tm-admin-save-button-width" type="submit" value="{$LANG_ADMIN['save']}" name="saveevent" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['save']}"><i class="uk-icon-save"></i></button>
+        </li>
+        <li>
+          <button class="uk-button uk-button-primary tm-admin-save-button-width" type="submit" value="{$LANG_ADMIN['cancel']" name="cancel" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['cancel']}"
+            onclick="javascript: document.location.href='{cancel_url}'" /><i class="uk-icon-undo"></i></button>
+        </li>
+        <li>
+          <button class="uk-button uk-button-danger tm-admin-save-button-width" type="submit" onclick="return confirm('Are you sure you want to delete this item?');" name="delevent" value="{$LANG_ADMIN['delete']}" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['delete']}"><i class="uk-icon-eraser"></i></button>
+        </li>
+      </ul>
+    </div>
+
   </form>
 </div>
 

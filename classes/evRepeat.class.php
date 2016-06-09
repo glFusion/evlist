@@ -340,11 +340,14 @@ class evRepeat
         evlist_hit($this->ev_id);
 
         $template = 'event';
-        if (!empty($tpl)) $template .= '_' . $tpl;
-        $tpltype = $_SYSTEM['framework'] == 'uikit' ? '.uikit' : '';
+        if (!empty($tpl)) {
+            $template .= '_' . $tpl;
+        } else {
+            $template .= $_SYSTEM['framework'] == 'uikit' ? '.uikit' : '';
+        }
         $T = new Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
-                'event' => $template . $tpltype . '.thtml',
+                'event' => $template . '.thtml',
                 //'editlinks' => 'edit_links.thtml',
                 'datetime' => 'date_time.thtml',
                 'address' => 'address.thtml',

@@ -4,40 +4,41 @@
 <link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
 </head>
 <body>
-<div class="evlist" id="evlistEventHeader">
-  <h2>{site_name}</h2>
-  <h2 class="evlist_header">{title}</h2>
+  <div class="evlist" id="evlistEventHeader">
+    <h2>{site_name}</h2>
+    <h2 class="evlist_header">{title}</h2>
+  </div>
 
   {!if map}
-    <div id="evlistMapOuter">
+  <div id="evlistMapOuter">
     {map}
-    </div>
+  </div>
   {!endif}
 
   <div id="evlistEventDetail">
-  {# event detail elements #}
-  <div style="margin-top:2em;"></div>
+    {# event detail elements #}
+    <div style="margin-top:2em;"></div>
 
     {!if summary}
-    <div>
+    <div class="evPrtDataItem">
       <label>{$LANG_EVLIST['what']}:</label>
       <div class="evdata">
-      {summary}
+        {summary}
       </div>
     </div>
     {!endif}
 
     {!if datetime_info}
-    <div>
+    <div class="evPrtDataItem">
       <label>{$LANG_EVLIST['when']}:</label>
       <div class="evdata">
-      {datetime_info}
+        {datetime_info}
       </div>
     </div>
     {!endif}
 
     {!if address_info}
-    <div>
+    <div class="evPrtDataItem">
       <label>{$LANG_EVLIST['where']}:</label>
       <div class="evdata">
       {address_info}
@@ -46,7 +47,7 @@
     {!endif}
 
     {!if contact_info}
-    <div>
+    <div class="evPrtDataItem">
       <label>{$LANG_EVLIST['ev_contact']}:</label>
       <div class="evdata">
       {contact_info}
@@ -54,7 +55,7 @@
     </div>
     {!endif}
 
-    <div>
+    <div class="evPrtDataItem">
       <label>{$LANG_EVLIST['calendar']}</label>
       <div class="evdata">
       {cal_name}
@@ -62,7 +63,7 @@
     </div>
 
     {!if category_link}
-    <div>
+    <div class="evPrtDataItem">
       <label>{$LANG_EVLIST['categories']}</label>
       <div class="evdata">
       {category_link}
@@ -70,7 +71,7 @@
     </div>
     {!endif}
 
-    <p>{full_description}</p>
+    <div class="evPrtDataItem">{full_description}</div>
 
     {!if owner_link}
     <p class="pluginSmallText">{owner_link}</p>
@@ -85,8 +86,9 @@
 
   </div>
 
+<div style="clear:both;">
+<i>{site_slogan}</i>
 </div>
-<p><i>{site_slogan}</i></p>
 </body>
 </html>
 {# end {templatelocation} #}

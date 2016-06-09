@@ -458,8 +458,7 @@ function toggleRSVPdetail(val)
             {$LANG_EVLIST['enable_reminders_q']}
         <a href="#" onclick="popupWindow('{doc_url}#desc_reminders', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
           </label>
-          <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} /><br />
-          <span class="pluginSmallText warning">{$LANG_EVLIST['submit_email_note']}</span>
+          <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} />
         {!endif}
         </p>
 
@@ -472,27 +471,20 @@ function toggleRSVPdetail(val)
       <div style="padding:5px;">
         <span><strong>{$LANG_EVLIST['add_to_cats']}</strong>.</span>
         <br />
+        {$LANG_EVLIST['cat_note1']}<br />
         <span class="evFieldNote">{$LANG_EVLIST['cats_not_req']}</span>
-        <br /><br />
-        {!if 0}
-        <!-- BEGIN CatItemBlk -->
-        <input type="checkbox" name="categories[]" value="{category_id}"
-            {cat_checked} />&nbsp;{category_name}&nbsp;&nbsp;
-        <!-- END CatItemBlk -->
-        {!endif}
+        <br />
         {catlist}
         {!if add_cat_input}
         <p>
-          <span style="">{$LANG_EVLIST['cat_note1']}</span><br /><br />
           <label for="addcat"><strong>{$LANG_EVLIST['new_category']}</strong>:</label>
           <input type="text" name="newcat" id="addcat" size="32" maxlength="32" value="{newcat}" />
         </p>
         {!endif}
         </div>
     </fieldset>
-
     {!endif}
-
+ 
     <fieldset>
       <legend>{$LANG_EVLIST['date_time_info']}</legend>
       <div style="padding:5px;">

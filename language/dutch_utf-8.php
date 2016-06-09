@@ -342,6 +342,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'editing_future' => 'Your are editing all future instances of this event.',
 'clk_help' => 'Click for help',
 'all' => 'All',
+'sel_category' => 'Select Category',
 );
 
 // Localization of the Admin Configuration UI

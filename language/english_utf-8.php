@@ -94,6 +94,7 @@ $LANG_EVLIST = array(
 'categories'        => 'Categories',
 'category'          => 'Category',
 'new_category'      => 'New Category',
+'sel_category'      => 'Select Category',
 'ticket_types'      => 'Ticket Types',
 'type'              => 'Type',
 'fee'               => 'Fee',

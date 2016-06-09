@@ -353,6 +353,7 @@ $LANG_EVLIST = array(
 'jump_today' => 'Jump to Today',
 'go' => 'Go',
 'all' => 'All',
+'sel_category' => 'Select Category',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

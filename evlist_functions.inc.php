@@ -471,31 +471,7 @@ function EVLIST_alertMessage($msg = '', $type = '', $header = '')
     if ($msg == '')
         return '';
 
-    // If no header text specified, we'll put in a default.
-    // Also validate the message type in this switch.
-    switch (strtolower($type)) {
-    case 'info':
-        $class = 'info';
-        if ($header == '') $header = $LANG_EVLIST['info'];
-        break;
-
-    case 'note':
-    case 'warn':
-        $class = 'note';
-        if ($header == '') $header = $LANG_EVLIST['warning'];
-        break;
-
-    case 'alert':
-    default:
-        $class = 'alert';
-        if ($header == '') $header = $LANG_EVLIST['alert'];
-        break;
-    }
-
-    return "<span class=\"$class\">"
-            . $msg
-            . '</span>';
-
+    return COM_showMessageText($msg, $header, true, $type);
 }
 
 
@@ -522,7 +498,6 @@ function EVLIST_cal_checkboxes($cals)
         }
     }
     return $boxes;
-
 }
 
 

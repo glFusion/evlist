@@ -776,7 +776,7 @@ class evEvent
         // data during construction.
         if (!$this->isSubmitter) {
             // At least submit privilege required
-            return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
+            COM_404();
         } elseif ($eid != ''  && $rp_id == 0 && is_object($this)) {
             // If an id is passed in, then read that record
             if (!$this->Read($eid)) {
@@ -787,7 +787,7 @@ class evEvent
             $this->SetVars($_POST);
 
             // Make sure the current user has access to this event.
-            if (!$this->hasAccess()) return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
+            if (!$this->hasAccess()) COM_404();
 
         }
 
@@ -807,11 +807,11 @@ class evEvent
 
         if ($rp_id > 0) {
             // Make sure the current user has access to this event.
-            if (!$this->hasAccess()) return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
+            if (!$this->hasAccess()) COM_404();
 
             if ($saveaction == 'savefuturerepeat') {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_future'],
-                        'info');
+                        'warning');
             } else {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_instance'],
                         'info');
@@ -852,7 +852,7 @@ class evEvent
 
             if ($this->id != '' && $this->recurring == 1) {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_series'],
-                    'alert');
+                    'error');
             }
             if ($this->isAdmin) {
                 $tabs[] = 'ev_perms';   // Add permissions tab, event edit only

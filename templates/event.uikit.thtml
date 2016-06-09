@@ -82,14 +82,15 @@
   </div>
 </div>
 
+{# Event detail and map div #}
 <div> 
+
 <div id="evlistEventDetail">
 {# event detail elements #}
-  <div style="margin-top:2em;"></div>
 
   {!if summary}
-  <div>
-    <label class="uk-hidden-small">{$LANG_EVLIST['what']}:</label>
+  <div class="evEventItem">
+    <label>{$LANG_EVLIST['what']}:</label>
     <div class="evdata" id="what">
       {summary}
     </div>
@@ -97,7 +98,7 @@
   {!endif}
 
   {!if datetime_info}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['when']}:</label>
     <div class="evdata" id="when">
       {datetime_info}
@@ -106,7 +107,7 @@
   {!endif}
 
   {!if address_info}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['where']}:</label>
     <div class="evdata" id="where">
       {address_info}
@@ -115,7 +116,7 @@
   {!endif}
 
   {!if contact_info}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['ev_contact']}:</label>
     <div class="evdata" id="contact">
     {contact_info}
@@ -123,13 +124,13 @@
   </div>
   {!endif}
 
-  <div>
+  <div class="evEventItem uk-hidden-small">
     <label>{$LANG_EVLIST['calendar']}</label>
-    <div class="evdata" id="calendar">{cal_name}</div>
+    <div class="evdata">{cal_name}</div>
   </div>
 
   {!if category_link}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['categories']}</label>
     <div class="evdata" id="categories">{category_link}</div>
   </div>
@@ -141,9 +142,11 @@
 {!endif}
 
   {!if register_link}
+  <div class="evEventItem">
   <label>{$LANG_EVLIST['signup']}</label>
   <div id="regdiv" class="evdata" style="margin-top:15px;">
- 
+  </div>
+
   <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
     <input type="hidden" name="rp_id" value="{rp_id}" />
     {$LANG_EVLIST['quantity']}:

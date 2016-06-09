@@ -78,13 +78,15 @@
     min-width: 50%;
 }
 
-#evlistEventDetail div {
-    margin-bottom: 15px;
+#evlistEventDetail div.evEventItem {
+    padding-top: 15px;
+    clear: both;
 }
 
 #evlistEventDetail div label {
     float: left;
     font-weight: bold;
+    width: 100px;
 }
 
 #evlistEventEditSelect {
@@ -148,10 +150,11 @@
   margin-bottom:1em;
 }
 
-.evdata {
+div.evdata {
   position: relative;
-  margin-left: 8em;
-  margin-bottom: 8px;
+  /*margin-left: 8em;
+  margin-bottom: 8px;*/
+  float: left;
 }
 
 h2.evlist_header {

@@ -383,7 +383,7 @@ case 'print':
         USES_evlist_class_repeat();
         $Rep = new evRepeat($rp_id);
         $pagetitle = COM_stripslashes($Rep->Event->title);
-        echo $Rep->Detail('', '', 'event_print');
+        echo $Rep->Render('', '', 'print');
         exit;
     } else {
         // Shouldn't be in this file without an event ID to display or edit
@@ -417,11 +417,11 @@ default:
         $Rep = new evRepeat($eid);
         $pagetitle = COM_stripslashes($Rep->Event->title);
         if ($view == 'print') {
-            $template = 'event_print';
+            $template = 'print';
             $query = '';
         }
         $query = isset($_GET['query']) ? $_GET['query'] : '';
-        $content .= $Rep->Detail('', $query, $template);
+        $content .= $Rep->Render('', $query, $template);
     } else {
         // Shouldn't be in this file without an event ID to display or edit
         echo COM_refresh(EVLIST_URL . '/index.php');

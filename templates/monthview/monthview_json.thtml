@@ -45,6 +45,8 @@
         <!-- END dayBlock -->
     </ul>
     <!-- END weekBlock -->
+  </div>
+</div>
 
 <div id="evlistCalendarPrintLink">
   <p><a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print"><img 

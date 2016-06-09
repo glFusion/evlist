@@ -310,9 +310,10 @@ class evRepeat
     *   @param  string  $tpl    Optional template filename, e.g. 'event_print'
     *   @return string      HTML for the page.
     */
-    public function Detail($rp_id=0, $query='', $tpl='')
+    public function Render($rp_id=0, $query='', $tpl='')
     {
-        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK;
+        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK,
+                $_SYSTEM;
 
         $retval = '';
 
@@ -338,14 +339,12 @@ class evRepeat
         //update hit count
         evlist_hit($this->ev_id);
 
-        if (empty($tpl) || 
-            !file_exists(EVLIST_PI_PATH . '/templates/' . $tpl . '.thtml')) {
-            // use the default template if none specified or available
-            $tpl = 'event';
-        }
+        $template = 'event';
+        if (!empty($tpl)) $template .= '_' . $tpl;
+        $tpltype = $_SYSTEM['framework'] == 'uikit' ? '.uikit' : '';
         $T = new Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
-                'event' => $tpl . '.thtml',
+                'event' => $template . $tpltype . '.thtml',
                 //'editlinks' => 'edit_links.thtml',
                 'datetime' => 'date_time.thtml',
                 'address' => 'address.thtml',

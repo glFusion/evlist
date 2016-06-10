@@ -5,13 +5,13 @@
   </h2>
 
   <div id="evlistEventEditSelect">
-  {!if can_edit}
+    {!if can_edit}
     <a href="javascript:void(0)" onclick='clickEditButton()' title="Edit"
         class="uk-icon-edit"></a>
     <div style="position:relative;display:inline">
       <div id="action_dialog">
-        <div class="evlistCalendarDialogClose uk-icon-close">
-          <a href="javascript:void(0)" onclick="closedialogs()"></a>
+        <div class="evlistCalendarDialogClose">
+          <a class="uk-alert-close uk-close" href="javascript:void(0)" onclick="closedialogs()"></a>
         </div>
         {!if is_recurring}
         <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat"
@@ -69,16 +69,16 @@
         <br />
       </div>
     </div>
-  {!endif}
+    {!endif}
 
-  {!if can_subscribe}
+    {!if can_subscribe}
     <a href="javascript:void(0)" onclick='clickSubscribeButton()' 
         title="Subscribe" class="uk-icon-justify uk-icon-calendar">
     </a>
     <div style="position:relative;display:inline;">
       <div id="subscribe_dialog">
-        <div class="evlistCalendarDialogClose uk-icon-close">
-          <a href="javascript:void(0)" onclick="closedialogs()"></a>
+        <div class="evlistCalendarDialogClose">
+          <a class="uk-alert-close uk-close" href="javascript:void(0)" onclick="closedialogs()"></a>
         </div>
         {$LANG_EVLIST['subscribe_to']} ...<br />
         <a href="{webcal_url}/ical.php?rp_id={rp_id}" 
@@ -112,18 +112,17 @@
         {!endif}
       </div>
     </div>
-  {!endif}
+    {!endif}
     <a href="{pi_url}/event.php?print=x&amp;rp_id={rp_id}" target="_new"
         title="Print" class="uk-icon-print"></a>
   </div>
+{# End header div #}
 </div>
 
 {# Event detail and map div #}
-<div> 
-
 <div id="evlistEventDetail">
-{# event detail elements #}
 
+  {# event detail elements #}
   {!if summary}
   <div class="evEventItem">
     <label>{$LANG_EVLIST['what']}:</label>
@@ -172,64 +171,55 @@
   </div>
   {!endif}
 
-{!if 0}
-  <input type="button" class="lgButton orange"
-    name="addcartitem" value="Registration" onclick="EV_toggleRegDiv();" />
-{!endif}
-
   {!if register_link}
   <div class="evEventItem">
-  <label>{$LANG_EVLIST['signup']}</label>
-  <div id="regdiv" class="evdata" style="margin-top:15px;">
-  </div>
+    <label>{$LANG_EVLIST['signup']}</label>
+    <div id="regdiv" class="evdata" style="margin-top:15px;"></div>
 
-  <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
-    <input type="hidden" name="rp_id" value="{rp_id}" />
-    {$LANG_EVLIST['quantity']}:
-    {!if register_unltd}
-    <input type="text" size="3" name="tick_count" value="1" />
-    {!elseif register_multi}
-    <select name="tick_count">
-      <!-- BEGIN tickCntBlk -->
-      <option value="{tick_cnt}">{tick_cnt}</option>
-      <!-- END tickCntBlk -->
-    </select>
-    {!else}
+    <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
+      <input type="hidden" name="rp_id" value="{rp_id}" />
+      {$LANG_EVLIST['quantity']}:
+      {!if register_unltd}
+      <input type="text" size="3" name="tick_count" value="1" />
+      {!elseif register_multi}
+      <select name="tick_count">
+        <!-- BEGIN tickCntBlk -->
+        <option value="{tick_cnt}">{tick_cnt}</option>
+        <!-- END tickCntBlk -->
+      </select>
+      {!else}
       <input type="hidden" name="tick_count" value="1" />1
-    {!endif}
+      {!endif}
 
-    {!if ticket_types_multi}
-    <select name="tick_type">
-      <!-- BEGIN tickTypeBlk -->
-      <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
-      <!-- END tickTypeBlk -->
-    </select>
-    {!else}
-    <input type="hidden" name="tick_type" value="{tick_type}" />
-    {tick_descr} - {tick_fee}
-    {!endif}
+      {!if ticket_types_multi}
+      <select name="tick_type">
+        <!-- BEGIN tickTypeBlk -->
+        <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
+        <!-- END tickTypeBlk -->
+      </select>
+      {!else}
+      <input type="hidden" name="tick_type" value="{tick_type}" />
+      {tick_descr} - {tick_fee}
+      {!endif}
 
-    <input type="submit" class="lgButton orange" name="register"
+      <input type="submit" class="lgButton orange" name="register"
         value="Register" />
-  </form>
+    </form>
+
   </div>
   {!endif}
 
   {!if login_to_register}
-    <div>
-    <span class="info">{$LANG_EVLIST['login_to_register']}</span>
-    </div>
+  <div class="uk-alert">{$LANG_EVLIST['login_to_register']}</div>
   {!endif}
 
   {!if is_registered}
-  <div>
     <div class="evdata">
         Your Regisrations:<br />
       <!-- BEGIN regBlock -->
         {reg_qty} {reg_desc}<br />
       <!-- END regBlock -->
     </div>
-  </div>
   {!endif}
 
   {!if unregister_link}
@@ -242,28 +232,30 @@
         </form>
   </div>
   {!endif}
+
   {!if have_tickets}
-    <p><a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a></p>
+  <div class="evdata">
+    <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
+  </div>
   {!endif}
 
   {!if show_reminderform}
   <div id="reminder_no" class="reminder_div" style="display:none;">
     <strong>{$LANG_EVLIST['email']}</strong>
     <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
-    <fieldset>
-    <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
-    <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
-    <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
-    <input type="submit" name="savereminder" class="lgButton blue" value="{$LANG_ACCESS['submit']}" />
-    <br />
-    {rem_note}<br />
-    <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
-    <!--<input type="hidden" name="eid" value="{eid}" />
-    <!--<input type="hidden" name="rp_id" value="{rp_id}" />-->
-    <input type="hidden" name="action" value="addreminder" />
-    </fieldset>
+      <fieldset>
+        <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
+        <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
+        <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
+        <input type="submit" name="savereminder" class="lgButton blue" value="{$LANG_ACCESS['submit']}" />
+        <br />
+        {rem_note}<br />
+        <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
+        <input type="hidden" name="action" value="addreminder" />
+      </fieldset>
     </form>
   </div>
+
   <div id="reminder_yes" class="reminder_div" style="display:none;">
     <form id="evRemDel" onsubmit="updateReminder(this);return false;">
     <fieldset>
@@ -281,23 +273,21 @@
 
 </div>
 
-  {!if map}
-    <div id="evlistMapOuter">
-    {map}
-    <div id="directions">
-      <form action="http://maps.google.com/maps" method="GET" target="_blank">
-        <input onfocus="this.value='';" type="text" size="40" maxlength="40"
+{!if map}
+<div id="evlistMapOuter">
+  {map}
+  <div id="directions">
+    <form action="http://maps.google.com/maps" method="GET" target="_blank">
+      <input onfocus="this.value='';" type="text" size="40" maxlength="40"
         name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
-        <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
-        <input type="hidden" name="daddr" value="{lat},{lng}" />
-      </form>
-    </div>
-    </div>
-  {!endif}
-
+      <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
+      <input type="hidden" name="daddr" value="{lat},{lng}" />
+    </form>
+  </div>
 </div>
+{!endif}
 
-<div style="clear:both;margin-top:1em;">
+<div style="clear:both;padding-top:3em;">
   <div style="margin-bottom:1em;">
   <p>{full_description}</p>
   </div>

@@ -6,18 +6,19 @@
 <body>
   <div class="evlist" id="evlistEventHeader">
     <h2>{site_name}</h2>
-    <h2 class="evlist_header">{title}</h2>
+    <h2 class="evlist_header">{title}<br />{datetime_info}
+    </h2>
   </div>
-
-  {!if map}
-  <div id="evlistMapOuter">
-    {map}
-  </div>
-  {!endif}
 
   <div id="evlistEventDetail">
     {# event detail elements #}
     <div style="margin-top:2em;"></div>
+  {!if map}
+  <div id="evlistMapOuter" style="float:right;">
+    {map}
+  </div>
+  {!endif}
+
 
     {!if summary}
     <div class="evPrtDataItem">
@@ -33,6 +34,9 @@
       <label>{$LANG_EVLIST['when']}:</label>
       <div class="evdata">
         {datetime_info}
+        {!if recurring_event}
+        <br />{recurring_event}
+        {!endif}
       </div>
     </div>
     {!endif}

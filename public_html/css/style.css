@@ -15,16 +15,20 @@
 }
 
 .evlistCalendarDialogClose {
-    width: 12px!important;
     position: absolute;
     right: 0px;
     top: 0px;
+    border: solid;
+    border-width: 1px;
+}
+
+.evlistCalendarDialogClose .legacy {
+    text-align: center;
+    width: 12px!important;
     background-color: #ffffff;
     border: solid #000000;
     border-width: 0 0 1px 1px;
-    text-align: center;
 }
-
 .evlistCalendarDialogClose a {
     font-weight: bold;
     text-decoration: none;
@@ -647,4 +651,7 @@ div.evPrtDataItem {
     clear: both;
     padding-top: 5px;
 }
-
+div.evPrtDataItem div.evdata {
+    float: inherit;
+    margin-left: 100px;
+}

@@ -18,8 +18,4 @@
       {!if country}
       {country}
       {!endif}
-      {!if url}
-        <br /> 
-        {$LANG_EVLIST['more_info']}: <a href="{url}" target="_blank">{$LANG_EVLIST['click_here']}</a>
-      {!endif}
 {# end {templatelocation} #}

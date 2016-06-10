@@ -19,7 +19,4 @@
 {!if allday_event}
 <br />{$LANG_EVLIST['allday']}
 {!endif}
-{!if recurring_event}
-<br>{recurring_event}</br>
-{!endif}
 {# end {templatelocation} #}

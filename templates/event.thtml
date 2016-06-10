@@ -11,7 +11,7 @@
     </a>
     <div style="position:relative;display:inline">
       <div id="action_dialog">
-        <div class="evlistCalendarDialogClose">
+        <div class="evlistCalendarDialogClose legacy">
           <a href="javascript:void(0)" onclick="closedialogs()">x</a>
         </div>
         {!if is_recurring}
@@ -47,7 +47,7 @@
     </a>
     <div style="position:relative;display:inline;">
       <div id="subscribe_dialog">
-        <div class="evlistCalendarDialogClose">
+        <div class="evlistCalendarDialogClose legacy">
           <a href="javascript:void(0)" onclick="closedialogs()">x</a>
         </div>
         {$LANG_EVLIST['subscribe_to']} ...<br />
@@ -101,6 +101,9 @@
     <label>{$LANG_EVLIST['when']}:</label>
     <div class="evdata" id="when">
       {datetime_info}
+      {!if recurring_event}
+      <br />{recurring_event}
+      {!endif}
     </div>
   </div>
   {!endif}
@@ -110,6 +113,10 @@
     <label>{$LANG_EVLIST['where']}:</label>
     <div class="evdata" id="where">
       {address_info}
+      {!if url}
+        <br /> 
+        {$LANG_EVLIST['more_info']}: <a href="{url}" target="_blank">{$LANG_EVLIST['click_here']}</a>
+      {!endif}
     </div>
   </div>
   {!endif}

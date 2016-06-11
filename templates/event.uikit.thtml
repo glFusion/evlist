@@ -210,20 +210,22 @@
   {!endif}
 
   {!if login_to_register}
-  <div class="uk-alert">{$LANG_EVLIST['login_to_register']}</div>
+  <div class="evEventItem uk-alert">{$LANG_EVLIST['login_to_register']}</div>
   {!endif}
 
   {!if is_registered}
+  <div class="evEventItem">
     <div class="evdata">
         Your Regisrations:<br />
       <!-- BEGIN regBlock -->
         {reg_qty} {reg_desc}<br />
       <!-- END regBlock -->
     </div>
+  </div>
   {!endif}
 
   {!if unregister_link}
-  <div class="evdata">
+  <div class="evEventItem">
     {$LANG_EVLIST['cancel_free']}<br />
         <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
         <input type="hidden" name="rp_id" value="{rp_id}" />
@@ -234,16 +236,17 @@
   {!endif}
 
   {!if have_tickets}
-  <div class="evdata">
+  <div class="evEventItem">
     <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
   </div>
   {!endif}
 
   {!if show_reminderform}
+  <div class="evEventItem">
   <div id="reminder_no" class="reminder_div" style="display:none;">
-    <strong>{$LANG_EVLIST['email']}</strong>
+    <label>{$LANG_EVLIST['email']}</label>
     <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
-      <fieldset>
+      <fieldset style="width:300px">
         <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
         <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
         <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
@@ -268,6 +271,7 @@
     <input type="hidden" name="notice" value="0" />
     </fieldset>
     </form> 
+  </div>
   </div>
   {!endif}
 

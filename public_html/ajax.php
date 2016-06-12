@@ -57,7 +57,7 @@ case 'addreminder':
     $status = array();
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
-    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess()) {
+    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess(2)) {
         $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
             (eid, rp_id, uid, email, days_notice)
         VALUES (

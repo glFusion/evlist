@@ -855,6 +855,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
                 if (empty($event['title'])) continue;
                 $ev_hover = '';
+                $ev_title = COM_truncate($event['title'], 40, '...');
 
                 // Sanitize fields for display.  No HTML in the popup.
                 $title = htmlentities(strip_tags($event['title']));
@@ -896,7 +897,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     'cal_id_url' => $cal_id,    // calendar requested
                     'cat_id'    => $cat,
                     'ev_hover'  => $ev_hover,
-                    'ev_title'  => $event['title'],
+                    'ev_title'  => $ev_title,
                     'eid'       => $event['rp_id'],
                     'fgcolor'   => $event['fgcolor'],
                     'bgcolor'   => $event['bgcolor'],

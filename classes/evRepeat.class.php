@@ -480,6 +480,7 @@ class evRepeat
             'cal_id'        => $this->Event->cal_id,
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
+            'more_info_link' => sprintf($LANG_EVLIST['click_here'], $url),
         ) );
 
         if ($_EV_CONF['enable_rsvp'] == 1 &&
@@ -564,16 +565,17 @@ class evRepeat
 
             }
 
-                // If ticket printing is enabled for this event, see if the
-                // current user has any tickets to print.
-                if ($this->Event->options['rsvp_print'] > 0) {
-                    $paid = $this->Event->options['rsvp_print'] == 1 ? 'paid' : '';
-                    USES_evlist_class_ticket();
-                    $tickets = evTicket::GetTickets($this->ev_id, '', $this->uid, $paid);
-                    if (count($tickets) > 0) {
-                        $T->set_var('have_tickets', 'true');
-                    }
+            // If ticket printing is enabled for this event, see if the
+            // current user has any tickets to print.
+            if ($this->Event->options['rsvp_print'] > 0) {
+                $paid = $this->Event->options['rsvp_print'] == 1 ? 'paid' : '';
+                USES_evlist_class_ticket();
+                $tickets = evTicket::GetTickets($this->ev_id, '', $this->uid, $paid);
+                if (count($tickets) > 0) {
+                    $T->set_var('have_tickets', 'true');
                 }
+            }
+
         }   // if enable_rsvp
 
         if (!empty($date_start) || !empty($date_end)) {
@@ -582,11 +584,9 @@ class evRepeat
 
         // Only process the location block if at least one element exists.
         // Don't want an empty block showing.
-        if (!empty($url) || !empty($location) || !empty($street) || 
+        if (!empty($location) || !empty($street) || 
             !empty($city) || !empty($province) || !empty($postal)) {
             $T->set_var(array(
-                'url' => $url,
-                'more_info_link' => sprintf($LANG_EVLIST['click_here'], $url),
                 'location' => $location,
                 'street' => $street,
                 'city' => $city,
@@ -704,26 +704,6 @@ class evRepeat
                 $hasReminder = DB_count($_TABLES['evlist_remlookup'],
                         array('eid', 'uid', 'rp_id'),
                         array($this->ev_id, $_USER['uid'], $this->rp_id) );
-                /*if ($hasReminder > 0) {
-                    $T->set_file('rem_form', 'reminder_delete_form.thtml');
-                    $T->set_var(array(
-                        'action' => EVLIST_URL . '/event.php',
-                        'eid' => $this->ev_id,
-                        'rp_id' => $this->rp_id,
-                    ) );
-                    $T->parse('reminder', 'rem_form');
-                } else {
-                    // user hasn't already requested a reminder
-                    $T->set_file('rem_form', 'reminder_form.thtml');
-                    $T->set_var(array(
-                        'action' => EVLIST_URL . '/event.php',
-                        'eid' => $this->ev_id,
-                        'notice' => 1,
-                        'rp_id' => $this->rp_id,
-                        'user_email' => $_USER['email'],
-                    ) );
-                    $T->parse('reminder', 'rem_form');
-                }*/
             }
         } else {
             $show_reminders = false;

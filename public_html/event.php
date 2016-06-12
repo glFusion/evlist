@@ -225,7 +225,7 @@ case 'delfuture':
 case 'savereminder':
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
-    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess()) {
+    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess(2)) {
         // eid is normally main event id.  This keeps us from being redirected
         // to index.php after saving the reminder.
         $eid = (int)$rp_id;

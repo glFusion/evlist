@@ -159,6 +159,15 @@
   </div>
   {!endif}
 
+  {!if more_info_link}
+  <div class="evEventItem">
+    <label>&nbsp;</label>
+    <div class="evdata">
+      {more_info_link}
+    </div>
+  </div>
+  {!endif}
+
   <div class="evEventItem uk-hidden-small">
     <label>{$LANG_EVLIST['calendar']}</label>
     <div class="evdata">{cal_name}</div>
@@ -243,35 +252,29 @@
 
   {!if show_reminderform}
   <div class="evEventItem">
-  <div id="reminder_no" class="reminder_div" style="display:none;">
-    <label>{$LANG_EVLIST['email']}</label>
-    <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
-      <fieldset style="width:300px">
+    <div id="reminder_no" class="evdata uk-alert" style="display:none;">
+      <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
+        {$LANG_EVLIST['email']}
         <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
         <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
-        <strong>{$LANG_EVLIST['days_prior']}</strong>&nbsp;
-        <input type="submit" name="savereminder" class="lgButton blue" value="{$LANG_ACCESS['submit']}" />
-        <br />
-        {rem_note}<br />
-        <span class="pluginSmallText warning">{$LANG_EVLIST['email_private']}</span>
+        {$LANG_EVLIST['days_prior']}
+        <input type="submit" name="savereminder" class="uk-button uk-button-success uk-button-small" value="{$LANG_ACCESS['submit']}" />
+        <p>{$LANG_EVLIST['email_private']}</p>
         <input type="hidden" name="action" value="addreminder" />
-      </fieldset>
-    </form>
-  </div>
+      </form>
+    </div>
 
-  <div id="reminder_yes" class="reminder_div" style="display:none;">
-    <form id="evRemDel" onsubmit="updateReminder(this);return false;">
-    <fieldset>
-    {$LANG_EVLIST['you_are_subscribed']}
-    <input type="submit" name="delreminder" class="lgButton red" value="{$LANG_ACCESS['remove']}" />
-    <input type="hidden" name="eid" value="{eid}" />
-    <input type="hidden" name="rp_id" value="{rp_id}" />
-    <input type="hidden" name="action" value="delreminder" />
-    <input type="hidden" name="rem_email" value="" />
-    <input type="hidden" name="notice" value="0" />
-    </fieldset>
-    </form> 
-  </div>
+    <div id="reminder_yes" class="evdata uk-alert" style="display:none;">
+      <form id="evRemDel" onsubmit="updateReminder(this);return false;">
+        {$LANG_EVLIST['you_are_subscribed']}
+        <input type="submit" name="delreminder" class="uk-button uk-button-danger uk-button-small" value="{$LANG_ACCESS['remove']}" />
+        <input type="hidden" name="eid" value="{eid}" />
+        <input type="hidden" name="rp_id" value="{rp_id}" />
+        <input type="hidden" name="action" value="delreminder" />
+        <input type="hidden" name="rem_email" value="" />
+        <input type="hidden" name="notice" value="0" />
+      </form> 
+    </div>
   </div>
   {!endif}
 
@@ -284,7 +287,7 @@
     <form action="http://maps.google.com/maps" method="GET" target="_blank">
       <input onfocus="this.value='';" type="text" size="40" maxlength="40"
         name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
-      <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
+      <input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
       <input type="hidden" name="daddr" value="{lat},{lng}" />
     </form>
   </div>
@@ -296,12 +299,12 @@
   <p>{full_description}</p>
   </div>
 
-  <div style="clear:both;">
   {!if owner_link}
-  <p class="pluginSmallText">{owner_link}</p>
-  {!endif}
-  {reminder}
+  <div style="clear:both;">
+    {owner_link}
   </div>
+  {reminder}
+  {!endif}
 
   {!if weather}
     <div style="clear:both;text-align:center">

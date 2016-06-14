@@ -40,20 +40,8 @@
 require_once '../../../lib-common.php';
 require_once '../../auth.inc.php';
 
-if (!in_array('evlist', $_PLUGINS)) {
+if (!in_array('evlist', $_PLUGINS) || !SEC_hasRights('evlist.admin')) {
     COM_404();
-    exit;
-}
-
-if (!SEC_hasRights('evlist.admin')) {
-    $display = COM_siteHeader ('menu', $LANG_ACCESS['accessdenied']);
-    $display .= COM_startBlock ($LANG_ACCESS['accessdenied'], '',
-                        COM_getBlockTemplate ('_msg_block', 'header'));
-    $display .= $LANG_EVLIST['access_denied_msg'];
-    $display .= COM_endBlock (COM_getBlockTemplate ('_msg_block', 'footer'));
-    $display .= COM_siteFooter ();
-    COM_accessLog ("An anonymous user, {$_SERVER['REMOTE_ADDR']}, tried to illegally access the evList index page.");
-    echo $display;
     exit;
 }
 

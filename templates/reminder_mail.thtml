@@ -1,0 +1,10 @@
+<p>{msg1}</p>
+<p>{lang_what}: {what}</p>
+<p>{lang_when}: {when}</p>
+<p>{lang_where}: {address_info}</p>
+{!if summary}
+<p>{summary}</p>
+{!endif}
+{!if url}
+<p>{url}</p>
+{!endif}

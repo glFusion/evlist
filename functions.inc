@@ -959,32 +959,14 @@ function plugin_runScheduledTask_evlist()
     if (!EVLIST_isCurrentVersion()) return;
 
     //check if reminders exist
-    $sql = "SELECT 
-            rem.email, rem.eid, rem.uid,
-            det.title, det.summary,
-            rep.rp_date_start, rep.rp_time_start1, rep.rp_time_end1, rep.rp_id,
-            rep.rp_time_start2, rep.rp_time_end2,
-            ev.allday, ev.split,
+    $sql = "SELECT rem.email, rem.eid, rem.uid, rem.name, rem.rp_id,
             u.language
-        FROM 
-            {$_TABLES['evlist_remlookup']} rem,
-            {$_TABLES['evlist_repeat']} rep,
-            {$_TABLES['evlist_events']} ev,
-            {$_TABLES['evlist_detail']} det,
-            {$_TABLES['users']} u
-        WHERE
-            ev.id=rem.eid 
-        AND 
-            rep.rp_id = rem.rp_id
-        AND
-            ev.id=rep.rp_ev_id
-        AND
-            det.det_id = rep.rp_det_id
-        AND
-            u.uid = rem.uid
-        AND
-            rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)
-        ";
+        FROM {$_TABLES['evlist_remlookup']} rem
+        LEFT JOIN {$_TABLES['users']} u
+            ON u.uid = rem.uid
+        LEFT JOIN {$_TABLES['evlist_repeat']} rep
+            ON rep.rp_id = rem.rp_id
+        WHERE rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)";
         // TODO: Figure out sql for recurring event reminders
         /*AND (
             rem.rp_id = 0 AND 
@@ -997,6 +979,14 @@ function plugin_runScheduledTask_evlist()
     }
     
     $now = time();
+    $events = array();
+    USES_evlist_class_repeat();
+
+    $T = new Template(EVLIST_PI_PATH . '/templates/');
+    $T->set_file(array(
+        'msg' => 'reminder_mail.thtml',
+        'addr' => 'address.thtml',
+    ) );
 
     //common variables
     //begin loop
@@ -1005,44 +995,58 @@ function plugin_runScheduledTask_evlist()
         // Load the user's language
         $LANG = plugin_loadlanguage_evlist($A['language']);
 
+        // Load the event instance. May be multiple notifications for
+        // upcoming events, but shouldn't be too many events.
+        if (!isset($events[$A['rp_id']])) {
+            $events[$A['rp_id']] = new evRepeat($A['rp_id']);
+        }
+        $Rp = $events[$A['rp_id']];
         $subject = $LANG['rem_subject'];
-        $msg_top = $LANG['rem_msg1'];
-        //$msg_bot = $LANG['rem_msg3'];
+        $l_msg_top = $LANG['rem_msg1'];
 
         $title = COM_stripslashes($A['title']);
         $summary = COM_stripslashes($A['summary']);
-        $date_start = EVLIST_formattedDate($A['rp_date_start']);
+        $date_start = EVLIST_formattedDate($Rp->date_start1);
         $event_url = EVLIST_URL . '/event.php?eid=' . $A['rp_id'];
         if ($A['allday'] == 1) {
             $times = $LANG['allday'];
         } else {
-            $times = EVLIST_formattedTime($A['rp_time_start1']) . ' - ' .
-                    EVLIST_formattedTime($A['rp_time_end1']);
+            $times = EVLIST_formattedTime($Rp->time_start1) . ' - ' .
+                    EVLIST_formattedTime($Rp->time_end1);
             if ($A['split'] == 1) {
                 $times .= ', ' . EVLIST_formattedTime($A['rp_time_start2']) .
                     ' - ' . EVLIST_formattedTime($A['rp_time_end2']);
             }
         }
 
-        $message = $msg_top . LB . LB;
-        $message .= $LANG['what'] . ': ' . $title . LB;
-        $message .= $LANG['when'] . ': ' . $date_start . ' ' . $times . LB;
-        if (!empty($summary)) {
-            $message .= LB . $summary . LB . LB;
-        }
-        $message .= sprintf($LANG_EVLIST['rem_url'], $event_url) . LB . LB;
+        $T->set_var(array(
+            'lang_what' => $LANG['what'],
+            'lang_when' => $LANG['when'],
+            'lang_where'    => $LANG['where'],
+            'what'      => $Rp->Event->Detail->title,
+            'when'      => $Rp->date_start . ' ' . $times,
+            'location'  => $Rp->Event->Detail->location,
+            'street'    => $Rp->Event->Detail->street,
+            'city'      => $Rp->Event->Detail->city,
+            'province'  => $Rp->Event->Detail->province,
+            'postal'    => $Rp->Event->Detail->postal,
+            'country'   => $Rp->Event->Detail->country,
+            'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
+            'summary'   => COM_stripSlashes($Rp->Event->Detail->summary),
+            'msg1'      => $LANG['rem_msg1'],
+        ) );
+        $T->parse('address_info', 'addr', true);
+        $T->parse('output', 'msg');
+        $message = $T->finish($T->get_var('output'));
 
-        $mailto = COM_formatEmailAddress('',$A['email']);
+        $mailto = COM_formatEmailAddress($A['name'], $A['email']);
         //mail reminder
-        COM_mail($mailto, $subject, $message);
+        COM_mail($mailto, $subject, $message, '', true);
 
         //delete reminder
         DB_delete($_TABLES['evlist_remlookup'],
                     array('eid', 'rp_id', 'uid'),
                     array($A['eid'], $A['rp_id'], $A['uid']));
-
-        $A['title'] = '';
-        $A['summary'] = '';
     }
 
     return true;

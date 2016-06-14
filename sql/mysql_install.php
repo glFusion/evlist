@@ -108,6 +108,7 @@ $_SQL['evlist_remlookup'] = "CREATE TABLE {$_TABLES['evlist_remlookup']} (
   `date_start` int(10) unsigned NOT NULL,
   `timestamp` int(10) unsigned DEFAULT NULL,
   `uid` mediumint(8) NOT NULL DEFAULT '1',
+  `name` varchar(40) NOT NULL DEFAULT 'nobody',
   `email` varchar(96) NOT NULL,
   `days_notice` smallint(3) NOT NULL DEFAULT '7',
   UNIQUE KEY `eid` (`eid`,`rp_id`,`email`,`days_notice`)
@@ -257,6 +258,8 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_remlookup']} DROP KEY `eid`",
     "ALTER TABLE {$_TABLES['evlist_remlookup']}
         ADD UNIQUE KEY `eid` (`eid`, `rp_id`, `email`, `days_notice`)",
+    "ALTER TABLE {$_TABLES['evlist_remlookup']}
+        ADD name varchar(40) NOT NULL DEFAULT 'nobody' after `uid`",
     ),
 );
 

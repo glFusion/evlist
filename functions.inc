@@ -1002,7 +1002,6 @@ function plugin_runScheduledTask_evlist()
         }
         $Rp = $events[$A['rp_id']];
         $subject = $LANG['rem_subject'];
-        $l_msg_top = $LANG['rem_msg1'];
 
         $title = COM_stripslashes($A['title']);
         $summary = COM_stripslashes($A['summary']);
@@ -1034,6 +1033,7 @@ function plugin_runScheduledTask_evlist()
             'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
             'summary'   => COM_stripSlashes($Rp->Event->Detail->summary),
             'msg1'      => $LANG['rem_msg1'],
+            'msg2'      => $LANG['rem_msg2'],
         ) );
         $T->parse('address_info', 'addr', true);
         $T->parse('output', 'msg');

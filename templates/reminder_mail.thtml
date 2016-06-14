@@ -8,3 +8,4 @@
 {!if url}
 <p>{url}</p>
 {!endif}
+<p>{msg2}</p>

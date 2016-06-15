@@ -1487,7 +1487,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
         // if not the current version, and not in development mode, return
         return $retval;
     }
-    USES_evlist_functions();
 
     //length to be set from admin panels sometime later, or not.
     $length = '96';
@@ -1588,17 +1587,19 @@ function phpblock_evlist_upcoming($A='', $catcal='')
 
             // TODO: displaying summaries in the block will be set from the 
             // admin panels sometime later.
-            $summary = strip_tags(EVLIST_noquotes($ev['summary']));
-            if (strlen($summary) > $length) {
-                $summary = substr($summary, 0, $length) . '...';
+            $summary = COM_truncate(htmlspecialchars(strip_tags(EVLIST_noquotes($ev['summary']))), $length, '...');
+            $title = htmlspecialchars($ev['title']);
+            $tooltip = $title;
+            if (!empty($summary)) {
+                $tooltip .= '::' . $summary;
             }
             $T->set_block('block', 'blkItem', 'bItem');
             $T->set_var(array(
-                'pi_url'    => EVLIST_URL,
                 'rp_id'     => $ev['rp_id'],
-                'title'     => htmlspecialchars($ev['title']),
-                'summary'   => htmlspecialchars($summary),
+                'title'     => $title,
+                'summary'   => $summary,
                 'full_description' => $ev['full_description'],
+                'tooltip'   => $tooltip,
             ) );
             $T->parse('bItem','blkItem', true);
             $count++;
@@ -2087,7 +2088,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             case 'cat':
                 if ($value > 0) {
                     $opt_select .= ', cat.name AS cat_name';
-                    $cat_status .= " AND l.cid = '$value' AND cat.status = 1";
+                    $cat_status = " AND l.cid = '$value' AND cat.status = 1";
                 }
                 break;
             case 'limit':
@@ -2134,15 +2135,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             LEFT JOIN {$_TABLES['evlist_categories']} cat
                 ON cat.id = l.cid 
             WHERE ev.status = 1 
+            AND (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
             AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
-            $cat_status
-            AND (
-                (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
-                OR
-                (rep.rp_date_end >= '$start' AND rep.rp_date_start <= '$start')
-                OR
-                (rep.rp_date_end <= '$end' AND rep.rp_date_start >= '$start')
-            ) " . 
+            $cat_status " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
             COM_getPermSQL('AND', 0, 2, 'cal') . 
             " $opt_where

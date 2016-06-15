@@ -970,7 +970,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
 
     EVLIST_setViewSession('year', $year, $month, $day);
 
@@ -1062,7 +1062,13 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                             'nolink-events' : 'day-events';
                     foreach ($events[$daydata] as $event) {
                         // Separate events by a newline if more than one
-                        if (!empty($popup)) $popup .= LB;
+                        if (!empty($popup)) {
+                            if ($_SYSTEM['framework'] == 'uikit') {
+                                // HTML break for UIkit tooltip
+                                 $popup .= '<br />';
+                            }
+                            $popup .= LB;
+                        }
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0) {
                             $dt->setTimestamp(strtotime($event['rp_date_start'] . 

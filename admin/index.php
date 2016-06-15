@@ -81,7 +81,7 @@ function EVLIST_adminHeader($page)
         $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editcat=x',
             'text' => $LANG_EVLIST['new_category']);
     } else {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?view=categories',
+        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?categories=x',
             'text' => $LANG_EVLIST['categories']);
     }
 
@@ -148,14 +148,11 @@ function EVLIST_adminlist_categories()
                       'has_extras'   => false,
                       'title'        => $LANG_EVLIST['pi_title'].': ' .
                                         $LANG_EVLIST['categories'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?categories=x',
                       'help_url'     => ''
     );
 
-    $sql = "SELECT *
-            FROM {$_TABLES['evlist_categories']} 
-            WHERE 1=1 ";
-
+    $sql = "SELECT * FROM {$_TABLES['evlist_categories']} WHERE 1=1 ";
     $query_arr = array('table' => 'evlist_categories',
             'sql' => $sql,
             'query_fields' => array('name'),

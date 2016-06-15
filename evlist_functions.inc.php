@@ -45,7 +45,7 @@
 */
 
 
-USES_evlist_class_datecalc();
+USES_lglib_class_datecalc();
 
 /**
 *   Get the Google-style page navigation for the list display

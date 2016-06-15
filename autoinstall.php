@@ -195,9 +195,6 @@ function USES_evlist_functions()
 function USES_evlist_views()
 {    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
 
-function USES_evlist_class_datecalc()
-{   require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php'; }
-
 function USES_evlist_class_event()
 {   require_once EVLIST_PI_PATH . '/classes/evEvent.class.php'; }
 

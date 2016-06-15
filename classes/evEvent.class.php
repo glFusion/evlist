@@ -11,7 +11,7 @@
  *  @filesource
  */
 
-USES_evlist_class_datecalc();
+USES_lglib_class_datecalc();
 USES_evlist_class_detail();
 USES_evlist_class_calendar();
 USES_evlist_functions();

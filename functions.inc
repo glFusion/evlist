@@ -101,11 +101,6 @@ function USES_evlist_functions()
 function USES_evlist_views()
 {    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
 
-function USES_evlist_class_datecalc()
-{   require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php';
-    //require_once 'Date/Calc.php';
-}
-
 function USES_evlist_class_event()
 {   require_once EVLIST_PI_PATH . '/classes/evEvent.class.php'; }
 
@@ -602,7 +597,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     // If we got this far, we're going to display something as long
     // as there's something to be displayed.
     USES_evlist_functions();
-    USES_evlist_class_datecalc();
+    USES_lglib_class_datecalc();
 
     $retval = '';
     $opts = array(
@@ -2047,7 +2042,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 {
     global $_TABLES, $_EV_CONF;
 
-    USES_evlist_class_datecalc();
+    USES_lglib_class_datecalc();
 
     if ($start == '') $start = $_EV_CONF['_today'];
     if ($end == '') $end = $start;
@@ -2188,7 +2183,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
         return $events;
 
     USES_evlist_class_repeat();
-    USES_evlist_class_datecalc();
+    USES_lglib_class_datecalc();
 
     while ($A = DB_fetchArray($result, false)) {
 

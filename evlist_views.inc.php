@@ -334,7 +334,7 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
 */
 function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_EVLIST;
+    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH;
 
     USES_class_date();
 

@@ -343,6 +343,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'clk_help' => 'Click for help',
 'all' => 'All',
 'sel_category' => 'Select Category',
+'click_for_datepicker' => 'Click for Date Selector',
 );
 
 // Localization of the Admin Configuration UI

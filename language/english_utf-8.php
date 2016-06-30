@@ -347,6 +347,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'name'          => 'Name',
 'quantity'      => 'Quantity',
 'all'           => 'All',
+'click_for_datepicker' => 'Click for Date Selector',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

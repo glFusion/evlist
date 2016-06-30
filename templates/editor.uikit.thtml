@@ -512,8 +512,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
-            id="startdt1_trigger" class="evDatePicker" />
+          <i class="uk-icon uk-icon-calendar" id="startdt1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
           <input type="text" name="date_start1" id="f_startdate1"
               size="10" value="{startdate1}"
               onchange="checkDate1();" />
@@ -539,8 +538,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div style="uk-form-controls">
-          <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
-            id="enddate1_trigger" class="evDatePicker" />
+          <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
           <input type="text" name="date_end1" id="f_enddate1" 
             size="10" value="{enddate1}" onchange="checkDate2();" />
           &nbsp;&nbsp;

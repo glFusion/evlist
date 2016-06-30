@@ -355,6 +355,7 @@ $LANG_EVLIST = array(
 'go' => 'Go',
 'all' => 'All',
 'sel_category' => 'Select Category',
+'click_for_datepicker' => 'Click for Date Selector',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

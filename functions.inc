@@ -708,23 +708,17 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
                 'country'   => $A['country'],
                 'email'     => $email,
                 'phone'     => $A['phone'],
-                'startdate' => 
-                        EVLIST_formattedDate($s_ts1),
-                'enddate' => 
-                        EVLIST_formattedDate($e_ts1),
-                'starttime1' => 
-                        EVLIST_formattedTime($s_ts1),
-                'endtime1' => 
-                        EVLIST_formattedTime($e_ts1),
+                'startdate' => EVLIST_formattedDate($s_ts1),
+                'enddate'   => EVLIST_formattedDate($e_ts1),
+                'starttime1' => EVLIST_formattedTime($s_ts1),
+                'endtime1'  => EVLIST_formattedTime($e_ts1),
             ) );
             if ($A['split'] == 1) {
                 $s_ts2 = strtotime($A['rp_date_start'] . ' ' . $A['rp_time_start2']);
                 $e_ts2= strtotime($A['rp_date_end'] . ' ' . $A['rp_time_end2']);
                 $T->set_var(array(
-                    'starttime2' => 
-                        EVLIST_formattedTime($s_ts2),
-                    'endtime2' => 
-                        EVLIST_formattedTime($e_ts2),
+                    'starttime2' => EVLIST_formattedTime($s_ts2),
+                    'endtime2' => EVLIST_formattedTime($e_ts2),
                 ) );
             } else {
                 $T->set_var(array(

@@ -26,7 +26,11 @@
       {!if addlink_year}
       <input type="hidden" name="year" value="{addlink_year}" />
       {!endif}
+      {!if is_uikit}
+      <input type="submit" name="edit" value="{add_event_text}" class="uk-button uk-button-success uk-button-small" />
+      {!else}
       <input type="submit" name="edit" value="{add_event_text}" class="lgButton green" />
+      {!endif}
     </form>
   {!endif}
 </div>
@@ -61,7 +65,11 @@
     <select name="view">
         {view_select}
     </select>
+    {!if is_uikit}
+    <input type="submit" name="hdrsubmit" value="Jump" class="uk-button uk-button-primary uk-button-small" />
+    {!else}
     <input type="submit" name="hdrsubmit" value="Jump" class="lgButton blue" />
+    {!endif}
     <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
         class="evlistDateTrigger"
         id="jumpdate_trigger"

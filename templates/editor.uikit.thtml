@@ -1025,7 +1025,7 @@ function toggleRSVPdetail(val)
            onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
     </p>
 
-    <div class="uk-margin-right-small uk-hidden-small tm-admin-save uk-scrollspy-init-inview uk-scrollspy-inview uk-animation-slide-bottom" data-uk-scrollspy="{cls:'uk-Xanimation-slide-bottom', delay:900}">
+    <div class="uk-margin-right-small uk-hidden-small tm-admin-save" data-uk-scrollspy="{cls:'uk-animation-slide-bottom', delay:900}">
       <ul>
         <li>
           <button class="uk-button uk-button-success tm-admin-save-button-width" type="submit" value="{$LANG_ADMIN['save']}" name="{saveaction}" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['save']}"><i class="uk-icon-save"></i></button>

@@ -306,7 +306,7 @@ function EVLIST_12to24($hour, $ampm='')
 */
 function EVLIST_getDayViewData($events, $today = '')
 {
-    global $_CONF;
+    global $_CONF, $_EV_CONF;
 
     // If no date/time passed used current timestamp
     if (empty($today)) $today = $_EV_CONF['_today'];

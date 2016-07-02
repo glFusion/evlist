@@ -377,7 +377,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $events = EVLIST_getEvents($today, $today,
             array('cat'=>$cat, 'cal'=>$cal));
     $calendars_used = array();
-    list($allday, $hourly) = EVLIST_getDayViewData($events, $starting_date);
+    list($allday, $hourly) = EVLIST_getDayViewData($events, $today);
 
     // Get allday events
     $alldaycount = count($allday);
@@ -437,67 +437,67 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
         $hourevents = $hourly[$i];
         $numevents = count($hourevents);
-        if ($numevents > 0) {
 
-            for ($j = 1; $j <= $numevents; $j++) {
-                $A = current($hourevents);
+        $T->clear_var('event_entry');
+        for ($j = 1; $j <= $numevents; $j++) {
+            $A = current($hourevents);
 
-                $calendars_used[$A['data']['cal_id']] = array(
+            $calendars_used[$A['data']['cal_id']] = array(
                     'cal_name' => $A['data']['cal_name'],
                     'cal_ena_ical' => $A['data']['cal_ena_ical'],
                     'cal_id' => $A['data']['cal_id'],
                     'fgcolor' => $A['data']['fgcolor'],
                     'bgcolor' => $A['data']['bgcolor'],
-                );
+            );
 
-                if ($A['data']['rp_date_start'] == $starting_date) {
-                    $start_time = date($_CONF['timeonly'],
-                        strtotime($A['data']['rp_date_start'] . ' ' .
-                            $A['time_start']));
-                            //strtotime($A['evt_start'] . ' ' . $A['timestart']));
-                } else {
-                    $start_time = date(
-                        $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
-                        strtotime($A['data']['rp_date_start'] . ' '. 
-                            $A['time_start']));
-                }
-
-                if ($A['data']['rp_date_end'] == $_EV_CONF['today']) {
-                    $end_time = date($_CONF['timeonly'],
-                            strtotime($A['data']['rp_date_end'] . ' ' .
-                                $A['time_end']));
-                } else $end_time = date(
-                        $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
-                        strtotime($A['data']['rp_date_end'] . ' ' . 
-                            $A['time_end']));
-
-                if ($start_time == ' ... ' && $end_time == ' ... ')
-                    $T->set_var('event_time', $LANG_EVLIST['allday']);
-                else
-                    $T->set_var('event_time',
-                        $start_time . ' - ' . $end_time);
-
-               $T->set_var(array(
-                    'delete_imagelink'  => EVLIST_deleteImageLink($A['data'], $token),
-                    'eid'               => $A['data']['rp_ev_id'],
-                    'rp_id'             => $A['data']['rp_id'],
-                    'event_title'       => stripslashes($A['data']['title']),
-                    'event_summary' => htmlspecialchars($A['data']['summary']),
-                    'fgcolor'       => $A['data']['fgcolor'],
-                    'bgcolor'       => '',
-                    'cal_id'        => $A['data']['cal_id'],
-                ) );
-                if ($j < $numevents) {
-                    $T->set_var('br', '<br />');
-                } else {
-                    $T->set_var('br', '');
-                }
-                $T->parse ('event_entry', 'event',
-                                       ($j == 1) ? false : true);
-                next($hourevents);
+            if ($A['data']['rp_date_start'] == $today) {
+                $start_time = date($_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_start'] . ' ' .
+                        $A['time_start']));
+                        //strtotime($A['evt_start'] . ' ' . $A['timestart']));
+            } else {
+                $start_time = date(
+                    $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_start'] . ' '. 
+                        $A['time_start']));
             }
-        } else {
-            $T->set_var('event_entry','&nbsp;');
+
+            if ($A['data']['rp_date_end'] == $today) {
+                $end_time = date($_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_end'] . ' ' .
+                        $A['time_end']));
+            } else {
+                $end_time = date(
+                    $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_end'] . ' ' . 
+                        $A['time_end']));
+            }
+
+            if ($start_time == ' ... ' && $end_time == ' ... ') {
+                $T->set_var('event_time', $LANG_EVLIST['allday']);
+            } else {
+                $T->set_var('event_time',
+                    $start_time . ' - ' . $end_time);
+            }
+
+            $T->set_var(array(
+                'delete_imagelink'  => EVLIST_deleteImageLink($A['data'], $token),
+                'eid'               => $A['data']['rp_ev_id'],
+                'rp_id'             => $A['data']['rp_id'],
+                'event_title'       => stripslashes($A['data']['title']),
+                'event_summary' => htmlspecialchars($A['data']['summary']),
+                'fgcolor'       => $A['data']['fgcolor'],
+                'bgcolor'       => '',
+                'cal_id'        => $A['data']['cal_id'],
+            ) );
+            if ($j < $numevents) {
+                $T->set_var('br', '<br />');
+            } else {
+                $T->set_var('br', '');
+            }
+            $T->parse ('event_entry', 'event',
+                                       ($j == 1) ? false : true);
+            next($hourevents);
         }
         $link = date($_CONF['timeonly'], mktime($i, 0));
 //        if ($_EV_CONF['_can_add']) {

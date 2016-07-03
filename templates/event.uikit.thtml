@@ -15,56 +15,40 @@
         </div>
         {!if is_recurring}
         <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat"
-            id="edit_repeat" title="{$LANG_EVLIST['edit_repeat']}"
-            class="uk-icon-edit"></a>
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat"
             id="edit_repeat" title="{$LANG_EVLIST['edit_repeat']}">
+            <i class="uk-icon-edit"></i>
             {$LANG_EVLIST['edit_repeat']}</a>
         <br />
         <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=futurerepeat"
-            id="edit_futurerepeat" title="{$LANG_EVLIST['edit_future']}"
-            class="uk-icon-edit"></a>
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=futurerepeat"
             id="edit_futurerepeat" title="{$LANG_EVLIST['edit_future']}">
+            <i class="uk-icon-edit"></i>
             {$LANG_EVLIST['edit_future']}</a>
         <br />
         {!endif}
         <a href="{pi_url}/event.php?eid={ev_id}&amp;edit=event"
-            id="edit_event" title="{$LANG_EVLIST['evit_event']}"
-            class="uk-icon-edit"></a>
-        <a href="{pi_url}/event.php?eid={ev_id}&amp;edit=event"
             id="edit_event" title="{$LANG_EVLIST['evit_event']}">
+            <i class="uk-icon-edit"></i>
             {$LANG_EVLIST['edit_event']}</a>
         <br />
         {!if is_recurring}
         <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delrepeat=x" 
             onclick="return confirm('{$LANG_EVLIST['conf_del_repeat']}')" 
-            id="delete_repeat"  title="{$LANG_EVLIST['del_repeat']}"
-            class="uk-icon-trash-o"></a>
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delrepeat=x" 
-            onclick="return confirm('{$LANG_EVLIST['conf_del_repeat']}')" 
             id="delete_repeat"  title="{$LANG_EVLIST['del_repeat']}">
+            <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_repeat']}</a>
         <br />
         <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delfuture=x" 
             onclick="return confirm('{$LANG_EVLIST['conf_del_future']}')" 
             id="delete_eventfuture" 
-            title="{$LANG_EVLIST['del_future']}"
-            class="uk-icon-trash-o"></a>
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delfuture=x" 
-            onclick="return confirm('{$LANG_EVLIST['conf_del_future']}')" 
-            id="delete_eventfuture" 
             title="{$LANG_EVLIST['del_future']}">
+            <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_future']}</a>
         <br />
         {!endif}
         <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x"
             onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
-            id="delete_event"  title="{$LANG_EVLIST['del_all']}"
-            class="uk-icon-trash-o"></a>
-        <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x"
-            onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
             id="delete_event"  title="{$LANG_EVLIST['del_all']}">
+            <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_all']}</a>
         <br />
       </div>
@@ -82,32 +66,26 @@
         </div>
         {$LANG_EVLIST['subscribe_to']} ...<br />
         <a href="{webcal_url}/ical.php?rp_id={rp_id}" 
-            id="sub_instance" title="{$LANG_EVLIST['sub_this_instance']}"
-            class="uk-icon-calendar"></a>
-        <a href="{webcal_url}/ical.php?rp_id={rp_id}" 
             id="sub_instance" title="{$LANG_EVLIST['sub_this_instance']}">
+            <i class="uk-icon-calendar"></i>
             {$LANG_EVLIST['sub_this_instance']}</a>
         <br />
         {!if is_recurring}
         <a href="{webcal_url}/ical.php?eid={ev_id}" 
             id="sub_all_instance"  title="{$LANG_EVLIST['sub_all_instances']}" 
-            style="text-decoration:none;" class="uk-icon-calendar"></a>
-        <a href="{webcal_url}/ical.php?eid={ev_id}" 
-            id="sub_all_instance"  title="{$LANG_EVLIST['sub_all_instances']}" 
             style="text-decoration:none;">
+            <i class="uk-icon-calendar"></i>
             {$LANG_EVLIST['sub_all_instances']}</a>
         <br />
         <a href="{webcal_url}/ical.php?cal={cal_id}" 
-            id="sub_this_calendar" title="{$LANG_EVLIST['calendar']}" class="uk-icon-calendar"></a>
-        <a href="{webcal_url}/ical.php?cal={cal_id}" 
             id="sub_this_calendar" title="{$LANG_EVLIST['calendar']}">
+            <i class="uk-icon-calendar"></i>
             {$LANG_EVLIST['calendar']}</a>
         <br />
         <a href="{webcal_url}/ical.php" 
-            id="sub_all_calendars"  title="{$LANG_EVLIST['all_calendars']}" class="uk-icon-calendar"></a>
-        <a href="{webcal_url}/ical.php" 
             id="sub_all_calendars"  title="{$LANG_EVLIST['all_calendars']}">
-                {$LANG_EVLIST['all_calendars']}</a>
+            <i class="uk-icon-calendar"></i>
+            {$LANG_EVLIST['all_calendars']}</a>
         <br />
         {!endif}
       </div>

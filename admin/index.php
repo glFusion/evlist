@@ -131,15 +131,21 @@ function EVLIST_adminlist_categories()
 
     $header_arr = array(
         array('text' => $LANG_EVLIST['edit'], 
-                'field' => 'edit', 'sort' => false),
+                'field' => 'edit', 'sort' => false,
+                'align' => 'center',
+        ),
         array('text' => $LANG_EVLIST['id'], 
                 'field' => 'id', 'sort' => true),
         array('text' => $LANG_EVLIST['cat_name'], 
                 'field' => 'name', 'sort' => true),
         array('text' => $LANG_EVLIST['enabled'],
-                'field' => 'status', 'sort' => false),
+                'field' => 'status', 'sort' => false,
+                'align' => 'center',
+        ),
         array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false),
+                'field' => 'delete', 'sort' => false,
+                'align' => 'center',
+        ),
     );
 
     $defsort_arr = array('field' => 'name', 'direction' => 'ASC');
@@ -179,7 +185,9 @@ function EVLIST_adminlist_tickettypes()
 
     $header_arr = array(
         array('text' => $LANG_EVLIST['edit'], 
-                'field' => 'edit', 'sort' => false),
+                'field' => 'edit', 'sort' => false,
+                'align' => 'center',
+        ),
         array('text' => $LANG_EVLIST['id'], 
                 'field' => 'id', 'sort' => true),
         array('text' => $LANG_EVLIST['description'], 
@@ -189,7 +197,9 @@ function EVLIST_adminlist_tickettypes()
         array('text' => $LANG_EVLIST['event_pass'],
                 'field' => 'event_pass', 'sort' => false),
         array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false),
+                'field' => 'delete', 'sort' => false,
+                'align' => 'center',
+        ),
     );
 
     $defsort_arr = array('field' => 'id', 'direction' => 'ASC');
@@ -238,7 +248,9 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
         array('text' => $LANG_EVLIST['event_pass'],
                 'field' => 'event_pass', 'sort' => false),
         array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false),
+                'field' => 'delete', 'sort' => false,
+                'align' => 'center',
+        ),
     );
 
     $defsort_arr = array('field' => 'tick_id', 'direction' => 'ASC');
@@ -282,18 +294,26 @@ function EVLIST_admin_list_events()
 
     $header_arr = array(
         array('text' => $LANG_EVLIST['edit'], 
-                'field' => 'edit', 'sort' => false),
+                'field' => 'edit', 'sort' => false,
+                'align' => 'center',
+        ),
         array('text' => $LANG_EVLIST['copy'], 
-                'field' => 'copy', 'sort' => false),
+                'field' => 'copy', 'sort' => false,
+                'align' => 'center',
+        ),
         array('text' => $LANG_EVLIST['id'], 'field' => 'id', 'sort' => true),
         array('text' => $LANG_EVLIST['title'], 
                 'field' => 'title', 'sort' => true),
         array('text' => $LANG_EVLIST['start_date'],
                 'field' => 'date_start1', 'sort' => true),
         array('text' => $LANG_EVLIST['enabled'],
-                'field' => 'status', 'sort' => false),
+                'field' => 'status', 'sort' => false,
+                'align' => 'center',
+        ),
         array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false),
+                'field' => 'delete', 'sort' => false,
+                'align' => 'center',
+        ),
     );
 
     $defsort_arr = array('field' => 'date_start1', 'direction' => 'DESC');
@@ -338,14 +358,23 @@ function EVLIST_admin_list_events()
 */
 function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_SYSTEM;
+
+    static $is_uikit = NULL;
+    if ($is_uikit === NULL)
+        $is_uikit = $_SYSTEM['framework'] == 'uikit' ? true : false;
 
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
                 '/index.php?editcat=x&amp;id=' . $A['id'].
-                '" title="' . $LANG_ADMIN['edit'] . '" />' .
-                $icon_arr['edit'] . '</a>';
+                '" title="' . $LANG_ADMIN['edit'] . '">';
+            if ($is_uikit) {
+                $retval .= '<i class="uk-icon-edit"></i>';
+            } else {
+                $retval .= $icon_arr['edit'];
+            }
+            $retval .= '</a>';
             break;
         case 'status':
             if ($A['status'] == '1') {
@@ -485,20 +514,35 @@ function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_ar
 */
 function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_SYSTEM;
+
+    static $is_uikit = NULL;
+    static $del_icon = NULL;
+    if ($is_uikit === NULL)
+        $is_uikit = $_SYSTEM['framework'] == 'uikit' ? true : false;
 
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?edit=event&amp;eid=' . $A['id'] . 
-                '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '" />' .
-                $icon_arr['edit'] . '</a>';
+                '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '">';
+            if ($is_uikit) {
+                $retval .= '<i class="uk-icon-edit"></i>';
+            } else {
+                $retval .= $icon_arr['edit'];
+            }
+            $retval .= '</a>';
             break;
         case 'copy':
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?clone=x&amp;eid=' . $A['id'] . 
-                '" title="' . $LANG_EVLIST['copy'] . '" />' .
-                $icon_arr['copy'] . '</a>';
+                '" title="' . $LANG_EVLIST['copy'] . '">';
+            if ($is_uikit) {
+                $retval .= '<i class="uk-icon-clone"></i>';
+            } else {
+                $retval .= $icon_arr['copy'];
+            }
+            $retval .= '</a>';
             break;
         case 'title':
             $title = $A['title'];
@@ -521,8 +565,15 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
                 '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
             break;
         case 'delete':
+            if ($del_icon === NULL) {
+                if ($is_uikit) {
+                    $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
+                } else {
+                    $del_icon = $icon_arr['delete'];
+                }
+            }
             $retval = COM_createLink(
-                    $icon_arr['delete'],
+                    $del_icon,
                     EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'],
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
                         'title' => $LANG_ADMIN['delete'],

@@ -253,7 +253,8 @@ table.evlist_month td.monthoff {
     vertical-align: top;
     background-color: #e0e0e0;
 }
-table.evlist_month td.monthtoday {
+table.evlist_month td.monthtoday,
+.day.today {
   /*  background-color: #FFFFFF;*/
 background-color:#FFF7D7;
 }
@@ -669,4 +670,8 @@ div.evPrtDataItem {
 div.evPrtDataItem div.evdata {
     float: inherit;
     margin-left: 100px;
+}
+
+.ev-icon-danger {
+    color:red;
 }

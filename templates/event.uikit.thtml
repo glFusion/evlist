@@ -6,7 +6,7 @@
 
   <div id="evlistEventEditSelect">
     {!if can_edit}
-    <a href="javascript:void(0)" onclick='clickEditButton()' title="Edit"
+    <a href="javascript:void(0)" onclick='clickEditButton()' title="{$LANG_EVLIST['edit']}" data-uk-tooltip
         class="uk-icon-edit"></a>
     <div style="position:relative;display:inline">
       <div id="action_dialog">
@@ -57,7 +57,7 @@
 
     {!if can_subscribe}
     <a href="javascript:void(0)" onclick='clickSubscribeButton()' 
-        title="Subscribe" class="uk-icon-justify uk-icon-calendar">
+        title="Subscribe" class="uk-icon-justify uk-icon-calendar" data-uk-tooltip>
     </a>
     <div style="position:relative;display:inline;">
       <div id="subscribe_dialog">
@@ -92,7 +92,7 @@
     </div>
     {!endif}
     <a href="{pi_url}/event.php?print=x&amp;rp_id={rp_id}" target="_new"
-        title="Print" class="uk-icon-print"></a>
+        title="Print" class="uk-icon-print" data-uk-tooltip></a>
   </div>
 {# End header div #}
 </div>

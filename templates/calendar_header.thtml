@@ -53,13 +53,13 @@
   {!endif}
   <br />
   {!if month_select}
-    <select name="month">
+    <select id="month_sel" name="month">
         {month_select}
     </select>
-    <select name="day">
+    <select id="day_sel" name="day">
         {day_select}
     </select>
-    <select name="year">
+    <select id="year_sel" name="year">
         {year_select}
     </select>
     <select name="view">
@@ -70,10 +70,14 @@
     {!else}
     <input type="submit" name="hdrsubmit" value="Jump" class="lgButton blue" />
     {!endif}
+{!if is_uikit}
+    <i class="uk-icon-calendar" data-uk-tooltip title="{$LANG_EVLIST['click_for_datepicker']}" id="jumpdate_trigger"></i>
+{!else}
     <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
         class="evlistDateTrigger"
         id="jumpdate_trigger"
         />
+{!endif}
     <input type="hidden" name="jumpdate" id="f_jumpdate"
         value="{curdate}" />
     <script type="text/javascript">

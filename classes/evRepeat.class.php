@@ -409,6 +409,9 @@ class evRepeat
         }
 
         $url = $this->Event->Detail->url;
+        if (!empty($url)) {
+            $more_info_link = sprintf($LANG_EVLIST['click_here'], $url);
+        }
         $street = $this->Event->Detail->street;
         $city = $this->Event->Detail->city;
         $province = $this->Event->Detail->province;
@@ -480,7 +483,7 @@ class evRepeat
             'cal_id'        => $this->Event->cal_id,
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
-            'more_info_link' => sprintf($LANG_EVLIST['click_here'], $url),
+            'more_info_link' => $more_info_link,
         ) );
 
         if ($_EV_CONF['enable_rsvp'] == 1 &&

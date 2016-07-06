@@ -31,7 +31,6 @@
 *   English language file for the evList plugin
 *   @package    evlist
 */
-
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
@@ -173,7 +172,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'when'              => 'When',
 'where'             => 'Where',
 'what'              => 'What',
-'click_here'        => '<a href="%s">Click Here</a> for more information',
+'click_here'        => '<a href="%s" %s>Click Here</a> for more information',
 'clk_help'         => 'Click for help',
 'more_info'         => 'More Information',
 'contact_us'        => 'Please <a href="%s">contact us</a> for more information.',
@@ -274,8 +273,9 @@ You may either move existing events to a new calendar, or delete those events.',
     23  => 'There was an error processing your request.',
     24  => 'You have been registered for this event.',
     25  => 'Your registration has been cancelled.',
-    26  => 'Payment is required, click <a href="%s">here</a> to check out',
-    27  => 'This event is full and you have been added to the waiting list',
+    26  => 'Payment is required, click <a href="%s">here</a> to check out.',
+    27  => '%s of your tickets have been added to the waiting list.',
+    28  => 'You have %d tickets remaining.',
     50  => 'Not Paid',
     51  => 'Already Used',
 ),

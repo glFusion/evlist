@@ -410,7 +410,12 @@ class evRepeat
 
         $url = $this->Event->Detail->url;
         if (!empty($url)) {
-            $more_info_link = sprintf($LANG_EVLIST['click_here'], $url);
+            if (strncasecmp($_CONF['site_url'], $url, strlen($_CONF['site_url']))) {
+                $target = 'target="_blank"';
+            } else {
+                $target = '';
+            }
+            $more_info_link = sprintf($LANG_EVLIST['click_here'], $url, $target);
         }
         $street = $this->Event->Detail->street;
         $city = $this->Event->Detail->city;

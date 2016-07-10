@@ -489,6 +489,7 @@ class evRepeat
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
             'more_info_link' => $more_info_link,
+            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         if ($_EV_CONF['enable_rsvp'] == 1 &&

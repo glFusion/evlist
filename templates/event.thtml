@@ -146,8 +146,9 @@
   {!endif}
 
   {!if register_link}
-  <label>{$LANG_EVLIST['signup']}</label>
-  <div id="regdiv" class="evdata" style="margin-top:15px;">
+  <div class="evEventItem">
+    <label>{$LANG_EVLIST['signup']}</label>
+    <div id="regdiv" class="evdata" style="margin-top:15px;">
  
     <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
       <input type="hidden" name="rp_id" value="{rp_id}" />
@@ -178,6 +179,7 @@
       <input type="submit" class="lgButton orange" name="register"
         value="Register" />
     </form>
+    </div>
   </div>
   {!endif}
 

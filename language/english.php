@@ -31,7 +31,6 @@
 *   English language file for the evList plugin
 *   @package    evlist
 */
-
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
@@ -173,12 +172,13 @@ You may either move existing events to a new calendar, or delete those events.',
 'when'              => 'When',
 'where'             => 'Where',
 'what'              => 'What',
-'click_here'        => '<a href="%s">Click Here</a> for more information',
+'click_here'        => '<a href="%s" %s>Click Here</a> for more information',
 'clk_help'         => 'Click for help',
 'more_info'         => 'More Information',
 'contact_us'        => 'Please <a href="%s">contact us</a> for more information.',
 'rem_subject' => "An event reminder from {$_CONF['site_name']}",
 'rem_msg1'  => "You are receiving this event reminder because your address was submitted to {$_CONF['site_name']}.",
+'rem_msg2'  => 'This is a one-time message. You will not receive another message unless you subscribe to other events.',
 'rem_url'   => 'For more information please visit %s',
 'you_are_subscribed' => 'You are subscribed to this event.',
 'topic_all'         => 'All',
@@ -273,8 +273,9 @@ You may either move existing events to a new calendar, or delete those events.',
     23  => 'There was an error processing your request.',
     24  => 'You have been registered for this event.',
     25  => 'Your registration has been cancelled.',
-    26  => 'Payment is required, click <a href="%s">here</a> to check out',
-    27  => 'This event is full and you have been added to the waiting list',
+    26  => 'Payment is required, click <a href="%s">here</a> to check out.',
+    27  => '%s of your tickets have been added to the waiting list.',
+    28  => 'You have %d tickets remaining.',
     50  => 'Not Paid',
     51  => 'Already Used',
 ),
@@ -346,6 +347,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'name'          => 'Name',
 'quantity'      => 'Quantity',
 'all'           => 'All',
+'click_for_datepicker' => 'Click for Date Selector',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

@@ -30,7 +30,7 @@ date_default_timezone_set('UTC');
 function EVLIST_calHeader($year, $month, $day, $view='month', 
     $cat=0, $cal=0, $range=0)
 {
-    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES;
+    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES, $_SYSTEM;
 
     $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('calendar_header', 'calendar_header.thtml');
@@ -93,6 +93,7 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
         'urlfilt_cal' => $cal,
         'urlfilt_cat' => $cat,
         'use_json' => $_EV_CONF['cal_tmpl'] == 'json'? 'true' : '',
+        'is_uikit' => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
     ) );
 
     $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -167,7 +168,7 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
 */
 function EVLIST_calFooter($calendars = '')
 {
-    global $LANG_EVLIST;
+    global $LANG_EVLIST, $_SYSTEM;
 
     $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('calendar_footer', 'calendar_footer.thtml');
@@ -199,6 +200,7 @@ function EVLIST_calFooter($calendars = '')
         'webcal_url'    => $webcal_url,
         'feed_links'    => $rss_links,
         'ical_links'    => $ical_links,
+        'is_uikit' => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
     ) );
 
     $T->parse('output', 'calendar_footer');
@@ -334,7 +336,7 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
 */
 function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_EVLIST;
+    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_SYSTEM;
 
     USES_class_date();
 
@@ -375,7 +377,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     $events = EVLIST_getEvents($today, $today,
             array('cat'=>$cat, 'cal'=>$cal));
     $calendars_used = array();
-    list($allday, $hourly) = EVLIST_getDayViewData($events, $starting_date);
+    list($allday, $hourly) = EVLIST_getDayViewData($events, $today);
 
     // Get allday events
     $alldaycount = count($allday);
@@ -435,67 +437,67 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
         $hourevents = $hourly[$i];
         $numevents = count($hourevents);
-        if ($numevents > 0) {
 
-            for ($j = 1; $j <= $numevents; $j++) {
-                $A = current($hourevents);
+        $T->clear_var('event_entry');
+        for ($j = 1; $j <= $numevents; $j++) {
+            $A = current($hourevents);
 
-                $calendars_used[$A['data']['cal_id']] = array(
+            $calendars_used[$A['data']['cal_id']] = array(
                     'cal_name' => $A['data']['cal_name'],
                     'cal_ena_ical' => $A['data']['cal_ena_ical'],
                     'cal_id' => $A['data']['cal_id'],
                     'fgcolor' => $A['data']['fgcolor'],
                     'bgcolor' => $A['data']['bgcolor'],
-                );
+            );
 
-                if ($A['data']['rp_date_start'] == $starting_date) {
-                    $start_time = date($_CONF['timeonly'],
-                        strtotime($A['data']['rp_date_start'] . ' ' .
-                            $A['time_start']));
-                            //strtotime($A['evt_start'] . ' ' . $A['timestart']));
-                } else {
-                    $start_time = date(
-                        $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
-                        strtotime($A['data']['rp_date_start'] . ' '. 
-                            $A['time_start']));
-                }
-
-                if ($A['data']['rp_date_end'] == $_EV_CONF['today']) {
-                    $end_time = date($_CONF['timeonly'],
-                            strtotime($A['data']['rp_date_end'] . ' ' .
-                                $A['time_end']));
-                } else $end_time = date(
-                        $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
-                        strtotime($A['data']['rp_date_end'] . ' ' . 
-                            $A['time_end']));
-
-                if ($start_time == ' ... ' && $end_time == ' ... ')
-                    $T->set_var('event_time', $LANG_EVLIST['allday']);
-                else
-                    $T->set_var('event_time',
-                        $start_time . ' - ' . $end_time);
-
-               $T->set_var(array(
-                    'delete_imagelink'  => EVLIST_deleteImageLink($A['data'], $token),
-                    'eid'               => $A['data']['rp_ev_id'],
-                    'rp_id'             => $A['data']['rp_id'],
-                    'event_title'       => stripslashes($A['data']['title']),
-                    'event_summary' => htmlspecialchars($A['data']['summary']),
-                    'fgcolor'       => $A['data']['fgcolor'],
-                    'bgcolor'       => '',
-                    'cal_id'        => $A['data']['cal_id'],
-                ) );
-                if ($j < $numevents) {
-                    $T->set_var('br', '<br />');
-                } else {
-                    $T->set_var('br', '');
-                }
-                $T->parse ('event_entry', 'event',
-                                       ($j == 1) ? false : true);
-                next($hourevents);
+            if ($A['data']['rp_date_start'] == $today) {
+                $start_time = date($_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_start'] . ' ' .
+                        $A['time_start']));
+                        //strtotime($A['evt_start'] . ' ' . $A['timestart']));
+            } else {
+                $start_time = date(
+                    $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_start'] . ' '. 
+                        $A['time_start']));
             }
-        } else {
-            $T->set_var('event_entry','&nbsp;');
+
+            if ($A['data']['rp_date_end'] == $today) {
+                $end_time = date($_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_end'] . ' ' .
+                        $A['time_end']));
+            } else {
+                $end_time = date(
+                    $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
+                    strtotime($A['data']['rp_date_end'] . ' ' . 
+                        $A['time_end']));
+            }
+
+            if ($start_time == ' ... ' && $end_time == ' ... ') {
+                $T->set_var('event_time', $LANG_EVLIST['allday']);
+            } else {
+                $T->set_var('event_time',
+                    $start_time . ' - ' . $end_time);
+            }
+
+            $T->set_var(array(
+                'delete_imagelink'  => EVLIST_deleteImageLink($A['data'], $token),
+                'eid'               => $A['data']['rp_ev_id'],
+                'rp_id'             => $A['data']['rp_id'],
+                'event_title'       => stripslashes($A['data']['title']),
+                'event_summary' => htmlspecialchars($A['data']['summary']),
+                'fgcolor'       => $A['data']['fgcolor'],
+                'bgcolor'       => '',
+                'cal_id'        => $A['data']['cal_id'],
+            ) );
+            if ($j < $numevents) {
+                $T->set_var('br', '<br />');
+            } else {
+                $T->set_var('br', '');
+            }
+            $T->parse ('event_entry', 'event',
+                                       ($j == 1) ? false : true);
+            next($hourevents);
         }
         $link = date($_CONF['timeonly'], mktime($i, 0));
 //        if ($_EV_CONF['_can_add']) {
@@ -528,6 +530,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'cal_checkboxes', EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
         'site_slogan'   => $_CONF['site_slogan'],
+        'is_uikit'  => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
     ) );
 
     return $T->parse('output', 'dayview');
@@ -547,7 +550,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST, $_SYSTEM;
 
     USES_class_date();
     EVLIST_setViewSession('week', $year, $month, $day);
@@ -726,6 +729,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'year'          => $year,
         'month'         => $month,
         'day'           => $day,
+        'is_uikit'  => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
     ) );
     $T->parse('output','week');
     return $T->finish($T->get_var('output'));
@@ -745,7 +749,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
 
     EVLIST_setViewSession('month', $year, $month, $day);
 
@@ -855,6 +859,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
                 if (empty($event['title'])) continue;
                 $ev_hover = '';
+                $ev_title = COM_truncate($event['title'], 40, '...');
 
                 // Sanitize fields for display.  No HTML in the popup.
                 $title = htmlentities(strip_tags($event['title']));
@@ -896,7 +901,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     'cal_id_url' => $cal_id,    // calendar requested
                     'cat_id'    => $cat,
                     'ev_hover'  => $ev_hover,
-                    'ev_title'  => $event['title'],
+                    'ev_title'  => $ev_title,
                     'eid'       => $event['rp_id'],
                     'fgcolor'   => $event['fgcolor'],
                     'bgcolor'   => $event['bgcolor'],
@@ -948,6 +953,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'cal_checkboxes' => EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
         'site_slogan'   => $_CONF['site_slogan'],
+        'is_uikit'  => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
     ) );
 
     $T->parse('output', 'monthview');
@@ -969,7 +975,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
 
     EVLIST_setViewSession('year', $year, $month, $day);
 
@@ -1061,7 +1067,13 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                             'nolink-events' : 'day-events';
                     foreach ($events[$daydata] as $event) {
                         // Separate events by a newline if more than one
-                        if (!empty($popup)) $popup .= LB;
+                        if (!empty($popup)) {
+                            if ($_SYSTEM['framework'] == 'uikit') {
+                                // HTML break for UIkit tooltip
+                                 $popup .= '<br />';
+                            }
+                            $popup .= LB;
+                        }
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0) {
                             $dt->setTimestamp(strtotime($event['rp_date_start'] . 

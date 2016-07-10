@@ -18,8 +18,6 @@
     position: absolute;
     right: 0px;
     top: 0px;
-    border: solid;
-    border-width: 1px;
 }
 
 .evlistCalendarDialogClose .legacy {
@@ -75,11 +73,29 @@
     margin-right: 15px;
 }
 
+@media (max-width: 1249px) {
+  #evlistEventDetail {
+    width: 100%;
+  }
+}
+
+/* Large screen and bigger */
+@media (min-width: 1250px) {
+  #evlistEventDetail {
+    min-width: 400px;
+    width: 60%;
+  }
+  div.evdata {
+    max-width: 80%;
+  }
+}
+ 
 #evlistEventDetail {
     clear: both;
     position: relative;
     float: left;
-    min-width: 50%;
+   /* min-width: 300px;
+    width: 60%;*/
 }
 
 #evlistEventDetail div.evEventItem {
@@ -163,7 +179,6 @@ div.evdata {
   /*margin-left: 8em;
   margin-bottom: 8px;*/
   float: left;
-  max-width: 80%;
 }
 
 h2.evlist_header {
@@ -242,7 +257,8 @@ table.evlist_month td.monthoff {
     vertical-align: top;
     background-color: #e0e0e0;
 }
-table.evlist_month td.monthtoday {
+table.evlist_month td.monthtoday,
+.day.today {
   /*  background-color: #FFFFFF;*/
 background-color:#FFF7D7;
 }
@@ -658,4 +674,8 @@ div.evPrtDataItem {
 div.evPrtDataItem div.evdata {
     float: inherit;
     margin-left: 100px;
+}
+
+.ev-icon-danger {
+    color:red;
 }

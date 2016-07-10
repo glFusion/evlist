@@ -164,11 +164,12 @@ $LANG_EVLIST = array(
 'when'             => 'Quand' ,
 'where'                => 'où',
 'what'                => 'CE',
-'click_here' => "<a href=\"%s\">cliquez ici</a> pour plus d'informations",
+'click_here' => "<a href=\"%s\" %s>cliquez ici</a> pour plus d'informations",
 'more_info'             => 'plus d informations',
 'contact_us'            => 'Veuillez <a href="%s">nous contacter< /a> pour plus d informations.',
 'rem_subject'           => "un rappel d événement de {$_CONF['site_name']}",
 'rem_msg1'          => "Vous recevez ce Rappel de l'événement parce que votre adresse a été présenté à {$_CONF['site_name']}.",
+'rem_msg2'  => 'This is a one-time message. You will not receive another message unless you subscribe to other events.',
 
 'rem_url'           => "Pour plus d'informations, consultez %s",
 'you_are_subscribed'        => 'Vous êtes abonné à cet événement. ',
@@ -267,6 +268,7 @@ $LANG_EVLIST = array(
 25              => 'Votre inscription a été annulée. ',
     26  => 'Payment is required, click <a href="%s">here</a> to check out',
     27  => 'This event is full and you have been added to the waiting list',
+    28  => 'You have %d tickets remaining.',
     50  => 'Not Paid',
     51  => 'Already Used',
 ),
@@ -354,6 +356,7 @@ $LANG_EVLIST = array(
 'go' => 'Go',
 'all' => 'All',
 'sel_category' => 'Select Category',
+'click_for_datepicker' => 'Click for Date Selector',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

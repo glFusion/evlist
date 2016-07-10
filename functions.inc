@@ -101,11 +101,6 @@ function USES_evlist_functions()
 function USES_evlist_views()
 {    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
 
-function USES_evlist_class_datecalc()
-{   require_once EVLIST_PI_PATH . '/classes/DateCalc.class.php';
-    //require_once 'Date/Calc.php';
-}
-
 function USES_evlist_class_event()
 {   require_once EVLIST_PI_PATH . '/classes/evEvent.class.php'; }
 
@@ -602,7 +597,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     // If we got this far, we're going to display something as long
     // as there's something to be displayed.
     USES_evlist_functions();
-    USES_evlist_class_datecalc();
+    USES_lglib_class_datecalc();
 
     $retval = '';
     $opts = array(
@@ -713,23 +708,17 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
                 'country'   => $A['country'],
                 'email'     => $email,
                 'phone'     => $A['phone'],
-                'startdate' => 
-                        EVLIST_formattedDate($s_ts1),
-                'enddate' => 
-                        EVLIST_formattedDate($e_ts1),
-                'starttime1' => 
-                        EVLIST_formattedTime($s_ts1),
-                'endtime1' => 
-                        EVLIST_formattedTime($e_ts1),
+                'startdate' => EVLIST_formattedDate($s_ts1),
+                'enddate'   => EVLIST_formattedDate($e_ts1),
+                'starttime1' => EVLIST_formattedTime($s_ts1),
+                'endtime1'  => EVLIST_formattedTime($e_ts1),
             ) );
             if ($A['split'] == 1) {
                 $s_ts2 = strtotime($A['rp_date_start'] . ' ' . $A['rp_time_start2']);
                 $e_ts2= strtotime($A['rp_date_end'] . ' ' . $A['rp_time_end2']);
                 $T->set_var(array(
-                    'starttime2' => 
-                        EVLIST_formattedTime($s_ts2),
-                    'endtime2' => 
-                        EVLIST_formattedTime($e_ts2),
+                    'starttime2' => EVLIST_formattedTime($s_ts2),
+                    'endtime2' => EVLIST_formattedTime($e_ts2),
                 ) );
             } else {
                 $T->set_var(array(
@@ -959,32 +948,14 @@ function plugin_runScheduledTask_evlist()
     if (!EVLIST_isCurrentVersion()) return;
 
     //check if reminders exist
-    $sql = "SELECT 
-            rem.email, rem.eid, rem.uid,
-            det.title, det.summary,
-            rep.rp_date_start, rep.rp_time_start1, rep.rp_time_end1, rep.rp_id,
-            rep.rp_time_start2, rep.rp_time_end2,
-            ev.allday, ev.split,
+    $sql = "SELECT rem.email, rem.eid, rem.uid, rem.name, rem.rp_id,
             u.language
-        FROM 
-            {$_TABLES['evlist_remlookup']} rem,
-            {$_TABLES['evlist_repeat']} rep,
-            {$_TABLES['evlist_events']} ev,
-            {$_TABLES['evlist_detail']} det,
-            {$_TABLES['users']} u
-        WHERE
-            ev.id=rem.eid 
-        AND 
-            rep.rp_id = rem.rp_id
-        AND
-            ev.id=rep.rp_ev_id
-        AND
-            det.det_id = rep.rp_det_id
-        AND
-            u.uid = rem.uid
-        AND
-            rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)
-        ";
+        FROM {$_TABLES['evlist_remlookup']} rem
+        LEFT JOIN {$_TABLES['users']} u
+            ON u.uid = rem.uid
+        LEFT JOIN {$_TABLES['evlist_repeat']} rep
+            ON rep.rp_id = rem.rp_id
+        WHERE rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)";
         // TODO: Figure out sql for recurring event reminders
         /*AND (
             rem.rp_id = 0 AND 
@@ -997,6 +968,14 @@ function plugin_runScheduledTask_evlist()
     }
     
     $now = time();
+    $events = array();
+    USES_evlist_class_repeat();
+
+    $T = new Template(EVLIST_PI_PATH . '/templates/');
+    $T->set_file(array(
+        'msg' => 'reminder_mail.thtml',
+        'addr' => 'address.thtml',
+    ) );
 
     //common variables
     //begin loop
@@ -1005,44 +984,58 @@ function plugin_runScheduledTask_evlist()
         // Load the user's language
         $LANG = plugin_loadlanguage_evlist($A['language']);
 
+        // Load the event instance. May be multiple notifications for
+        // upcoming events, but shouldn't be too many events.
+        if (!isset($events[$A['rp_id']])) {
+            $events[$A['rp_id']] = new evRepeat($A['rp_id']);
+        }
+        $Rp = $events[$A['rp_id']];
         $subject = $LANG['rem_subject'];
-        $msg_top = $LANG['rem_msg1'];
-        //$msg_bot = $LANG['rem_msg3'];
 
         $title = COM_stripslashes($A['title']);
         $summary = COM_stripslashes($A['summary']);
-        $date_start = EVLIST_formattedDate($A['rp_date_start']);
+        $date_start = EVLIST_formattedDate($Rp->date_start1);
         $event_url = EVLIST_URL . '/event.php?eid=' . $A['rp_id'];
         if ($A['allday'] == 1) {
             $times = $LANG['allday'];
         } else {
-            $times = EVLIST_formattedTime($A['rp_time_start1']) . ' - ' .
-                    EVLIST_formattedTime($A['rp_time_end1']);
+            $times = EVLIST_formattedTime($Rp->time_start1) . ' - ' .
+                    EVLIST_formattedTime($Rp->time_end1);
             if ($A['split'] == 1) {
                 $times .= ', ' . EVLIST_formattedTime($A['rp_time_start2']) .
                     ' - ' . EVLIST_formattedTime($A['rp_time_end2']);
             }
         }
 
-        $message = $msg_top . LB . LB;
-        $message .= $LANG['what'] . ': ' . $title . LB;
-        $message .= $LANG['when'] . ': ' . $date_start . ' ' . $times . LB;
-        if (!empty($summary)) {
-            $message .= LB . $summary . LB . LB;
-        }
-        $message .= sprintf($LANG_EVLIST['rem_url'], $event_url) . LB . LB;
+        $T->set_var(array(
+            'lang_what' => $LANG['what'],
+            'lang_when' => $LANG['when'],
+            'lang_where'    => $LANG['where'],
+            'what'      => $Rp->Event->Detail->title,
+            'when'      => $Rp->date_start . ' ' . $times,
+            'location'  => $Rp->Event->Detail->location,
+            'street'    => $Rp->Event->Detail->street,
+            'city'      => $Rp->Event->Detail->city,
+            'province'  => $Rp->Event->Detail->province,
+            'postal'    => $Rp->Event->Detail->postal,
+            'country'   => $Rp->Event->Detail->country,
+            'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
+            'summary'   => COM_stripSlashes($Rp->Event->Detail->summary),
+            'msg1'      => $LANG['rem_msg1'],
+            'msg2'      => $LANG['rem_msg2'],
+        ) );
+        $T->parse('address_info', 'addr', true);
+        $T->parse('output', 'msg');
+        $message = $T->finish($T->get_var('output'));
 
-        $mailto = COM_formatEmailAddress('',$A['email']);
+        $mailto = COM_formatEmailAddress($A['name'], $A['email']);
         //mail reminder
-        COM_mail($mailto, $subject, $message);
+        COM_mail($mailto, $subject, $message, '', true);
 
         //delete reminder
         DB_delete($_TABLES['evlist_remlookup'],
                     array('eid', 'rp_id', 'uid'),
                     array($A['eid'], $A['rp_id'], $A['uid']));
-
-        $A['title'] = '';
-        $A['summary'] = '';
     }
 
     return true;
@@ -1483,7 +1476,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
         // if not the current version, and not in development mode, return
         return $retval;
     }
-    USES_evlist_functions();
 
     //length to be set from admin panels sometime later, or not.
     $length = '96';
@@ -1584,17 +1576,19 @@ function phpblock_evlist_upcoming($A='', $catcal='')
 
             // TODO: displaying summaries in the block will be set from the 
             // admin panels sometime later.
-            $summary = strip_tags(EVLIST_noquotes($ev['summary']));
-            if (strlen($summary) > $length) {
-                $summary = substr($summary, 0, $length) . '...';
+            $summary = COM_truncate(htmlspecialchars(strip_tags(EVLIST_noquotes($ev['summary']))), $length, '...');
+            $title = htmlspecialchars($ev['title']);
+            $tooltip = $title;
+            if (!empty($summary)) {
+                $tooltip .= '::' . $summary;
             }
             $T->set_block('block', 'blkItem', 'bItem');
             $T->set_var(array(
-                'pi_url'    => EVLIST_URL,
                 'rp_id'     => $ev['rp_id'],
-                'title'     => htmlspecialchars($ev['title']),
-                'summary'   => htmlspecialchars($summary),
+                'title'     => $title,
+                'summary'   => $summary,
                 'full_description' => $ev['full_description'],
+                'tooltip'   => $tooltip,
             ) );
             $T->parse('bItem','blkItem', true);
             $count++;
@@ -2042,7 +2036,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 {
     global $_TABLES, $_EV_CONF;
 
-    USES_evlist_class_datecalc();
+    USES_lglib_class_datecalc();
 
     if ($start == '') $start = $_EV_CONF['_today'];
     if ($end == '') $end = $start;
@@ -2083,7 +2077,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             case 'cat':
                 if ($value > 0) {
                     $opt_select .= ', cat.name AS cat_name';
-                    $cat_status .= " AND l.cid = '$value' AND cat.status = 1";
+                    $cat_status = " AND l.cid = '$value' AND cat.status = 1";
                 }
                 break;
             case 'limit':
@@ -2130,15 +2124,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             LEFT JOIN {$_TABLES['evlist_categories']} cat
                 ON cat.id = l.cid 
             WHERE ev.status = 1 
+            AND (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
             AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
-            $cat_status
-            AND (
-                (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
-                OR
-                (rep.rp_date_end >= '$start' AND rep.rp_date_start <= '$start')
-                OR
-                (rep.rp_date_end <= '$end' AND rep.rp_date_start >= '$start')
-            ) " . 
+            $cat_status " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
             COM_getPermSQL('AND', 0, 2, 'cal') . 
             " $opt_where
@@ -2189,7 +2177,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
         return $events;
 
     USES_evlist_class_repeat();
-    USES_evlist_class_datecalc();
+    USES_lglib_class_datecalc();
 
     while ($A = DB_fetchArray($result, false)) {
 

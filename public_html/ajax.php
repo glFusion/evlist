@@ -57,13 +57,15 @@ case 'addreminder':
     $status = array();
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
-    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess()) {
+    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess(2)) {
+        $username = COM_getDisplayName($_GET['uid']);
         $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
-            (eid, rp_id, uid, email, days_notice)
+            (eid, rp_id, uid, name, email, days_notice)
         VALUES (
             '{$Ev->Event->id}', 
             '{$Ev->rp_id}', 
             '" . (int)$_USER['uid']. "',
+            '" . DB_escapeString($username) . "',
             '" . DB_escapeString($_GET['rem_email']) . "',
             '" . (int)$_GET['notice']. "')";
         //COM_errorLog($sql);

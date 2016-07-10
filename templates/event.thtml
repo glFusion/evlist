@@ -82,14 +82,12 @@
   </div>
 </div>
 
-<div> 
 <div id="evlistEventDetail">
 {# event detail elements #}
-  <div style="margin-top:2em;"></div>
 
   {!if summary}
   <div class="evEventItem">
-    <label class="uk-hidden-small">{$LANG_EVLIST['what']}:</label>
+    <label>{$LANG_EVLIST['what']}:</label>
     <div class="evdata" id="what">
       {summary}
     </div>
@@ -113,10 +111,15 @@
     <label>{$LANG_EVLIST['where']}:</label>
     <div class="evdata" id="where">
       {address_info}
-      {!if url}
-        <br /> 
-        {$LANG_EVLIST['more_info']}: <a href="{url}" target="_blank">{$LANG_EVLIST['click_here']}</a>
-      {!endif}
+    </div>
+  </div>
+  {!endif}
+
+  {!if more_info_link}
+  <div class="evEventItem">
+    <label>&nbsp;</label>
+    <div class="evdata">
+      {more_info_link}
     </div>
   </div>
   {!endif}
@@ -125,72 +128,67 @@
   <div class="evEventItem">
     <label>{$LANG_EVLIST['ev_contact']}:</label>
     <div class="evdata" id="contact">
-    {contact_info}
+      {contact_info}
     </div>
   </div>
   {!endif}
 
   <div class="evEventItem">
     <label>{$LANG_EVLIST['calendar']}</label>
-    <div class="evdata" id="calendar">{cal_name}</div>
+    <div class="evdata">{cal_name}</div>
   </div>
 
   {!if category_link}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['categories']}</label>
     <div class="evdata" id="categories">{category_link}</div>
   </div>
   {!endif}
 
-{!if 0}
-  <input type="button" class="lgButton orange"
-    name="addcartitem" value="Registration" onclick="EV_toggleRegDiv();" />
-{!endif}
-
   {!if register_link}
   <label>{$LANG_EVLIST['signup']}</label>
   <div id="regdiv" class="evdata" style="margin-top:15px;">
  
-  <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
-    <input type="hidden" name="rp_id" value="{rp_id}" />
-    {$LANG_EVLIST['quantity']}:
-    {!if register_unltd}
-    <input type="text" size="3" name="tick_count" value="1" />
-    {!elseif register_multi}
-    <select name="tick_count">
-      <!-- BEGIN tickCntBlk -->
-      <option value="{tick_cnt}">{tick_cnt}</option>
-      <!-- END tickCntBlk -->
-    </select>
-    {!else}
+    <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
+      <input type="hidden" name="rp_id" value="{rp_id}" />
+      {$LANG_EVLIST['quantity']}:
+      {!if register_unltd}
+      <input type="text" size="3" name="tick_count" value="1" />
+      {!elseif register_multi}
+      <select name="tick_count">
+        <!-- BEGIN tickCntBlk -->
+        <option value="{tick_cnt}">{tick_cnt}</option>
+        <!-- END tickCntBlk -->
+      </select>
+      {!else}
       <input type="hidden" name="tick_count" value="1" />1
-    {!endif}
+      {!endif}
 
-    {!if ticket_types_multi}
-    <select name="tick_type">
-      <!-- BEGIN tickTypeBlk -->
-      <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
-      <!-- END tickTypeBlk -->
-    </select>
-    {!else}
-    <input type="hidden" name="tick_type" value="{tick_type}" />
-    {tick_descr} - {tick_fee}
-    {!endif}
+      {!if ticket_types_multi}
+      <select name="tick_type">
+        <!-- BEGIN tickTypeBlk -->
+        <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
+        <!-- END tickTypeBlk -->
+      </select>
+      {!else}
+      <input type="hidden" name="tick_type" value="{tick_type}" />
+      {tick_descr} - {tick_fee}
+      {!endif}
 
-    <input type="submit" class="lgButton orange" name="register"
+      <input type="submit" class="lgButton orange" name="register"
         value="Register" />
-  </form>
+    </form>
   </div>
   {!endif}
 
   {!if login_to_register}
-    <div>
+  <div clas="evEventItem">
     <span class="info">{$LANG_EVLIST['login_to_register']}</span>
-    </div>
+  </div>
   {!endif}
 
   {!if is_registered}
-  <div>
+  <div class="evEventItem">
     <div class="evdata">
         Your Regisrations:<br />
       <!-- BEGIN regBlock -->
@@ -201,7 +199,7 @@
   {!endif}
 
   {!if unregister_link}
-  <div class="evdata">
+  <div class="evEventItem">
     {$LANG_EVLIST['cancel_free']}<br />
         <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
         <input type="hidden" name="rp_id" value="{rp_id}" />
@@ -210,8 +208,11 @@
         </form>
   </div>
   {!endif}
+
   {!if have_tickets}
-    <p><a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a></p>
+  <div class="evEventItem">
+    <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
+  </div>
   {!endif}
 
   {!if show_reminderform}
@@ -249,21 +250,19 @@
 
 </div>
 
-  {!if map}
-    <div id="evlistMapOuter">
-    {map}
-    <div id="directions">
-      <form action="http://maps.google.com/maps" method="GET" target="_blank">
-        <input onfocus="this.value='';" type="text" size="40" maxlength="40"
+{!if map}
+<div id="evlistMapOuter">
+  {map}
+  <div id="directions">
+    <form action="http://maps.google.com/maps" method="GET" target="_blank">
+      <input onfocus="this.value='';" type="text" size="40" maxlength="40"
         name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
-        <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
-        <input type="hidden" name="daddr" value="{lat},{lng}" />
-      </form>
-    </div>
-    </div>
-  {!endif}
-
+      <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
+      <input type="hidden" name="daddr" value="{lat},{lng}" />
+    </form>
+  </div>
 </div>
+{!endif}
 
 <div style="clear:both;margin-top:1em;">
   <div style="margin-bottom:1em;">

@@ -49,9 +49,14 @@
 </div>
 
 <div id="evlistCalendarPrintLink">
-  <p><a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print"><img 
-        src="{layout_url}/images/print.png" alt="Print" 
-        width="16" height="16" /></a>
+  <p>
+    <a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print">
+{!if is_uikit}
+      <i class="uk-icon uk-icon-print"></i>
+{!else}
+      <img src="{layout_url}/images/print.png" alt="Print" width="16" height="16" />
+{!endif}
+    </a>
   </p>
 </div>
 <div id="evlistCalendarFooter">

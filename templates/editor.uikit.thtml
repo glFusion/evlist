@@ -1,12 +1,6 @@
 {# begin {templatelocation} #}
 <script type="text/javascript">
-<!--
-{!if mootools}
-window.addEvent('domready',function() {
-    var myValidator = new fValidator("eventeditor");
-{!else}
 $(document).ready(function() {
-{!endif}
     toggleRSVPdetail({use_rsvp});
     showhiderecurringoptions();
     showhideformatoptions({format_opt});
@@ -512,8 +506,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
-            id="startdt1_trigger" class="evDatePicker" />
+          <i class="uk-icon uk-icon-calendar" id="startdt1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
           <input type="text" name="date_start1" id="f_startdate1"
               size="10" value="{startdate1}"
               onchange="checkDate1();" />
@@ -539,8 +532,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div style="uk-form-controls">
-          <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
-            id="enddate1_trigger" class="evDatePicker" />
+          <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
           <input type="text" name="date_end1" id="f_enddate1" 
             size="10" value="{enddate1}" onchange="checkDate2();" />
           &nbsp;&nbsp;
@@ -1027,18 +1019,26 @@ function toggleRSVPdetail(val)
            onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
     </p>
 
-    <div class="uk-margin-right-small uk-hidden-small tm-admin-save uk-scrollspy-init-inview uk-scrollspy-inview uk-animation-slide-bottom" data-uk-scrollspy="{cls:'uk-Xanimation-slide-bottom', delay:900}">
+    <div class="uk-margin-right-small uk-hidden-small tm-admin-save" data-uk-scrollspy="{cls:'uk-animation-slide-bottom', delay:900}">
       <ul>
         <li>
-          <button class="uk-button uk-button-success tm-admin-save-button-width" type="submit" value="{$LANG_ADMIN['save']}" name="saveevent" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['save']}"><i class="uk-icon-save"></i></button>
+          <button class="uk-button uk-button-success tm-admin-save-button-width" type="submit" value="{$LANG_ADMIN['save']}" name="{saveaction}" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['save']}">
+            <i class="uk-icon-save"></i>
+          </button>
         </li>
         <li>
-          <button class="uk-button uk-button-primary tm-admin-save-button-width" type="submit" value="{$LANG_ADMIN['cancel']" name="cancel" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['cancel']}"
-            onclick="javascript: document.location.href='{cancel_url}'" /><i class="uk-icon-undo"></i></button>
+          <button class="uk-button uk-button-primary tm-admin-save-button-width" type="reset" value="{$LANG_ADMIN['reset']" name="reset" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['cancel']}"
+           onclick="javascript: document.location.href='{cancel_url}'" />
+            <i class="uk-icon-undo"></i>
+          </button>
         </li>
+{!if del_button}
         <li>
-          <button class="uk-button uk-button-danger tm-admin-save-button-width" type="submit" onclick="return confirm('Are you sure you want to delete this item?');" name="delevent" value="{$LANG_ADMIN['delete']}" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['delete']}"><i class="uk-icon-eraser"></i></button>
+          <button class="uk-button uk-button-danger tm-admin-save-button-width" type="submit" onclick="return confirm('Are you sure you want to delete this item?');" name="delevent" value="{$LANG_ADMIN['delete']}" name="{delaction}" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['delete']}">
+            <i class="uk-icon-eraser"></i>
+          </button>
         </li>
+{!endif}
       </ul>
     </div>
 

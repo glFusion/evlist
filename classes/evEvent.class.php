@@ -11,7 +11,7 @@
  *  @filesource
  */
 
-USES_evlist_class_datecalc();
+USES_lglib_class_datecalc();
 USES_evlist_class_detail();
 USES_evlist_class_calendar();
 USES_evlist_functions();
@@ -787,7 +787,7 @@ class evEvent
             $this->SetVars($_POST);
 
             // Make sure the current user has access to this event.
-            if (!$this->hasAccess()) COM_404();
+            if (!$this->hasAccess(3)) COM_404();
 
         }
 
@@ -807,7 +807,7 @@ class evEvent
 
         if ($rp_id > 0) {
             // Make sure the current user has access to this event.
-            if (!$this->hasAccess()) COM_404();
+            if (!$this->hasAccess(3)) COM_404();
 
             if ($saveaction == 'savefuturerepeat') {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_future'],
@@ -1512,7 +1512,6 @@ class evEvent
                     $this->perm_members, $this->perm_anon);
 
         return $access >= $level ? true : false;
-
     }
 
 

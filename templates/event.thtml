@@ -88,7 +88,7 @@
   <div style="margin-top:2em;"></div>
 
   {!if summary}
-  <div>
+  <div class="evEventItem">
     <label class="uk-hidden-small">{$LANG_EVLIST['what']}:</label>
     <div class="evdata" id="what">
       {summary}
@@ -97,7 +97,7 @@
   {!endif}
 
   {!if datetime_info}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['when']}:</label>
     <div class="evdata" id="when">
       {datetime_info}
@@ -109,7 +109,7 @@
   {!endif}
 
   {!if address_info}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['where']}:</label>
     <div class="evdata" id="where">
       {address_info}
@@ -122,7 +122,7 @@
   {!endif}
 
   {!if contact_info}
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['ev_contact']}:</label>
     <div class="evdata" id="contact">
     {contact_info}
@@ -130,7 +130,7 @@
   </div>
   {!endif}
 
-  <div>
+  <div class="evEventItem">
     <label>{$LANG_EVLIST['calendar']}</label>
     <div class="evdata" id="calendar">{cal_name}</div>
   </div>

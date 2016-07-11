@@ -30,7 +30,7 @@ date_default_timezone_set('UTC');
 function EVLIST_calHeader($year, $month, $day, $view='month', 
     $cat=0, $cal=0, $range=0)
 {
-    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES, $_SYSTEM;
+    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES;
 
     $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('calendar_header', 'calendar_header.thtml');
@@ -93,7 +93,7 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
         'urlfilt_cal' => $cal,
         'urlfilt_cat' => $cat,
         'use_json' => $_EV_CONF['cal_tmpl'] == 'json'? 'true' : '',
-        'is_uikit' => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
+        'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
     ) );
 
     $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -168,7 +168,7 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
 */
 function EVLIST_calFooter($calendars = '')
 {
-    global $LANG_EVLIST, $_SYSTEM;
+    global $LANG_EVLIST, $_EV_CONF;
 
     $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('calendar_footer', 'calendar_footer.thtml');
@@ -200,7 +200,7 @@ function EVLIST_calFooter($calendars = '')
         'webcal_url'    => $webcal_url,
         'feed_links'    => $rss_links,
         'ical_links'    => $ical_links,
-        'is_uikit' => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
+        'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
     ) );
 
     $T->parse('output', 'calendar_footer');
@@ -336,7 +336,7 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
 */
 function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_SYSTEM;
+    global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH;
 
     USES_class_date();
 
@@ -530,7 +530,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'cal_checkboxes', EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
         'site_slogan'   => $_CONF['site_slogan'],
-        'is_uikit'  => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
+        'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
     ) );
 
     return $T->parse('output', 'dayview');
@@ -550,7 +550,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST, $_SYSTEM;
+    global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST;
 
     USES_class_date();
     EVLIST_setViewSession('week', $year, $month, $day);
@@ -729,7 +729,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'year'          => $year,
         'month'         => $month,
         'day'           => $day,
-        'is_uikit'  => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
+        'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
     ) );
     $T->parse('output','week');
     return $T->finish($T->get_var('output'));
@@ -749,7 +749,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
+    global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     EVLIST_setViewSession('month', $year, $month, $day);
 
@@ -953,7 +953,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'cal_checkboxes' => EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
         'site_slogan'   => $_CONF['site_slogan'],
-        'is_uikit'  => $_SYSTEM['framework'] == 'uikit' ? 'true' : '',
+        'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
     ) );
 
     $T->parse('output', 'monthview');
@@ -975,7 +975,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
+    global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     EVLIST_setViewSession('year', $year, $month, $day);
 
@@ -1068,11 +1068,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     foreach ($events[$daydata] as $event) {
                         // Separate events by a newline if more than one
                         if (!empty($popup)) {
-                            if ($_SYSTEM['framework'] == 'uikit') {
-                                // HTML break for UIkit tooltip
-                                 $popup .= '<br />';
-                            }
-                            $popup .= LB;
+                            $popup .= EVLIST_tooltip_newline();
                         }
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0) {

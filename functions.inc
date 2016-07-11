@@ -83,6 +83,10 @@ if ($_CONF['loginrequired'] == 1) {
     $_EV_CONF['allow_anon_view'] = '0';
 }
 
+// Mark whether this is a uikit theme. Save to global conf var
+// so it's available where needed.
+$_EV_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikie' ? true : false;
+
 // Include the user's language file, if found.  Default to englsh.
 $langpath = EVLIST_PI_PATH . '/language';
 $langfile = $_CONF['language'] . '.php';
@@ -740,6 +744,8 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 
 /**
 *   Change ownership of user events when the user is deleted.
+*
+*   @param  integer $uid    ID of user being deleted
 */
 function plugin_user_delete_evlist($uid)
 {
@@ -1589,6 +1595,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
                 'summary'   => $summary,
                 'full_description' => $ev['full_description'],
                 'tooltip'   => $tooltip,
+                'url' => $_CONF['site_url'] . "/evlist/event.php?eid={rp_id}",
             ) );
             $T->parse('bItem','blkItem', true);
             $count++;
@@ -2331,9 +2338,9 @@ function EVLIST_canSubmit()
 */
 function EVLIST_tooltip_newline()
 {
-    global $_SYSTEM;
+    global $_EV_CONF;
 
-    if ($_SYSTEM['framework'] == 'uikit') {
+    if ($_EV_CONF['_is_uikit']) {
         return '<br />' . LB;
     } else {
         return LB;

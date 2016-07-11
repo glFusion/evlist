@@ -358,18 +358,14 @@ function EVLIST_admin_list_events()
 */
 function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_SYSTEM;
-
-    static $is_uikit = NULL;
-    if ($is_uikit === NULL)
-        $is_uikit = $_SYSTEM['framework'] == 'uikit' ? true : false;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
                 '/index.php?editcat=x&amp;id=' . $A['id'].
                 '" title="' . $LANG_ADMIN['edit'] . '">';
-            if ($is_uikit) {
+            if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-edit"></i>';
             } else {
                 $retval .= $icon_arr['edit'];
@@ -514,19 +510,16 @@ function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_ar
 */
 function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_SYSTEM;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
-    static $is_uikit = NULL;
     static $del_icon = NULL;
-    if ($is_uikit === NULL)
-        $is_uikit = $_SYSTEM['framework'] == 'uikit' ? true : false;
 
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?edit=event&amp;eid=' . $A['id'] . 
                 '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '">';
-            if ($is_uikit) {
+            if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-edit"></i>';
             } else {
                 $retval .= $icon_arr['edit'];
@@ -537,7 +530,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?clone=x&amp;eid=' . $A['id'] . 
                 '" title="' . $LANG_EVLIST['copy'] . '">';
-            if ($is_uikit) {
+            if ($_EV_CONF['is_uikid']) {
                 $retval .= '<i class="uk-icon-clone"></i>';
             } else {
                 $retval .= $icon_arr['copy'];
@@ -566,7 +559,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             break;
         case 'delete':
             if ($del_icon === NULL) {
-                if ($is_uikit) {
+                if ($_EV_CONF['_is_uikit']) {
                     $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
                 } else {
                     $del_icon = $icon_arr['delete'];

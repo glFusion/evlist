@@ -312,8 +312,7 @@ class evRepeat
     */
     public function Render($rp_id=0, $query='', $tpl='')
     {
-        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK,
-                $_SYSTEM;
+        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK;
 
         $retval = '';
 
@@ -339,11 +338,13 @@ class evRepeat
         //update hit count
         evlist_hit($this->ev_id);
 
+        // Print or other template modifier can be passed in. For display
+        // check if this is a uikit theme
         $template = 'event';
         if (!empty($tpl)) {
             $template .= '_' . $tpl;
         } else {
-            $template .= $_SYSTEM['framework'] == 'uikit' ? '.uikit' : '';
+            $template .= $_EV_CONF['_is_uikit'] ? '.uikit' : '';
         }
         $T = new Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
@@ -408,6 +409,8 @@ class evRepeat
             } 
         }
 
+        // Get the link to more info. If it's an external link, target a
+        // new browser window.
         $url = $this->Event->Detail->url;
         if (!empty($url)) {
             if (strncasecmp($_CONF['site_url'], $url, strlen($_CONF['site_url']))) {
@@ -416,6 +419,8 @@ class evRepeat
                 $target = '';
             }
             $more_info_link = sprintf($LANG_EVLIST['click_here'], $url, $target);
+        } else {
+            $more_info_link = '';
         }
         $street = $this->Event->Detail->street;
         $city = $this->Event->Detail->city;

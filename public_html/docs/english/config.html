@@ -1,253 +1,195 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
-  <link href="../../../docs/docstyle.css" type="text/css" rel="stylesheet" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon-precomposed" href="../../layout/cms/images/apple-touch-icon.png">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.26.3/css/uikit.almost-flat.min.css">
   <meta name="robots" content="noindex,nofollow" />
-  <title>EVList Plugin - glFusion CMS</title>
+  <title>glFusion Paypal Plugin Configuration</title>
+  <style>
+    html{background:#f9f9f9}.tm-dropdown,.tm-navbar{background:#325482!important}.uk-form label{font-weight:700}.tm-navbar{border-radius:0!important;padding:1px 0 6px!important;border:none!important}.tm-navbar-brand{color:#eee!important}.tm-navbar-brand a{text-shadow:none;color:#fff}.tm-navbar-brand a:hover{color:#ababab;text-decoration:none}.tm-navbar-brand-oc a{text-shadow:none;color:#fff}.tm-navbar-brand-oc a:hover{color:#ababab;text-decoration:none}.tm-navbar-nav>li>a{border:none;border-radius:3px!important;font-size:15px!important;height:40px!important;margin:0!important}.tm-dropdown{color:#000;border-radius:0!important;border:0!important}.tm-nav-navbar>li>a{color:#fff!important}.tm-navbar::after,.tm-navbar::before{margin-top:7px!important}.tm-navbar-nav>li.uk-open>a,.tm-navbar-nav>li:hover>a,.tm-navbar-nav>li>a:focus{color:#fff;outline:0;background:#35B3EE!important}.tm-navbar-nav>li>a{color:#fff!important;text-shadow:none!important}.tm-navbar-toggle{color:#ccc!important;text-shadow:none!important}.tm-navbar-toggle:focus,.tm-navbar-toggle:hover{color:#fff!important}.tm-footer{background:#252525;border-top:1px solid #232425;margin-bottom:0;bottom:0;padding:10px;color:#fff}.tm-wrapper{min-height:100%;margin:0 auto -51px!important}.tm-push,footer{height:51px}.uk-navbar-content > a {color:#fff !important;}
+  </style>
 </head>
 
-<body style="direction: ltr;">
-<div id="gl_container_fluid">
-  <div id="gl_header"><span style="color: rgb(255, 255, 255); float: left; padding-left: 10px; padding-top: 5px; vertical-align: middle;">glFusion Documentation Project
-  </span><a style="float: right; padding-right: 10px; padding-top: 5px; vertical-align: middle;" href="http://www.glfusion.org/wiki/doku.php">glFusion Wiki</a>
-</div>
-<div id="gl_wrapper">
-<div class="body-container">
-<h1><a name="memb_plugin" id="memb_plugin">EVList Plugin</a></h1>
+<body class="uk-height-1-1">
+  <div class="tm-wrapper">
+    <nav class="uk-navbar uk-navbar-attached tm-navbar uk-margin-bottom">
+      <div class="uk-navbar-brand tm-navbar-brand">
+        glFusion evList Plugin Configuration
+      </div>
+      <div class="uk-navbar-flip uk-hidden-small">
+        <div class="uk-navbar-content tm-navbar-content" style="text-shadow:none;">
+          <a href="https://www.glfusion.org/wiki/">glFusion Wiki</a>
+        </div>
+      </div>
+    </nav>
 
-<div class="level1">
-<p>The EVList Plugin provides an event calendar</p>
-<h1><a name="evlist_plugin_configuration_options" id="evlist_plugin_configuration_options">EVList Plugin Configuration Options</a></h1>
+    <div class="uk-container uk-container-center uk-margin-bottom">
+      <h1>glFusion evList Plugin Configuration</h1>
 
-<table class="inline">
-  <tbody>
-    <tr>
-      <th class="col0 leftalign" colspan="2">Main Settings</th>
-    </tr>
+      <h2>Main Options</h2>
 
-    <tr class="row0">
-      <th class="col0 leftalign">Option </th>
-      <th class="col1 leftalign">Description </th>
-    </tr>
-
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_allow_anon_view"></a>
-        Allow Anonymous View?</td>
-      <td class="col1 leftalign">
+      <dl id="desc_allow_anon_view">
+        <dt>Allow Anonymous View?</dt>
+        <dd>
         Select whether anonymous visitors can view the calendar. Note that permissions can be restricted for each event as well.
-      </td>
-    </tr>
+        </dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_can_add"></a>Who can add events</td>
-      <td class="col1 leftalign">
+      <dl id="desc_can_add">
+        <dt>Who can add events</dt>
+        <dd>
         Select Users, Anonymous, or both as the user group that can create events.
-      </td>
-    </tr>
+        </dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_allow_html"></a>Allow HTML in events?</td>
-      <td class="col1 leftalign">
-        Select whether HTML code can be added to event descriptions.
-      </td>
-    </tr>
+      <dl id="desc_allow_html">
+        <dt>Allow HTML in events?</dt>
+        <dd>
+          Select whether HTML code can be added to event descriptions.
+        </dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_usermenu_option"></a>Show on user menu?</td>
-      <td class="col1 leftalign">
-        Select the link that will be added to the user menu, if any.
-      </td>
-    </tr>
+      <dl id="desc_usermenu_option">
+        <dt>Show on user menu?</dt>
+        <dd>
+          Select the link that will be added to the user menu, if any.
+        </dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_enable_menuitem"></a>Enable Main Menu?</td>
-      <td class="col1 leftalign">
-        Select whether a link to EVList will be available from any navigation menu. Also adds the entry to the &quot;Extras&quot; menu.
-      </td>
-    </tr>
+      <dl id="desc_enable_menuitem">
+        <dt>Enable Main Menu?</dt>
+        <dd>Select whether a link to EVList will be available from any navigation menu. Also adds the entry to the &quot;Extras&quot; menu.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_enable_categories"></a>
-        Enable categories?</td>
-      <td class="col1 leftalign">
-        Select whether event categories will be used.
-      </td>
-    </tr>
+      <dl id="desc_enable_categories">
+        <dt>Enable categories?</dt>
+        <dd>Select whether event categories will be used.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_enable_centerblock"></a>
-        Enable Centerblock?</td>
-      <td class="col1 leftalign">
-        Select whether the upcoming event list will be shown in the centerblock.
-      </td>
-    </tr>
+      <dl id="desc_enable_centerblock">
+        <dt>Enable Centerblock?</dt>
+        <dd>Select whether the upcoming event list will be shown in the centerblock.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_pos_centerblock"></a>
-        Centerblock Position</td>
-      <td class="col1 leftalign">
-        Select the position of the centerblock, if used.
-      </td>
-    </tr>
+      <dl id="desc_pos_centerblock">
+        <dt>Centerblock Position</dt>
+        <dd>Select the position of the centerblock, if used.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_topic_centerblock"></a>
-        Centerblock Topic</td>
-      <td class="col1 leftalign">
-        Select which topic will display the centerblock.
-      </td>
-    </tr>
+      <dl id="desc_topic_centerblock">
+        <dt>Centerblock Topic</dt>
+        <dd>Select which topic will display the centerblock.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_range_centerblock"></a>
-        Centerblock Range</td>
-      <td class="col1 leftalign">
-        Select the range of events that will be shown in the centerblock.
-      </td>
-    </tr>
+      <dl id="desc_range_centerblock">
+        <dt>Centerblock Range</dt>
+        <dd>Select the range of events that will be shown in the centerblock.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_limit_list"></a>
-        Events to show in list</td>
-      <td class="col1 leftalign">
-        Enter the maximum number of events to be shown in list views.
-      </td>
-    </tr>
+      <dl id="desc_limit_list">
+        <dt>Events to show in list</dt>
+        <dd>Enter the maximum number of events to be shown in list views.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_limit_block"></a>
-        Events to show in blocks</td>
-      <td class="col1 leftalign">
-        Enter the maximum number of events to be shown in blocks.
-      </td>
-    </tr>
+      <dl id="desc_limit_block">
+        <dt>Events to show in blocks</dt>
+        <dd>Enter the maximum number of events to be shown in blocks.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_limit_summary"></a>
-        Characters to show in summaries</td>
-      <td class="col1 leftalign">
-        Enter the maximum number of characters to show in event summaries.
-      </td>
-    </tr>
+      <dl id="desc_limit_summary">
+        <dt>Characters to show in summaries</dt>
+        <dd>Enter the maximum number of characters to show in event summaries.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_enable_reminders"></a>
-        Enable Reminders?</td>
-      <td class="col1 leftalign">
-        Select whether to allow visitors to enter their email address to receive a reminder of upcoming events.
-      </td>
-    </tr>
+      <dl id="desc_enable_reminders">
+        <dt>Enable Reminders?</dt>
+        <dd>Select whether to allow visitors to enter their email address to receive a reminder of upcoming events.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_event_passing"></a>
-        When has an event passed?</td>
-      <td class="col1 leftalign">
-        Select the date/time when an event is considered to have passed for purposes of displaying upcoming events.
-      </td>
-    </tr>
+      <dl id="desc_event_passing">
+        <dt>When has an event passed?</dt>
+        <dd>Select the date/time when an event is considered to have passed for purposes of displaying upcoming events.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_default_permissions"></a>
-        Default permissions</td>
-      <td class="col1 leftalign">
-        Select the permissions to be applied to new events by default. These may be overridden when the event is created or edited.
-      </td>
-    </tr>
+      <dl id="desc_default_permissions">
+        <dt>Default permissions</dt>
+        <dd>Select the permissions to be applied to new events by default. These may be overridden when the event is created or edited.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_reminder_speedlimit"></a>
-        Reminder Speedlimit</td>
-      <td class="col1 leftalign">
-        Enter the number of seconds that must pass between reminder email address submissions.
-      </td>
-    </tr>
+      <dl id="desc_reminder_speedlimit">
+        <dt>Reminder Speedlimit</dt>
+        <dd>Enter the number of seconds that must pass between reminder email address submissions.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_post_speedlimit"></a>
-        Posting Speedlimit</td>
-      <td class="col1 leftalign">
-        Enter the number of seconds that must pass between event submissions.
-    </tr>
+      <dl id="desc_post_speedlimit">
+        <dt>Posting Speedlimit</dt>
+        <dd>Enter the number of seconds that must pass between event submissions.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_reminder_days"></a>
-        Minimum Reminder Days</td>
-      <td class="col1 leftalign">
-        Enter the minimum number of days before an event that a reminder can be sent.
-      </td>
-    </tr>
+      <dl id="desc_reminder_days">
+        <dt>Minimum Reminder Days</dt>
+        <dd>Enter the minimum number of days before an event that a reminder can be sent.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_displayblocks"></a>
-        Display glFusion blocks?</td>
-      <td class="col1 leftalign">
-        Select which glFusion blocks will be displayed along with event listing or calendar views.
-      </td>
-    </tr>
+      <dl id="desc_displayblocks">
+        <dt>Display glFusion blocks?</dt>
+        <dd>Select which glFusion blocks will be displayed along with event listing or calendar views.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_default_view"></a>
-        Default View</td>
-      <td class="col1 leftalign">
-        Select the view to be shown by default upon visiting the main EVList page.
-      </td>
-    </tr>
+      <dl id="desc_default_view">
+        <dt>Default View</dt>
+        <dd>Select the view to be shown by default upon visiting the main EVList page.</dt>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_max_upcoming_days"></a>
-        Max days for Upcoming Events</td>
-      <td class="col1 leftalign">
-        Enter the maximum days in the future for events to be displayed in &quot;upcoming events&quot; blocks.
-      </td>
-    </tr>
+      <dl id="desc_max_upcoming_days">
+        <dt>Max days for Upcoming Events</dt>
+        <dd>Enter the maximum days in the future for events to be displayed in &quot;upcoming events&quot; blocks.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_use_locator"></a>
-        Use Locator Plugin?</td>
-      <td class="col1 leftalign">
-        If the Locator plugin is installed, it can be used to determine the locaiton of events, proviee a dropdown list of event locations, and display a map along with the event. Select whether this integration will be used.<br />
-        If the Locator plugin is not installed this option has no effect.
-      </td>
-    </tr>
+      <dl id="desc_use_locator">
+        <dd>Use Locator Plugin?</dt>
+        <dd>If the Locator plugin is installed, it can be used to determine the locaiton of events, proviee a dropdown list of event locations, and display a map along with the event. Select whether this integration will be used.<br />
+        If the Locator plugin is not installed this option has no effect.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_use_weather"></a>
-        Use Weather Plugin?</td>
-      <td class="col1 leftalign">
-        If the Weather plugin is installed it can display a weather forecast for the event location. If it is not installed this option has no effect.
-      </td>
-    </tr>
+      <dl id="desc_use_weather">
+        <dt>Use Weather Plugin?</dt>
+        <dd>If the Weather plugin is installed it can display a weather forecast for the event location. If it is not installed this option has no effect.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_cal_tmpl"></a>
-        Calendar Template</td>
-      <td class="col1 leftalign">
-        Select whether to use the original HTML calendars or the new JSON AJAX-enabled calendars. JSON is recommended unless you experience issues with it.
-      </td>
-    </tr>
+      <dl id="desc_cal_tmpl">
+        <dt>Calendar Template</dt>
+        <dd>Select whether to use the original HTML calendars or the new JSON AJAX-enabled calendars. JSON is recommended unless you experience issues with it.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_enable_rsvp"></a>
-        Enable Registrations</td>
-      <td class="col1 leftalign">
-        Select whether users are alowed to sign up for events. Tickets are created for each signup.
-      </td>
-    </tr>
+      <dl id="desc_enable_rsvp">
+        <dt>Enable Registrations</dt>
+        <dd>Select whether users are alowed to sign up for events. Tickets are created for each signup.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_rsvp_print"></a>Enable Ticket Printing<td>
-      <td class="col1 leftalign">
-        Select whether users can print their own paid or unpaid event tickets. If you enable registrations but do not actually use tickets you can turn this off.
-      </td>
-    </tr>
+      <dl id="desc_rsvp_print">
+        <dt>Enable Ticket Printing</dt>
+        <dd>Select whether users can print their own paid or unpaid event tickets. If you enable registrations but do not actually use tickets you can turn this off.</dd>
+      </dl>
 
-   </tbody>
-</table>
-<p></p>
-</div>
-</div>
-</div>
-</div>
+      <dl id="desc_meetup_key">
+        <dt>Meetup API Key</dt>
+        <dd>Enter your API key for meetup.com, if you wish to include events from Meetup in your calendars. See <a href="http://www.meetup.com/meetup_api/" target="_blank">meetup.com</a> for more information.</dd>
+      </dl>
+
+      <dl id="desc_meetup_gid">
+        <dt>Meetup Group ID(s)</dt>
+        <dd>Enter one or more meeup.com group IDs to include in your calendars. Your API key must have permission to view the events in these groups (you must first join the groups). Separate multiple groups with commas, e.g. "12345,2468"</dd>
+      </dl>
+
+      <dl id="desc_meetup_cache_minutes">
+        <dt>Cache Minutes</dt>
+        <dd>Enter the number of minutes to cache results from meetup.com. This is meant to avoid excessive requests to Meetup.</dd>
+      </dl>
+
+    </div>
+  </div>
 </body>
 </html>

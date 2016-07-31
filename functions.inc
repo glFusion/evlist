@@ -129,6 +129,9 @@ function USES_evlist_class_tickettype()
 function USES_evlist_class_ticket()
 {   require_once EVLIST_PI_PATH . '/classes/evTicket.class.php'; }
 
+function USES_evlist_class_meetup()
+{   require_once 'classes/evMeetup.class.php';  }
+
 // Define values for whether RSVP can be per repeat or only for a whole event
 // This is basically ignored for one-time events.
 define('EV_RSVP_EVENT', 1);
@@ -1473,7 +1476,7 @@ function EVLIST_obfuscate($str)
 */
 function phpblock_evlist_upcoming($A='', $catcal='')
 {
-    global $_EV_CONF;
+    global $_EV_CONF, $_CONF;
 
     $retval = '';
 
@@ -1541,7 +1544,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
         $daycount = 0;      // Count events shown each day.
 
         foreach ($daydata as $ev_id=>$ev) {
-
             // Get the timestamps for quick comparisons.  If split, use time2
             $s_ts = $ev['rp_date_start'] . ' ' . $ev['rp_time_start1'];
             if ($ev['split'] == 1) {
@@ -1589,23 +1591,39 @@ function phpblock_evlist_upcoming($A='', $catcal='')
                 $tooltip .= '::' . $summary;
             }
             $T->set_block('block', 'blkItem', 'bItem');
+            if (isset($ev['type']) && $ev['type'] == 'meetup') {
+                $url = $ev['url'];
+                $url_target = '_blank';
+            } else {
+                $url =  $_CONF['site_url'] . "/evlist/event.php?eid={$ev['rp_id']}";
+                $url_target = '';
+            }
             $T->set_var(array(
                 'rp_id'     => $ev['rp_id'],
                 'title'     => $title,
                 'summary'   => $summary,
                 'full_description' => $ev['full_description'],
                 'tooltip'   => $tooltip,
-                'url' => $_CONF['site_url'] . "/evlist/event.php?eid={rp_id}",
+                'url'       => $url,
+                'url_target' => $url_target,
             ) );
             $T->parse('bItem','blkItem', true);
             $count++;
             $daycount++;
+
+            // Only $limit events were retrieved from Evlist, but if Meetup
+            // events are added the total may exceed the count. Break here
+            // to close out the day view, then check in the outer loop to
+            // stop displaying anything further.
+            if ($count > $limit) break;
         }
         if ($daycount > 0) {
             $T->set_var('start_date', $startdate);
             $T->parse('bDay', 'blkDay', true);
             $T->clear_var('bItem');
         }
+
+        if ($count >= $limit) break;
     }
     if ($count > 0) {
         // Add the block footer only if at least one event is shown.  Otherwise
@@ -1821,14 +1839,20 @@ function plugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 */
 function plugin_getconfigelementhelp_evlist($element, $doclang )
 {
-    $doc_url = EVLIST_getDocURL('config.html', $doclang);
+    if (version_compare(GVERSION, '1.6.0', '<')) {
+        $file = 'config.legacy.html';
+    } else {
+        $file = 'config.html';
+    }
+ 
+    $doc_url = EVLIST_getDocURL($file, $doclang);
     if (empty($doc_url))
         return false;
 
     if (!empty($option)) {
-        $file .= '#desc_' . $option;
+        $doc_url .= '#desc_' . $option;
     }
-    return array($doc_url . $file, 0);
+    return array($doc_url, 0);
 }
 
 
@@ -2176,7 +2200,6 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     global $_EV_CONF;
 
     $events = array();
-
     $sql = EVLIST_getEvents_sql($start, $end, $opts);
     $result = DB_query($sql, 1);
 
@@ -2207,7 +2230,55 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 
     }   // while
 
+    // Now, get Meetup events
+    if (!empty($_EV_CONF['meetup_gid'])) {
+        EVLIST_getMeetupEvents($start, $end, $events);
+    }
+
     return $events;
+}
+
+
+function EVLIST_getMeetupEvents($start='', $end='', &$events)
+{
+    global $_EV_CONF, $_CONF;
+
+    USES_evlist_class_meetup();
+    $key = $start . '-' . $end . @serialize($opts);
+    $key = md5($key);
+    $M = new evMeetup($key);
+    $Mevents = $M->getEvents($start, $end);
+    foreach ($Mevents as $ev_date=>$ev_events) {
+        foreach ($ev_events as $event) {
+            // Format the meetup.com date information into the expected layout
+            $dt = new Date($event->time / 1000, $_CONF['timezone']);
+            $ev_start = $dt->format('H:i:s', true);
+            if (!isset($event->duration)) {
+                $duration = 3600000;     // duration required, default one hour
+            } else {
+                $duration = $event->duration;
+            }
+            $end = $event->time + $duration;
+            $dt->setTimeStamp(($event->time + $duration) / 1000);
+            $ev_end = $dt->format('H:i:s', true);
+            $events[$ev_date][] = array(
+                'type' => 'meetup',
+                'rp_id' => $event->id,
+                'rp_date_start' => $ev_date,
+                'rp_date_end' => $ev_date,
+                'rp_time_start1' => $ev_start,
+                'rp_time_start2' => $ev_end,
+                'title' => $event->name,
+                'summary' => $event->description,
+                'full_description' => $event->description,
+                'url' => $event->event_url,
+                'show_upcoming' => 1,   // force to be shown in upcoming block
+            );
+        }
+    }
+    if (!empty($Mevents)) {
+        ksort($events);
+    }
 }
 
 

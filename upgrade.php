@@ -220,16 +220,27 @@ function evlist_upgrade()
         }
     }
 
+    if ($currentVersion < '1.4.0') {    // Update versions less than 1.3.7
+        $error = EVLIST_do_upgrade_sql('1.4.0');
+        if ($error) {
+            return false;
+        }
+        $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
+        $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
+        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
+                30, 10, 0, 10, true, 'evlist');
+        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
+                30, 10, 0, 20, true, 'evlist');
+    }
+
     CTL_clearCache();
 
-    DB_query("UPDATE {$_TABLES['plugins']}
-        SET 
+    DB_query("UPDATE {$_TABLES['plugins']} SET 
             pi_version='{$_EV_CONF['pi_version']}',
             pi_gl_version='{$_EV_CONF['gl_version']}'
-        WHERE 
-            pi_name='evlist' LIMIT 1", 1);
+        WHERE pi_name='evlist' LIMIT 1", 1);
  
-    if ( DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'") == $_EV_CONF['pi_version']) {
+    if (DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'") == $_EV_CONF['pi_version']) {
         return true;
     } else {
         return false;

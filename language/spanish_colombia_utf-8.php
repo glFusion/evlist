@@ -394,6 +394,9 @@ $LANG_confignames['evlist'] = array(
     'cal_tmpl'              => 'Use HTML or JSON templates',
     'enable_rsvp'           => 'Enable Registration/Ticketing?',
     'rsvp_print'            => 'Enable Ticket Printing?',
+    'meetup_key'            => 'Meetup API Key',
+    'meetup_gid'            => 'Meetup Group ID(s)',
+    'meetup_cache_minutes'  => 'Cache Minutes',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',

@@ -4,7 +4,10 @@
 <h3>{start_date}</h3>
   <!-- BEGIN blkItem -->
   <a data-uk-tooltip class="gl_mootip" title="{tooltip}"
-    href="{site_url}/evlist/event.php?eid={rp_id}">{title}</a>
+{!if url_target}
+    target="{url_target}"
+{!endif}
+    href="{url}">{title}</a>
   <br />
   <!-- END blkItem -->
 </div>

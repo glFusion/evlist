@@ -170,10 +170,6 @@
   margin-bottom:1em;
 }
 
-div.evEventItem {
-    clear: left;
-}
-
 div.evdata {
   position: relative;
   /*margin-left: 8em;

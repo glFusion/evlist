@@ -38,7 +38,7 @@ if (!defined ('GVERSION')) {
 global $_TABLES, $_SQL, $_EV_UPGRADE;
 
 $event_table = 
-  "`id` varchar(40) NOT NULL,
+  "`id` varchar(128) NOT NULL,
   `date_start1` date DEFAULT NULL,
   `date_end1` date DEFAULT NULL,
   `time_start1` time DEFAULT NULL,
@@ -74,7 +74,7 @@ $_SQL['evlist_submissions'] = "CREATE TABLE {$_TABLES['evlist_submissions']} (".
 
 $_SQL['evlist_repeat'] = "CREATE TABLE {$_TABLES['evlist_repeat']} (
   `rp_id` int(10) NOT NULL AUTO_INCREMENT,
-  `rp_ev_id` varchar(40) DEFAULT NULL,
+  `rp_ev_id` varchar(128) DEFAULT NULL,
   `rp_det_id` int(10) NOT NULL,
   `rp_date_start` date DEFAULT NULL,
   `rp_date_end` date DEFAULT NULL,
@@ -96,14 +96,14 @@ $_SQL['evlist_categories'] = "CREATE TABLE {$_TABLES['evlist_categories']} (
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_lookup'] = "CREATE TABLE {$_TABLES['evlist_lookup']} (
-  eid VARCHAR(40) NOT NULL,
+  eid VARCHAR(128) NOT NULL,
   cid INT UNSIGNED NOT NULL,
   status TINYINT(1) NOT NULL default '1',
   PRIMARY KEY(eid,cid)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_remlookup'] = "CREATE TABLE {$_TABLES['evlist_remlookup']} (
-  `eid` varchar(40) NOT NULL,
+  `eid` varchar(128) NOT NULL,
   `rp_id` int(10) unsigned NOT NULL DEFAULT '0',
   `date_start` int(10) unsigned NOT NULL,
   `timestamp` int(10) unsigned DEFAULT NULL,
@@ -116,7 +116,7 @@ $_SQL['evlist_remlookup'] = "CREATE TABLE {$_TABLES['evlist_remlookup']} (
 
 $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
   `det_id` int(10) NOT NULL AUTO_INCREMENT,
-  `ev_id` varchar(40) NOT NULL,
+  `ev_id` varchar(128) NOT NULL,
   `title` tinytext,
   `summary` text,
   `full_description` text,
@@ -152,7 +152,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
 )";
 
 $_SQL['evlist_rsvp'] = "CREATE TABLE {$_TABLES['evlist_rsvp']} (
-  `ev_id` varchar(40) NOT NULL DEFAULT '',
+  `ev_id` varchar(128) NOT NULL DEFAULT '',
   `rp_id` int(10) unsigned NOT NULL DEFAULT '0',
   `uid` int(11) unsigned NOT NULL DEFAULT '0',
   `num_attendees` int(4) unsigned NOT NULL DEFAULT '1',
@@ -178,7 +178,7 @@ $_EV_UPGRADE = array(
     )",
     "CREATE TABLE {$_TABLES['evlist_repeat']} (
       `rp_id` int(10) NOT NULL AUTO_INCREMENT,
-      `rp_ev_id` varchar(40) DEFAULT NULL,
+      `rp_ev_id` varchar(128) DEFAULT NULL,
       `rp_det_id` int(10) NOT NULL,
       `rp_date_start` date DEFAULT NULL,
       `rp_date_end` date DEFAULT NULL,
@@ -192,7 +192,7 @@ $_EV_UPGRADE = array(
     ) ENGINE=MyISAM",
     "CREATE TABLE {$_TABLES['evlist_detail']} (
       `det_id` int(10) NOT NULL AUTO_INCREMENT,
-      `ev_id` varchar(40) NOT NULL,
+      `ev_id` varchar(128) NOT NULL,
       `title` tinytext,
       `summary` text,
       `full_description` text,
@@ -234,7 +234,7 @@ $_EV_UPGRADE = array(
     "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
       `tic_id` varchar(255) NOT NULL,
       `tic_type` int(11) unsigned NOT NULL DEFAULT '0',
-      `ev_id` varchar(20) NOT NULL,
+      `ev_id` varchar(128) NOT NULL,
       `rp_id` int(11) unsigned NOT NULL DEFAULT '0',
       `fee` float(6,2) unsigned NOT NULL DEFAULT '0.00',
       `paid` float(6,2) unsigned NOT NULL DEFAULT '0.00',
@@ -261,9 +261,28 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_remlookup']}
         ADD name varchar(40) NOT NULL DEFAULT 'nobody' after `uid`",
     ),
+'1.4.0' => array(
+    "CREATE TABLE {$_TABLES['evlist_cache']} (
+      `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      `type` varchar(50) DEFAULT NULL,
+      `data` text",
+    "ALTER TABLE {$_TABLES['evlist_events']}
+        CHANGE id id varchar(128) NOT NULL",
+    "ALTER TABLE {$_TABLES['evlist_repeat']}
+        CHANGE rp_ev_id rp_ev_id varchar(128) NOT NULL",
+    "ALTER TABLE {$_TABLES['evlist_tickets']}
+        CHANGE ev_id ev_id varchar(128) NOT NULL",
+    "ALTER TABLE {$_TABLES['evlist_lookup']}
+        CHANGE eid eid VARCHAR(128) NOT NULL",
+    "ALTER TABLE {$_TABLES['evlist_remlookup']}
+        CHANGE eid eid varchar(128) NOT NULL",
+    "ALTER TABLE {$_TABLES['evlist_detail']}
+        CHANGE ev_id ev_id varchar(128) NOT NULL",
+    ),
 );
 
 $_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
+$_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];
 
 ?>

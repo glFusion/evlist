@@ -404,11 +404,15 @@ $LANG_confignames[ 'evlist'] = array(
     'cal_tmpl'              => 'Use HTML or JSON templates',
     'enable_rsvp'           => 'Enable Registration/Ticketing?',
     'rsvp_print'            => 'Enable Ticket Printing?',
+    'meetup_key'            => 'Meetup API Key',
+    'meetup_gid'            => 'Meetup Group ID(s)',
+    'meetup_cache_minutes'  => 'Cache Minutes',
 );
 
 $LANG_configsubgroups[ 'evlist'] = array(
-'sg_main'            => 'Paramètres principaux',
+    'sg_main'               => 'Paramètres principaux',
     'sg_rsvp'               => 'RSVP/Ticketing',
+    'sg_integ'              => 'Integrations',
 );
 
 $LANG_fs[ 'evlist'] = array(
@@ -417,6 +421,7 @@ $LANG_fs[ 'evlist'] = array(
 'ev_centerblock'        => 'Centerblock Settings',
 'ev_permissions'        => 'Les autorisations par défaut',
     'ev_rsvp'               => 'Registration and Ticketing',
+    'ev_integ_meetup'       => 'Meetup.Com',
 );
 
 $LANG_configselects[ 'evlist'] = array(

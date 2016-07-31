@@ -490,6 +490,15 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'bgcolor'       => '',
                 'cal_id'        => $A['data']['cal_id'],
             ) );
+            if (isset($A['data']['type']) && $A['data']['type'] == 'meetup') {
+                $T->set_var(array(
+                    'is_meetup' => 'true',
+                    'ev_url' => $A['data']['url'],
+                ) );
+            } else {
+                $T->clear_var('is_meetup');
+            }
+ 
             if ($j < $numevents) {
                 $T->set_var('br', '<br />');
             } else {
@@ -500,13 +509,11 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
             next($hourevents);
         }
         $link = date($_CONF['timeonly'], mktime($i, 0));
-//        if ($_EV_CONF['_can_add']) {
         if (EVLIST_canSubmit()) {
             $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
                         $month . '&amp;day=' . $day . '&amp;year=' . $year .
                         '&amp;hour=' . $i . '">' . $link . '</a>';
         }
-    //    $T->set_var ($i . '_hour',$link);
         $T->parse ($i . '_cols', 'column', true);
     }
     $T->set_var(array(
@@ -704,6 +711,14 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'pi_url'        => EVLIST_URL,
                 'fgcolor'       => $A['fgcolor'],
             ) );
+            if (isset($A['type']) && $A['type'] == 'meetup') {
+                $T->set_var(array(
+                    'is_meetup' => 'true',
+                    'ev_url' => $A['url'],
+                ) );
+            } else {
+                $T->clear_var('is_meetup');
+            }
             $T->parse('eBlk', 'eventBlock', true);
         }
 
@@ -749,6 +764,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 */
 function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
+
     global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     EVLIST_setViewSession('month', $year, $month, $day);
@@ -895,7 +911,6 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 } else {
                     $ev_hover .= $title;
                 }
-
                 $T->set_var(array(
                     'cal_id'    => $event['cal_id'],
                     'cal_id_url' => $cal_id,    // calendar requested
@@ -907,6 +922,14 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     'bgcolor'   => $event['bgcolor'],
                     'pi_url'        => EVLIST_URL,
                 ) );
+                if (isset($event['type']) && $event['type'] == 'meetup') {
+                    $T->set_var(array(
+                        'is_meetup' => 'true',
+                        'ev_url' => $event['url'],
+                    ) );
+                } else {
+                    $T->clear_var('is_meetup');
+                }
                 if ($event['allday'] == 1) {
                     $dayentries .= $T->parse('output', 'allday_event', true);
                 } else {

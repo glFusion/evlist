@@ -6,6 +6,7 @@ v1.4.0
 - Add uikit-based templates
 - Add responsive month view calendar
 - Add ticketing and rsvp
+- Add meetup.com event integration
 
 v1.3.6
 ------

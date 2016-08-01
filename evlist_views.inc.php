@@ -384,13 +384,15 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     if ($alldaycount > 0) {
         for ($i = 1; $i <= $alldaycount; $i++) {
             $A = current($allday);
-            $calendars_used[$A['cal_id']] = array(
+            if (isset($event['cal_id'])) {
+                $calendars_used[$A['cal_id']] = array(
                     'cal_name' => $A['cal_name'],
                     'cal_ena_ical' => $A['cal_ena_ical'],
                     'cal_id' => $A['cal_id'],
                     'fgcolor' => $A['fgcolor'],
                     'bgcolor' => $A['bgcolor'],
-            );
+                );
+            }
 
             $T->set_var(array(
                 'delete_imagelink'  => EVLIST_deleteImageLink($A, $token),
@@ -442,13 +444,15 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         for ($j = 1; $j <= $numevents; $j++) {
             $A = current($hourevents);
 
-            $calendars_used[$A['data']['cal_id']] = array(
+            if (isset($event['cal_id'])) {
+                $calendars_used[$A['data']['cal_id']] = array(
                     'cal_name' => $A['data']['cal_name'],
                     'cal_ena_ical' => $A['data']['cal_ena_ical'],
                     'cal_id' => $A['data']['cal_id'],
                     'fgcolor' => $A['data']['fgcolor'],
                     'bgcolor' => $A['data']['bgcolor'],
-            );
+                );
+            }
 
             if ($A['data']['rp_date_start'] == $today) {
                 $start_time = date($_CONF['timeonly'],
@@ -534,7 +538,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'pi_url'        => EVLIST_URL,
         'currentday'    => $dayname. ', ' . $dtToday->format($_CONF['shortdate']),
         'week_num'      => $dtToday->format('W'),
-        'cal_checkboxes', EVLIST_cal_checkboxes($calendars_used),
+        'cal_checkboxes'=> EVLIST_cal_checkboxes($calendars_used),
         'site_name'     => $_CONF['site_name'],
         'site_slogan'   => $_CONF['site_slogan'],
         'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
@@ -688,13 +692,15 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     $event_time .= ' & ' . $starttime2 . ' - ' . $endtime2;
                 }
             }
-            $calendars_used[$A['cal_id']] = array(
+            if (isset($event['cal_id'])) {
+                $calendars_used[$A['cal_id']] = array(
                     'cal_name' => $A['cal_name'],
                     'cal_ena_ical' => $A['cal_ena_ical'],
                     'cal_id' => $event['cal_id'],
                     'fgcolor' => $A['fgcolor'],
                     'bgcolor' => $A['bgcolor'],
-            );
+                );
+            }
             /*$eventlink = '<a class="cal-event" style="' .
                         $fgstyle . '" href="' .
                         EVLIST_URL . '/event.php?eid=' .
@@ -882,13 +888,15 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 $summary = htmlentities(strip_tags($event['summary']));
 
                 // add the calendar to the array to create the JS checkboxes
-                $calendars_used[$event['cal_id']] = array(
+                if (isset($event['cal_id'])) {
+                    $calendars_used[$event['cal_id']] = array(
                             'cal_name' => $event['cal_name'],
                             'cal_ena_ical' => $event['cal_ena_ical'],
                             'cal_id' => $event['cal_id'],
                             'fgcolor' => $event['fgcolor'],
                             'bgcolor' => $event['bgcolor'],
-                );
+                    );
+                }
 
                 // Create the hover tooltip.  Timed events show the times first
                 if ($event['allday'] == 0) {

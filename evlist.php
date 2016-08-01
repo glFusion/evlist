@@ -72,6 +72,7 @@ $_TABLES['evlist_rsvp']         = $_DB_table_prefix . 'evlist_rsvp';
 $_TABLES['evlist_tickettypes']  = $_DB_table_prefix . 'evlist_tickettypes';
 $_TABLES['evlist_tickets']      = $_DB_table_prefix . 'evlist_tickets';
 $_TABLES['evlist_tickets_used'] = $_DB_table_prefix . 'evlist_tickets_used';
+$_TABLES['evlist_cache']        = $_DB_table_prefix . 'evlist_cache';
 
 // Deprecated tables, but needed to do the upgrade
 $_TABLES['evlist_dateformat']   = $_DB_table_prefix . 'evlist_dateformat';

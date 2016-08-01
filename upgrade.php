@@ -231,6 +231,8 @@ function evlist_upgrade()
                 30, 10, 0, 10, true, 'evlist');
         $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
                 30, 10, 0, 20, true, 'evlist');
+        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
+                30, 10, 0, 30, true, 'evlist');
     }
 
     CTL_clearCache();

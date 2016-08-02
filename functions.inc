@@ -1591,7 +1591,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
                 $tooltip .= '::' . $summary;
             }
             $T->set_block('block', 'blkItem', 'bItem');
-            if (isset($ev['type']) && $ev['type'] == 'meetup') {
+            if ($ev['cal_id'] < 0) {
                 $url = $ev['url'];
                 $url_target = '_blank';
             } else {
@@ -2239,6 +2239,16 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 }
 
 
+/**
+*   Get events from meetup.com API.
+*   Adds events to the $events array created by EVLIST_getEvents().
+*   Assigns calendar ID "-1" named "meetup" to all events.
+*
+*   @param  string  $start      Starting date (YYYY-MM-DD)
+*   @param  string  $end        Ending date (YYYY-MM-DD)
+*   @param  array   &$events    Existing array of events
+*   @return none
+*/
 function EVLIST_getMeetupEvents($start='', $end='', &$events)
 {
     global $_EV_CONF, $_CONF;
@@ -2262,7 +2272,9 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
             $dt->setTimeStamp(($event->time + $duration) / 1000);
             $ev_end = $dt->format('H:i:s', true);
             $events[$ev_date][] = array(
-                'type' => 'meetup',
+                'cal_name' => 'meetup',
+                'cal_ena_ical' => 0,
+                'cal_id' => -1,
                 'rp_id' => $event->id,
                 'rp_date_start' => $ev_date,
                 'rp_date_end' => $ev_date,

@@ -444,7 +444,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         for ($j = 1; $j <= $numevents; $j++) {
             $A = current($hourevents);
 
-            if (isset($event['cal_id'])) {
+            if (isset($A['data']['cal_id'])) {
                 $calendars_used[$A['data']['cal_id']] = array(
                     'cal_name' => $A['data']['cal_name'],
                     'cal_ena_ical' => $A['data']['cal_ena_ical'],
@@ -494,7 +494,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'bgcolor'       => '',
                 'cal_id'        => $A['data']['cal_id'],
             ) );
-            if (isset($A['data']['type']) && $A['data']['type'] == 'meetup') {
+            if ($A['data']['cal_id'] < 0) {
                 $T->set_var(array(
                     'is_meetup' => 'true',
                     'ev_url' => $A['data']['url'],
@@ -692,7 +692,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     $event_time .= ' & ' . $starttime2 . ' - ' . $endtime2;
                 }
             }
-            if (isset($event['cal_id'])) {
+            if (isset($A['cal_id'])) {
                 $calendars_used[$A['cal_id']] = array(
                     'cal_name' => $A['cal_name'],
                     'cal_ena_ical' => $A['cal_ena_ical'],
@@ -701,11 +701,6 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     'bgcolor' => $A['bgcolor'],
                 );
             }
-            /*$eventlink = '<a class="cal-event" style="' .
-                        $fgstyle . '" href="' .
-                        EVLIST_URL . '/event.php?eid=' .
-                        $A['rp_id'] . '">' . stripslashes($A['title']) .
-                        '</a>';*/
 
             $T->set_var(array(
                 'event_times'   => $event_time,
@@ -717,7 +712,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'pi_url'        => EVLIST_URL,
                 'fgcolor'       => $A['fgcolor'],
             ) );
-            if (isset($A['type']) && $A['type'] == 'meetup') {
+            if ($A['cal_id'] < 0) {
                 $T->set_var(array(
                     'is_meetup' => 'true',
                     'ev_url' => $A['url'],
@@ -930,7 +925,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     'bgcolor'   => $event['bgcolor'],
                     'pi_url'        => EVLIST_URL,
                 ) );
-                if (isset($event['type']) && $event['type'] == 'meetup') {
+                if ($event['cal_id'] < 0) {
                     $T->set_var(array(
                         'is_meetup' => 'true',
                         'ev_url' => $event['url'],

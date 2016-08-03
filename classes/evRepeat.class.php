@@ -584,7 +584,7 @@ class evRepeat
             if ($this->Event->options['rsvp_print'] > 0) {
                 $paid = $this->Event->options['rsvp_print'] == 1 ? 'paid' : '';
                 USES_evlist_class_ticket();
-                $tickets = evTicket::GetTickets($this->ev_id, '', $this->uid, $paid);
+                $tickets = evTicket::GetTickets($this->ev_id, $this->rp_id, $this->uid, $paid);
                 if (count($tickets) > 0) {
                     $T->set_var('have_tickets', 'true');
                 }
@@ -942,6 +942,7 @@ class evRepeat
                     AND uid = $uid";
             // check for fee = 0 if free_only is set
             if ($key == 1) $sql .= ' AND fee = 0';
+            //echo $sql;die;
             $res = DB_query($sql);
             $A = DB_fetchArray($res, false);
             $counter[$key][$uid] = isset($A['c']) ? (int)$A['c'] : 0;

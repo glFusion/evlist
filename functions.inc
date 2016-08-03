@@ -2215,6 +2215,10 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 
     while ($A = DB_fetchArray($result, false)) {
 
+        // Set a valid foreground and background color
+        if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
+        if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
+
         if ($A['rp_date_start'] == $A['rp_date_end']) {
             // Single-day event just gets added to the array
             $events[$A['rp_date_start']][] = $A;
@@ -2289,6 +2293,8 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
                 'full_description' => $event->description,
                 'url' => $event->event_url,
                 'show_upcoming' => 1,   // force to be shown in upcoming block
+                'fgcolor' => 'inherit',
+                'bgcolor' => 'inherit',
             );
         }
     }

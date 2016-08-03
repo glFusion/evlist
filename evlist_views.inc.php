@@ -222,6 +222,11 @@ function EVLIST_calFooter($calendars = '')
 */
 function EVLIST_setViewSession($type, $year, $month, $day)
 {
+    $A = SESS_getVar('evlist.current');
+    if ($year == 0) $year = $A['date'][0];
+    if ($month == 0) $month = $A['date'][1];
+    if ($day == 0) $day = $A['date'][2];
+
     SESS_setVar('evlist.current', array(
         'view' => $type,
         'date' => array($year, $month, $day),
@@ -768,7 +773,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
     global $_CONF, $_EV_CONF, $LANG_MONTH;
 
-    EVLIST_setViewSession('month', $year, $month, $day);
+    EVLIST_setViewSession('month', $year, $month, 0);
 
     $retval = '';
     list($currentyear, $currentmonth, $currentday) = 
@@ -1003,7 +1008,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
     global $_CONF, $_EV_CONF, $LANG_MONTH;
 
-    EVLIST_setViewSession('year', $year, $month, $day);
+    EVLIST_setViewSession('year', $year, 0, 0);
 
     $retval = '';
 

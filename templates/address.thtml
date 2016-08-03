@@ -1,21 +1,21 @@
 {# begin {templatelocation} #}
-      {!if location}
-        {location}<br />
-      {!endif}
-      {!if street}
-        {street}<br />
-      {!endif}
-      {!if city}
-        {city}
-        {!if province}
-          , {province}
-        {!endif}
-        <br />
-      {!endif}
-      {!if postal}
-      {postal}
-      {!endif}
-      {!if country}
-      {country}
-      {!endif}
+{!if location}
+{location}<br />
+{!endif}
+{!if street}
+{street}<br />
+{!endif}
+{!if city}
+{!if province}
+{city}, {province}
+{!else} 
+{city}
+{!endif}
+{!endif}
+{!if postal}
+ {postal}
+{!endif}
+{!if country}
+ {country}
+{!endif}
 {# end {templatelocation} #}

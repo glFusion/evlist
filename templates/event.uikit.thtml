@@ -97,6 +97,22 @@
 {# End header div #}
 </div>
 
+{!if map}
+<div id="evlistMapOuter">
+  {map}
+  <div id="directions">
+    <form action="http://maps.google.com/maps" method="GET" target="_blank">
+      <input onfocus="this.value='';" type="text" size="40" maxlength="40"
+        name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
+      <input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
+      <input type="hidden" name="daddr" value="{lat},{lng}" />
+    </form>
+  </div>
+</div>
+{!endif}
+
+
+
 {# Event detail and map div #}
 <div id="evlistEventDetail">
 
@@ -158,151 +174,137 @@
   </div>
   {!endif}
 
-  {!if register_link}
-  <div class="evEventItem">
-    <label>{$LANG_EVLIST['signup']}</label>
-    <div id="regdiv" class="evdata" style="margin-top:15px;"></div>
+</div>
 
-    <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
-      <input type="hidden" name="rp_id" value="{rp_id}" />
-      {$LANG_EVLIST['quantity']}:
-      {!if register_unltd}
-      <input type="text" size="3" name="tick_count" value="1" />
-      {!elseif register_multi}
-      <select name="tick_count">
-        <!-- BEGIN tickCntBlk -->
-        <option value="{tick_cnt}">{tick_cnt}</option>
-        <!-- END tickCntBlk -->
-      </select>
-      {!else}
-      <input type="hidden" name="tick_count" value="1" />1
-      {!endif}
-
-      {!if ticket_types_multi}
-      <select name="tick_type">
-        <!-- BEGIN tickTypeBlk -->
-        <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
-        <!-- END tickTypeBlk -->
-      </select>
-      {!else}
-      <input type="hidden" name="tick_type" value="{tick_type}" />
-      {tick_descr} - {tick_fee}
-      {!endif}
-
-      <input type="submit" class="lgButton orange" name="register"
-        value="Register" />
-    </form>
-
+<div style="clear:left;padding-top:1em;">
+  <div style="margin-bottom:1em;">
+    {full_description}
   </div>
-  {!endif}
 
-  {!if login_to_register}
-  <div class="evEventItem uk-alert">{$LANG_EVLIST['login_to_register']}</div>
-  {!endif}
+{!if owner_link}
+  <div style="clear:left;">
+    {owner_link}
+  </div>
+  {reminder}
+{!endif}
 
-  {!if is_registered}
-  <div class="evEventItem">
-    <div class="evdata">
-        Your Regisrations:<br />
-      <!-- BEGIN regBlock -->
-        {reg_qty} {reg_desc}<br />
-      <!-- END regBlock -->
+{!if weather}
+    <div style="clear:left;text-align:center">
+    {weather}
     </div>
-  </div>
-  {!endif}
-
-  {!if unregister_link}
-  <div class="evEventItem">
-    {$LANG_EVLIST['cancel_free']}<br />
-        <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
-        <input type="hidden" name="rp_id" value="{rp_id}" />
-        <input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
-        <input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
-        </form>
-  </div>
-  {!endif}
-
-  {!if have_tickets}
-  <div class="evEventItem">
-    <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
-  </div>
-  {!endif}
-
-  {!if show_reminderform}
-  <div class="evEventItem">
-    <div id="reminder_no" class="evdata uk-alert" style="display:none;">
-      <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
-        {$LANG_EVLIST['email']}
-        <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
-        <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
-        {$LANG_EVLIST['days_prior']}
-        <input type="submit" name="savereminder" class="uk-button uk-button-success uk-button-small" value="{$LANG_ACCESS['submit']}" />
-        <p>{$LANG_EVLIST['email_private']}</p>
-        <input type="hidden" name="action" value="addreminder" />
-      </form>
-    </div>
-
-    <div id="reminder_yes" class="evdata uk-alert" style="display:none;">
-      <form id="evRemDel" onsubmit="updateReminder(this);return false;">
-        {$LANG_EVLIST['you_are_subscribed']}
-        <input type="submit" name="delreminder" class="uk-button uk-button-danger uk-button-small" value="{$LANG_ACCESS['remove']}" />
-        <input type="hidden" name="eid" value="{eid}" />
-        <input type="hidden" name="rp_id" value="{rp_id}" />
-        <input type="hidden" name="action" value="delreminder" />
-        <input type="hidden" name="rem_email" value="" />
-        <input type="hidden" name="notice" value="0" />
-      </form> 
-    </div>
-  </div>
-  {!endif}
+{!endif}
 
 </div>
 
-{!if map}
-<div id="evlistMapOuter">
-  {map}
-  <div id="directions">
-    <form action="http://maps.google.com/maps" method="GET" target="_blank">
-      <input onfocus="this.value='';" type="text" size="40" maxlength="40"
-        name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
-      <input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
-      <input type="hidden" name="daddr" value="{lat},{lng}" />
-    </form>
+{!if login_to_register}
+<div class="evEventRegInfo uk-alert">{$LANG_EVLIST['login_to_register']}</div>
+{!endif}
+
+{!if is_registered}
+<div class="evEventRegInfo">
+  <div class="evdata">
+    Your Regisrations:<br />
+      <!-- BEGIN regBlock -->
+      {reg_qty} {reg_desc}<br />
+      <!-- END regBlock -->
   </div>
 </div>
 {!endif}
 
-<div style="clear:both;padding-top:3em;">
-  <div style="margin-bottom:1em;">
-  <p>{full_description}</p>
+{!if unregister_link}
+<div class="evEventRegInfo">
+  {$LANG_EVLIST['cancel_free']}<br />
+  <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    <input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
+    <input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
+  </form>
+</div>
+{!endif}
+
+{!if show_reminderform}
+<div class="evEventItem">
+  <div id="reminder_no" class="evdata uk-alert" style="display:none;">
+    <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
+      {$LANG_EVLIST['email']}
+      <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
+      <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
+      {$LANG_EVLIST['days_prior']}
+      <input type="submit" name="savereminder" class="uk-button uk-button-success uk-button-small" value="{$LANG_ACCESS['submit']}" />
+      <p>{$LANG_EVLIST['email_private']}</p>
+      <input type="hidden" name="action" value="addreminder" />
+    </form>
   </div>
 
-  {!if owner_link}
+  <div id="reminder_yes" class="evdata uk-alert" style="display:none;">
+    <form id="evRemDel" onsubmit="updateReminder(this);return false;">
+      {$LANG_EVLIST['you_are_subscribed']}
+      <input type="submit" name="delreminder" class="uk-button uk-button-danger uk-button-small" value="{$LANG_ACCESS['remove']}" />
+      <input type="hidden" name="eid" value="{eid}" />
+      <input type="hidden" name="rp_id" value="{rp_id}" />
+      <input type="hidden" name="action" value="delreminder" />
+      <input type="hidden" name="rem_email" value="" />
+      <input type="hidden" name="notice" value="0" />
+    </form> 
+  </div>
+</div>
+{!endif}
+
+{!if register_link}
+<div style="clear:both;" class="evEventRegInfo">
+  <label>{$LANG_EVLIST['signup']}</label>
+  <div id="regdiv" class="evdata" style="margin-top:15px;"></div>
+
+  <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    {$LANG_EVLIST['quantity']}:
+{!if register_unltd}
+    <input type="text" size="3" name="tick_count" value="1" />
+{!elseif register_multi}
+    <select name="tick_count">
+      <!-- BEGIN tickCntBlk -->
+      <option value="{tick_cnt}">{tick_cnt}</option>
+      <!-- END tickCntBlk -->
+    </select>
+{!else}
+    <input type="hidden" name="tick_count" value="1" />1
+{!endif}
+
+{!if ticket_types_multi}
+    <select name="tick_type">
+      <!-- BEGIN tickTypeBlk -->
+      <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
+      <!-- END tickTypeBlk -->
+    </select>
+{!else}
+    <input type="hidden" name="tick_type" value="{tick_type}" />
+    {tick_descr} - {tick_fee}
+{!endif}
+
+    <input type="submit" class="lgButton orange" name="register"
+        value="Register" />
+  </form>
+
+</div>
+{!endif}
+{!if have_tickets}
+<div class="evEventRegInfo">
+  <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
+</div>
+{!endif}
+
+<div style="clear:both;"></div>
+<div style="float:right; margin-right:15px;">
+  <a href="javascript:window.history.go(-1);" title="Back">Back</a>
+</div>
+
+{!if admin_rsvp}
   <div style="clear:both;">
-    {owner_link}
-  </div>
-  {reminder}
-  {!endif}
-
-  {!if weather}
-    <div style="clear:both;text-align:center">
-    {weather}
-    </div>
-  {!endif}
-
-  <div style="clear:both;"></div>
-  <div style="float:right; margin-right:15px;">
-    <a href="javascript:window.history.go(-1);" title="Back">Back</a>
-  </div>
-
-  {!if admin_rsvp}
-    <div style="clear:both;">
     <p>&nbsp;</p>
     <hr />
     {admin_rsvp}
-    </div>
-  {!endif}
-</div>
+  </div>
+{!endif}
 
 <script type="text/javascript">
 var showregdiv = 0;

@@ -75,7 +75,7 @@
 
 @media (max-width: 1249px) {
   #evlistEventDetail {
-    width: 100%;
+    /*width: 100%;*/
   }
 }
 
@@ -83,7 +83,7 @@
 @media (min-width: 1250px) {
   #evlistEventDetail {
     min-width: 400px;
-    width: 60%;
+    /*width: 100%;*/
   }
   div.evdata {
     max-width: 80%;
@@ -91,7 +91,7 @@
 }
  
 #evlistEventDetail {
-    clear: both;
+    /*clear: both;*/
     position: relative;
     float: left;
    /* min-width: 300px;
@@ -117,7 +117,7 @@
 
 #evlistMapOuter {
     position: relative;
-    float: left;
+    float: right;
     margin: 15px;
     width: 400px;
 }
@@ -150,6 +150,11 @@
 #evlistCategoryLinks {
     text-align: center;
     margin-bottom: 2em;
+}
+
+.evEventRegInfo {
+    clear:both;
+    margin-top:5px;
 }
 
 .evlistRedNote {

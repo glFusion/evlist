@@ -87,6 +87,10 @@ if ($_CONF['loginrequired'] == 1) {
 // so it's available where needed.
 $_EV_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
 
+if (empty($_EV_CONF['meetup_gid']) || empty($_EV_CONF['meetup_key'])) {
+    $_EV_CONF['meetup_enabled'] = 0;
+}
+
 // Include the user's language file, if found.  Default to englsh.
 $langpath = EVLIST_PI_PATH . '/language';
 $langfile = $_CONF['language'] . '.php';
@@ -2231,7 +2235,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     }   // while
 
     // Now, get Meetup events
-    if (!empty($_EV_CONF['meetup_gid'])) {
+    if ($_EV_CONF['meetup_enabled']) {
         EVLIST_getMeetupEvents($start, $end, $events);
     }
 

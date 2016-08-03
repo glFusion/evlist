@@ -86,6 +86,7 @@ $CONF_EVLIST_DEFAULT = array(
     'meetup_key'        => '',  // Meetup API key
     'meetup_gid'        => '',  // Meetup group IDs
     'meetup_cache_minutes' => 30,
+    'meetup_enabled'    => 0,   // 10 to enable meetup event inclusion
 );
 
 /**
@@ -195,7 +196,8 @@ function plugin_initconfig_evlist()
                 30, 10, 0, 20, true, 'evlist');
         $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
                 30, 10, 0, 30, true, 'evlist');
-
+        $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
+                30, 10, 0, 40, true, 'evlist');
     }
 
     return true;

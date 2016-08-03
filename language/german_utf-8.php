@@ -389,6 +389,7 @@ $LANG_confignames['evlist'] = array(
     'meetup_key'            => 'Meetup API Key',
     'meetup_gid'            => 'Meetup Group ID(s)',
     'meetup_cache_minutes'  => 'Cache Minutes',
+    'meetup_enabled'        => 'Enable Meetup.com integration?',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Haupteinstellungen',

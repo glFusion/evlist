@@ -227,12 +227,14 @@ function evlist_upgrade()
         }
         $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
         $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
-        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
+        $c->add('meetup_key', $CONF_EVLIST_DEFAULT['meetup_key'], 'text',
                 30, 10, 0, 10, true, 'evlist');
-        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
+        $c->add('meetup_gid', $CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
                 30, 10, 0, 20, true, 'evlist');
-        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
+        $c->add('meetup_cache_minutes', $CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
                 30, 10, 0, 30, true, 'evlist');
+        $c->add('meetup_enabled', $CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
+                30, 10, 0, 40, true, 'evlist');
     }
 
     CTL_clearCache();

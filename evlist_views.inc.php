@@ -257,7 +257,7 @@ function EVLIST_view_json($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $
     }
 
     $T->set_var(array(
-        'cal_header'    => EVLIST_calHeader($year, $month, $day, $type), 
+        'cal_header'    => EVLIST_calHeader($year, $month, $day, $type, $cat, $cal), 
         'calendar_content' => $function($year, $month, $day, $cat, $cal, $opt),
         'urlfilt_cal' => (int)$cal,
         'urlfilt_cat' => (int)$cat,
@@ -312,7 +312,7 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
     // the calendar within the JSON template. Otherwise return the simple
     // HTML version of the calendar.
     if ($_EV_CONF['cal_tmpl'] == 'json') {
-        return EVLIST_view_json($type, $year, $month, $day, $cal, $opt);
+        return EVLIST_view_json($type, $year, $month, $day, $cat, $cal, $opt);
     } else {
         $function = "EVLIST_{$type}view";
         if (!function_exists($function)) {

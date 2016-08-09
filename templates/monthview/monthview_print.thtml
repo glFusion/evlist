@@ -11,21 +11,16 @@
 
 <table cellpadding="5" cellspacing="1" border="1" class="evlist_month">
   <tr class="daynames">
-    <td width="2%">&nbsp;</td>
-    <td width="14%">{dayname0}</td>
-    <td width="14%">{dayname1}</td>
-    <td width="14%">{dayname2}</td>
-    <td width="14%">{dayname3}</td>
-    <td width="14%">{dayname4}</td>
-    <td width="14%">{dayname5}</td>
-    <td width="14%">{dayname6}</td>
+    <td>{dayname0}</td>
+    <td>{dayname1}</td>
+    <td>{dayname2}</td>
+    <td>{dayname3}</td>
+    <td>{dayname4}</td>
+    <td>{dayname5}</td>
+    <td>{dayname6}</td>
   </tr>
   <!-- BEGIN weekBlock -->
   <tr>
-    <td class="cal-weekpointers" align="center" >
-    <b>{weeknum}&nbsp;</b>
-    </td>
-
     <!-- BEGIN dayBlock -->
     <td valign="top" class="month{cal_day_style}" >
       <div class="monthview_daterow">

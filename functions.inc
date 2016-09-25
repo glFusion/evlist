@@ -2270,7 +2270,7 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
         foreach ($ev_events as $event) {
             // Format the meetup.com date information into the expected layout
             $dt = new Date($event->time / 1000, $_CONF['timezone']);
-            $ev_start = $dt->format('H:i:s', true);
+            $ev_start = $dt->format($_CONF['timeonly'], true);
             if (!isset($event->duration)) {
                 $duration = 3600000;     // duration required, default one hour
             } else {
@@ -2278,7 +2278,7 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
             }
             $end = $event->time + $duration;
             $dt->setTimeStamp(($event->time + $duration) / 1000);
-            $ev_end = $dt->format('H:i:s', true);
+            $ev_end = $dt->format($_CONF['timeonly'], true);
             $events[$ev_date][] = array(
                 'cal_name' => 'meetup',
                 'cal_ena_ical' => 0,
@@ -2287,7 +2287,7 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
                 'rp_date_start' => $ev_date,
                 'rp_date_end' => $ev_date,
                 'rp_time_start1' => $ev_start,
-                'rp_time_start2' => $ev_end,
+                'rp_time_end1' => $ev_end,
                 'title' => $event->name,
                 'summary' => $event->description,
                 'full_description' => $event->description,

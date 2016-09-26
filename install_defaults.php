@@ -86,7 +86,7 @@ $CONF_EVLIST_DEFAULT = array(
     'meetup_key'        => '',  // Meetup API key
     'meetup_gid'        => '',  // Meetup group IDs
     'meetup_cache_minutes' => 30,
-    'meetup_enabled'    => 0,   // 10 to enable meetup event inclusion
+    'meetup_enabled'    => 0,   // 1 to enable meetup event inclusion
 );
 
 /**

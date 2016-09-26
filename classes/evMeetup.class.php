@@ -114,6 +114,9 @@ class evMeetup
             $this->setParam('time', $time_param);
         }
 
+        // Get both upcoming and past events
+        $this->setParam('status', 'upcoming,past');
+
         try {
             $M = new Meetup(array('key' => $_EV_CONF['meetup_key']));
             $response = $M->getEvents($this->params);

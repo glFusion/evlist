@@ -260,21 +260,21 @@ function plugin_getuseroption_evlist()
         return $retval;
     }
 
-    $add_url = $LANG_EVLIST['add_event'],
-                EVLIST_URL . '/event.php?edit=x'
+    $add_opton = array($LANG_EVLIST['add_event'],
+                EVLIST_URL . '/event.php?edit=x', 0);
 
     switch ($_EV_CONF['can_add']) {
     case 0:     // only admins can add events
         if (plugin_ismoderator_evlist()) {
-            $retval = array($add_url, 0);
+            $retval = $add_option;
         } break;
     case 1:     // logged-in users can add events
         if (!COM_isAnonUser()) {
-            $retval = array($add_url, 0);
+            $retval = $add_option;
         }
         break;
     case 2:     // logged-in + anonymous users can add
-        $retval = array($add_url, 0);
+        $retval = $add_option;
         break;
     }
     return $retval;

@@ -374,6 +374,13 @@ class evTicket
     {
         global $_CONF;
 
+        // Verify that the current is an admin or event owner
+        USES_evlist_class_event();
+        $Event = new evEvent($ev_id);
+        if (!$Event->hasAccess(3)) {
+            return;
+        }
+
         $checkin_url = $_CONF['site_admin_url'] . '/plugins/evlist/checkin.php?tic=';
 
         // get the tickets, paid and unpaid. Need event id and uid.
@@ -515,13 +522,18 @@ class evTicket
         global $_CONF, $LANG_EVLIST;
 
         $retval = '';
-        // get the tickets, paid and unpaid. Need event id and uid.
-        $tickets = self::GetTickets($ev_id, $rp_id, $uid);
 
         USES_evlist_class_repeat();
         USES_evlist_class_tickettype();
 
         $Rp = new evRepeat($rp_id);
+        // Verify that the current is an admin or event owner
+        if (!$Rp->Event->hasAccess(3)) {
+            return $retval;
+        }
+
+        // get the tickets, paid and unpaid. Need event id and uid.
+        $tickets = self::GetTickets($ev_id, $rp_id, $uid);
 
         $header = array(
             $LANG_EVLIST['ticket_num'],

@@ -199,6 +199,35 @@ case 'list':
     $content .= EVLIST_listview($range, $category, $calendar, $block_title);
     break;
 
+case 'printtickets':
+    // Print all tickets for an event, for all users
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_ticket();
+        $eid = COM_sanitizeID($_GET['eid'], false);
+        $doc = evTicket::PrintTickets($eid);
+        echo $doc;
+        exit;
+    } else {
+        $content .= 'Function not available';
+    }
+    break;
+
+case 'exporttickets':
+    // Print all tickets for an event, for all users
+    if ($_EV_CONF['enable_rsvp']) {
+        USES_evlist_class_ticket();
+        $eid = COM_sanitizeID($_GET['eid'], false);
+        $doc = evTicket::ExportTickets($eid);
+        header('Content-type: text/csv');
+        header('Content-Disposition: attachment; filename="event-'.$ev_id.'.csv');
+        echo $doc;
+        exit;
+    } else {
+        $content .= 'Function not available';
+    }
+    break;
+
+
 default:
     $content = EVLIST_view('', 0, 0, 0);
     break;

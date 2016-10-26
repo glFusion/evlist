@@ -663,11 +663,11 @@ function EVLIST_adminRSVP($rp_id)
         $LANG_EVLIST['admin_rsvp'] . ' -- ' .
         COM_createLink($Ev->Event->Detail->title . ' (' . $Ev->date_start . ')',
         EVLIST_URL . '/event.php?eid=' . $rp_id);
-    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.$_CONF['site_admin_url'] .
-            '/plugins/evlist/index.php?printtickets&eid=' . $Ev->ev_id .
+    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '/index.php?view=printtickets&eid=' . $Ev->ev_id .
             '" class="lgButton blue" target="_new">' . $LANG_EVLIST['print_tickets'] . '</a>';
-    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.$_CONF['site_admin_url'] .
-            '/plugins/evlist/index.php?exporttickets&eid=' . $Ev->rp_id .
+    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
             '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
  
     if ($Ev->Event->options['use_reg'] == EV_RSVP_REPEAT) {

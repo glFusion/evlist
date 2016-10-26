@@ -145,8 +145,8 @@ class evRepeat
         if ($fromDB) {      // Read from the database
 
             // dates are YYYY-MM-DD
-            list($startyear, $startmonth, $startday) = split('-', $row['rp_start_date']);
-            list($endyear, $endmonth, $endday) = split('-', $row['rp_end_date']);
+            list($startyear, $startmonth, $startday) = explode('-', $row['rp_start_date']);
+            list($endyear, $endmonth, $endday) = explode('-', $row['rp_end_date']);
         } else {            // Coming from the form
 
             $this->date_start = $row['date_start1'];

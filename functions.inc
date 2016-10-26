@@ -259,23 +259,24 @@ function plugin_getuseroption_evlist()
     if (!EVLIST_isCurrentVersion()) {
         return $retval;
     }
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
-        return $retval;
-    }
 
-    switch ($_EV_CONF['usermenu_option']) {
-    case 1:
-        $retval = array($LANG_EVLIST['add_event'],
-                EVLIST_URL . '/event.php?edit=x',
-                0);
+    $add_url = $LANG_EVLIST['add_event'],
+                EVLIST_URL . '/event.php?edit=x'
+
+    switch ($_EV_CONF['can_add']) {
+    case 0:     // only admins can add events
+        if (plugin_ismoderator_evlist()) {
+            $retval = array($add_url, 0);
+        } break;
+    case 1:     // logged-in users can add events
+        if (!COM_isAnonUser()) {
+            $retval = array($add_url, 0);
+        }
         break;
-    case 2:
-        $retval = array($LANG_EVLIST['pi_title'],
-                EVLIST_URL . '/index.php?op=' . $_EV_CONF['default_view'],
-                0);
+    case 2:     // logged-in + anonymous users can add
+        $retval = array($add_url, 0);
         break;
     }
-
     return $retval;
 }
 
@@ -1138,7 +1139,11 @@ function plugin_moderationvalues_evlist()
 */
 function plugin_ismoderator_evlist()
 {
-    return SEC_hasRights('evlist.admin');
+    static $ismod = NULL;
+    if ($ismod === NULL) {
+        $ismod = SEC_hasRights('evlist.admin');
+    }
+    return $ismod;
 }
 
 

@@ -114,12 +114,8 @@ function plugin_initconfig_evlist()
 
         $c->add('allow_anon_view',$CONF_EVLIST_DEFAULT['allow_anon_view'], 'select',
                 0, 0, 0, 10, true, 'evlist');
-        $c->add('can_add',$CONF_EVLIST_DEFAULT['allow_anon_add'], 'select',
+        $c->add('can_add',$CONF_EVLIST_DEFAULT['can_add'], 'select',
                 0, 0, 15, 20, true, 'evlist');
-        /*$c->add('allow_anon_add',$CONF_EVLIST_DEFAULT['allow_anon_add'], 'select',
-                0, 0, 0, 20, true, 'evlist');
-        $c->add('allow_user_add',$CONF_EVLIST_DEFAULT['allow_user_add'], 'select',
-                0, 0, 0, 30, true, 'evlist');*/
         $c->add('allow_html',$CONF_EVLIST_DEFAULT['allow_html'], 'select',
                 0, 0, 0, 40, true, 'evlist');
         $c->add('enable_menuitem',$CONF_EVLIST_DEFAULT['enable_menuitem'], 'select',

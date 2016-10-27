@@ -157,7 +157,7 @@ class evTicket
         // md5 makes a long value to put in a qrcode url.
         // makeSid() should be sufficient since it includes some
         // random characters.
-        return COM_makeSid();
+        return 'EV' . COM_makeSid();
     }
 
 
@@ -562,8 +562,13 @@ class evTicket
                 $ticket->fee,
                 $ticket->paid,
                 $ticket->used > $ticket->dt ? $dt_used->toMySQL(): '',
-                ($counter > $Rp->Event->options['max_rsvp']) ? 'Yes': 'No',
             );
+            if ($Rp->Event->options['max_rsvp'] > 0) {
+                $is_waitlisted = ($counter > $Rp->Event->options['max_rsvp']) ? 'Yes': 'No';
+            } else {
+                $is_waitlisted = 'N/A';
+            }
+            $values[] = $is_waitlisted;
             $retval .= '"' . implode('","', $values) . '"' . "\n";
         }
         return $retval;

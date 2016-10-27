@@ -284,13 +284,10 @@ class evTicket
     *
     *   @param  integer $id     ID of ticket reset
     */
-    public function Reset($id='')
+    public static function Reset($id='')
     {
         global $_TABLES;
 
-        if ($id == '' && is_object($this)) {
-            $id = $this->tic_id;
-        }
         if (is_array($id)) {
             foreach ($id as $idx=>$tic_id) {
                 $id[$idx] = DB_escapeString($tic_id);
@@ -590,18 +587,18 @@ class evTicket
         global $_TABLES;
 
         // Check that the ticket hasn't already been used
-        //if ($this->used > 0) return 51;
+        if ($this->used > 0) return 51;
         if ($this->fee > 0 && $this->paid < $this->fee) return 50;
 
         // Record the current timestamp in the DB
-        //$this->used = time();
-        /*$sql = "UPDATE {$_TABLES['evlist_tickets']}
+        $this->used = time();
+        $sql = "UPDATE {$_TABLES['evlist_tickets']}
             SET used = {$this->used}
-            WHERE tic_id = '{$this->tic_id}'";*/
-        $sql = "INSERT INTO {$_TABLES['evlist_tickets_used']} SET
+            WHERE tic_id = '{$this->tic_id}'";
+        /*$sql = "INSERT INTO {$_TABLES['evlist_tickets_used']} SET
                 tic_id = '" . DB_escapeString($this->tic_id) . "',
                 rp_id = {$rp_id},
-                used = UNIX_TIMESTAMP()";
+                used = UNIX_TIMESTAMP()";*/
         DB_query($sql, 1);
         return DB_error() ? 51 : 0;
     }

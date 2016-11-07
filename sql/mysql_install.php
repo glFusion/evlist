@@ -232,7 +232,7 @@ $_EV_UPGRADE = array(
     ),
 '1.3.7' => array(
     "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
-      `tic_id` varchar(255) NOT NULL,
+      `tic_id` varchar(128) NOT NULL,
       `tic_type` int(11) unsigned NOT NULL DEFAULT '0',
       `ev_id` varchar(128) NOT NULL,
       `rp_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -271,7 +271,8 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_repeat']}
         CHANGE rp_ev_id rp_ev_id varchar(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_tickets']}
-        CHANGE ev_id ev_id varchar(128) NOT NULL",
+        CHANGE ev_id ev_id varchar(128) NOT NULL,
+        CHANGE tic_id tic_id varchar(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_lookup']}
         CHANGE eid eid VARCHAR(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_remlookup']}

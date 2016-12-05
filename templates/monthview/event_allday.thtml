@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div data-uk-tooltip class="gl_mootip monthview_allday show_cal{cal_id} event" 
+<div class="tooltip gl_mootip monthview_allday show_cal{cal_id} event" 
     title="{ev_hover}"
     style="background-color:{bgcolor};">
 {!if is_meetup}

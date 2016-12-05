@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div data-uk-tooltip class="gl_mootip monthview_timed show_cal{cal_id} event"
+<div class="tooltip gl_mootip monthview_timed show_cal{cal_id} event"
     title="{ev_hover}">
 {!if is_meetup}
   <a href="{ev_url}" target="_blank"

@@ -279,6 +279,12 @@ $_EV_UPGRADE = array(
         CHANGE eid eid varchar(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_detail']}
         CHANGE ev_id ev_id varchar(128) NOT NULL",
+    "UPDATE {$_TABLES['gl_conf_values']} SET
+        subgroup = 30, sort_order = 50, fieldset = 0
+        WHERE group_name = 'evlist' AND name='use_weather'",
+    "UPDATE {$_TABLES['gl_conf_values']} SET
+        subgroup = 30, sort_order = 60, fieldset = 0
+        WHERE group_name = 'evlist' AND name='use_locator'",
     ),
 );
 

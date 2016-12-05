@@ -149,10 +149,6 @@ function plugin_initconfig_evlist()
                 0, 1, 14, 90, true, 'evlist');
         $c->add('max_upcoming_days', $CONF_EVLIST_DEFAULT['max_upcoming_days'], 'text',
                 0, 1, 0, 100, true, 'evlist');
-        $c->add('use_locator', $CONF_EVLIST_DEFAULT['use_locator'], 'select',
-                0, 1, 0, 110, true, 'evlist');
-        $c->add('use_weather', $CONF_EVLIST_DEFAULT['use_weather'], 'select',
-                0, 1, 0, 120, true, 'evlist');
         $c->add('cal_tmpl', $CONF_EVLIST_DEFAULT['cal_tmpl'], 'select',
                 0, 1, 16, 130, true, 'evlist');
 
@@ -186,15 +182,19 @@ function plugin_initconfig_evlist()
         // External integrations
         $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
         $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
-        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
-                30, 10, 0, 10, true, 'evlist');
-        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
-                30, 10, 0, 20, true, 'evlist');
-        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
-                30, 10, 0, 30, true, 'evlist');
         $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
+                30, 10, 0, 10, true, 'evlist');
+        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
+                30, 10, 0, 20, true, 'evlist');
+        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
+                30, 10, 0, 30, true, 'evlist');
+        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
                 30, 10, 0, 40, true, 'evlist');
-    }
+        $c->add('use_locator', $CONF_EVLIST_DEFAULT['use_locator'], 'select',
+                30, 10, 0, 50, true, 'evlist');
+        $c->add('use_weather', $CONF_EVLIST_DEFAULT['use_weather'], 'select',
+                30, 10, 0, 60, true, 'evlist');
+     }
 
     return true;
 }

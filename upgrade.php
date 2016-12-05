@@ -36,8 +36,9 @@
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+*   @copyright  Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
+*   @version    1.4.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -62,7 +63,8 @@ $c = config::get_instance();
 */
 function evlist_upgrade()
 {
-    global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c;
+    global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c,
+        $_CONF_EVLIST_DEFAULTS;
 
     $currentVersion = DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'");
 
@@ -221,20 +223,22 @@ function evlist_upgrade()
     }
 
     if ($currentVersion < '1.4.0') {    // Update versions less than 1.3.7
-        $error = EVLIST_do_upgrade_sql('1.4.0');
-        if ($error) {
-            return false;
-        }
         $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
         $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
-        $c->add('meetup_key', $CONF_EVLIST_DEFAULT['meetup_key'], 'text',
+        $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
                 30, 10, 0, 10, true, 'evlist');
-        $c->add('meetup_gid', $CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
+        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
                 30, 10, 0, 20, true, 'evlist');
-        $c->add('meetup_cache_minutes', $CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
+        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
                 30, 10, 0, 30, true, 'evlist');
-        $c->add('meetup_enabled', $CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
+        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
                 30, 10, 0, 40, true, 'evlist');
+
+        // SQL includes moving configuration items under the sg_integ group,
+        // so execute it last.
+        if (!EVLIST_do_upgrade_sql('1.4.0'))
+            return false;
+        }
     }
 
     CTL_clearCache();

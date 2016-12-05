@@ -263,9 +263,10 @@ $_EV_UPGRADE = array(
     ),
 '1.4.0' => array(
     "CREATE TABLE {$_TABLES['evlist_cache']} (
+      `type` varchar(50) NOT NULL DEFAULT '',
       `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      `type` varchar(50) DEFAULT NULL,
-      `data` text)",
+      `data` text,
+      PRIMARY KEY (`type`,`ts`))",
     "ALTER TABLE {$_TABLES['evlist_events']}
         CHANGE id id varchar(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_repeat']}

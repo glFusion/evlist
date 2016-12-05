@@ -212,7 +212,7 @@ function evlist_upgrade()
             $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
             $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
             $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                20, 10, 17, 10, true, 'evlist');
+                20, 10, 0, 10, true, 'evlist');
             $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
                 20, 10, 17, 20, true, 'evlist');
         } else {

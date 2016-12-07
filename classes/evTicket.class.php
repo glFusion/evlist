@@ -369,19 +369,22 @@ class evTicket
     */
     public static function PrintTickets($ev_id='', $rp_id=0, $uid=0)
     {
-        global $_CONF;
+        global $_CONF, $_USER;
 
-        // Verify that the current is an admin or event owner
         USES_evlist_class_event();
         $Event = new evEvent($ev_id);
-        if (!$Event->hasAccess(3)) {
-            return;
+
+        // Verify that the current user is an admin or event owner to print
+        // all tickets, otherwise only print the user's tickets.
+        if (!$Event->hasAccess(3) && $uid == 0) {
+            $uid = $_USER['uid'];
         }
 
         $checkin_url = $_CONF['site_admin_url'] . '/plugins/evlist/checkin.php?tic=';
 
         // get the tickets, paid and unpaid. Need event id and uid.
         $tickets = self::GetTickets($ev_id, $rp_id, $uid);
+
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
         // the lglib version during installation

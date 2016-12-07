@@ -531,7 +531,7 @@ function toggleRSVPdetail(val)
           {$LANG_EVLIST['end_date']}:
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
-        <div style="uk-form-controls">
+        <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
           <input type="text" name="date_end1" id="f_enddate1" 
             size="10" value="{enddate1}" onchange="checkDate2();" />

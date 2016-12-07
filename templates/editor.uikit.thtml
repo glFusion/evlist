@@ -361,7 +361,6 @@ function toggleRSVPdetail(val)
 {!endif}
 }
 
--->
 </script>
 
 <div id="pe_navbar" style="display:none">
@@ -569,7 +568,6 @@ function toggleRSVPdetail(val)
         <br /><br />
 
         <p {datetime2_show} id="div3">
-        <!--<span {datetime2_show} id="div3">-->
           <label for="starthour2">
             {$LANG_EVLIST['start_time']}:
           </label>
@@ -609,7 +607,6 @@ function toggleRSVPdetail(val)
                 id="recurring"{recurring_checked} 
                 onclick="showhiderecurringoptions()" />
 
-        <!--<span {recurring_show} id="div2"><br/><br/>-->
         <div {recurring_show} id="div2">
           <label for="format">{$LANG_EVLIST['event_recurs']}:</label>
           <select name="format" id="format" 
@@ -619,7 +616,6 @@ function toggleRSVPdetail(val)
           </select>
 
           <p {stopshow} id="stopdate_div">
-          <!--<div {stopshow} id="stopdate_div"><br/>-->
             <label for="f_stopdate" style="width:50%;text-align:left;">
               {dailystop_label}:
             </label>
@@ -630,11 +626,9 @@ function toggleRSVPdetail(val)
             <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
                 id="stopdate_trigger" class="evDatePicker"
                 />
-          <!--</div>-->
           </p>
 
           <div {monthday_sel_show} id="monthday_sel">
-          <!--<p {monthday_sel_show} id="monthday_sel">-->
             {$LANG_EVLIST['sel_monthdays']}<br />
             <table border="0">
             <tr>
@@ -674,10 +668,8 @@ function toggleRSVPdetail(val)
             </tr>
             </table>
           </div>
-          <!--</p>-->
 
           <p {format1show} id="format1"><br/>
-          <!--<div {format1show} id="format1"><br/>-->
             <label for="skipnext">
               {$LANG_EVLIST['skip_weekends']}
             </label>
@@ -693,11 +685,9 @@ function toggleRSVPdetail(val)
             {$LANG_EVLIST['next_bus_day']}
             </span>
             <span class="evFieldNote">{skipnext_note}</span>
-          <!--</div>-->
           </p>
 
           <p {format4show} id="format4">
-          <!--<div {format4show} id="format4"><br/>-->
             <label style="width:50%;text-align:left;">{listdays_label}:</label><br/>
             <input name="listdays[]" type="checkbox" value="1" {daychk1} />
             {$LANG_WEEK[1]}&nbsp;
@@ -713,15 +703,13 @@ function toggleRSVPdetail(val)
             {$LANG_WEEK[6]}&nbsp;
             <input name="listdays[]" type="checkbox" value="7" {daychk7} />
             {$LANG_WEEK[7]}&nbsp;
-          <!--</div>-->
           </p>
 
           <p {format5show} id="format5">
-          <!--<div {format5show} id="format5">-->
             <label style="width:50%;text-align:left;">
             {$LANG_EVLIST['interval_label']}:<br />
             {$LANG_EVLIST['interval_note']}</label>
-              {recurring_interval_options}
+              {recurring_interval_options}<br />
             <input type="checkbox" value="1" name="interval[]" {dom_int_chk_1} />&nbsp;{dom_int_txt_1}&nbsp;&nbsp;
             <input type="checkbox" value="2" name="interval[]" {dom_int_chk_2} />&nbsp;{dom_int_txt_2}&nbsp;&nbsp;
             <input type="checkbox" value="3" name="interval[]" {dom_int_chk_3} />&nbsp;{dom_int_txt_3}&nbsp;&nbsp;
@@ -730,37 +718,29 @@ function toggleRSVPdetail(val)
             <select name="weekday" id="weekday">
               {recurring_weekday_options}
             </select>
-            <br/><br/>
           </p>
 
           <p {freq_div_show} id="freq_div">
-          <!--<div {freq_div_show} id="freq_div">-->
-            <br/>
             <label for="rec_freq" style="width:50%;text-align:left;">
               {$LANG_EVLIST['recur_freq_txt']}
             </label>
             <input type="text" size="3" maxlength="3" name="rec_freq"
                 id="rec_freq" value="{rec_freq}" />
             <span id="freq_type">{freq_text}</span>
-          <!--</div>-->
           </p>
 
           <p {format6show} id="format6">
-          <!--<div {format6show} id="format6">-->
             <label for="custom" style="width:90%;text-align:left;">
               {custom_label} {$LANG_EVLIST['recur_cust_ignoredates']}:
             <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
-                id="custom_trigger" class="evDatePicker"
-                />
+                id="custom_trigger" class="evDatePicker" />
             </label>
             <br />
             <input type="text" name="custom" id="custom" size="" 
                 style="width:80%" maxlength="255" value="{custom_val}" />
             <br />
             <span class="evFieldNote">{$LANG_EVLIST['recur_cust_format']}</span>
-          <!--</div>-->
           </p>
-        <!--</span>-->
         </div>
 
       </div>

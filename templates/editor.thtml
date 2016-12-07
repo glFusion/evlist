@@ -19,8 +19,9 @@ var days_diff = ts2 - ts1;
 var disp_format = "{display_format}";
 var fld_format = "%Y-%m-%d";
 
-function dateFromYMD(parts)
+function dateFromYMD(ymd)
 {
+    parts = ymd.split("-");
     temp = new Date(parts[0],parts[1]-1,parts[2],0,0,0,0);
     return temp;
 };

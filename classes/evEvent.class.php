@@ -792,7 +792,7 @@ class evEvent
         }
 
         $T = new Template($_CONF['path'] . 'plugins/evlist/templates/');
-        if ($_SYSTEM['disable_jquery_slimbox']) {
+        if ($_EV_CONF['_is_uikit']) {
             $T->set_file('editor', 'editor.uikit.thtml');
         } else {
             $T->set_file('editor', 'editor.thtml');

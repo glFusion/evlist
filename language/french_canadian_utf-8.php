@@ -277,7 +277,7 @@ $LANG_EVLIST = array(
 'categories'            => "Suppression de catégories <strong>pas< /strong> supprimer les événements appartenant à ces catégories. <br / >La désactivation d'une catégorie <strong>pas< /strong> désactiver ses événements. Ces événements continueront d'apparaître dans la liste d'événements. ",
 'calendars'            => "Tous les événements doivent être associées à un calendrier. <br / >La désactivation d'un calendrier empêche ses événements d'être affiché. La suppression d'un calendrier, il faut que les événements appartenant à la déplacer dans un autre calendrier. <br / >Calendrier numéro 1 ne peut pas être supprimé, mais elle peut être désactivée. ",
 'events'            => "Pour créer un nouvel événement, cliquez sur 'Nouvel événement' ci-dessus. <br / >Pour modifier ou supprimer un événement, cliquez sur cet événement\'s modifier icône ci-dessous. Pour activer/désactiver un événement, cochez la case appropriée ci-dessous. ",
-    'tickettypes' => 'Tickets can be created for free or paid admission, and to cover one event occurrence or all occurrences (event pass). Tickets are only used if the global &quot;Enable RSVP&quot; setting is enabled.<br />Ticket Types can only be deleted if they haven&apos; been used for any events.',
+    'tickettypes' => 'Tickets can be created for free or paid admission, and to cover one event occurrence or all occurrences (event pass). Tickets are only used if the global &quot;Enable RSVP&quot; setting is enabled.<br />Ticket Types can only be deleted if they haven&apos;t been used for any events.',
 ),
 
 'current_events'        => 'événements en cours',

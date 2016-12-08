@@ -92,16 +92,16 @@ function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
             LEFT JOIN {$_TABLES['evlist_calendars']} cal
                 ON cal.cal_id = ev.cal_id
             $cat_join
-            WHERE ev.status = 1 
+            WHERE ev.status = 1
             AND (
                 (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
                 OR
                 (rep.rp_date_end >= '$start' AND rep.rp_date_start <= '$start')
                 OR
                 (rep.rp_date_end <= '$end' AND rep.rp_date_start >= '$start')
-            ) " . 
+            ) " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
-            COM_getPermSQL('AND', 0, 2, 'cal') . 
+            COM_getPermSQL('AND', 0, 2, 'cal') .
             " $cat_where $cal_where
             ORDER BY rep.rp_date_start ASC";
     //echo $sql;die;
@@ -194,11 +194,11 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
                     // Show event titles on different lines if more than one
                     if (!empty($popup)) $popup .= EVLIST_tooltip_newline();
                     // Don't show a time for all-day events
-                    if ($event['allday'] == 0 && 
+                    if ($event['allday'] == 0 &&
                             $event['rp_date_start'] == $event['rp_date_end']) {
-                        $dt->setTimestamp(strtotime($event['rp_date_start'] . 
+                        $dt->setTimestamp(strtotime($event['rp_date_start'] .
                                 ' ' . $event['rp_time_start1']));
-                        // Time is a localized string, not a timestamp, so 
+                        // Time is a localized string, not a timestamp, so
                         // don't adjust for the timezone
                         $popup .= $dt->format($_CONF['timeonly'], false) . ': ';
                     }
@@ -363,7 +363,7 @@ function EVLIST_getDayViewData($events, $today = '')
                 $dtEnd = new Date(strtotime($A['rp_date_end'] .
                                     ' ' . $A['rp_time_end1']));
 
-                //if (date('i', strtotime($A['rp_date_end'] . ' ' . 
+                //if (date('i', strtotime($A['rp_date_end'] . ' ' .
                 //            $A['rp_time_end1'])) == '00') {
                 //    $endhour = $endhour - 1;
                 //}
@@ -383,18 +383,18 @@ function EVLIST_getDayViewData($events, $today = '')
                     'data'       => $A,
                 );
 
-                if ($A['split'] == 1 && 
+                if ($A['split'] == 1 &&
                         $A['rp_time_end2'] > $A['rp_time_start2']) {
                     // This is a split event, second half occurs later today.
                     // Events spanning multiple days can't be split, so we
                     // know that the start and end times are on the same day.
                     //$starthour = date('G', strtotime($A['rp_date_start'] .
                     //                ' ' . $A['rp_time_start2']));
-                    $dtStart->setTimestamp(strtotime($event['rp_date_start'] . 
+                    $dtStart->setTimestamp(strtotime($event['rp_date_start'] .
                                 ' ' . $event['rp_time_start2']));
                     $starthour = $dtStart->format('G', false);
                     $time_start = $dtStart->format($_CONF['timeonly'], false);
-                    $dtEnd->setTimestamp(strtotime($event['rp_date_start'] . 
+                    $dtEnd->setTimestamp(strtotime($event['rp_date_start'] .
                                 ' ' . $event['rp_time_end2']));
                     $time_end = $dtEnd->format($_CONF['timeonly'], false);
                     $hourlydata[(int)$starthour][] = array(
@@ -460,7 +460,7 @@ function EVLIST_deleteImageLink($A, $token)
 *
 *   @param  string  $msg    Error message to display
 *   @param  string  $type   Type of message, used for style and header
-*   @param  string  $header Optional header text.  
+*   @param  string  $header Optional header text.
 *   @return string      Formatted error message
 */
 function EVLIST_alertMessage($msg = '', $type = '', $header = '')
@@ -490,10 +490,10 @@ function EVLIST_cal_checkboxes($cals)
     asort($cals);
     if (!empty($cals)) {
         foreach ($cals as $key=>$cal) {
-            $boxes .= '<div style="float:left;width:100%;' . 
+            $boxes .= '<div style="float:left;width:100%;' .
                 'color:' . $cal['fgcolor'] . '">
                 <input checked="checked" type="checkbox" id="cal' . $key .
-                '" onclick="SelectCal(this)">&nbsp;' . 
+                '" onclick="SelectCal(this)">&nbsp;' .
                 $cal['cal_name'] . '</div><br >' . LB;
         }
     }
@@ -533,8 +533,8 @@ function EVLIST_GetOptions($options, $selected = '', $bias=0)
 
 /**
 *   Get the ISO language.
-*   This is to load the correct language for the calendar popup, so make 
-*   sure a corresponding language file exists.  
+*   This is to load the correct language for the calendar popup, so make
+*   sure a corresponding language file exists.
 *   Default to English if not found.
 *
 *   @return string      ISO language string, 'en' by default
@@ -544,7 +544,7 @@ function EVLIST_getIsoLang()
     global $_CONF, $_EV_CONF;
 
     $iso_lang = $_CONF['iso_lang'];
-    if (!is_file($_CONF['path_html'] . $_EV_CONF['pi_name'] . 
+    if (!is_file($_CONF['path_html'] . $_EV_CONF['pi_name'] .
             '/js/calendar/lang/calendar-' . $iso_lang . '.js')) {
         $iso_lang = 'en';
     }
@@ -567,7 +567,7 @@ function EVLIST_getFeedLinks()
         return $retval;
 
     // Get the feed info for configured feeds
-    $result = DB_query("SELECT title, filename 
+    $result = DB_query("SELECT title, filename
             FROM {$_TABLES['syndication']}
             WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
 
@@ -602,7 +602,7 @@ function EVLIST_getFeedIcons()
         return $retval;
 
     // Get the feed info for configured feeds
-    $result = DB_query("SELECT title, filename 
+    $result = DB_query("SELECT title, filename
             FROM {$_TABLES['syndication']}
             WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
 
@@ -659,7 +659,7 @@ function EVLIST_adminRSVP($rp_id)
                 ON u.uid = tk.uid
             WHERE tk.ev_id = '{$Ev->Event->id}' ";
 
-    $title = $LANG_EVLIST['pi_title'] . ': ' . 
+    $title = $LANG_EVLIST['pi_title'] . ': ' .
         $LANG_EVLIST['admin_rsvp'] . ' -- ' .
         COM_createLink($Ev->Event->Detail->title . ' (' . $Ev->date_start . ')',
         EVLIST_URL . '/event.php?eid=' . $rp_id);
@@ -669,7 +669,7 @@ function EVLIST_adminRSVP($rp_id)
     $title .= '&nbsp;&nbsp;&nbsp;<a href="'.EVLIST_URL .
             '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
             '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
- 
+
     if ($Ev->Event->options['use_reg'] == EV_RSVP_REPEAT) {
         $sql .= " AND rp_id = '{$Ev->rp_id}' ";
     }
@@ -685,7 +685,7 @@ function EVLIST_adminRSVP($rp_id)
 
     $header_arr = array(
         array(  'text'  => $LANG_EVLIST['rsvp_date'],
-                'field' => 'dt', 
+                'field' => 'dt',
                 'sort'  => true,
         ),
         array(  'text'  => $LANG_EVLIST['name'],
@@ -729,19 +729,18 @@ function EVLIST_adminRSVP($rp_id)
             '<input data-uk-tooltip name="tickreset" type="image" src="'
             . $_CONF['site_url'] . '/evlist/images/reset.png'
             . '" style="vertical-align:text-bottom;" title="'
-            . $LANG_EVLIST['reset_usage'] 
-            . '" class="gl_mootip"' 
+            . $LANG_EVLIST['reset_usage']
+            . '" class="gl_mootip"'
             . ' onclick="return confirm(\'' . $LANG_EVLIST['conf_reset']
             . '\');" />&nbsp;' . $LANG_EVLIST['reset_usage']
             . '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
- 
     );
 
     $query_arr = array(
         'sql'       => $sql,
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_getField_rsvp', 
+    $retval .= ADMIN_list('evlist', 'EVLIST_getField_rsvp',
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 '', '', $options_arr);
     return $retval;
@@ -773,7 +772,7 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
             $retval = 'Yes';
         }
         break;
-            
+
     case 'uid':
         $retval = COM_getDisplayName($fieldvalue);
         break;
@@ -795,7 +794,7 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
             $retval = '';
         }
         break;
-                
+
     default:
         $retval = $fieldvalue;
         break;
@@ -834,6 +833,5 @@ function EVLIST_getDayNames($letters = 0)
     }
     return $retval;
 }
-
 
 ?>

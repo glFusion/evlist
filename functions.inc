@@ -71,7 +71,7 @@ if ($_EV_CONF['use_locator'] == 1) {
         $_EV_CONF['use_locator'] = 0;
     }
 }
-        
+
 // Local configuration overrides can be set by having a config.php file.
 if (file_exists(EVLIST_PI_PATH . '/config.php')) {
     /** Include local configuration overrides */
@@ -180,7 +180,7 @@ function plugin_autouninstall_evlist()
         'groups'    => array('evlist Admin'),
         'features'  => array('evlist.admin', 'evlist.submit'),
 
-        'php_blocks' => array('phpblock_evlist_upcoming', 
+        'php_blocks' => array('phpblock_evlist_upcoming',
                         'phpblock_evlist_smallmonth'),
     );
 
@@ -319,7 +319,7 @@ function plugin_showstats_evlist($showsitestats)
         $permSQL = COM_getPermSQL('AND');
     }
 
-    $result = DB_query("SELECT ev.id, det.title, ev.hits 
+    $result = DB_query("SELECT ev.id, det.title, ev.hits
             FROM {$_TABLES['evlist_events']} ev
             LEFT JOIN {$_TABLES['evlist_detail']} det
                 ON ev.id = det.ev_id
@@ -330,12 +330,12 @@ function plugin_showstats_evlist($showsitestats)
         USES_lib_admin();
         $header_arr = array(
             array('text' => $LANG_EVLIST['event_title'],
-                    'field' => 'eid', 
+                    'field' => 'eid',
                     'header_class' => 'stats-header-title',
             ),
-            array(  'text' => $LANG_EVLIST['hits'], 
-                    'field' => 'hits', 
-                    'header_class' => 'stats-header-count', 
+            array(  'text' => $LANG_EVLIST['hits'],
+                    'field' => 'hits',
+                    'header_class' => 'stats-header-count',
                     'field_class' => 'stats-list-count',
             ),
         );
@@ -346,7 +346,7 @@ function plugin_showstats_evlist($showsitestats)
         for ($i = 0; $i < $nrows; $i++) {
             $A = DB_fetchArray ($result);
             $A['title'] = COM_stripslashes($A['title']);
-            $A['eid'] = '<a href="' . 
+            $A['eid'] = '<a href="' .
                     COM_buildUrl(EVLIST_URL . '/event.php?eid=' . $A['id']) .
                     '">' . $A['title'] . '</a>';
             $A['hits'] = COM_NumberFormat($A['hits']);
@@ -377,8 +377,8 @@ function plugin_statssummary_evlist()
         $permSQL = COM_getPermSQL('AND');
     }
 
-    $result = DB_query("SELECT COUNT(*) AS numrows 
-                FROM {$_TABLES['evlist_events']} 
+    $result = DB_query("SELECT COUNT(*) AS numrows
+                FROM {$_TABLES['evlist_events']}
                 WHERE status='1' $permSQL");
     list ($numrows) = DB_fetchArray($result);
 
@@ -408,7 +408,7 @@ function plugin_searchtypes_evlist()
 *
 *   @return mixed       SearchCriteria object, or NULL if not allowed
 */
-function plugin_dopluginsearch_evlist($query, $datestart, $dateend, 
+function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $topic, $type, $author, $keyType, $page, $perpage
 ) {
     global $_CONF, $_EV_CONF,$_TABLES;
@@ -427,9 +427,9 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
 
     $url = '/evlist/event.php?view=x&eid=';
     $q = '&query=' . urlencode($query);
-    $sql = "SELECT e.id, d.title, d.summary as description, 
+    $sql = "SELECT e.id, d.title, d.summary as description,
                 UNIX_TIMESTAMP(r.rp_date_start) AS date,
-                e.hits, e.owner_id AS uid, gl.username, 
+                e.hits, e.owner_id AS uid, gl.username,
                 CONCAT('$url',r.rp_id,'$q') AS url
             FROM {$_TABLES['evlist_detail']} d
             LEFT JOIN {$_TABLES['evlist_events']} e
@@ -447,9 +447,9 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $search = new SearchCriteria('evlist', 'evList');
     $columns = array('d.title', 'd.summary', 'd.full_description',
                     'd.location', 'd.contact');
-    $sql .= $search->getDateRangeSQL('AND', 'UNIX_TIMESTAMP(r.rp_date_start)', 
+    $sql .= $search->getDateRangeSQL('AND', 'UNIX_TIMESTAMP(r.rp_date_start)',
                     $datestart, $dateend);
-    list($sql,$ftsql) = $search->buildSearchSQL($keyType, $query, 
+    list($sql,$ftsql) = $search->buildSearchSQL($keyType, $query,
                     $columns, $sql);
     $sql .= ' GROUP BY d.det_id ';
     $search->setSQL($sql);
@@ -576,7 +576,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     default:
         return '';
     }
- 
+
     if ( (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') ||
         $_EV_CONF['pos_centerblock'] != $where ) {
         return '';
@@ -813,7 +813,7 @@ function plugin_getfeednames_evlist()
         // Always include "All" as an option
         array('id' => '0', 'name' => $LANG_EVLIST['all_upcoming']),
     );
-    $result = DB_query("SELECT id, name 
+    $result = DB_query("SELECT id, name
             FROM {$_TABLES['evlist_categories']}
             WHERE status = 1");
     while ($A = DB_fetchArray($result, false)) {
@@ -857,7 +857,7 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
     if ($limit > 500) $limit = 500;
 
     // Get all upcoming events
-    $events = EVLIST_getEvents($_EV_CONF['_today'], 
+    $events = EVLIST_getEvents($_EV_CONF['_today'],
             date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
             array('cat'=>$F['topic'], 'limit'=>$limit)
     );
@@ -902,8 +902,8 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
         }
     }
 
-    $view = isset($_EV_CONF['default_view']) && 
-            !empty($_EV_CONF['default_view']) ? 
+    $view = isset($_EV_CONF['default_view']) &&
+            !empty($_EV_CONF['default_view']) ?
             $_EV_CONF['default_view'] : 'list';
     if ($F['topic'] == 0) {
         $link = EVLIST_URL . '/index.php?view=' . $view;
@@ -938,7 +938,7 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
     $limit = (int)$limit;
     if ($limit > 500) $limit = 500;
 
-    $sql = EVLIST_getEvents_sql($_EV_CONF['_today'], 
+    $sql = EVLIST_getEvents_sql($_EV_CONF['_today'],
             date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
             array('cat'=>$topic, 'limit'=>$limit, 'select'=>'rep.rp_id')
     );
@@ -973,7 +973,7 @@ function plugin_runScheduledTask_evlist()
         WHERE rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)";
         // TODO: Figure out sql for recurring event reminders
         /*AND (
-            rem.rp_id = 0 AND 
+            rem.rp_id = 0 AND
             rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)            )
     )";*/
     //COM_errorLog($sql);
@@ -981,7 +981,7 @@ function plugin_runScheduledTask_evlist()
     if (DB_numRows($result) < 1) {
         return true;
     }
-    
+
     $now = time();
     $events = array();
     USES_evlist_class_repeat();
@@ -1123,9 +1123,9 @@ function plugin_moderationvalues_evlist()
         'id',
         $_TABLES['evlist_events'],
         'id, date_start1, date_end1,
-        time_start1, time_end1, time_start2, time_end2, 
-        recurring, rec_data, allday, split, 
-        status, postmode, hits, enable_reminders, 
+        time_start1, time_end1, time_start2, time_end2,
+        recurring, rec_data, allday, split,
+        status, postmode, hits, enable_reminders,
         owner_id, group_id, perm_owner, perm_group, perm_members, perm_anon,
         det_id, show_upcoming, cal_id, options',
         $_TABLES['evlist_submissions']
@@ -1190,15 +1190,15 @@ function plugin_enablestatechange_evlist($enable)
     $is_enabled = $enable ? 1 : 0;
 
     // toggle evlist feeds
-    DB_query ("UPDATE {$_TABLES['syndication']} 
-                SET is_enabled = $is_enabled 
+    DB_query ("UPDATE {$_TABLES['syndication']}
+                SET is_enabled = $is_enabled
                 WHERE type = 'evlist'");
 
     // turns block off if on, but will not turn it on if off.
     if ($is_enabled != 1) {
-        DB_query ("UPDATE {$_TABLES['blocks']} 
-                    SET is_enabled = $is_enabled 
-                    WHERE (type = 'phpblock') 
+        DB_query ("UPDATE {$_TABLES['blocks']}
+                    SET is_enabled = $is_enabled
+                    WHERE (type = 'phpblock')
                     AND (phpblockfn LIKE 'phpblock_evlist_%')");
     }
 }
@@ -1362,11 +1362,11 @@ function EVLIST_getCatLinks($eid, $andrange)
 {
     global $_TABLES, $_CONF;
 
-    $sql = "SELECT tc.id, tc.name 
+    $sql = "SELECT tc.id, tc.name
             FROM {$_TABLES['evlist_categories']} tc
-            LEFT JOIN {$_TABLES['evlist_lookup']} tl 
-                ON tc.id = tl.cid 
-            WHERE tl.eid = '".DB_escapeString($eid)."' 
+            LEFT JOIN {$_TABLES['evlist_lookup']} tl
+                ON tc.id = tl.cid
+            WHERE tl.eid = '".DB_escapeString($eid)."'
             AND tl.status = '1'";
     //echo $sql;die;
     $cresult = DB_query($sql);
@@ -1375,8 +1375,8 @@ function EVLIST_getCatLinks($eid, $andrange)
         $catlinks = array();
         while ($C = DB_fetchArray($cresult, false)) {
             $catlinks[] = '<a href="' .
-                COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange . 
-                '&amp;cat=' . $C['id']) . '">' . COM_stripslashes($C['name']) . 
+                COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange .
+                '&amp;cat=' . $C['id']) . '">' . COM_stripslashes($C['name']) .
                 '</a>';
         }
         $retval = implode('&nbsp;|&nbsp;', $catlinks);
@@ -1393,8 +1393,8 @@ function evlist_getCategoryOptions($selected) {
     global $_TABLES;
 
     $options = '';
-    $result = DB_query("SELECT id, name 
-                FROM {$_TABLES['evlist_categories']} 
+    $result = DB_query("SELECT id, name
+                FROM {$_TABLES['evlist_categories']}
                 WHERE status = '1'");
     while ($A = DB_fetchArray($result)) {
         $options .= '<option value="' . $A['id'] . '"';
@@ -1490,7 +1490,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
 
     $retval = '';
 
-    if ( !EVLIST_isCurrentVersion() && 
+    if ( !EVLIST_isCurrentVersion() &&
         (!isset($_EV_CONF['devel']) || $_EV_CONF['devel'] == 0) ) {
         // if not the current version, and not in development mode, return
         return $retval;
@@ -1542,7 +1542,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     $T = new Template(EVLIST_PI_PATH . '/templates/');
     $T->set_file('block','phpblock.thtml');
     $listlink = COM_buildURL(EVLIST_URL . '/index.php');
-    
+
     $count = 0;
     $rp_shown = array();    // Store repeat ids to avoid dups
     foreach ($events as $ev_dt=>$daydata) {
@@ -1586,13 +1586,13 @@ function phpblock_evlist_upcoming($A='', $catcal='')
 
             // Check that this event should be shown as upcoming at all, and
             // only show multi-day events once.
-            if ($ev['show_upcoming'] != 1 || 
+            if ($ev['show_upcoming'] != 1 ||
                 array_key_exists($ev['rp_id'], $rp_shown)) {
                 continue;
             }
             $rp_shown[$ev['rp_id']] = 1;
 
-            // TODO: displaying summaries in the block will be set from the 
+            // TODO: displaying summaries in the block will be set from the
             // admin panels sometime later.
             $summary = COM_truncate(htmlspecialchars(strip_tags(EVLIST_noquotes($ev['summary']))), $length, '...');
             $title = htmlspecialchars($ev['title']);
@@ -1673,8 +1673,8 @@ function plugin_configmanager_select_topic_centerblock_evlist()
         $permSQL = COM_getPermSQL('WHERE');
     }
 
-    $result = DB_query("SELECT tid, topic 
-                FROM {$_TABLES['topics']} 
+    $result = DB_query("SELECT tid, topic
+                FROM {$_TABLES['topics']}
                 $permSQL");
     while ($A = DB_fetchArray($result, false)) {
         $tid = COM_stripslashes($A['tid']);
@@ -1749,9 +1749,9 @@ function plugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
     } else {
         $permSql = COM_getPermSql($permOp);
     }
-    $sql = "SELECT " . implode(',', $fields) . 
+    $sql = "SELECT " . implode(',', $fields) .
             " FROM {$_TABLES['evlist_events']}
-            $where 
+            $where
             $permSql ";
 
     if ($id != '*') {
@@ -1854,7 +1854,7 @@ function plugin_getconfigelementhelp_evlist($element, $doclang )
     } else {
         $file = 'config.html';
     }
- 
+
     $doc_url = EVLIST_getDocURL($file, $doclang);
     if (empty($doc_url))
         return false;
@@ -1895,7 +1895,7 @@ function EVLIST_getDocURL($file='', $doclang='english')
     return $doc_url;
 }
 
- 
+
 /**
 *   Get the site header, with or without left blocks according to config.
 *
@@ -1986,9 +1986,9 @@ function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 *   language/custom, if available.  The admin can override language strings
 *   by creating a language file in that directory.
 *
-*   By including the language file, this function reads the $LANG_EVLIST 
-*   array. However, since it is not declared as global this does not override 
-*   the global version.  This version is returned to be used in a different 
+*   By including the language file, this function reads the $LANG_EVLIST
+*   array. However, since it is not declared as global this does not override
+*   the global version.  This version is returned to be used in a different
 *   variable name.
 *
 *   @param  mixed   $requested  A single or array of language strings
@@ -2002,7 +2002,7 @@ function plugin_loadlanguage_evlist($requested='')
 
     // Add the requested language, which may be an array or
     // a single item.
-    if (is_array($requested)) { 
+    if (is_array($requested)) {
         $languages = $requested;
     } elseif ($requested != '') {
         $languages[] = $requested;
@@ -2045,7 +2045,7 @@ function EVLIST_isCurrentVersion()
 
     if ($isCurrent === -1) {
         $isCurrent = true;
-        $evListVersion = DB_getItem($_TABLES['plugins'], 'pi_version', 
+        $evListVersion = DB_getItem($_TABLES['plugins'], 'pi_version',
                 "pi_name = 'evlist'");
         $installed = explode('.', $evListVersion);
         $code = explode('.', $_EV_CONF['pi_version']);
@@ -2147,7 +2147,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     // By default, get all fields that the caller could possibly want.  If
     // a selection option is specified, then that is used instead.  It's up
     // to the caller to request the value properly, including table prefix.
-    if ($selection == '') 
+    if ($selection == '')
         $selection = "rep.*, det.*, cal.*, ev.* $opt_select";
 
     // All the "*" queries may be ineffecient, but we need to read all
@@ -2161,18 +2161,18 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             LEFT JOIN {$_TABLES['evlist_calendars']} cal
                 ON cal.cal_id = ev.cal_id
             LEFT JOIN {$_TABLES['evlist_lookup']} l
-                ON l.eid = ev.id 
+                ON l.eid = ev.id
             LEFT JOIN {$_TABLES['evlist_categories']} cat
-                ON cat.id = l.cid 
-            WHERE ev.status = 1 
+                ON cat.id = l.cid
+            WHERE ev.status = 1
             AND (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
             AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
             $cat_status " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
-            COM_getPermSQL('AND', 0, 2, 'cal') . 
+            COM_getPermSQL('AND', 0, 2, 'cal') .
             " $opt_where
             GROUP BY rep.rp_id
-            ORDER BY rep.rp_date_start $opt_order, 
+            ORDER BY rep.rp_date_start $opt_order,
                     rep.rp_time_start1 $opt_order";
     if ($limit > 0) {
         if ($page > 1) {
@@ -2246,7 +2246,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 
     // Now, get Meetup events
     if ($_EV_CONF['meetup_enabled']) {
-        EVLIST_getMeetupEvents($start, $end, $events);
+        EVLIST_getMeetupEvents($start, $end, $opts, $events);
     }
 
     return $events;
@@ -2260,14 +2260,16 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 *
 *   @param  string  $start      Starting date (YYYY-MM-DD)
 *   @param  string  $end        Ending date (YYYY-MM-DD)
+*   @param  array   $opts       Options passed to caller
 *   @param  array   &$events    Existing array of events
 *   @return none
 */
-function EVLIST_getMeetupEvents($start='', $end='', &$events)
+function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
 {
     global $_EV_CONF, $_CONF;
 
     USES_evlist_class_meetup();
+    // Create a unique key for the query for cache identification
     $key = $start . '-' . $end . @serialize($opts);
     $key = md5($key);
     $M = new evMeetup($key);
@@ -2370,7 +2372,7 @@ function EVLIST_Log($logentry = '')
 
     // A little sanitizing
     $logentry = str_replace(
-            array('<?', '?>'), 
+            array('<?', '?>'),
             array('(@', '@)'),
             $logentry);
 
@@ -2384,8 +2386,8 @@ function EVLIST_Log($logentry = '')
 
     // Get the user name if it's not anonymous
     if (isset($_USER['uid'])) {
-        $byuser = $_USER['uid'] . '-'. 
-            COM_getDisplayName($_USER['uid'], 
+        $byuser = $_USER['uid'] . '-'.
+            COM_getDisplayName($_USER['uid'],
                 $_USER['username'], $_USER['fullname']);
     } else {
         $byuser = 'anon';

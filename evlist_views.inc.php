@@ -27,7 +27,7 @@ date_default_timezone_set('UTC');
 *   @param  integer $range  Range being displayed (optional)
 *   @return string          HTML for calendar header
 */
-function EVLIST_calHeader($year, $month, $day, $view='month', 
+function EVLIST_calHeader($year, $month, $day, $view='month',
     $cat=0, $cal=0, $range=0)
 {
     global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES;
@@ -98,14 +98,14 @@ function EVLIST_calHeader($year, $month, $day, $view='month',
 
     $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
     $T->set_var('cal_select', COM_optionList($_TABLES['evlist_calendars'],
-                    'cal_id,cal_name', $cal_selected, 1, 
+                    'cal_id,cal_name', $cal_selected, 1,
                     '1=1 '. COM_getPermSQL('AND'))
     );
 
     if (isset($_GET['range']) && !empty($_GET['range'])) {
         $T->set_var('range_url', 'range=' . $_GET['range']);
     }
-        
+
     if ($view == 'detail') {
         // Set marker to disable category/range dropdowns
         $T->set_var('showing_detail', 'true');
@@ -189,7 +189,7 @@ function EVLIST_calFooter($calendars = '')
         foreach ($calendars as $cal) {
             if ($cal['cal_ena_ical']) {
                 $ical_links .= '<a href="' . $webcal_url . '/ical.php?cal=' .
-                    $cal['cal_id'] . '">' . $cal['cal_name'] . 
+                    $cal['cal_id'] . '">' . $cal['cal_name'] .
                     '</a>&nbsp;&nbsp;';
             }
         }
@@ -262,7 +262,7 @@ function EVLIST_view_json($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $
     }
 
     $T->set_var(array(
-        'cal_header'    => EVLIST_calHeader($year, $month, $day, $type, $cat, $cal), 
+        'cal_header'    => EVLIST_calHeader($year, $month, $day, $type, $cat, $cal),
         'calendar_content' => $function($year, $month, $day, $cat, $cal, $opt),
         'urlfilt_cal' => (int)$cal,
         'urlfilt_cat' => (int)$cat,
@@ -348,7 +348,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     EVLIST_setViewSession('day', $year, $month, $day);
 
    $retval = '';
-    list($currentyear, $currentmonth, $currentday) = 
+    list($currentyear, $currentmonth, $currentday) =
         explode('-', $_EV_CONF['_today']);
 
     // Default to the current day
@@ -430,8 +430,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                         '&amp;hour=' . $i . '">' . $link . '</a>';
         }
         $T->set_var ($i . '_hour',$link);
-    } 
-
+    }
 
     // Get hourly events
     /*$times = array();
@@ -467,7 +466,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
             } else {
                 $start_time = date(
                     $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
-                    strtotime($A['data']['rp_date_start'] . ' '. 
+                    strtotime($A['data']['rp_date_start'] . ' '.
                         $A['time_start']));
             }
 
@@ -478,7 +477,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
             } else {
                 $end_time = date(
                     $_CONF['shortdate'].' @ ' . $_CONF['timeonly'],
-                    strtotime($A['data']['rp_date_end'] . ' ' . 
+                    strtotime($A['data']['rp_date_end'] . ' ' .
                         $A['time_end']));
             }
 
@@ -507,7 +506,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
             } else {
                 $T->clear_var('is_meetup');
             }
- 
+
             if ($j < $numevents) {
                 $T->set_var('br', '<br />');
             } else {
@@ -537,7 +536,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'nextyear'      => $dtNext->format('Y', false),
         'urlfilt_cal'   => $cal,
         'urlfilt_cat'   => $cat,
-        'cal_header'    => EVLIST_calHeader($year, $month, $day, 'day', 
+        'cal_header'    => EVLIST_calHeader($year, $month, $day, 'day',
                             $cat, $cal),
         'cal_footer'    => EVLIST_calFooter($calendars_used),
         'pi_url'        => EVLIST_URL,
@@ -572,7 +571,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     EVLIST_setViewSession('week', $year, $month, $day);
 
     $retval = '';
-    list($currentyear, $currentmonth, $currentday) = 
+    list($currentyear, $currentmonth, $currentday) =
         explode('-', $_EV_CONF['_today']);
 
     // Default to the current month
@@ -643,7 +642,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
         $monthname = $LANG_MONTH[(int)$curmonth];
         $T->set_var('dayinfo', $daynames[$idx] . ', ' .
-            COM_createLink($dtToday->format($_CONF['shortdate']), 
+            COM_createLink($dtToday->format($_CONF['shortdate']),
                 EVLIST_URL . "/index.php?view=day&amp;day=$curday" .
                 "&amp;cat={$cat}&amp;cal={$cal}" .
                 "&amp;month=$curmonth&amp;year=$curyear")
@@ -671,7 +670,7 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                     ($A['rp_date_start'] < $weekData &&
                     $A['rp_date_end'] > $weekData)) {
                 $event_time = $LANG_EVLIST['allday'];
-                /*$event_div = '<div class="monthview_allday" 
+                /*$event_div = '<div class="monthview_allday"
                     style="background-color:'. $event['bgcolor'].';">';*/
             } else {
                 if ($A['rp_date_start'] == $weekData) {
@@ -776,7 +775,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
     EVLIST_setViewSession('month', $year, $month, 0);
 
     $retval = '';
-    list($currentyear, $currentmonth, $currentday) = 
+    list($currentyear, $currentmonth, $currentday) =
             explode('-', $_EV_CONF['_today']);
 
     // Default to the current month
@@ -900,12 +899,12 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 
                 // Create the hover tooltip.  Timed events show the times first
                 if ($event['allday'] == 0) {
-                    $ev_hover = date($_CONF['timeonly'], 
+                    $ev_hover = date($_CONF['timeonly'],
                         strtotime($event['rp_date_start'] . ' ' . $event['rp_time_start1']) );
                     if ($event['split'] == 1 && !empty($event['rp_time_start2']) ) {
-                        $ev_hover .= ' &amp; ' . 
-                                date($_CONF['timeonly'], 
-                                strtotime($event['rp_date_start'] . ' ' . 
+                        $ev_hover .= ' &amp; ' .
+                                date($_CONF['timeonly'],
+                                strtotime($event['rp_date_start'] . ' ' .
                                 $event['rp_time_start2']) );
                     }
                     $ev_hover .= ' - ';
@@ -1103,9 +1102,9 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                         }
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0) {
-                            $dt->setTimestamp(strtotime($event['rp_date_start'] . 
+                            $dt->setTimestamp(strtotime($event['rp_date_start'] .
                                 ' ' . $event['rp_time_start1']));
-                            // Time is a localized string, not a timestamp, so 
+                            // Time is a localized string, not a timestamp, so
                             // don't adjust for the timezone
                             $popup .= $dt->format($_CONF['timeonly'], false) . ': ';
                         }
@@ -1147,7 +1146,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
         'thisyear'      => $year,
         'prevyear'      => $year - 1,
         'nextyear'      => $year + 1,
-        'cal_header'    => EVLIST_calHeader($year, $month, $day, 'year', 
+        'cal_header'    => EVLIST_calHeader($year, $month, $day, 'year',
                             $cat, $cal),
         'cal_footer'    => EVLIST_calFooter($calendars_used),
         'urlfilt_cat'   => $cat,
@@ -1167,7 +1166,7 @@ function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 *   @param  string  $block_title    Title of block
 *   @return string      HTML for list page
 */
-function EVLIST_listview($range = '', $category = '', $calendar = '', 
+function EVLIST_listview($range = '', $category = '', $calendar = '',
         $block_title='')
 {
     global $_CONF, $_EV_CONF, $_USER, $_TABLES, $LANG_EVLIST;
@@ -1194,9 +1193,9 @@ function EVLIST_listview($range = '', $category = '', $calendar = '',
     ) );
 
     $page = empty($_GET['page']) ? 1 : (int)$_GET['page'];
-    $opts = array('cat'=>$category, 
-                'page'=>$page, 
-                'limit'=>$_EV_CONF['limit_list'], 
+    $opts = array('cat'=>$category,
+                'page'=>$page,
+                'limit'=>$_EV_CONF['limit_list'],
                 'cal'=>$calendar,
             );
     switch ($range) {

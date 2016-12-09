@@ -496,8 +496,9 @@ class evTicket
                 $params['data'] = $checkin_url . $tic_id . '&rp=' . $rp_id;
                 $qrc_status = LGLIB_invokeService('qrcode', 'getcode', $params, $qrcode, $svc_msg);
                 if ($qrc_status == PLG_RET_OK) {
+                    $fileinfo = pathinfo($qrcode['img']);
                     $pdf->SetX(-40);
-                    $pdf->Image($qrcode['path'],null,$y,25);
+                    $pdf->Image($qrcode['path'], null, $y, 25, 0, $fileinfo['extension']);
                 }
                 $pdf->Ln();
 

@@ -145,6 +145,8 @@ class evMeetup
 
     /**
     *   Update the cache
+    *
+    *   @param  mixed   $data   Data, typically an array
     */
     public function updateCache($data)
     {

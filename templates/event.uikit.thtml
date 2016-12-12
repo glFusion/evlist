@@ -299,8 +299,7 @@
 </div>
 
 {!if admin_rsvp}
-  <div style="clear:both;">
-    <p>&nbsp;</p>
+  <div class="evAdminRSVP">
     <hr />
     {admin_rsvp}
   </div>

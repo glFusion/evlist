@@ -659,14 +659,11 @@ function EVLIST_adminRSVP($rp_id)
                 ON u.uid = tk.uid
             WHERE tk.ev_id = '{$Ev->Event->id}' ";
 
-    $title = $LANG_EVLIST['pi_title'] . ': ' .
-        $LANG_EVLIST['admin_rsvp'] . ' -- ' .
-        COM_createLink($Ev->Event->Detail->title . ' (' . $Ev->date_start . ')',
-        EVLIST_URL . '/event.php?eid=' . $rp_id);
-    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.EVLIST_URL .
+    $title = $LANG_EVLIST['admin_rsvp'] .
+            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
             '/index.php?view=printtickets&eid=' . $Ev->ev_id .
-            '" class="lgButton blue" target="_new">' . $LANG_EVLIST['print_tickets'] . '</a>';
-    $title .= '&nbsp;&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '" class="lgButton blue" target="_new">' . $LANG_EVLIST['print_tickets'] . '</a>' .
+            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
             '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
             '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
 

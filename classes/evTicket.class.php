@@ -3,9 +3,9 @@
 *   Class to manage tickets and registrations
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2015-2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.1
+*   @version    1.4.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
 *   @filesource
@@ -201,7 +201,6 @@ class evTicket
         } else {
             return NULL;
         }
-
     }   // function Create()
 
 
@@ -248,7 +247,6 @@ class evTicket
         } else {
             return NULL;
         }
-
     }   // function Create()
 
 
@@ -369,7 +367,7 @@ class evTicket
     */
     public static function PrintTickets($ev_id='', $rp_id=0, $uid=0)
     {
-        global $_CONF, $_USER;
+        global $_CONF, $_USER, $LANG_EVLIST;
 
         USES_evlist_class_event();
         $Event = new evEvent($ev_id);
@@ -453,34 +451,36 @@ class evTicket
                         $pdf->Ln(5);
                     if ($ticket->paid >= $ticket->fee) {
                         $pdf->SetX(-40);
-                        $pdf->Cell(0,30,'Paid');
+                        $pdf->Cell(0, 30, $LANG_EVLIST['paid']);
                     } else {
                         $pdf->SetX(-55);
                         $due = $ticket->fee - $ticket->paid;
-                        $pdf->Cell(0, 30, 'Balance Due: ' . self::formatAmount($due));
+                        $pdf->Cell(0, 30, $LANG_EVLIST['balance_due'] . ': ' . self::formatAmount($due));
                     }
                 }
 
                 $pdf->SetX(20);
-                $pdf->Cell(0, 8, "Date:", 0, 0);
+                $pdf->Cell(0, 8, $LANG_EVLIST['date'] . ': ', 0, 0);
                 $pdf->setX(40);
                 $pdf->Cell(0, 8, $ev_date, 0, 1);
-                $pdf->Cell(0,6, "Time:", 0, 0);
+                $pdf->Cell(0, 6, $LANG_EVLIST['time'] . ': ', 0, 0);
                 $pdf->SetX(40);
                 $pdf->Cell(0, 6, $ev_time, 0, 1);
 
+                $addr_line = 0;
                 if ($Ev->Detail->location != '') {
                     $pdf->Ln(5);
-                    $pdf->Cell(0, 2, 'Where: ', 0, 0);
+                    $pdf->Cell(0, 2, $LANG_EVLIST['where'] . ': ', 0, 0);
                     $pdf->SetX(40);
                     $pdf->Cell(0, 2, $Ev->Detail->location, 0, 1);
+                    $addr_line = 4;
                 }
                 if (!empty($address)) {
                     if ($Ev->Detail->location == '') {
                         $pdf->Ln(5);
-                        $pdf->Cell(0, 2, 'Where: ', 0, 0);
+                        $pdf->Cell(0, 2, $LANG_EVLIST['where'] . ': ', 0, 0);
                     }
-                    $pdf->Ln(4);
+                    $pdf->Ln($addr_line);
                     $pdf->SetX(40);
                     $pdf->Cell(0, 2, $address, 0, 1);
                 }
@@ -508,7 +508,6 @@ class evTicket
             }
         }
         $pdf->Output();
-
     }   // end func PrintTickets()
 
 
@@ -573,7 +572,6 @@ class evTicket
             $retval .= '"' . implode('","', $values) . '"' . "\n";
         }
         return $retval;
- 
     }   // end func ExportTickets()
 
 
@@ -693,7 +691,6 @@ class evTicket
         DB_query($sql);
         return ($unpaid - $count);
     }
-
 
 }   // class evTicket
 

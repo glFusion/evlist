@@ -145,20 +145,15 @@ function evlist_upgrade()
         case '1.2.6' :
             // Lots of updates
             $status = evlist_upgrade_1_3_0();
-            if ($status > 0) break;
+            if ($status > 0) return false;
+            if (!EVLIST_do_set_version('1.3.0')) return false;
 
         case '1.3.0':
         case '1.3.0.1':
         case '1.3.0.2':
         case '1.3.1':
-            $error = EVLIST_do_upgrade_sql('1.3.2');
-            if ($error) break;
-            // Add the enable_ical option to the calendar table
-            /*COM_errorLog('Adding ical-enable field to calendars table');
-            DB_query("ALTER TABLE {$_TABLES['evlist_calendars']}
-                ADD `cal_ena_ical` tinyint(1) unsigned DEFAULT '1'
-                AFTER `cal_status`", 1);*/
-            //if (DB_error()) break;
+            $currentVersion = '1.3.2';
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;;
         
             // Change the recurring interval type to an array to support
             // multiple occurrences per month for DOM-type events
@@ -168,7 +163,7 @@ function evlist_upgrade()
             $res = DB_query($sql, 1);
             if (!$res) {
                 COM_errorLog("Error retrieving recurring events");
-                break;
+                return false;
             }
             while ($A = DB_fetchArray($res, false)) {
                 $data = @unserialize($A['rec_data']);
@@ -184,27 +179,28 @@ function evlist_upgrade()
                     DB_query("UPDATE {$_TABLES['evlist_events']}
                             SET rec_data = '$data'
                             WHERE id = '{$A['id']}'", 1);
-                    if (DB_error()) break 2;
+                    if (DB_error()) return false;
                 }
             }
+            if (!EVLIST_do_set_version($currentVersion)) return false;
 
         case '1.3.4':
             // This is likely to fail, rec_option has been unused since 1.3.0
             // but was never removed via upgrading
             DB_query("ALTER TABLE {$_TABLES['evlist_events']} DROP rec_option", 1);
+            if (!EVLIST_do_set_version('1.3.5')) return false;
 
         case '1.3.5':
             DB_query("UPDATE {$_TABLES['conf_values']}
                     SET selectionArray = 9
                     WHERE name = 'enable_centerblock'
                     AND group_name = '{$_EV_CONF['pi_name']}'");
-    }
+            if (!EVLIST_do_set_version('1.3.6')) return false;
 
-    // Recent updates, check for version less than current rather than
-    // exact versions
-    if ($currentVersion < '1.3.7') {    // Update versions less than 1.3.7
-        $error = EVLIST_do_upgrade_sql('1.3.7');
-        if (!$error) {
+        case '1.3.6':
+            $currentVersion = '1.3.7';
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+
             // Remove date and time formats, global configs are used instead.
             $c->del('week_begins', 'evlist');
             $c->del('date_format', 'evlist');
@@ -214,45 +210,35 @@ function evlist_upgrade()
             $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
             $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
             $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                20, 10, 0, 10, true, 'evlist');
+                    20, 10, 0, 10, true, 'evlist');
             $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
-                20, 10, 17, 20, true, 'evlist');
-        } else {
-            return false;
-        }
-    }
+                    20, 10, 17, 20, true, 'evlist');
 
-    if ($currentVersion < '1.4.0') {    // Update versions less than 1.3.7
-        $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
-        $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
-        $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
-                30, 10, 0, 10, true, 'evlist');
-        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
-                30, 10, 0, 20, true, 'evlist');
-        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
-                30, 10, 0, 30, true, 'evlist');
-        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
-                30, 10, 0, 40, true, 'evlist');
+            if (!EVLIST_do_set_version($currentVersion)) return false;
 
-        // SQL includes moving configuration items under the sg_integ group,
-        // so execute it last.
-        if (!EVLIST_do_upgrade_sql('1.4.0'))
-            return false;
-        }
+        case '1.3.7':
+        case '1.3.8':
+        case '1.3.9':
+            $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
+            $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
+            $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
+                    30, 10, 0, 10, true, 'evlist');
+            $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
+                    30, 10, 0, 20, true, 'evlist');
+            $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
+                    30, 10, 0, 30, true, 'evlist');
+            $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
+                    30, 10, 0, 40, true, 'evlist');
+
+            // SQL includes moving configuration items under the new sg_integ group,
+            // so execute it last.
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+            if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
     CTL_clearCache();
-
-    DB_query("UPDATE {$_TABLES['plugins']} SET 
-            pi_version='{$_EV_CONF['pi_version']}',
-            pi_gl_version='{$_EV_CONF['gl_version']}'
-        WHERE pi_name='evlist' LIMIT 1", 1);
- 
-    if (DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'") == $_EV_CONF['pi_version']) {
-        return true;
-    } else {
-        return false;
-    }
+    COM_errorLog("Successfully updated the {$_EV_CONF['pi_display_name']} Plugin", 1);
+    return true;
 }
 
 
@@ -450,7 +436,6 @@ function evlist_upgrade_1_3_0()
     CTL_clearCache();   // Clear cache to activate new configuration items.
 
     return $error;
-
 }   // function evlist_upgrade_1_3_0
 
 
@@ -461,32 +446,55 @@ function evlist_upgrade_1_3_0()
 *
 *   @since  version 1.3.4
 *   @param  string  $version    Version being upgraded TO
+*   @return boolean             True on success, False after a failure
 */
 function EVLIST_do_upgrade_sql($version='')
 {
     global $_TABLES, $_EV_CONF, $_EV_UPGRADE;
 
-    $error = 0;
-
     // If no sql statements passed in, return success
-    if (!is_array($_EV_UPGRADE[$version]))
-        return $error;
+    if (!is_array($_EV_UPGRADE[$version])) return true;
 
     // Execute SQL now to perform the upgrade
-    COM_errorLOG("--Updating EvList to version $version");
+    COM_errorLOG("--Updating {$_EV_CONF['pi_name']} to version $version");
     foreach($_EV_UPGRADE[$version] as $sql) {
-        COM_errorLOG("EvList Plugin $version update: Executing SQL => $sql");
+        COM_errorLOG("$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
         DB_query($sql, '1');
         if (DB_error()) {
-            COM_errorLog("SQL Error during EvList Plugin update", 1);
-            $error = 1;
-            break;
+            COM_errorLog("SQL Error during {$_EV_CONF['pi_name']} Plugin update", 1);
+            return false;
         }
     }
-
-    return $error;
-
+    return true;
 }
 
+
+/**
+*   Update the plugin version number in the database.
+*   Called at each version upgrade to keep up to date with
+*   successful upgrades.
+*
+*   @param  string  $ver    New version to set
+*   @return boolean         True on success, False on failure
+*/
+function EVLIST_do_set_version($ver)
+{
+    global $_TABLES, $_EV_CONF;
+
+    // now update the current version number.
+    $sql = "UPDATE {$_TABLES['plugins']} SET
+            pi_version = '{$_EV_CONF['pi_version']}',
+            pi_gl_version = '{$_EV_CONF['gl_version']}',
+            pi_homepage = '{$_EV_CONF['pi_url']}'
+        WHERE pi_name = '{$_EV_CONF['pi_name']}'";
+
+    $res = DB_query($sql, 1);
+    if (DB_error()) {
+        COM_errorLog("Error updating the {$_EV_CONF['pi_display_name']} Plugin version",1);
+        return false;
+    } else {
+        return true;
+    }
+}
 
 ?>

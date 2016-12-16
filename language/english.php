@@ -133,11 +133,11 @@ You may either move existing events to a new calendar, or delete those events.',
     ),
 
 'rec_periods'       => array(
-    1 => 'day',
-    2 => 'month',
-    3 => 'year',
-    4 => 'week',
-    5 => 'month',
+    1 => 'day(s)',
+    2 => 'month(s)',
+    3 => 'year(s)',
+    4 => 'week(s)',
+    5 => 'month(s)',
     6 => '',
     ),
 
@@ -350,6 +350,10 @@ You may either move existing events to a new calendar, or delete those events.',
 'quantity'      => 'Quantity',
 'all'           => 'All',
 'click_for_datepicker' => 'Click for Date Selector',
+'paid_only'     => 'Paid Only',
+'paid_or_unpaid'    => 'Paid or Unpaid',
+'register'      => 'Register',
+'allow_ticket_printing' => 'Allow Ticket Printing',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

@@ -347,6 +347,10 @@ You may either move existing events to a new calendar, or delete those events.',
 'all' => 'All',
 'sel_category' => 'Select Category',
 'click_for_datepicker' => 'Click for Date Selector',
+'paid_only'     => 'Paid Only',
+'paid_or_unpaid'    => 'Paid or Unpaid',
+'register'      => 'Register',
+'allow_ticket_printing' => 'Allow Ticket Printing',
 );
 
 // Localization of the Admin Configuration UI

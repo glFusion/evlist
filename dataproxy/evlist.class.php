@@ -53,116 +53,116 @@ if (!defined ('GVERSION')) {
 */
 class Dataproxy_evlist extends DataproxyDriver
 {
-	var $driver_name = 'evlist';
+    var $driver_name = 'evlist';
 
-	/*
-	*   Returns the location of index.php of each plugin
+    /*
+    *   Returns the location of index.php of each plugin
     *
     *   @return string  URL to plugin's index page
-	*/
-	function getEntryPoint()
+    */
+    function getEntryPoint()
     {
-		global $_CONF;
+        global $_CONF;
 
-		return $_CONF['site_url'] . '/evlist/index.php';
-	}
+        return $_CONF['site_url'] . '/evlist/index.php';
+    }
 
-	/**
-	* Returns array of (
-	*   'id'        => $id (string),
-	*   'title'     => $title (string),
-	*   'uri'       => $uri (string),
-	*   'date'      => $date (int: Unix timestamp),
-	*   'image_uri' => $image_uri (string),
-	*   'raw_data'  => raw data of the item (stripslashed)
-	* )
+    /**
+    * Returns array of (
+    *   'id'        => $id (string),
+    *   'title'     => $title (string),
+    *   'uri'       => $uri (string),
+    *   'date'      => $date (int: Unix timestamp),
+    *   'image_uri' => $image_uri (string),
+    *   'raw_data'  => raw data of the item (stripslashed)
+    * )
     *
     *   @return array   Array described above
-	*/
-	function getItemById($id, $all_langs = false)
-	{
-	    global $_CONF, $_TABLES;
+    */
+    function getItemById($id, $all_langs = false)
+    {
+        global $_CONF, $_TABLES;
 
-		$retval = array();
+        $retval = array();
 
-		$sql = "SELECT e.date_start1, d.*
-		        FROM {$_TABLES['evlist_events']} e
+        $sql = "SELECT e.date_start1, d.*
+                FROM {$_TABLES['evlist_events']} e
                 LEFT JOIN {$_TABLES['evlist_detail']} d
                     ON e.det_id = d.det_id
-			    WHERE (e.id = '" . DB_escapeString($id) . "') ";
-		if ($this->uid > 0) {
-			$sql .= COM_getPermSql('AND', $this->uid, 'e');
-		}
-		$result = DB_query($sql);
-		if (DB_error()) {
-			return $retval;
-		}
+                WHERE (e.id = '" . DB_escapeString($id) . "') ";
+        if ($this->uid > 0) {
+            $sql .= COM_getPermSql('AND', $this->uid, 'e');
+        }
+        $result = DB_query($sql);
+        if (DB_error()) {
+            return $retval;
+        }
 
-		if (DB_numRows($result) == 1) {
-			$A = DB_fetchArray($result, false);
+        if (DB_numRows($result) == 1) {
+            $A = DB_fetchArray($result, false);
 
-			$retval['id']        = $id;
-			$retval['title']     = $A['title'];
-			$retval['uri']       = COM_buildURL(
-				$_CONF['site_url'] . '/evlist/event.php?eid='
-				. rawurlencode($id)
-			);
-			$retval['date']      = strtotime($A['date_start1']);
-			$retval['image_uri'] = false;
-			$retval['raw_data']  = $A;
-		}
+            $retval['id']        = $id;
+            $retval['title']     = $A['title'];
+            $retval['uri']       = COM_buildURL(
+                $_CONF['site_url'] . '/evlist/event.php?eid='
+                . rawurlencode($id)
+            );
+            $retval['date']      = strtotime($A['date_start1']);
+            $retval['image_uri'] = false;
+            $retval['raw_data']  = $A;
+        }
 
-		return $retval;
-	}
+        return $retval;
+    }
 
-	/**
-	* This function ignores static pages which are displayed in the
-	* center block.
-	*
-	* Returns an array of (
-	*   'id'        => $id (string),
-	*   'title'     => $title (string),
-	*   'uri'       => $uri (string),
-	*   'date'      => $date (int: Unix timestamp),
-	*   'image_uri' => $image_uri (string)
-	* )
+    /**
+    * This function ignores static pages which are displayed in the
+    * center block.
+    *
+    * Returns an array of (
+    *   'id'        => $id (string),
+    *   'title'     => $title (string),
+    *   'uri'       => $uri (string),
+    *   'date'      => $date (int: Unix timestamp),
+    *   'image_uri' => $image_uri (string)
+    * )
     *
     *   @return array   Array of item information
-	*/
-	function getItems($category, $all_langs = false)
-	{
-		global $_CONF, $_TABLES, $_EV_CONF;
+    */
+    function getItems($category, $all_langs = false)
+    {
+        global $_CONF, $_TABLES, $_EV_CONF;
 
-		$entries = array();
+        $entries = array();
 
-		$sql = "SELECT e.id, d.title, UNIX_TIMESTAMP(e.date_start1) AS day
-			    FROM {$_TABLES['evlist_events']} e
+        $sql = "SELECT e.id, d.title, UNIX_TIMESTAMP(e.date_start1) AS day
+                FROM {$_TABLES['evlist_events']} e
                 LEFT JOIN {$_TABLES['evlist_detail']} d
                     ON d.ev_id=e.id ";
-		if ($this->uid > 0) {
-			$sql .= COM_getPermSql('WHERE', $this->uid, 2, 'e');
-		}
+        if ($this->uid > 0) {
+            $sql .= COM_getPermSql('WHERE', $this->uid, 2, 'e');
+        }
 
-		$sql .= ' ORDER BY e.date_start1';
+        $sql .= ' ORDER BY e.date_start1';
 
-		$result = DB_query($sql);
-		if (DB_error()) {
-			return $entries;
-		}
+        $result = DB_query($sql);
+        if (DB_error()) {
+            return $entries;
+        }
 
-		while (($A = DB_fetchArray($result, false)) !== FALSE) {
-			$entry = array();
-			$entry['id']        = $A['id'];
-			$entry['title']     = $A['title'];
-			$entry['uri']       = COM_buildURL(
-				$_CONF['site_url'] . '/evlist/event.php?eid='
-				. $A['id']
-			);
-			$entry['date']      = $A['day'];
-			$entry['image_uri'] = false;
-			$entries[] = $entry;
-		}
-		return $entries;
-	}
+        while (($A = DB_fetchArray($result, false)) !== FALSE) {
+            $entry = array();
+            $entry['id']        = $A['id'];
+            $entry['title']     = $A['title'];
+            $entry['uri']       = COM_buildURL(
+                $_CONF['site_url'] . '/evlist/event.php?eid='
+                . $A['id']
+            );
+            $entry['date']      = $A['day'];
+            $entry['image_uri'] = false;
+            $entries[] = $entry;
+        }
+        return $entries;
+    }
 }
 ?>

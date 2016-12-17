@@ -337,6 +337,7 @@ function EVLIST_view($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='
 *   @param  integer $day    Starting day
 *   @param  integer $cat    Category to show
 *   @param  integer $cal    Calendar to show
+*   @param  string  $opt    Optional template modifier, e.g. "print"
 *   @return string          HTML for calendar page
 */
 function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
@@ -561,6 +562,7 @@ function EVLIST_dayview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 *   @param  integer $day    Starting day
 *   @param  integer $cat    Event category
 *   @param  integer $cal    Calendar to show
+*   @param  string  $opt    Optional template modifier, e.g. "print"
 *   @return string          HTML for calendar page
 */
 function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
@@ -764,12 +766,12 @@ function EVLIST_weekview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 *   @param  integer $month  Starting month
 *   @param  integer $day    Starting day
 *   @param  integer $cat    Event category
-*   @plaram integer $cal    Calendar ID
+*   @param  integer $cal    Calendar ID
+*   @param  string  $opt    Optional template modifier, e.g. "print"
 *   @return string          HTML for calendar page
 */
 function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 {
-
     global $_CONF, $_EV_CONF, $LANG_MONTH;
 
     EVLIST_setViewSession('month', $year, $month, 0);
@@ -1001,6 +1003,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
 *   @param  integer $day    Starting day
 *   @param  integer $cat    Category to show
 *   @param  integer $cal    Calendar to show
+*   @param  string  $opt    Optional template modifier, e.g. "print"
 *   @return string          HTML for calendar page
 */
 function EVLIST_yearview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')

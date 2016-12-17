@@ -6,7 +6,7 @@
  *  @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
  *  @package    evlist
  *  @version    1.3.0
- *  @license    http://opensource.org/licenses/gpl-2.0.php 
+ *  @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  *  @filesource
  */
@@ -30,7 +30,7 @@ class evRepeat
 
     /**
      *  Constructor.
-     *  Reads in the specified event repeat, if $rp_id is set.  
+     *  Reads in the specified event repeat, if $rp_id is set.
      *  If $id is zero, then a new entry is being created.
      *
      *  @param integer $id Optional type ID
@@ -46,9 +46,9 @@ class evRepeat
             $this->date_start = '';
             $this->date_end = '';
             $this->time_start1 = '';
-            $this->time_end1 = ''; 
+            $this->time_end1 = '';
             $this->time_start2 = '';
-            $this->time_end2 = ''; 
+            $this->time_end2 = '';
         } else {
             $this->rp_id = $rp_id;
             if (!$this->Read()) {
@@ -131,10 +131,10 @@ class evRepeat
     {
         if (!is_array($row)) return;
 
-        $fields = array('ev_id', 'det_id', 
+        $fields = array('ev_id', 'det_id',
                 'date_start', 'date_end',
-                'time_start1', 'time_end1', 
-                'time_start2', 'time_end2', 
+                'time_start1', 'time_end1',
+                'time_start2', 'time_end2',
                 );
         foreach ($fields as $field) {
             if (isset($row['rp_' . $field])) {
@@ -160,17 +160,17 @@ class evRepeat
                 $this->time_end2 = NULL;
             } else {
                 $tmp = EVLIST_12to24($row['starthour1'], $row['start1_ampm']);
-                $this->time_start1 = sprintf('%02d:%02d:00', 
+                $this->time_start1 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute1']);
                 $tmp = EVLIST_12to24($row['endhour1'], $row['end1_ampm']);
-                $this->time_end1 = sprintf('%02d:%02d:00', 
+                $this->time_end1 = sprintf('%02d:%02d:00',
                     $tmp, $row['endminute1']);
                 if (isset($row['split']) && $row['split'] == '1') {
                     $tmp = EVLIST_12to24($row['starthour2'], $row['start2_ampm']);
-                    $this->time_start2 = sprintf('%02d:%02d:00', 
+                    $this->time_start2 = sprintf('%02d:%02d:00',
                         $tmp, $row['startminute1']);
                     $tmp = EVLIST_12to24($row['endhour2'], $row['end2_ampm']);
-                    $this->time_end2 = sprintf('%02d:%02d:00', 
+                    $this->time_end2 = sprintf('%02d:%02d:00',
                         $tmp, $row['endminute2']);
                 } else {
                     $this->time_start2 = NULL;
@@ -265,7 +265,7 @@ class evRepeat
             $D->SetVars($A);
             $D->ev_id = $this->ev_id;
             $this->det_id = $D->Save();
-            $sql = "UPDATE {$_TABLES['evlist_repeat']} SET 
+            $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
                 rp_date_start = '" . DB_escapeString($this->date_start) . "',
                 rp_date_end= '" . DB_escapeString($this->date_end) . "',
                 rp_time_start1 = '" . DB_escapeString($this->time_start1) . "',
@@ -282,8 +282,8 @@ class evRepeat
 
 
     /**
-     *  Delete the current instance from the database
-     */
+    *   Delete the current instance from the database
+    */
     public function Delete()
     {
         global $_TABLES;
@@ -406,7 +406,7 @@ class evRepeat
             if ($this->Event->split == '1') {
                 $time_start2 = EVLIST_formattedTime($this->time_start2);
                 $time_end2 = EVLIST_formattedTime($this->time_end2);
-            } 
+            }
         }
 
         // Get the link to more info. If it's an external link, target a
@@ -429,7 +429,7 @@ class evRepeat
         $country = $this->Event->Detail->country;
 
         // Now get the text description of the recurring interval, if any
-        if ($this->Event->recurring && 
+        if ($this->Event->recurring &&
                 $this->Event->rec_data['type'] < EV_RECUR_DATES) {
             $rec_data = $this->Event->rec_data;
             $rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
@@ -452,9 +452,9 @@ class evRepeat
                 foreach($rec_data['interval'] as $key=>$day) {
                     $days[] = $LANG_EVLIST['rec_intervals'][$day];
                 }
-                $days_text = implode(', ', $days) . ' ' . 
+                $days_text = implode(', ', $days) . ' ' .
                         $LANG_WEEK[$rec_data['weekday']];
-                $rec_string .= ' ' . sprintf($LANG_EVLIST['on_the_days'], 
+                $rec_string .= ' ' . sprintf($LANG_EVLIST['on_the_days'],
                     $days_text);
                 break;
             }
@@ -525,7 +525,7 @@ class evRepeat
                 // Show the registration link
                if (    ($this->Event->options['max_rsvp'] == 0 ||
                         $this->Event->options['rsvp_waitlist'] == 1 ||
-                        $this->Event->options['max_rsvp'] > 
+                        $this->Event->options['max_rsvp'] >
                         $this->TotalRegistrations() )
                         &&
                         ( $this->Event->options['max_user_rsvp'] == 0 ||
@@ -598,7 +598,7 @@ class evRepeat
 
         // Only process the location block if at least one element exists.
         // Don't want an empty block showing.
-        if (!empty($location) || !empty($street) || 
+        if (!empty($location) || !empty($street) ||
             !empty($city) || !empty($province) || !empty($postal)) {
             $T->set_var(array(
                 'location' => $location,
@@ -618,10 +618,10 @@ class evRepeat
                 $loc = '';
                 if (!empty($city) && !empty($province)) {
                     $loc = $city . ', ' . $province . ' ' . $country;
-                } 
+                }
                 if (!empty($postal)) {
                     $loc .= ' ' . $postal;
-                } 
+                }
                 if (!empty($loc)) {
                     // Location info was found, get the weather
                     LGLIB_invokeService('weather', 'embed',
@@ -652,7 +652,7 @@ class evRepeat
         }
 
         //put contact info here: contact, email, phone#
-        $name = $this->Event->Detail->contact != '' ? 
+        $name = $this->Event->Detail->contact != '' ?
             COM_applyFilter($this->Event->Detail->contact) : '';
         if ($this->Event->Detail->email != '') {
             $email = COM_applyFilter($this->Event->Detail->email);
@@ -691,7 +691,7 @@ class evRepeat
             $catlinks = array();
             for ($i = 0; $i < $catcount; $i++) {
                 $catlinks[] = '<a href="' .
-                COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange . 
+                COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange .
                 '&cat=' . $cats[$i]['id']) .
                 '">' . $cats[$i]['name'] . '</a>&nbsp;';
             }
@@ -699,16 +699,16 @@ class evRepeat
             $T->set_var('category_link', $catlink, true);
         }
 
-        //  reminders must be enabled globally first and then per event in 
+        //  reminders must be enabled globally first and then per event in
         //  order to be active
         if (!isset($_EV_CONF['reminder_days'])) {
             $_EV_CONF['reminder_days'] = 1;
         }
 
         $hasReminder = 0;
-        if ($_EV_CONF['enable_reminders'] == '1' && 
-                $this->Event->enable_reminders == '1' && 
-                time() < strtotime("-".$_EV_CONF['reminder_days']." days", 
+        if ($_EV_CONF['enable_reminders'] == '1' &&
+                $this->Event->enable_reminders == '1' &&
+                time() < strtotime("-".$_EV_CONF['reminder_days']." days",
                     strtotime($this->date_start))) {
             //form will not appear within XX days of scheduled event.
             $show_reminders = true;
@@ -724,7 +724,7 @@ class evRepeat
         }
 
         if ($this->Event->options['contactlink'] == 1) {
-            $ownerlink = $_CONF['site_url'] . '/profiles.php?uid=' . 
+            $ownerlink = $_CONF['site_url'] . '/profiles.php?uid=' .
                     $this->Event->owner_id;
             $ownerlink = sprintf($LANG_EVLIST['contact_us'], $ownerlink);
         } else {
@@ -782,7 +782,7 @@ class evRepeat
             return 0;
         }
 
-        // Make sure that registrations are enabled and that the current user 
+        // Make sure that registrations are enabled and that the current user
         // has access to this event.  If $uid > 0, then this is an admin
         // registering another user, don't check access
         if ($this->Event->options['use_rsvp'] == 0 ||
@@ -830,7 +830,7 @@ class evRepeat
                 } else {
                     $str = $waitlist;
                 }
-                LGLIB_storeMessage($LANG_EVLIST['messages']['22'] . ' ' . 
+                LGLIB_storeMessage($LANG_EVLIST['messages']['22'] . ' ' .
                     sprintf($LANG_EVLIST['messages'][27], $str));
             }
         }
@@ -882,7 +882,7 @@ class evRepeat
     /**
     *   Cancel a user's registration for an event.
     *   Delete the newer records first, to preserve waitlist position for the user.
-    *   
+    *
     *   @param  integer $uid    Optional User ID to remove, 0 for current user
     *   @param  integer $num    Number of reservations to cancel, 0 for all
     */
@@ -893,7 +893,6 @@ class evRepeat
         if ($_EV_CONF['enable_rsvp'] != 1) return false;
 
         $num = (int)$num;
-
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
         $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE
                 ev_id = '" . $this->Event->id . "'
@@ -923,15 +922,6 @@ class evRepeat
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
         $key = $free_only ? 1 : 0;
 
-        /*if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
-            $count = DB_count($_TABLES['evlist_rsvp'], 
-                    array('ev_id', 'uid'),
-                    array($this->Event->id, $uid));
-        } else {
-            $count = DB_count($_TABLES['evlist_rsvp'],
-                array('ev_id', 'rp_id', 'uid'),
-                array($this->Event->id, $this->rp_id, $uid));
-        }*/
         if (!isset($counter[$key])) {
             $counter[$key] = array();
         }
@@ -1027,7 +1017,7 @@ class evRepeat
             // Find all custom detail records and delete them.
             $sql = "SELECT rp_id, rp_det_id
                     FROM {$_TABLES['evlist_repeat']}
-                    WHERE rp_ev_id='{$this->ev_id}' 
+                    WHERE rp_ev_id='{$this->ev_id}'
                     AND rp_date_start >= '{$this->date_start}'
                     AND rp_det_id <> '{$this->Event->det_id}'";
             $res = DB_query($sql);
@@ -1044,14 +1034,14 @@ class evRepeat
 
             // Now delete the repeats
             $sql = "DELETE FROM {$_TABLES['evlist_repeat']}
-                    WHERE rp_ev_id='{$this->ev_id}' 
+                    WHERE rp_ev_id='{$this->ev_id}'
                     AND rp_date_start >= '{$this->date_start}'";
             DB_query($sql);
 
             // Now adjust the recurring stop date for the event.
-            $new_stop = DB_getItem($_TABLES['evlist_repeat'], 
-                'rp_date_start', 
-                "rp_ev_id='{$R->ev_id}' 
+            $new_stop = DB_getItem($_TABLES['evlist_repeat'],
+                'rp_date_start',
+                "rp_ev_id='{$R->ev_id}'
                     ORDER BY rp_date_start DESC LIMIT 1");
             if (!empty($new_stop)) {
                 $this->Event->rec_data['stop'] = $new_stop;
@@ -1113,13 +1103,13 @@ class evRepeat
         $rp_id = $TickType->event_pass ? 0 : $this->rp_id;
 
         $evCart = array(
-            'item_number' => 'evlist:eventfee:' . $this->Event->id . '/' . 
+            'item_number' => 'evlist:eventfee:' . $this->Event->id . '/' .
                     $tick_type . '/' . $rp_id,
             'item_name' => $TickType->description . ': ' . $LANG_EVLIST['event_fee'] . ' - ' .
-                    $this->Event->Detail->title . ' ' . $this->start_date1 . 
+                    $this->Event->Detail->title . ' ' . $this->start_date1 .
                     ' ' . $this->start_time1,
-            'short_description' => $TickType->description . ': ' . 
-                    $this->Event->Detail->title . ' ' . $this->start_date1 . 
+            'short_description' => $TickType->description . ': ' .
+                    $this->Event->Detail->title . ' ' . $this->start_date1 .
                     ' ' . $this->start_time1,
 
             'amount' => sprintf("%5.2f", (float)$fee),
@@ -1130,8 +1120,6 @@ class evRepeat
         return $evCart;
      }
 
-
 }   // class evRepeat
-
 
 ?>

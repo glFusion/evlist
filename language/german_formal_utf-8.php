@@ -246,11 +246,11 @@ $LANG_EVLIST = array(
 					6   => 'Benutzerdef. Daten: ein Liste mit Kalenderdaten, mit Komma getrennt',
     ),
 'rec_periods'       => array(
-					1	=> 'Tag',
-					2	=> 'Monat',
-					3	=> 'Jahr',
-					4	=> 'Woche',
-					5	=> 'Monat',
+					1	=> 'Tag(e)',
+					2	=> 'Monat(e)',
+					3	=> 'Jahr(e)',
+					4	=> 'Woche(n)',
+					5	=> 'Monat(e)',
 					6	=> '',
     ),
 

@@ -186,7 +186,7 @@ function showhideformatoptions(option) {
         document.getElementById("format5").style.display="none";
         document.getElementById("format6").style.display="none";
         document.getElementById("freq_div").style.display="none";
-        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['day']}(s)";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['day']}";
         document.getElementById("monthday_sel").style.display="none";
         break;
     case 2:             // monthly by date
@@ -198,7 +198,7 @@ function showhideformatoptions(option) {
         document.getElementById("format5").style.display="none";
         document.getElementById("format6").style.display="none";
         document.getElementById("freq_div").style.display="";
-        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['month']}(s)";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['month']}";
         document.getElementById("monthday_sel").style.display="";
         break;
     case 3:             // yearly by date
@@ -210,7 +210,7 @@ function showhideformatoptions(option) {
         document.getElementById("format5").style.display="none";
         document.getElementById("format6").style.display="none";
         document.getElementById("freq_div").style.display="";
-        document.getElementById("freq_type").innerHTML="{$LANG_EVLIST['year']}(s)";
+        document.getElementById("freq_type").innerHTML="{$LANG_EVLIST['year']}";
         document.getElementById("monthday_sel").style.display="none";
         break;
     case 4:             // weekly by day
@@ -222,7 +222,7 @@ function showhideformatoptions(option) {
         document.getElementById("format5").style.display="none";
         document.getElementById("format6").style.display="none";
         document.getElementById("freq_div").style.display="";
-        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['week']}(s)";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['week']}";
         document.getElementById("monthday_sel").style.display="none";
         break;
     case 5:             // monthly by day
@@ -234,7 +234,7 @@ function showhideformatoptions(option) {
         document.getElementById("format5").style.display="";
         document.getElementById("format6").style.display="none";
         document.getElementById("freq_div").style.display="";
-        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['month']}(s)";
+        document.getElementById("freq_type").innerHTML="{$LANG_WHATSNEW['month']}";
         document.getElementById("monthday_sel").style.display="none";
         break;
     case 6:             // specific dates
@@ -485,7 +485,7 @@ function toggleRSVPdetail(val)
         </div>
     </fieldset>
     {!endif}
- 
+
     <fieldset>
       <legend>{$LANG_EVLIST['date_time_info']}</legend>
       <div style="padding:5px;">
@@ -493,7 +493,7 @@ function toggleRSVPdetail(val)
           {$LANG_EVLIST['start_date']}:
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
-        <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+        <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
             id="startdt1_trigger" class="evDatePicker"
         />
         <input type="text" name="date_start1" id="f_startdate1"
@@ -519,10 +519,10 @@ function toggleRSVPdetail(val)
           {$LANG_EVLIST['end_date']}:
         <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
-        <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+        <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
             id="enddate1_trigger" class="evDatePicker"
         />
-        <input type="text" name="date_end1" id="f_enddate1" 
+        <input type="text" name="date_end1" id="f_enddate1"
             size="10" value="{enddate1}" onchange="checkDate2();" />
         {# <div id="d_enddate1" style="float:left;width:10em;">{d_enddate1}</div> #}
         &nbsp;&nbsp;
@@ -543,7 +543,7 @@ function toggleRSVPdetail(val)
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
         <a href="#" onclick="popupWindow('{doc_url}#desc_split', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
-          <input type="checkbox" name="split" value="1" 
+          <input type="checkbox" name="split" value="1"
                 id="split" {split_checked} onclick="showhideallday()" />
           &nbsp;&nbsp;
         </span>
@@ -551,7 +551,7 @@ function toggleRSVPdetail(val)
         <span {allday_show} id="div1">
           {$LANG_EVLIST['allday']}
         <a href="#" onclick="popupWindow('{doc_url}#desc_allday', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
-          <input type="checkbox" name="allday" value="1" 
+          <input type="checkbox" name="allday" value="1"
             id="allday" {allday_checked} onclick="chk_allday()" />
         </span>
         <br /><br />
@@ -592,14 +592,14 @@ function toggleRSVPdetail(val)
       <legend>{$LANG_EVLIST['rec_event_info']}</legend>
       <div style="padding:5px;">
         <label for="recurring" style="width:16em;">{$LANG_EVLIST['rec_event_q']}</label>
-        <input type="checkbox" name="recurring" value="1" 
-                id="recurring"{recurring_checked} 
+        <input type="checkbox" name="recurring" value="1"
+                id="recurring"{recurring_checked}
                 onclick="showhiderecurringoptions()" />
 
         <!--<span {recurring_show} id="div2"><br/><br/>-->
         <div {recurring_show} id="div2">
           <label for="format">{$LANG_EVLIST['event_recurs']}:</label>
-          <select name="format" id="format" 
+          <select name="format" id="format"
                 onchange="(showhideformatoptions(this.selectedIndex))">
             <option value="0">{$LANG_EVLIST['select_format']}</option>
             {recurring_format_options}
@@ -614,7 +614,7 @@ function toggleRSVPdetail(val)
                 size="10" value="{stopdate}" />
             {# <div id="d_stopdate" style="float:left;width:10em;">{d_stopdate}&nbsp;
             </div> #}
-            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
                 id="stopdate_trigger" class="evDatePicker"
                 />
           <!--</div>-->
@@ -668,14 +668,14 @@ function toggleRSVPdetail(val)
             <label for="skipnext">
               {$LANG_EVLIST['skip_weekends']}
             </label>
-            <input id="skipnext" type="radio" name="skipnext" value="0" 
+            <input id="skipnext" type="radio" name="skipnext" value="0"
                 {skipnext0_checked} />
             {$LANG_EVLIST['no']}&nbsp;&nbsp;
-            <input type="radio" name="skipnext" value="1" 
+            <input type="radio" name="skipnext" value="1"
                     {skipnext1_checked} />
             {$LANG_EVLIST['yes']}&nbsp;&nbsp;
             <span {format2show} id="format2">
-            <input type="radio" name="skipnext" value="2" 
+            <input type="radio" name="skipnext" value="2"
                     {skipnext2_checked} />
             {$LANG_EVLIST['next_bus_day']}
             </span>
@@ -737,12 +737,12 @@ function toggleRSVPdetail(val)
           <!--<div {format6show} id="format6">-->
             <label for="custom" style="width:90%;text-align:left;">
               {custom_label} {$LANG_EVLIST['recur_cust_ignoredates']}:
-            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker" 
+            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
                 id="custom_trigger" class="evDatePicker"
                 />
             </label>
             <br />
-            <input type="text" name="custom" id="custom" size="" 
+            <input type="text" name="custom" id="custom" size=""
                 style="width:80%" maxlength="255" value="{custom_val}" />
             <br />
             <span class="evFieldNote">{$LANG_EVLIST['recur_cust_format']}</span>
@@ -761,7 +761,7 @@ function toggleRSVPdetail(val)
       <label for="show_upcoming" style="width:16em;">
         {$LANG_EVLIST['show_upcoming']}?
       </label>
-      <input id="show_upcoming" name="show_upcoming" type="checkbox" 
+      <input id="show_upcoming" name="show_upcoming" type="checkbox"
             value="1" {upcoming_chk} />
     </fieldset>
     {!endif}
@@ -771,10 +771,10 @@ function toggleRSVPdetail(val)
       <legend>Registration</legend>
       <p>
         <label for="use_rsvp">{$LANG_EVLIST['use_rsvp']}:</label>
-        <input id="use_rsvp" type="radio" name="use_rsvp" value="0" {reg_chk0} 
+        <input id="use_rsvp" type="radio" name="use_rsvp" value="0" {reg_chk0}
             onclick="javascript:toggleRSVPdetail(0);" />
         {$LANG_EVLIST['rsvp_none']}
-        <input type="radio" name="use_rsvp" value="1" {reg_chk1} 
+        <input type="radio" name="use_rsvp" value="1" {reg_chk1}
            onclick="javascript:toggleRSVPdetail(1);" />
         {$LANG_EVLIST['rsvp_event']}
         <span id="rsvp_repeat">
@@ -786,19 +786,19 @@ function toggleRSVPdetail(val)
       <div id="rsvp_detail">
       <p>
         <label for="max_rsvp">{$LANG_EVLIST['max_rsvp']}:</label>
-        <input type="text" id="max_rsvp" name="max_rsvp" maxlength="5" 
+        <input type="text" id="max_rsvp" name="max_rsvp" maxlength="5"
             value="{max_rsvp}" />
         &nbsp;&nbsp;{$LANG_EVLIST['rsvp_waitlist']}
         <input type="checkbox" name="rsvp_waitlist" value="1" {rsvp_wait_chk} />
       </p>
       <p>
         <label for="rsvp_cutoff">{$LANG_EVLIST['rsvp_cutoff']}:</label>
-        <input type="text" name="rsvp_cutoff" maxlength="5" 
+        <input type="text" name="rsvp_cutoff" maxlength="5"
             id="rsvp_cutoff" value="{rsvp_cutoff}" />
       </p>
       <p>
         <label for="max_user_rsvp">{$LANG_EVLIST['max_user_rsvp']}:</label>
-        <input type="text" name="max_user_rsvp" maxlength="5" 
+        <input type="text" name="max_user_rsvp" maxlength="5"
             id="max_user_rsvp" value="{max_user_rsvp}" />
       </p>
       <div style="clear:both;"></div>
@@ -822,10 +822,10 @@ function toggleRSVPdetail(val)
       </p>
       {!if rsvp_print}
       <p>
-        <label>Allow Ticket Printing?:</label>
-        <input type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}> No
-        <input type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}> Paid Only
-        <input type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}> Paid or Unpaid
+        <label>{$LANG_EVLIST['allow_ticket_printing']}?:</label>
+        <input type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}> {$LANG_EVLIST['no']}
+        <input type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}> ${LANG_EVLIST['paid_only']}
+        <input type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}> {$LANG_EVLIST['paid_or_unpaid']}
       </p>
      {!endif}
       </div>
@@ -840,7 +840,7 @@ function toggleRSVPdetail(val)
       <div style="padding:5px;">
         {!if use_locator}
         <label for="loc_sel">{$LANG_EVLIST['select_location']}</label>
-        <select id="loc_sel" name="loc_sel" 
+        <select id="loc_sel" name="loc_sel"
             onchange="javascript:EVupdateLoc(this.value);" >
           <option value=''>{$LANG_EVLIST['select_location']}</option>
           {loc_selection}
@@ -859,7 +859,7 @@ function toggleRSVPdetail(val)
         <br /><br />
 
         <label for="city">{$LANG_EVLIST['city']}:</label>
-        <input type="text" name="city" id="city" style="width:80%;" 
+        <input type="text" name="city" id="city" style="width:80%;"
             maxlength="64" value="{city}" /><br />
         <br />
 
@@ -869,12 +869,12 @@ function toggleRSVPdetail(val)
         <br /><br />
 
         <label for="country">{$LANG_EVLIST['country']}:</label>
-        <input type="text" name="country" id="country" style="width:80%;" 
+        <input type="text" name="country" id="country" style="width:80%;"
             maxlength="64" value="{country}" />
         <br /><br />
 
         <label for="postal">{$LANG_EVLIST['zip']}:</label>
-        <input type="text" name="postal" id="postal" size="10" maxlength="25" 
+        <input type="text" name="postal" id="postal" size="10" maxlength="25"
             value="{postal}" />
         <br /><br />
 
@@ -894,24 +894,24 @@ function toggleRSVPdetail(val)
       <legend>{$LANG_EVLIST['ev_contact']}</legend>
       <div style="padding:5px;">
         <label for="contact" style="width:16em;">{$LANG_EVLIST['for_more_info']}:</label>
-        <input type="text" name="contact" id="contact" style="width:50%;" 
+        <input type="text" name="contact" id="contact" style="width:50%;"
             maxlength="64" value="{contact}" />
         <br /><br />
 
         <label for="email" style="width:16em;">{$LANG_EVLIST['email']}</label>
-        <input type="text" name="email" id="email" style="width:50%;" 
+        <input type="text" name="email" id="email" style="width:50%;"
             maxlength="64" value="{email}" />
         <br/><br/>
 
         <label for="phone" style="width:16em;">{$LANG_EVLIST['phone']}</label>
-        <input type="text" name="phone" id="phone" maxlength="32" 
+        <input type="text" name="phone" id="phone" maxlength="32"
             value="{phone}" />
         <br />
 
         <label for="contactlink" style="width:16em;">
             {$LANG_EVLIST['show_contactlink']}?
         </label>
-        <input type="checkbox" name="contactlink" id="contactlink" 
+        <input type="checkbox" name="contactlink" id="contactlink"
             {contactlink_chk} />
       </div>
     </fieldset>
@@ -949,7 +949,7 @@ function toggleRSVPdetail(val)
       {!if del_button}
         <input type="submit" class="lgButton red" name="{delaction}" value="{$LANG_ADMIN['delete']}" />
       {!endif}
-      <input type="reset" class="lgButton blue" name="cancel" value="{$LANG_ADMIN['cancel']}" 
+      <input type="reset" class="lgButton blue" name="cancel" value="{$LANG_ADMIN['cancel']}"
            onclick="javascript: document.location.href='{cancel_url}'" />
     </p>
   </form>

@@ -282,7 +282,7 @@
 {!endif}
 
     <input type="submit" class="lgButton orange" name="register"
-        value="Register" />
+        value="${LANG_EVLIST['register']}" />
   </form>
 
 </div>

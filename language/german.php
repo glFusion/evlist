@@ -417,6 +417,13 @@ $LANG_EVLIST = array(
 'all' => 'All',
 'sel_category' => 'Select Category',
 'click_for_datepicker' => 'Click for Date Selector',
+<<<<<<< HEAD
+>>>>>>> refs/remotes/leegarner-glfusion/master
+=======
+'paid_only'     => 'Paid Only',
+'paid_or_unpaid'    => 'Paid or Unpaid',
+'register'      => 'Register',
+'allow_ticket_printing' => 'Allow Ticket Printing',
 >>>>>>> refs/remotes/leegarner-glfusion/master
 );
 

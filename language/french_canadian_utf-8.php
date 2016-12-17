@@ -359,6 +359,10 @@ $LANG_EVLIST = array(
 'all' => 'All',
 'sel_category' => 'Select Category',
 'click_for_datepicker' => 'Click for Date Selector',
+'paid_only'     => 'Paid Only',
+'paid_or_unpaid'    => 'Paid or Unpaid',
+'register'      => 'Register',
+'allow_ticket_printing' => 'Allow Ticket Printing',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

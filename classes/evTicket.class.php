@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2015-2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
 *   @version    1.4.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -54,7 +54,7 @@ class evTicket
         if ($tic_id != '')
             $this->tic_id = $tic_id;
 
-        $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} 
+        $sql = "SELECT * FROM {$_TABLES['evlist_tickets']}
             WHERE tic_id='{$this->tic_id}'";
         //echo $sql;
         $result = DB_query($sql);
@@ -193,7 +193,7 @@ class evTicket
             uid = $uid,
             used = 0,
             dt = UNIX_TIMESTAMP()";
- 
+
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
@@ -222,7 +222,7 @@ class evTicket
             $this->tic_id = self::MakeTicketId(
                 array($this->ev_id, $this->rp_id, $this->fee, $this->uid)
             );
-            $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET 
+            $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET
                 tic_id = '" . DB_escapeString($this->tic_id) . "',
                 dt = UNIX_TIMESTAMP(), ";
             $sql3 = '';
@@ -239,7 +239,7 @@ class evTicket
             uid = {$this->uid},
             used = {$this->used}";
 
-        $sql = $sql1 . $sql2 . $sql3; 
+        $sql = $sql1 . $sql2 . $sql3;
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
@@ -270,7 +270,7 @@ class evTicket
         } else {
             $id = DB_escapeString($id);
             $where = "= '$id'";
-        } 
+        }
         $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE tic_id $where";
         DB_query($sql);
         EVLIST_log("Deleted tickets $where");
@@ -294,7 +294,7 @@ class evTicket
         } else {
             $id = DB_escapeString($id);
             $where = "= '$id'";
-        } 
+        }
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
                 SET used = 0 WHERE tic_id $where";
         DB_query($sql);
@@ -400,10 +400,11 @@ class evTicket
         $params = array('module_size'=>5);
 
         $pdf = new FPDF();
-        $pdf->SetLeftMargin(20); 
+        $pdf->SetLeftMargin(20);
         $pdf->AddPage();
 
         $tic_types = array();
+        $counter = 0;
         foreach ($tickets as $tic_id=>$ticket) {
             if (!isset($tick_types[$ticket->tic_type])) {
                 $tick_types[$ticket->tic_type] = new evTicketType($ticket->tic_type);
@@ -426,7 +427,18 @@ class evTicket
             // Get the repeat(s) for the ticket(s) to print a ticket for each
             // occurrence.
             $repeats = evRepeat::GetRepeats($ticket->ev_id, $ticket->rp_id);
+            if (empty($repeats)) {
+                echo $LANG_EVLIST['none_found'];
+                return;
+            }
+
             foreach ($repeats as $rp_id => $event) {
+                $counter++;
+                if ($counter > 3) {     // Print up to 3 tickets per page
+                    $pdf->AddPage();
+                    $counter = 1;
+                }
+
                 $ev_date = $event->date_start;
                 $ev_time = $event->time_start1 . ' - ' . $event->time_end1;
                 if (!empty($event->time_start2)) {

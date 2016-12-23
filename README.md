@@ -139,3 +139,5 @@ event to occur on that Monday as well as the following Tuesdays.
 * When the JSON calendar is used:
   * the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
   * the date selector always defaults to the date first viewed.
+* If ticket printing is used, and the event repeat occurrences are changed after
+tickets have been created, the tickets will be orphaned and can't be printed.

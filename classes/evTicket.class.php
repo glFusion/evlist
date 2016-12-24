@@ -427,10 +427,7 @@ class evTicket
             // Get the repeat(s) for the ticket(s) to print a ticket for each
             // occurrence.
             $repeats = evRepeat::GetRepeats($ticket->ev_id, $ticket->rp_id);
-            if (empty($repeats)) {
-                echo $LANG_EVLIST['none_found'];
-                return;
-            }
+            if (empty($repeats)) return;
 
             foreach ($repeats as $rp_id => $event) {
                 $counter++;

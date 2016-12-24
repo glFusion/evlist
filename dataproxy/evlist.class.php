@@ -6,11 +6,11 @@
 // |                                                                          |
 // | evList plugin interface                                                  |
 // +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 by the following authors:                             |
+// | Copyright (C) 2009-2015 by the following authors:                        |
 // |                                                                          |
 // | Mark R. Evans          mark AT glfusion DOT org                          |
 // |                                                                          |
-// | Based on the Data Proxy Plugin for Geeklog CMS                           |
+// | Based on the Data Proxy Plugin                                           |
 // | Copyright (C) 2007-2008 by the following authors:                        |
 // |                                                                          |
 // | Authors: mystral-kk        - geeklog AT mystral-kk DOT net               |
@@ -67,6 +67,7 @@ class Dataproxy_evlist extends DataproxyDriver
         return $_CONF['site_url'] . '/evlist/index.php';
     }
 
+
     /**
     * Returns array of (
     *   'id'        => $id (string),
@@ -114,6 +115,7 @@ class Dataproxy_evlist extends DataproxyDriver
 
         return $retval;
     }
+
 
     /**
     * This function ignores static pages which are displayed in the
@@ -164,5 +166,7 @@ class Dataproxy_evlist extends DataproxyDriver
         }
         return $entries;
     }
+
 }
+
 ?>

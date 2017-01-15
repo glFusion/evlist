@@ -37,8 +37,9 @@
 *
 *   @author     Lee P. Garner <lee@leegarner.com
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
+*   @version    1.4.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -470,7 +471,6 @@ function EVLIST_alertMessage($msg = '', $type = '', $header = '')
     // Require a valid message
     if ($msg == '')
         return '';
-
     return COM_showMessageText($msg, $header, true, $type);
 }
 
@@ -755,7 +755,7 @@ function EVLIST_adminRSVP($rp_id)
 */
 function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ACCESS, $LANG_ADMIN;
+    global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
 
     USES_class_date();
 
@@ -763,10 +763,10 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 
     switch($fieldname) {
     case 'tic_count':
-        if ($fieldvalue <= $A['max_rsvp']) {
+        if ($A['max_rsvp'] == 0 || $fieldvalue <= $A['max_rsvp']) {
             $retval = '';
         } else {
-            $retval = 'Yes';
+            $retval = $LANG_EVLIST['yes'];
         }
         break;
 
@@ -776,9 +776,9 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'rank':
         if ($fieldvalue > $A['max_signups']) {
-            $retval = 'Yes';
+            $retval = $LANG_EVLIST['yes'];
         } else {
-            $retval = 'No';
+            $retval = $LANG_EVLIST['no'];
         }
         break;
 

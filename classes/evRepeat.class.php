@@ -15,18 +15,27 @@ USES_evlist_class_event();
 USES_evlist_class_detail();
 
 /**
- *  Class for event
- *  @package evlist
- */
+*   Class for event
+*   @package evlist
+*/
 class evRepeat
 {
     /** Property fields.  Accessed via Set() and Get()
     *   @var array */
     var $properties = array();
 
+    /** Associated event
+    *   @var object */
     var $Event;
+
+    /** Associated event detail (title, location, summary, etc.
+    *   @var object */
     var $Detail;
-    public $isAdmin;   // indicates if the current user can admin this event
+
+    /** Indicate if admin access is granted to this event/repeat
+    *   @var boolean */
+    public $isAdmin;
+
 
     /**
      *  Constructor.
@@ -61,7 +70,6 @@ class evRepeat
 
         // this gets used a few times, might as well sanitize it here
         $this->uid = (int)$_USER['uid'];
-
     }
 
 
@@ -875,19 +883,6 @@ class evRepeat
         for ($i = 0; $i < $num_attendees; $i++) {
             evTicket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid);
         }
-        /*if ($fee < .01) {
-        DB_query("INSERT INTO {$_TABLES['evlist_rsvp']} SET
-                    ev_id = '{$this->Event->id}',
-                    rp_id = '{$rp_id}',
-                    uid = '{$uid}',
-                    num_attendees = '{$num_attendees}',
-                    dt_reg = " . time());
-        if (DB_error())
-            return 23;
-        } else {
-            $this->AddToCart($tick_type, $num_attendees);
-        }*/
-
         return 0;
     }
 
@@ -959,18 +954,22 @@ class evRepeat
     *   If provided, the $rp_id parameter will be considered an event ID or
     *   a repeat ID, depending on the event's registration option.
     *
-    *   @return integer         Total registrations
+    *   @return integer         Total registrations for this instance
     */
     public function TotalRegistrations()
     {
         global $_TABLES, $_EV_CONF;
 
-        if ($_EV_CONF['enable_rsvp'] != 1) return 0;
+        static $count = NULL;
 
-        if ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
-            $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $this->ev_id);
-        } else {
-            $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $this->rp_id);
+        if ($count === NULL) {
+            if ($_EV_CONF['enable_rsvp'] != 1) {
+                $count = 0;
+            } elseif ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
+                $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $this->ev_id);
+            } else {
+                $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $this->rp_id);
+            }
         }
         return $count;
     }
@@ -985,29 +984,31 @@ class evRepeat
     {
         global $_TABLES, $_EV_CONF;
 
-        $retval = array();
-        if ($_EV_CONF['enable_rsvp'] != 1 ||
-                $this->Event->options['use_rsvp'] == 0) {
-            // Registrations disbled, return empty array
-            return $retval;
-        }
+        static $retval = NULL;
 
-        $sql = "SELECT uid, dt_reg
-            FROM {$_TABLES['evlist_tickets']}
-            WHERE ev_id = '{$this->ev_id}' ";
+        if ($retval === NULL) {
+            $retval = array();
 
-        if ($this->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
-            $sql .= " AND rp_id = '{$this->rp_id}' ";
-        }
-        $sql .= ' ORDER BY dt_reg ASC';
+            // Check that registrations are enabled
+            if ($_EV_CONF['enable_rsvp'] == 1 &&
+                    $this->Event->options['use_rsvp'] != 0) {
 
-        $res = DB_query($sql, 1);
-        if ($res) {
-            while ($A = DB_fetchArray($res, false)) {
-                $retval[] = $A;
+                $sql = "SELECT uid, dt_reg
+                        FROM {$_TABLES['evlist_tickets']}
+                        WHERE ev_id = '{$this->ev_id}' ";
+
+                if ($this->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
+                    $sql .= " AND rp_id = '{$this->rp_id}' ";
+                }
+                $sql .= ' ORDER BY dt_reg ASC';
+                $res = DB_query($sql, 1);
+                if ($res) {
+                    while ($A = DB_fetchArray($res, false)) {
+                        $retval[] = $A;
+                    }
+                }
             }
         }
-
         return $retval;
     }
 

@@ -1125,7 +1125,7 @@ function plugin_moderationvalues_evlist()
         'id, date_start1, date_end1,
         time_start1, time_end1, time_start2, time_end2,
         recurring, rec_data, allday, split,
-        status, postmode, hits, enable_reminders,
+        status, postmode, hits, enable_reminders, enable_comments,
         owner_id, group_id, perm_owner, perm_group, perm_members, perm_anon,
         det_id, show_upcoming, cal_id, options',
         $_TABLES['evlist_submissions']

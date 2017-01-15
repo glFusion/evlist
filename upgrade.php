@@ -241,7 +241,7 @@ function evlist_upgrade()
             $c->add('commentsupport',$CONF_EVLIST_DEFAULT['commentsupport'], 'select',
                 0, 0, 0, 100, true, 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+            if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
     CTL_clearCache();

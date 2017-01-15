@@ -78,7 +78,6 @@ class evMeetup
         $events = array();
 
         // cache_minutes is already sanitized as an intgeger
-        $db_loc = strtolower(COM_sanitizeId($loc, false));
         if ($key != '') $this->key = $key;
         $key = DB_escapeString($this->key);
         $sql = "SELECT * FROM {$_TABLES['evlist_cache']} WHERE
@@ -122,17 +121,16 @@ class evMeetup
             $response = $M->getEvents($this->params);
             $events = array();
             foreach ($response->results as $event) {
-                $tz = $event->timezone;
+                /*$tz = $event->timezone;
                 $d = new Date($event->time / 1000, $tz);
                 $dt = $d->format('Y-m-d', true);
-                $tm = $d->format('H:i:s', true);
+                $tm = $d->format('H:i:s', true);*/
                 if (!isset($events[$dt])) $events[$dt] = array();
                 $events[$dt][] = $event;
             }
             $this->updateCache($events);
         }
-        catch(Exception $e)
-        {
+        catch(Exception $e) {
             COM_errorLog('EVLIST:' . $e->getMessage());
             if (!empty($A)) {
             // Got old data from cache, better than nothing

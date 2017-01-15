@@ -42,7 +42,7 @@
 }
 
 .evlisteditor label {
-  width: 8em;
+  width: 12em;
   float: left;
   text-align: right;
   margin-right: 0.5em;
@@ -55,19 +55,19 @@
 }
 
 .evlisteditor textarea {
-    width: 80%;
+    width: 50%;
     height: 5em;
 }
 
-.evlisteditor input.text {
-    width: 80%;
+.evlisteditor input[type=text] {
+    width: 50%;
 }
 
 .evlisteditor fieldset div {
     padding: 5px;
 }
 
-#evlistEventHeader {
+#evlistEventHeader, #evEventButtons {
     clear: both;
     margin-left: 15px;
     margin-right: 15px;
@@ -154,7 +154,7 @@
 
 .evEventRegInfo {
     clear:both;
-    margin-top:5px;
+    margin-top:15px;
 }
 
 .evlistRedNote {
@@ -679,4 +679,9 @@ div.evPrtDataItem div.evdata {
 
 .ev-icon-danger {
     color:red;
+}
+
+.evAdminRSVP {
+  clear:both;
+  margin-top:10px;
 }

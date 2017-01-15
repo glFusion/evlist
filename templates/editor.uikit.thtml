@@ -399,7 +399,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <input required class="fValidate['required']" type="text" name="title"
+          <input required type="text" name="title"
             id="title" style="width:50%;" maxlength="255"
             value="{title}" />
           <span class="evFieldNote">{title_note}</span>
@@ -412,7 +412,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_summary', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <textarea name="summary" id="summary" style="width:80%;"
+          <textarea name="summary" id="summary"
             cols="80" rows="2">{summary}</textarea>
         </div>
       </div>
@@ -423,7 +423,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <textarea name="full_description" id="description" style="width:80%;"
+          <textarea name="full_description" id="description"
             cols="80" rows="3">{description}</textarea>
         </div>
       </div>
@@ -446,7 +446,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_url', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <input type="text" name="url" id="url" style="width:80%"
+          <input type="text" name="url" id="url" style="width:50%"
             maxlength="255" value="{url}" />
         </div>
       </div>
@@ -468,6 +468,19 @@ function toggleRSVPdetail(val)
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} />
+        </div>
+      </div>
+      {!endif}
+
+      {!if commentsupport}
+      <div class="uk-form-row">
+        <label for="enable_comments" class="uk-form-label">{$LANG_EVLIST['enable_comments']}</label>
+        <div class="uk-form-controls">
+          <select name="enable_comments">
+            <option value="0" {ena_cmt_0}>{$LANG_EVLIST['yes']}</option>
+            <option value="2" {ena_cmt_2}>{$LANG_EVLIST['no']}</option>
+            <option value="1" {ena_cmt_1}>{$LANG_EVLIST['closed']}</option>
+          </select>
         </div>
       </div>
       {!endif}
@@ -598,6 +611,7 @@ function toggleRSVPdetail(val)
       </div>
     </fieldset>
 
+{!if recur_section}
     <fieldset class="evForm">
       <legend>{$LANG_EVLIST['rec_event_info']}</legend>
       <div class="uk-form-row">
@@ -737,7 +751,7 @@ function toggleRSVPdetail(val)
             </label>
             <br />
             <input type="text" name="custom" id="custom" size=""
-                style="width:80%" maxlength="255" value="{custom_val}" />
+                maxlength="255" value="{custom_val}" />
             <br />
             <span class="evFieldNote">{$LANG_EVLIST['recur_cust_format']}</span>
           </p>
@@ -745,6 +759,7 @@ function toggleRSVPdetail(val)
 
       </div>
     </fieldset>
+{!endif}
 
     {!if is_repeat}
     {!else}
@@ -1101,7 +1116,7 @@ function toggleRSVPdetail(val)
             showhidesplit(1);
         }
     }
-
+{!if recur_section}
     // Update the custom recurring date field.
     function updatecustom(cal)
     {
@@ -1140,6 +1155,7 @@ function toggleRSVPdetail(val)
         showsTime   :   false,
         button      :   "stopdate_trigger"
     });
+{!endif}
 
 /* Initially the navbar is hidden - in case JS is disabled. Enable it now */
 document.getElementById('pe_navbar').style.display='';

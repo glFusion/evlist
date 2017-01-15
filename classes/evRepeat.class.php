@@ -497,6 +497,17 @@ class evRepeat
             'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
+        // Show the user comments. Moderators and event owners can delete comments
+        $this->Event->enable_comments = 0;
+        if (plugin_commentsupport_evlist() && $this->Event->enable_comments < 2) {
+            $T->set_var('usercomments',
+                CMT_userComments($this->rp_id, $this->Detail->title, 'evlist',
+                    '', '', 0, 1, false,
+                    (plugin_ismoderator_evlist() || $this->Event->owner_id == $_USER['uid']),
+                    $this->Event->enable_comments)
+            );
+        }
+
         if ($_EV_CONF['enable_rsvp'] == 1 &&
                 $this->Event->options['use_rsvp'] > 0) {
             if ($this->Event->options['rsvp_cutoff'] > 0) {
@@ -755,10 +766,12 @@ class evRepeat
 
         // Show the "manage reservations" link to the event owner
         if ($_EV_CONF['enable_rsvp'] == 1 &&
-                $this->Event->options['use_rsvp'] > 0) {
-            if ($this->isAdmin) {
-                $T->set_var('admin_rsvp', EVLIST_adminRSVP($this->rp_id));
-            }
+                $this->Event->options['use_rsvp'] > 0 &&
+                $this->isAdmin) {
+            $T->set_var(array(
+                'admin_rsvp'    => EVLIST_adminRSVP($this->rp_id),
+                'rsvp_count'    => $this->TotalRegistrations(),
+            ) );
         }
 
         $T->parse ('output','event');

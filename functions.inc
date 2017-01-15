@@ -1686,157 +1686,154 @@ function plugin_configmanager_select_topic_centerblock_evlist()
 
 
 /**
-* Return information for an event
+*   Return information for an event
 *
-* @param    string  $id         event ID or '*'
-* @param    string  $what       comma-separated list of properties
-* @param    int     $uid        user ID or 0 = current user
-* @param    array   $options    (reserved for future extensions)
-* @return   mixed               string or array of strings with the information
-*
+*   @param  string  $id         Event instance (repeat) ID
+*   @param  string  $what       comma-separated list of properties
+*   @param  int     $uid        user ID or 0 = current user
+*   @param  array   $options    (reserved for future extensions)
+*   @return mixed         string or array of strings with the information
 */
 function plugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 {
     global $_CONF, $_TABLES, $LANG_EVLIST;
 
+    // Getting all events not yet supported
+    if ($id == '*') return array();
+
+    USES_evlist_class_repeat();
+    $Rp = new evRepeat($id);
+    if ($Rp->isNew) {
+        return array();
+    }
+
     $properties = explode(',', $what);
-    $fields = array();
+    $props = array();
     foreach ($properties as $p) {
         switch ($p) {
-            case 'date':
-                $fields[] = 'date_start';
-                break;
-            case 'description':
-            case 'raw-description' :
-                $fields[] = 'full_description';
-                break;
-            case 'excerpt':
-                $fields[] = 'summary';
-                break;
-            case 'label':
-            case 'url':
-                $fields[] = 'id';
-                break;
-            case 'status' :
-            case 'id':
-            case 'title':
-                $fields[] = $p;
-                break;
-            case 'author':
-                $fields[] = 'owner_id';
-                break;
-            default:
-                break;
-        }
-    }
-
-    $fields = array_unique($fields);
-
-    if (count($fields) == 0) {
-        $retval = array();
-        return $retval;
-    }
-
-    if ($id == '*') {
-        $where = '';
-        $permOp = 'WHERE';
-    } else {
-        $where = " WHERE id = '" . DB_escapeString($id) . "'";
-        $permOp = 'AND';
-    }
-    if ($uid > 0) {
-        $permSql = COM_getPermSql($permOp, $uid);
-    } else {
-        $permSql = COM_getPermSql($permOp);
-    }
-    $sql = "SELECT " . implode(',', $fields) .
-            " FROM {$_TABLES['evlist_events']}
-            $where
-            $permSql ";
-
-    if ($id != '*') {
-        $sql .= ' LIMIT 1';
-    }
-
-    $result = DB_query($sql);
-    $numRows = DB_numRows($result);
-
-    $retval = array();
-    for ($i = 0; $i < $numRows; $i++) {
-        $A = DB_fetchArray($result);
-
-        $props = array();
-        foreach ($properties as $p) {
-            switch ($p) {
-                case 'date' :
-                    $props[$p] = $A['date_start1'];
-                    break;
-                case 'description':
-                    if ($A['postmode'] != 'plaintext') {
-                        $props[$p] = PLG_replaceTags($A['full_description']);
-                    } else {
-                        $props[$p] = $A['full_description'];
-                    }
-                    break;
-                case 'raw-description' :
-                    $props[$p] = $A['full_description'];
-                    break;
-                case 'excerpt':
-                    $props[$p] = $A['summary'];
-                    break;
-                case 'id':
-                    $props['id'] = $A['id'];
-                    break;
-                case 'title':
-                    $props['title'] = $A['title'];
-                    break;
-                case 'url':
-                    if (empty($A['id'])) {
-                        $props['url'] = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $id);
-                    } else {
-                        $props['url'] = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $A['id']);
-                    }
-                    break;
-                case 'label':
-                    $props['label'] = $LANG_EVLIST['pi_title'];
-                    break;
-                case 'status':
-                    $props['status'] = $A['status'];
-                    break;
-                case 'author':
-                    $props['author'] = $A['owner_id'];
-                    break;
-                default:
-                    $props[$p] = '';
-                    break;
-            }
-        }
-
-        $mapped = array();
-        foreach ($props as $key => $value) {
-            if ($id == '*') {
-                if ($value != '') {
-                    $mapped[$key] = $value;
-                }
+        case 'date' :
+            $props[$p] = $Rp->date_start;
+            break;
+        case 'description':
+            if ($Rp->Event->postmode != 'plaintext') {
+                $props[$p] = PLG_replaceTags($Rp->Event->Detail->full_description);
             } else {
-                $mapped[$key] = $value;
+                $props[$p] = $Rp->Event->Detail->full_description;
             }
-        }
-
-        if ($id == '*') {
-            $retval[] = $mapped;
-        } else {
-            $retval = $mapped;
+            break;
+        case 'raw-description' :
+            $props[$p] = $Rp->Event->Detail->full_description;
+            break;
+        case 'excerpt':
+            $props[$p] = $Rp->Event->Detail->summary;
+            break;
+        case 'id':
+            $props[$p] = $Rp->rp_id;
+            break;
+        case 'title':
+            $props[$p] = $Rp->Event->Detail->title;
+            break;
+        case 'url':
+            $props[$p] = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $Rp->rp_id);
+            break;
+        case 'label':
+            $props[$p] = $LANG_EVLIST['pi_title'];
+            break;
+        case 'author':
+            $props[$p] = $Rp->Event->owner_id;
+            break;
+        default:
+            $props[$p] = '';
             break;
         }
     }
 
-    if (($id != '*') && (count($retval) == 1)) {
-        $tRet = array_values($retval);
+    // Return a string if one property requested, or an array
+    // of property=>value elements
+    if (count($props) == 1) {
+        $tRet = array_values($props);
         $retval = $tRet[0];
+    } else {
+        $retval = $props;
     }
-
     return $retval;
+}
+
+
+/**
+*   Check to see if this Plugin uses comments
+*
+*   @return   boolean true or false
+*/
+function plugin_commentsupport_evlist()
+{
+    global $_EV_CONF;
+    return (int)$_EV_CONF['commentsupport'] == 1 ? true : false;
+}
+
+
+/**
+*   Save a comment.
+*   Saves the comment, updates the comment counter in the ad record,
+*   and notifies the ad owner that a new comment has been posted.
+*
+*   @param   string  $title  comment title
+*   @param   string  $comment comment text
+*   @param   string  $id     Item id to which $comment belongs
+*   @param   int     $pid    comment parent
+*   @param   string  $postmode 'html' or 'text'
+*   @return  mixed   false for failure, HTML string (redirect?) for success
+*/
+function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
+{
+    global $LANG03;
+
+    if (!plugin_commentsupport_classifieds())
+        return;
+
+    $title = strip_tags($title);
+    $pid = COM_applyFilter($pid, true);
+    $postmode = COM_applyFilter($postmode);
+
+    $ret = CMT_saveComment($title, $comment, $id, $pid,
+            'evlist', $postmode);
+
+    if ($ret > 0) {         // failure, return to comment form
+        return EVLIST_siteHeader()
+            . CMT_commentform($title, $comment, $id, $pid,
+                    'evlist', $LANG03[14], $postmode)
+            . EVLIST_siteFooter();
+    }
+    return (COM_refresh(EVLIST_URL . '/event.php?eid='.$id));
+}
+
+
+/**
+*   Plugin API to delete a comment
+*   Moderators and event owners can delete comments.
+*
+*   @param  integer $cid    Comment to be deleted
+*   @param  string  $id     Item id to which $cid belongs
+*   @return mixed   false for failure, HTML string (redirect?) for success
+*/
+function plugin_deletecomment_evlist($cid,$id)
+{
+    global $_USER;
+
+    USES_class_evlist_repeat();
+    $Rp = new evRepeat($id);
+    if ($Rp->isNew) return false;   // invalid item
+
+    if (plugin_ismoderator_evlist() || $Rp->Event->owner_id == $_USER['uid']) {
+        if (CMT_deleteComment($cid, $id, 'evlist') == 0) {
+            // Redirect back to the event view
+            return (COM_refresh(EVLIST_URL . '/event.php?eid='  . $id));
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
 
 

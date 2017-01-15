@@ -1,37 +1,34 @@
-evList ChangeLog
+# evList plugin for glFusion - Changelog
 
-v1.4.0
-------
+## v1.4.1
+- Add comment support
+
+## v1.4.0
 - Add event signups
 - Add uikit-based templates
 - Add responsive month view calendar
 - Add ticketing and rsvp
 - Add meetup.com event integration
 
-v1.3.6
-------
+## v1.3.6
 - Added AJAX calendar navigation
 
-v1.3.5
-------
+## v1.3.5
 - Fixed owner_id and group_id values when importing from CSV
 - Moved calendar popup javascript & css to separate plugin
 - Fix to allow yearly events based on DOM, e.g. last Monday in May
 
-v1.3.2
-------
+## v1.3.2
 - Added missing style & javascript for colorpicker.
 - Changed version check to accomodate patch-level versions, and require exact
     matches
 
-v1.3.1
-------
+## v1.3.1
 - Updated version number to fix error when calling COM_checkVersion() with
     patch-level releases (e.g. "1.3.0.1")
 - Implemented needed changes to centerblock
 
-v1.3.0
-------
+## v1.3.0
 - Fixed import bug when importing from glFusion calendar plugin
   start / end times for all day events.
 - Save all event recurrences as discrete events.
@@ -62,8 +59,7 @@ v1.3.0
     installed, map and weather information can be displayed with the event 
     detail.
 
-v1.2.6
-------
+## v1.2.6
 - Implemented support for $_CONF['loginrequired']
 - Implemented new glFusion admin authentication.
 - Implemented additional plugin calls for improved integration with
@@ -72,27 +68,22 @@ v1.2.6
 - Added daily, weekly, monthly and yearly calendar views.
 - Added a monthly calendar block.
 
-v1.2.5
-------
+## v1.2.5
 - New Dutch translation
 - Fix layout issue when categories are enabled
 
-v1.2.4
-------
+## v1.2.4
 - Properly filter search by date ranges
 
-v1.2.3
-------
+## v1.2.3
 - Fixed recurring issue with items like 3rd tuesday of the month
 - Fixed several E_ALL warnings.
 
-v1.2.2
-------
+## v1.2.2
 - Fixed issue where the body of the message did not appear when emailing
   of a new post (Mark)
 
-v1.2.1
-------
+## v1.2.1
 - Fixed issue where searching for & (or other special chars) would fail.
         private/plugins/evlist/functions.inc
 - Implemented support for glFusion 1.1.2 auto plugin install
@@ -100,8 +91,7 @@ v1.2.1
   moderate events.
 - Implemented ability to mail the evList Admin group on new submissions
 
-v1.2.0
-------
+## v1.2.0
 - Small HTML modifications
 - Added option to remove / add subscription
 - Fixed bug where configured permissions were not used on new events

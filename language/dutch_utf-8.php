@@ -352,6 +352,9 @@ You may either move existing events to a new calendar, or delete those events.',
 'paid_or_unpaid'    => 'Paid or Unpaid',
 'register'      => 'Register',
 'allow_ticket_printing' => 'Allow Ticket Printing',
+'enable_comments' => 'Enable Comments?',
+'closed'        => 'Closed',
+'event'         => 'Event',
 );
 
 // Localization of the Admin Configuration UI
@@ -397,6 +400,7 @@ $LANG_confignames['evlist'] = array(
     'meetup_gid'            => 'Meetup Group ID(s)',
     'meetup_cache_minutes'  => 'Cache Minutes',
     'meetup_enabled'        => 'Enable Meetup.com integration?',
+    'commentsupport'        => 'Enable Comments?',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Hoofd Instellingen',

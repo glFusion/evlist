@@ -351,6 +351,9 @@ $LANG_EVLIST = array(
 'paid_or_unpaid'		=> 'Bezahlt & Unbezahlt',
 'register'				=> 'Reservieren',
 'allow_ticket_printing'	=> 'Erlaube Ticket drucken',
+'enable_comments' => 'Enable Comments?',
+'closed'        => 'Closed',
+'event'         => 'Event',
 );
 
 // Localization of the Admin Configuration UI
@@ -396,6 +399,7 @@ $LANG_confignames['evlist'] = array(
     'meetup_gid'            => 'Meetup Group ID(s)',
     'meetup_cache_minutes'  => 'Meetup zwischenspeichern (Minuten)',
     'meetup_enabled'        => 'Meetup.com integrieren',
+    'commentsupport'        => 'Enable Comments?',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Haupteinstellungen',

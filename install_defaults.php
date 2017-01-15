@@ -87,6 +87,7 @@ $CONF_EVLIST_DEFAULT = array(
     'meetup_gid'        => '',  // Meetup group IDs
     'meetup_cache_minutes' => 30,
     'meetup_enabled'    => 0,   // 1 to enable meetup event inclusion
+    'commentsupport'    => 1,   // 1 = yes, 0 = no
 );
 
 /**
@@ -130,7 +131,8 @@ function plugin_initconfig_evlist()
                 0, 0, 0, 80, true, 'evlist');
         $c->add('reminder_days',$CONF_EVLIST_DEFAULT['reminder_days'], 'text',
                 0, 0, NULL, 90, true, 'evlist');
-
+        $c->add('commentsupport',$CONF_EVLIST_DEFAULT['commentsupport'], 'select',
+                0, 0, 0, 100, true, 'evlist');
 
         $c->add('ev_gui', NULL, 'fieldset', 0, 1, NULL, 0, true, 'evlist');
         $c->add('enable_menuitem',$CONF_EVLIST_DEFAULT['enable_menuitem'], 'select',

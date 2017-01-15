@@ -38,7 +38,7 @@
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.0
+*   @version    1.4.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -133,12 +133,12 @@ function evlist_upgrade()
             // no db or config changes
             DB_query("UPDATE {$_TABLES['groups']} SET grp_gl_core=2 WHERE grp_name='evList Admin'",1);
             DB_query("INSERT INTO {$_TABLES['blocks']} (
-                is_enabled, name, type, title, tid, blockorder, onleft, 
-                phpblockfn, group_id, owner_id, 
+                is_enabled, name, type, title, tid, blockorder, onleft,
+                phpblockfn, group_id, owner_id,
                 perm_owner, perm_group, perm_members, perm_anon
             ) VALUES (
                 '0', 'evlist_smallmonth', 'phpblock', 'Event Calendar', 'all', 0, 0,
-                'phpblock_evlist_smallmonth', 4, 2, 
+                'phpblock_evlist_smallmonth', 4, 2,
                 3, 3, 2, 2
             )");
 
@@ -154,7 +154,7 @@ function evlist_upgrade()
         case '1.3.1':
             $currentVersion = '1.3.2';
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;;
-        
+       
             // Change the recurring interval type to an array to support
             // multiple occurrences per month for DOM-type events
             $sql = "SELECT id, rec_data
@@ -219,6 +219,7 @@ function evlist_upgrade()
         case '1.3.7':
         case '1.3.8':
         case '1.3.9':
+            $currentVersion = '1.4.0';
             $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
             $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
             $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
@@ -234,6 +235,13 @@ function evlist_upgrade()
             // so execute it last.
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
+
+        case '1.4.0':
+            $currentVersion = '1.4.1';
+            $c->add('commentsupport',$CONF_EVLIST_DEFAULT['commentsupport'], 'select',
+                0, 0, 0, 100, true, 'evlist');
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
     }
 
     CTL_clearCache();
@@ -294,7 +302,7 @@ function evlist_upgrade_1_3_0()
 
     // Add new "submit" feature & map to Root group
     DB_query("INSERT INTO {$_TABLES['features']} (ft_name, ft_descr)
-            VALUES ('evlist.submit', 
+            VALUES ('evlist.submit',
                     'Allowed to bypass the evList submission queue')", 1);
     if (!DB_error()) {
         $ft_id = (int)DB_insertId();
@@ -330,7 +338,7 @@ function evlist_upgrade_1_3_0()
                     street, city, province, country, postal, contact,
                     email, phone
                 ) VALUES (
-                    '{$A['id']}', '{$A['title']}', '{$A['summary']}', 
+                    '{$A['id']}', '{$A['title']}', '{$A['summary']}',
                     '{$A['full_description']}', '{$A['url']}',
                     '{$A['location']}', '{$A['street']}',
                     '{$A['city']}', '{$A['province']}',
@@ -458,7 +466,7 @@ function EVLIST_do_upgrade_sql($version='')
     // Execute SQL now to perform the upgrade
     COM_errorLOG("--Updating {$_EV_CONF['pi_name']} to version $version");
     foreach($_EV_UPGRADE[$version] as $sql) {
-        COM_errorLOG("$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
+        COM_errorLOG("{$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
         DB_query($sql, '1');
         if (DB_error()) {
             COM_errorLog("SQL Error during {$_EV_CONF['pi_name']} Plugin update", 1);

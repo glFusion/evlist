@@ -396,6 +396,10 @@ $LANG_confignames['evlist'] = array(
     'meetup_gid'            => 'Meetup Group ID(s)',
     'meetup_cache_minutes'  => 'Meetup zwischenspeichern (Minuten)',
     'meetup_enabled'        => 'Meetup.com integrieren',
+    'commentsupport'        => 'Enable Comments?',
+'enable_comments' => 'Enable Comments?',
+'closed'        => 'Closed',
+'event'         => 'Event',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Haupteinstellungen',

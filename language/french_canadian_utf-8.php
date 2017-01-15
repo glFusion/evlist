@@ -363,6 +363,9 @@ $LANG_EVLIST = array(
 'paid_or_unpaid'    => 'Paid or Unpaid',
 'register'      => 'Register',
 'allow_ticket_printing' => 'Allow Ticket Printing',
+'enable_comments' => 'Enable Comments?',
+'closed'        => 'Closed',
+'event'         => 'Event',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";
@@ -414,6 +417,7 @@ $LANG_confignames[ 'evlist'] = array(
     'meetup_gid'            => 'Meetup Group ID(s)',
     'meetup_cache_minutes'  => 'Cache Minutes',
     'meetup_enabled'        => 'Enable Meetup.com integration?',
+    'commentsupport'        => 'Enable Comments?',
 );
 
 $LANG_configsubgroups[ 'evlist'] = array(

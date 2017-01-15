@@ -53,6 +53,7 @@ $event_table =
   `postmode` varchar(10) NOT NULL DEFAULT 'plaintext',
   `hits` int(11) NOT NULL DEFAULT '0',
   `enable_reminders` tinyint(1) NOT NULL DEFAULT '1',
+  `enable_comments` tinyint(1) NOT NULL DEFAULT '0',
   `owner_id` mediumint(8) DEFAULT NULL,
   `group_id` mediumint(8) DEFAULT NULL,
   `perm_owner` tinyint(1) DEFAULT NULL,
@@ -286,6 +287,14 @@ $_EV_UPGRADE = array(
     "UPDATE {$_TABLES['gl_conf_values']} SET
         subgroup = 30, sort_order = 60, fieldset = 0
         WHERE group_name = 'evlist' AND name='use_locator'",
+    ),
+'1.4.1' => array(
+    "ALTER TABLE {$_TABLES['evlist_events']}
+        ADD `enable_comments` tinyint(1) NOT NULL DEFAULT '0' AFTER enable_reminders",
+    "ALTER TABLE {$_TABLES['evlist_submissions']}
+        ADD `enable_comments` tinyint(1) NOT NULL DEFAULT '0' AFTER enable_reminders",
+    "ALTER TABLE {$_TABLES['evlist_submissions']}
+        CHANGE id id varchar(128) NOT NULL",
     ),
 );
 

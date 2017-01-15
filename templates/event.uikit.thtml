@@ -1,4 +1,10 @@
 {# begin {templatelocation} #}
+{!if admin_rsvp}
+<div id="evEventButtons">
+  <button id="btn_event" class="uk-button uk-button-primary" onclick="changeView('event')">{$LANG_EVLIST['event']}</button>
+  <button id="btn_rsvp" class="uk-button" onclick="changeView('rsvp')">RSVP ({rsvp_count})</button>
+</div>
+{!endif}
 <div id="evlistEventHeader">
   <h2 class="evlist_header">
     {title}
@@ -97,6 +103,7 @@
 {# End header div #}
 </div>
 
+<div id="evlistEvent">
 {!if map}
 <div id="evlistMapOuter">
   {map}
@@ -110,8 +117,6 @@
   </div>
 </div>
 {!endif}
-
-
 
 {# Event detail and map div #}
 <div id="evlistEventDetail">
@@ -298,12 +303,22 @@
   <a href="javascript:window.history.go(-1);" title="Back">Back</a>
 </div>
 
+{!if usercomments}
+<div style="clear:both;">
+  {usercomments}
+</div>
+{!endif}
+</div>
+
 {!if admin_rsvp}
+<div id="evlistRSVP" style="display:none">
   <div class="evAdminRSVP">
     <hr />
     {admin_rsvp}
   </div>
+</div>
 {!endif}
+
 
 <script type="text/javascript">
 var showregdiv = 0;
@@ -395,5 +410,19 @@ function() {
   showReminder({reminder_set});
 });
 
+function changeView(view)
+{
+  if (view == 'event') {
+    document.getElementById("btn_event").className = "uk-button uk-button-primary";
+    document.getElementById("btn_rsvp").className = "uk-button";
+    document.getElementById("evlistEvent").style = "display:''";
+    document.getElementById("evlistRSVP").style = "display:none";
+  } else {
+    document.getElementById("btn_event").className = "uk-button";
+    document.getElementById("btn_rsvp").className = "uk-button uk-button-primary";
+    document.getElementById("evlistEvent").style = "display:none";
+    document.getElementById("evlistRSVP").style = "display:''";
+  }
+}
 </script>
 {# end {templatelocation} #}

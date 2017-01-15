@@ -6,7 +6,7 @@
  *  @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
  *  @package    evlist
  *  @version    1.3.0
- *  @license    http://opensource.org/licenses/gpl-2.0.php 
+ *  @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  *  @filesource
  */
@@ -56,7 +56,7 @@ class evEvent
 
     /**
      *  Constructor.
-     *  Reads in the specified class, if $id is set.  If $id is zero, 
+     *  Reads in the specified class, if $id is set.  If $id is zero,
      *  then a new entry is being created.
      *
      *  @param  string  $ev_id  Optional event ID
@@ -82,6 +82,7 @@ class evEvent
             $this->categories = array();
             $this->owner_id = $_USER['uid'];
             $this->group_id = 13;
+            $this->enable_comments = $_EV_CONF['commentsupport'] ? 0 : 2;
 
             // Create dates & times based on individual URL parameters,
             // or defaults.
@@ -93,7 +94,7 @@ class evEvent
             $startmonth1 = isset($_GET['month']) ? (int)$_GET['month'] : '';
             if ($startmonth1 < 1 || $startmonth1 > 12)
                     $startmonth1 = $dt->format('n', true);
-            $startyear1 = isset($_GET['year']) ? 
+            $startyear1 = isset($_GET['year']) ?
                     (int)$_GET['year'] : $dt->format('Y', true);
             $starthour1 = isset($_GET['hour']) ?
                     (int)$_GET['hour'] : $dt->format('H', true);
@@ -113,13 +114,13 @@ class evEvent
             $endhour2 = $endhour1;
             $endminute2 = $endminute1;
 
-            $this->date_start1 = sprintf("%4d-%02d-%02d", 
+            $this->date_start1 = sprintf("%4d-%02d-%02d",
                             $startyear1, $startmonth1, $startday1);
-            $this->time_start1 = sprintf("%02d:%02d:00", 
+            $this->time_start1 = sprintf("%02d:%02d:00",
                             $starthour1, $startminute1);
-            $this->time_start2 = sprintf("%02d:%02d:00", 
+            $this->time_start2 = sprintf("%02d:%02d:00",
                             $starthour2, $startminute2);
-            $this->date_end1 = sprintf("%4d-%02d-%02d", 
+            $this->date_end1 = sprintf("%4d-%02d-%02d",
                             $endyear1, $endmonth1, $endday1);
             $this->time_end1 = sprintf("%02d:%02d:00", $endhour1, $endminute1);
             $this->time_end2 = sprintf("%02d:%02d:00", $endhour2, $endminute2);
@@ -203,6 +204,7 @@ class evEvent
         case 'endday1':
         case 'endday2':
         case 'cal_id':
+        case 'enable_comments':
             // Integer values
             if ($value == '') $value = 0;
             $this->properties[$var] = (int)$value;
@@ -277,15 +279,15 @@ class evEvent
 
         if (!is_array($row)) return;
 
-        $this->date_start1 = (isset($row['date_start1']) && 
+        $this->date_start1 = (isset($row['date_start1']) &&
             !empty($row['date_start1'])) ? $row['date_start1'] : date('Y-m-d');
-        $this->date_end1 = (isset($row['date_end1']) && 
+        $this->date_end1 = (isset($row['date_end1']) &&
             !empty($row['date_end1'])) ? $row['date_end1'] : $this->date_start1;
         $this->cal_id = $row['cal_id'];
         $this->show_upcoming = isset($row['show_upcoming']) ? 1 : 0;
-        $this->recurring = isset($row['recurring']) && 
+        $this->recurring = isset($row['recurring']) &&
                 $row['recurring'] == 1 ? 1 : 0;
-        $this->show_upcoming = isset($row['show_upcoming']) && 
+        $this->show_upcoming = isset($row['show_upcoming']) &&
                 $row['show_upcoming'] == 1 ? 1 : 0;
         if (isset($row['allday']) && $row['allday'] == 1) {
             $this->allday = 1;
@@ -301,13 +303,13 @@ class evEvent
         }
 
         $this->status = isset($row['status']) && $row['status'] == 1 ? 1 : 0;
-        $this->postmode = isset($row['postmode']) && 
+        $this->postmode = isset($row['postmode']) &&
                 $row['postmode'] == 'html' ? 'html' : 'plaintext';
-        $this->enable_reminders = isset($row['enable_reminders']) && 
+        $this->enable_reminders = isset($row['enable_reminders']) &&
                 $row['enable_reminders'] == 1 ? 1 : 0;
         $this->owner_id = $row['owner_id'];
         $this->group_id = $row['group_id'];
-        //$this->title = $row['title'];
+        $this->enable_comments = $row['enable_comments'];
 
         if (isset($row['categories']) && is_array($row['categories'])) {
             $this->categories = $row['categories'];
@@ -342,10 +344,10 @@ class evEvent
                 $this->time_end1 = '23:59:59';
             } else {
                 $tmp = EVLIST_12to24($row['starthour1'], $row['start1_ampm']);
-                $this->time_start1 = sprintf('%02d:%02d:00', 
+                $this->time_start1 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute1']);
                 $tmp = EVLIST_12to24($row['endhour1'], $row['end1_ampm']);
-                $this->time_end1 = sprintf('%02d:%02d:00', 
+                $this->time_end1 = sprintf('%02d:%02d:00',
                     $tmp, $row['endminute1']);
             }
 
@@ -353,10 +355,10 @@ class evEvent
             // Splits don't support allday events
             if ($this->split == 1) {
                 $tmp = EVLIST_12to24($row['starthour2'], $row['start2_ampm']);
-                $this->time_start2 = sprintf('%02d:%02d:00', 
+                $this->time_start2 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute2']);
                 $tmp = EVLIST_12to24($row['endhour2'], $row['end2_ampm']);
-                $this->time_end2 = sprintf('%02d:%02d:00', 
+                $this->time_end2 = sprintf('%02d:%02d:00',
                     $tmp, $row['endminute1']);
             } else {
                 $this->time_start2 = NULL;
@@ -439,12 +441,12 @@ class evEvent
             // We'll just stick the categories into $row before it gets
             // sent to SetVars().
             $row['categories'] = array();
-            $cresult = DB_query("SELECT cid 
+            $cresult = DB_query("SELECT cid
                         FROM {$_TABLES['evlist_lookup']}
                         WHERE eid='{$this->id}'");
             if ($cresult) {
                 while ($A = DB_fetchArray($cresult, false)) {
-                    $row['categories'][] = $A['cid']; 
+                    $row['categories'][] = $A['cid'];
                 }
             }
 
@@ -581,7 +583,7 @@ class evEvent
                 $this->perm_group = $_EV_CONF['default_permissions'][1];
                 $this->perm_members = $_EV_CONF['default_permissions'][2];
                 $this->perm_anon = $_EV_CONF['default_permissions'][3];
-                // Set the group_id to the default 
+                // Set the group_id to the default
                 $this->group_id = (int)DB_getItem($_TABLES['groups'],
                         'grp_id', 'grp_name="evList Admin"');
                 // Set the owner to the submitter
@@ -612,6 +614,8 @@ class evEvent
                     id = '" . DB_escapeString($this->id) . "', ";
             $sql2 = '';
         }
+
+        if (!$_EV_CONF['commentsupport']) $this->enable_comments = 2;
 
         // Now save the categories
         // First save the new category if one was submitted
@@ -644,6 +648,7 @@ class evEvent
             status = '{$this->status}',
             postmode = '" . DB_escapeString($this->postmode) . "',
             enable_reminders = '{$this->enable_reminders}',
+            enable_comments = '{$this->enable_comments}',
             owner_id = '{$this->owner_id}',
             group_id = '{$this->group_id}',
             perm_owner = '{$this->perm_owner}',
@@ -661,7 +666,7 @@ class evEvent
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
-        } elseif ($this->table == 'evlist_submissions' && 
+        } elseif ($this->table == 'evlist_submissions' &&
                 isset($_CONF['notification']) &&
                 in_array ('evlist', $_CONF['notification'])) {
             $N = new Template(EVLIST_PI_PATH . '/templates/');
@@ -716,7 +721,7 @@ class evEvent
         DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $eid);
         DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
         DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
-        
+        DB_delete($_TABLES['evlist_tickets'], 'ev_id', $eid);
         return true;
     }
 
@@ -741,13 +746,13 @@ class evEvent
             $this->Errors[] = $LANG_EVLIST['err_times'];
 
         if ($this->split == 1 && $this->date_start1 == $this->date_end1) {
-            if ($this->date_start1 . ' ' . $this->time_start2 > 
+            if ($this->date_start1 . ' ' . $this->time_start2 >
                 $this->date_start1 . ' ' . $this->time_end2)
                 $this->Errors[] = $LANG_EVLIST['err_times'];
         }
 
-        if ($this->format == EV_RECUR_WEEKLY && 
-                $this->listdays == '') 
+        if ($this->format == EV_RECUR_WEEKLY &&
+                $this->listdays == '')
             $this->Errors[] = $LANG_EVLIST['err_missing_weekdays'];
 
         if (!empty($this->Errors)) {
@@ -798,7 +803,7 @@ class evEvent
             $T->set_file('editor', 'editor.thtml');
         }
 
-        // Basic tabs for editing both events and instances, show up on 
+        // Basic tabs for editing both events and instances, show up on
         // all edit forms
         //$tabs = array('ev_info', 'ev_schedule', 'ev_location', 'ev_contact',);
         $tabs = array('ev_info', 'ev_location', 'ev_contact',);
@@ -836,7 +841,7 @@ class evEvent
             // $rp_id is passed when this is called from class evRepeat.
             // Maybe that should pass in the repeat's data instead to avoid
             // another DB lookup.  An array of values could be used.
-            $Rep = DB_fetchArray(DB_query("SELECT * 
+            $Rep = DB_fetchArray(DB_query("SELECT *
                     FROM {$_TABLES['evlist_repeat']}
                     WHERE rp_id='$rp_id'"), false);
             if ($Rep) {
@@ -859,9 +864,33 @@ class evEvent
                 $T->set_var('permissions_editor', 'true');
             }
             $T->set_var(array(
+                'recur_section' => 'true',
                 'contact_section' => 'true',
                 'category_section' => 'true',
                 'upcoming_chk' => $this->show_upcoming ? EVCHECKED : '',
+                'enable_reminders' => $_EV_CONF['enable_reminders'],
+                'rem_status_checked' => $this->enable_reminders == 1 ?
+                        EVCHECKED : '',
+                'commentsupport' => $_EV_CONF['commentsupport'],
+                'ena_cmt_' . $this->enable_comments => 'selected="selected"',
+                'recurring_format_options' =>
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $option),
+                'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
+                'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
+                        $LANG_EVLIST['day_by_date'], ''),
+                'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
+                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
+                'yearlystop_label' => sprintf($LANG_EVLIST['stop_label'],
+                        $LANG_EVLIST['year'], $LANG_EVLIST['if_any']),
+                'listdays_label' => sprintf($LANG_EVLIST['custom_label'],
+                        $LANG_EVLIST['days_of_week'], ''),
+                'listdaystop_label' => sprintf($LANG_EVLIST['stop_label'],
+                        $LANG_EVLIST['date_l'], $LANG_EVLIST['if_any']),
+                'intervalstop_label' => sprintf($LANG_EVLIST['stop_label'],
+                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
+                'custom_label' => sprintf($LANG_EVLIST['custom_label'],
+                        $LANG_EVLIST['dates'], ''),
+                'datestart_note' => $LANG_EVLIST['datestart_note'],
             ) );
         }
 
@@ -893,15 +922,15 @@ class evEvent
         //$recinterval = '';
         $recweekday  = '';
 
-        $ownerusername = DB_getItem($_TABLES['users'], 
+        $ownerusername = DB_getItem($_TABLES['users'],
                     'username', "uid='{$this->owner_id}'");
 
         $retval .= COM_startBlock($LANG_EVLIST['event_editor']);
         $summary = $this->Detail->summary;
         $full_description = $this->Detail->full_description;
         $location = $this->Detail->location;
-        if (($this->isAdmin || 
-                ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)) 
+        if (($this->isAdmin ||
+                ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1))
                 && $A['postmode'] == 'html') {
             $postmode = '2';      //html
         } else {
@@ -920,19 +949,19 @@ class evEvent
             $this->date_end1 = $this->date_start1;
         }
         if ($this->date_start1 != '' && $this->date_start1 != '0000-00-00') {
-            list($startmonth1, $startday1, $startyear1, 
-                $starthour1, $startminute1) = 
+            list($startmonth1, $startday1, $startyear1,
+                $starthour1, $startminute1) =
                 $this->DateParts($this->date_start1, $this->time_start1);
         } else {
-            list($startmonth1, $startday1, $startyear1, 
-                $starthour1, $startminute1) = 
+            list($startmonth1, $startday1, $startyear1,
+                $starthour1, $startminute1) =
                 $this->DateParts(date('Y-m-d', time()), date('H:i:s', time()));
         }
 
         // The end date can't be before the start date
         if ($this->date_end1 >= $this->date_start1) {
             list($endmonth1, $endday1, $endyear1,
-                    $endhour1, $endminute1) = 
+                    $endhour1, $endminute1) =
                     $this->DateParts($this->date_end1, $this->time_end1);
             $days_interval = Date_Calc::dateDiff(
                     $endday1, $endmonth1, $endyear1,
@@ -955,7 +984,7 @@ class evEvent
             //    $T->set_var('format' . $i . 'show', ' style="display:none;"');
             //}
         } else {
-            $option = empty($this->rec_data['type']) ? 
+            $option = empty($this->rec_data['type']) ?
                         '0' : (int)$this->rec_data['type'];
 
             $T->set_var(array(
@@ -964,72 +993,73 @@ class evEvent
                 'format_opt'    => $option,
             ) );
         }
-            if (isset($this->rec_data['stop']) && 
+        if (isset($this->rec_data['stop']) &&
                     !empty($this->rec_data['stop'])) {
-                $T->set_var(array(
-                    'stopdate'      => $this->rec_data['stop'],
-                    'd_stopdate'    => 
-                                EVLIST_formattedDate($this->rec_data['stop']),
-                ) );
-            }
-            if (!empty($this->rec_data['skip'])) {
-                $T->set_var("skipnext{$this->rec_data['skip']}_checked", 
-                        EVCHECKED);
-            }
-
-            if (!empty($this->rec_data['freq'])) {
-                $freq = (int)$this->rec_data['freq'];
-                if ($freq < 1) $freq = 1;
-            } else {
-                $freq = 1;
-            }
             $T->set_var(array(
-                'freq_text' => $LANG_EVLIST['rec_periods'][$this->rec_data['type']].'(s)',
-                'rec_freq'  => $freq,
+                'stopdate'      => $this->rec_data['stop'],
+                'd_stopdate'    =>
+                            EVLIST_formattedDate($this->rec_data['stop']),
             ) );
+        }
 
-            foreach ($LANG_EVLIST['rec_intervals'] as $key=>$str) {
-                $T->set_var('dom_int_txt_' . $key, $str);
-                if (is_array($this->rec_data['interval'])) {
-                    if (in_array($key, $this->rec_data['interval'])) {
-                        $T->set_var('dom_int_chk_'.$key, EVCHECKED);
+        // Skip weekends. Default to "no" if not already set for this event
+        $skip = empty($this->rec_data['skip']) ? 0 : $this->rec_data['skip'];
+
+        if (!empty($this->rec_data['freq'])) {
+            $freq = (int)$this->rec_data['freq'];
+            if ($freq < 1) $freq = 1;
+        } else {
+            $freq = 1;
+        }
+        $T->set_var(array(
+            'freq_text' => $LANG_EVLIST['rec_periods'][$this->rec_data['type']],
+            'rec_freq'  => $freq,
+            "skipnext{$skip}_checked" => EVCHECKED,
+        ) );
+
+        foreach ($LANG_EVLIST['rec_intervals'] as $key=>$str) {
+            $T->set_var('dom_int_txt_' . $key, $str);
+            if (is_array($this->rec_data['interval'])) {
+                if (in_array($key, $this->rec_data['interval'])) {
+                    $T->set_var('dom_int_chk_'.$key, EVCHECKED);
+                }
+            }
+        }
+
+        // Set up the recurring options needed for the current event
+        switch ($option) {
+        case 0:
+            // Not a recurring event
+            break;
+        case EV_RECUR_MONTHLY:
+            if (is_array($this->rec_data['listdays'])) {
+                foreach ($this->rec_data['listdays'] as $mday) {
+                    $T->set_var('mdchk'.$mday, EVCHECKED);
+                }
+            }
+            break;
+        case EV_RECUR_WEEKLY:
+            $T->set_var('listdays_val', COM_stripslashes($rec_data[0]));
+            if (is_array($this->rec_data['listdays']) &&
+                    !empty($this->rec_data['listdays'])) {
+                foreach($this->rec_data['listdays'] as $day) {
+                    $day = (int)$day;
+                    if ($day > 0 && $day < 8) {
+                        $T->set_var('daychk'.$day, EVCHECKED);
                     }
                 }
             }
-
-            // Set up the recurring options needed for the current event
-            switch ($option) {
-            case 0:
-                break;
-            case EV_RECUR_MONTHLY:
-                if (is_array($this->rec_data['listdays'])) {
-                    foreach ($this->rec_data['listdays'] as $mday) {
-                        $T->set_var('mdchk'.$mday, EVCHECKED);
-                    }
-                }
-                break;
-            case EV_RECUR_WEEKLY:
-                $T->set_var('listdays_val', COM_stripslashes($rec_data[0]));
-                if (is_array($this->rec_data['listdays']) &&
-                        !empty($this->rec_data['listdays'])) {
-                    foreach($this->rec_data['listdays'] as $day) {
-                        $day = (int)$day;
-                        if ($day > 0 && $day < 8) {
-                            $T->set_var('daychk'.$day, EVCHECKED);
-                        }
-                    }
-                }
-                break;
-            case EV_RECUR_DOM:
-                $recweekday = $this->rec_data['weekday'];
-                break;
-            case EV_RECUR_DATES:
-                $T->set_var(array(
-                    'stopshow'      => 'style="display:none;"',
-                    'custom_val' => implode(',', $this->rec_data['custom']),
-                ) );
-                break;
-            }
+            break;
+        case EV_RECUR_DOM:
+            $recweekday = $this->rec_data['weekday'];
+            break;
+        case EV_RECUR_DATES:
+            $T->set_var(array(
+                'stopshow'      => 'style="display:none;"',
+                'custom_val' => implode(',', $this->rec_data['custom']),
+            ) );
+            break;
+        }
 
         $start1 = EVLIST_TimeSelect('start1', $this->time_start1);
         $start2 = EVLIST_TimeSelect('start2', $this->time_start2);
@@ -1089,34 +1119,12 @@ class evEvent
             'end_hour_options2'     => $end2['hour'],
             'end_minute_options2'   => $end2['minute'],
             'enddate2_ampm'         => $end2['ampm'],
-            'recurring_format_options' => 
-                    EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $option),
-            //'recurring_interval_options' => EVLIST_GetOptions($LANG_EVLIST['rec_intervals'], $recinterval),
-            'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
-            'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['day_by_date'], ''),
-            'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'], 
-                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
-            'yearlystop_label' => sprintf($LANG_EVLIST['stop_label'], 
-                        $LANG_EVLIST['year'], $LANG_EVLIST['if_any']),
-            'listdays_label' => sprintf($LANG_EVLIST['custom_label'],
-                        $LANG_EVLIST['days_of_week'], ''),
-            'listdaystop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['date_l'], $LANG_EVLIST['if_any']),
-            'intervalstop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
-            'custom_label' => sprintf($LANG_EVLIST['custom_label'],
-                        $LANG_EVLIST['dates'], ''),
-            'datestart_note' => $LANG_EVLIST['datestart_note'],
             'src'   => isset($_GET['src']) && $_GET['src'] == 'a' ? '1' : '0',
 
-            'rem_status_checked' => $this->enable_reminders == 1 ? 
-                        EVCHECKED : '',
             'del_button'    => $this->id == '' ? '' : 'true',
             'saveaction'    => $saveaction,
             'delaction'     => $delaction,
             'owner_id'      => $this->owner_id,
-            'enable_reminders' => $_EV_CONF['enable_reminders'],
             'iso_lang'      => EVLIST_getIsoLang(),
             'hour_mode'     => $_CONF['hour_mode'],
             'days_interval' => $days_interval,
@@ -1124,7 +1132,7 @@ class evEvent
             'ts_start'      => strtotime($this->date_start1),
             'ts_end'        => strtotime($this->date_end1),
             'cal_select'    => $cal_select,
-            'contactlink_chk' => $this->options['contactlink'] == 1 ? 
+            'contactlink_chk' => $this->options['contactlink'] == 1 ?
                                 EVCHECKED : '',
             'lat'           => $this->Detail->lat,
             'lng'           => $this->Detail->lng,
@@ -1134,7 +1142,7 @@ class evEvent
             'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
-        if ($_EV_CONF['enable_rsvp']) {
+        if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
             USES_evlist_class_tickettype();
             $TickTypes = evTicketType::GetTicketTypes();
             //$T->set_block('editor', 'Tickets', 'tTypes');
@@ -1148,11 +1156,11 @@ class evEvent
                     $checked = '';
                     $fee = 0;
                 }
-                $tick_opts .= '<tr><td><input name="tickets[' . $tick_id . 
+                $tick_opts .= '<tr><td><input name="tickets[' . $tick_id .
                     ']" type="checkbox" ' . $checked .
                     ' value="' . $tick_id . '" /></td>' .
                     '<td>' . $tick_obj->description . '</td>' .
-                    '<td><input type="text" name="tick_fees[' . $tick_id . 
+                    '<td><input type="text" name="tick_fees[' . $tick_id .
                     ']" value="' . $fee . '" size="8" /></td></tr>' . LB;
                 /*$T->set_var(array(
                     'tick_id' => $tic['id'],
@@ -1217,7 +1225,7 @@ class evEvent
         // evlist_lookup table.
         if ($_EV_CONF['enable_categories'] == '1') {
             $cresult = DB_query("SELECT tc.id, tc.name
-                FROM {$_TABLES['evlist_categories']} tc 
+                FROM {$_TABLES['evlist_categories']} tc
                 WHERE tc.status='1' ORDER BY tc.name");
             while ($A = DB_fetchArray($cresult, false)) {
                 if (isset($_POST['categories']) && is_array($_POST['categories'])) {
@@ -1244,14 +1252,14 @@ class evEvent
 
         // Enable the post mode selector if we allow HTML and the user is
         // logged in, or if this user is an authorized editor
-        if ($this->isAdmin || 
+        if ($this->isAdmin ||
                 ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)) {
             $T->set_var(array(
                 'postmode_options' => EVLIST_GetOptions($LANG_EVLIST['postmodes'], $postmode),
                 'allowed_html' => COM_allowedHTML('evlist.submit'),
             ));
 
-            if ($postmode == 'plaintext') { 
+            if ($postmode == 'plaintext') {
                 // plaintext, hide postmode selector
                 $T->set_var('postmode_show', ' style="display:none"');
             }
@@ -1262,13 +1270,13 @@ class evEvent
             $T->set_var(array(
                 'owner_username' => COM_stripslashes($ownerusername),
                 'owner_dropdown' => COM_optionList($_TABLES['users'],
-                        'uid,username', $this->owner_id, 1, 
+                        'uid,username', $this->owner_id, 1,
                         "uid <> 1"),
                 'group_dropdown' => SEC_getGroupDropdown ($this->group_id, 3),
             ) );
             if ($rp_id == 0) {  // can only change permissions on main event
                 $T->set_var('permissions_editor', SEC_getPermissionsHTML(
-                        $this->perm_owner, $this->perm_group, 
+                        $this->perm_owner, $this->perm_group,
                         $this->perm_members, $this->perm_anon));
             }
 
@@ -1381,7 +1389,7 @@ class evEvent
             $Rec = new evRecurDates($this);
             break;
         case EV_RECUR_DOM:
-            // Recurs on one or more days each month- 
+            // Recurs on one or more days each month-
             // e.g. first and third Tuesday
             $Rec = new evRecurDOM($this);
             break;
@@ -1390,7 +1398,7 @@ class evEvent
             $Rec = new evRecurDaily($this);
             break;
         case EV_RECUR_WEEKLY:
-            // Recurs on one or more days each week- 
+            // Recurs on one or more days each week-
             // e.g. Tuesday and Thursday
             $Rec = new evRecurWeekly($this);
             break;
@@ -1438,7 +1446,7 @@ class evEvent
                         rp_time_start1, rp_time_end1,
                         rp_time_start2, rp_time_end2
                     ) VALUES (
-                        '{$this->id}', '{$this->det_id}', 
+                        '{$this->id}', '{$this->det_id}',
                         '{$event['dt_start']}', '{$event['dt_end']}',
                         '{$event['tm_start1']}', '{$event['tm_end1']}',
                         '{$event['tm_start2']}', '{$event['tm_end2']}'
@@ -1508,7 +1516,7 @@ class evEvent
             return true;
 
         $access = SEC_hasAccess($this->owner_id, $this->group_id,
-                    $this->perm_owner, $this->perm_group, 
+                    $this->perm_owner, $this->perm_group,
                     $this->perm_members, $this->perm_anon);
 
         return $access >= $level ? true : false;
@@ -1525,11 +1533,11 @@ class evEvent
         global $_TABLES;
 
         $retval = array();
-        $sql = "SELECT tc.id, tc.name 
+        $sql = "SELECT tc.id, tc.name
                 FROM {$_TABLES['evlist_categories']} tc
-                LEFT JOIN {$_TABLES['evlist_lookup']} tl 
-                ON tc.id = tl.cid 
-                WHERE tl.eid = '{$this->id}' 
+                LEFT JOIN {$_TABLES['evlist_lookup']} tl
+                ON tc.id = tl.cid
+                WHERE tl.eid = '{$this->id}'
                 AND tl.status = '1'";
         //echo $sql;die;
         $cresult = DB_query($sql, 1);
@@ -1556,7 +1564,7 @@ class evEvent
 
         // Make sure it's not a duplicate name.  While we're at it, get
         // the category ID to return.
-        $id = DB_getItem($_TABLES['evlist_categories'], 'id', 
+        $id = DB_getItem($_TABLES['evlist_categories'], 'id',
                 "name='$cat_name'");
         if (!$id) {
             DB_query("INSERT INTO {$_TABLES['evlist_categories']}
@@ -1644,7 +1652,7 @@ class evEvent
         return false;
 
     }
-        
+
 
     /**
     *   Creates the rec_data array.
@@ -1655,7 +1663,7 @@ class evEvent
     {
         if ($A == '') $A = $_POST;
 
-        // Re-initialize the array, and make sure this is really a 
+        // Re-initialize the array, and make sure this is really a
         $this->rec_data = array();
         if (!isset($A['recurring']) ||$A['recurring'] != 1) {
             $this->rec_data['type'] = 0;
@@ -1663,7 +1671,7 @@ class evEvent
             $this->rec_data['freq'] = 1;
             return;
         } else {
-            $this->rec_data['type'] = isset($A['format']) ? 
+            $this->rec_data['type'] = isset($A['format']) ?
                     (int)$A['format'] : 0;
             $this->rec_data['freq'] = isset($A['rec_freq']) ?
                     (int)$A['rec_freq'] : 1;
@@ -1769,8 +1777,8 @@ class evEvent
         // Create the recurring description.  Nothing for custom dates
         if ($interval < EV_RECUR_DATES) {
             $interval_txt = $LANG_EVLIST['rec_periods'][$interval];
-            if ($freq > 1) 
-                $freq_str = "$freq {$interval_txt}s";
+            if ($freq > 1)
+                $freq_str = "$freq {$interval_txt}";
             else
                 $freq_str = $interval_txt;
         }
@@ -1778,8 +1786,6 @@ class evEvent
         return $freq_str;
     }
 
-
 }   // class evEvent
-
 
 ?>

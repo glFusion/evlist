@@ -28,12 +28,13 @@
 // |                                                                          |
 // +--------------------------------------------------------------------------+
 /**
-*   glFusion API functions for the EvList plugin
+*   Table and variable definitions for the Evlist plugin for glFusion
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.0
+*   @version    1.4.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -48,14 +49,9 @@ if (!defined ('GVERSION')) {
 *   Define global variables.
 *   The arrays have already been created; these are effectively overrides
 */
-
-/*-------------------------------------------------------------------------*/
-/* Don't change anything below this line                                   */
-/*-------------------------------------------------------------------------*/
-
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.4.0';
+$_EV_CONF['pi_version']      = '1.4.1';
 $_EV_CONF['gl_version']      = '1.4.0';
 $_EV_CONF['pi_url']          = 'http://www.glfusion.org';
 

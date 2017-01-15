@@ -402,7 +402,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <input required class="fValidate['required']" type="text" name="title"
-            id="title" style="width:50%;" maxlength="255"
+            id="title" maxlength="255"
             value="{title}" />
         <span class="evFieldNote">{title_note}</span>
         </p>
@@ -412,8 +412,7 @@ function toggleRSVPdetail(val)
             {$LANG_EVLIST['event_summary']}:
         <a href="#" onclick="popupWindow('{doc_url}#desc_summary', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
-        <textarea name="summary" id="summary" style="width:80%;"
-            cols="80" rows="2">{summary}</textarea>
+        <textarea name="summary" id="summary" cols="80" rows="2">{summary}</textarea>
         </p>
 
         <p>
@@ -422,8 +421,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         </label>
-        <textarea name="full_description" id="description" style="width:80%;"
-            cols="80" rows="3">{description}</textarea>
+        <textarea name="full_description" id="description" cols="80" rows="3">{description}</textarea>
         </p>
 
         {!if event_postmode}
@@ -442,8 +440,7 @@ function toggleRSVPdetail(val)
         <label for="url">{$LANG_EVLIST['url']}:
         <a href="#" onclick="popupWindow('{doc_url}#desc_url', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
-        <input type="text" name="url" id="url" style="width:80%"
-            maxlength="255" value="{url}" />
+        <input type="text" name="url" id="url" maxlength="255" value="{url}" />
         </p>
 
         <p>
@@ -462,6 +459,19 @@ function toggleRSVPdetail(val)
           <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} />
         {!endif}
         </p>
+
+{!if commentsupport}
+      <p style="clear:both;">
+        <label for="enable_comments">{$LANG_EVLIST['enable_comments']}
+          <a href="#" onclick="popupWindow('{doc_url}#desc_commentsupport', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+        </label>
+        <select name="enable_comments">
+          <option value="0" {ena_cmt_0}>{$LANG_EVLIST['yes']}</option>
+          <option value="2" {ena_cmt_2}>{$LANG_EVLIST['no']}</option>
+          <option value="1" {ena_cmt_1}>{$LANG_EVLIST['closed']}</option>
+        </select>
+      </p>
+{!endif}
 
       </div>
     </fieldset>
@@ -496,7 +506,7 @@ function toggleRSVPdetail(val)
         <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
             id="startdt1_trigger" class="evDatePicker"
         />
-        <input type="text" name="date_start1" id="f_startdate1"
+        <input type="text" name="date_start1" id="f_startdate1" style="width:8em"
             size="10" value="{startdate1}"
             onchange="checkDate1();" />
         {# <div id="d_startdate1" style="float:left;width:10em;">{d_startdate1}</div> #}
@@ -522,7 +532,7 @@ function toggleRSVPdetail(val)
         <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
             id="enddate1_trigger" class="evDatePicker"
         />
-        <input type="text" name="date_end1" id="f_enddate1"
+        <input type="text" name="date_end1" id="f_enddate1" style="width:8em"
             size="10" value="{enddate1}" onchange="checkDate2();" />
         {# <div id="d_enddate1" style="float:left;width:10em;">{d_enddate1}</div> #}
         &nbsp;&nbsp;
@@ -743,7 +753,7 @@ function toggleRSVPdetail(val)
             </label>
             <br />
             <input type="text" name="custom" id="custom" size=""
-                style="width:80%" maxlength="255" value="{custom_val}" />
+                maxlength="255" value="{custom_val}" />
             <br />
             <span class="evFieldNote">{$LANG_EVLIST['recur_cust_format']}</span>
           <!--</div>-->
@@ -849,27 +859,27 @@ function toggleRSVPdetail(val)
         {!endif}
 
         <label for="location">{$LANG_EVLIST['ev_location']}:</label>
-        <textarea name="location" id="location" style="width:80%;"
+        <textarea name="location" id="location"
             cols="80" rows="1">{location}</textarea>
         <br/><br/>
 
         <label for="street">{$LANG_EVLIST['street_address']}:</label>
-        <input type="text" name="street" id="street" style="width:80%;"
+        <input type="text" name="street" id="street"
             maxlength="64" value="{street}" />
         <br /><br />
 
         <label for="city">{$LANG_EVLIST['city']}:</label>
-        <input type="text" name="city" id="city" style="width:80%;"
+        <input type="text" name="city" id="city"
             maxlength="64" value="{city}" /><br />
         <br />
 
         <label for="province">{$LANG_EVLIST['state']}:</label>
-        <input type="text" name="province" id="province" style="width:80%;"
+        <input type="text" name="province" id="province"
             maxlength="64" value="{province}" />
         <br /><br />
 
         <label for="country">{$LANG_EVLIST['country']}:</label>
-        <input type="text" name="country" id="country" style="width:80%;"
+        <input type="text" name="country" id="country"
             maxlength="64" value="{country}" />
         <br /><br />
 
@@ -1032,6 +1042,7 @@ function toggleRSVPdetail(val)
         }
     }
 
+{!if recur_section}
     // Update the custom recurring date field.
     function updatecustom(cal)
     {
@@ -1070,6 +1081,7 @@ function toggleRSVPdetail(val)
         showsTime   :   false,
         button      :   "stopdate_trigger"
     });
+{!endif}
 
 /* Initially the navbar is hidden - in case JS is disabled. Enable it now */
 document.getElementById('pe_navbar').style.display='';

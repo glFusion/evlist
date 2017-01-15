@@ -295,6 +295,13 @@
 </div>
 {!endif}
 
+{!if usercomments}
+<div style="clear:both;">
+  {usercomments}
+</div>
+{!endif}
+</div>
+
 <script type="text/javascript">
 var showregdiv = 0;
 function EV_toggleRegDiv() {

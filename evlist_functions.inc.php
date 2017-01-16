@@ -667,7 +667,7 @@ function EVLIST_adminRSVP($rp_id)
             '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
             '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
 
-    if ($Ev->Event->options['use_reg'] == EV_RSVP_REPEAT) {
+    if ($Ev->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
         $sql .= " AND rp_id = '{$Ev->rp_id}' ";
     }
 

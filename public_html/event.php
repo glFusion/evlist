@@ -98,8 +98,15 @@ if (isset($_POST['rp_id'])) {
 } else {
     $rp_id = 0;
 }
-//$eid = isset($_POST['eid']) ? COM_applyFilter($_POST['eid']) :
-//        isset($_GET['eid']) ? COM_applyFilter($_GET['eid']) : '';
+if (isset($_POST['eid'])) {
+    $eid = $_POST['eid'];
+} elseif (isset($_GET['eid'])) {
+    $eid = $_GET['eid'];
+} else {
+    $eid = '';
+}
+$mode = isset($_POST['mode']) ? $_POST['mode'] : 'nested';
+$order = isset($_POST['order']) ? $_POST['order'] : 'ASC';
 $cal_id = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
 $cat_id = isset($_GET['cat']) ? $_GET['cat'] : '';
 
@@ -195,7 +202,7 @@ case 'savefuturerepeat':
 
 case 'delevent':
     USES_evlist_class_event();
-    $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ? 
+    $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ?
             $_REQUEST['eid'] : '';
     if ($eid != '') {
         evEvent::Delete($eid);
@@ -205,7 +212,7 @@ case 'delevent':
 
 case 'delrepeat':
     USES_evlist_class_repeat();
-    $rp_id = isset($_REQUEST['rp_id']) && !empty($_REQUEST['rp_id']) ? 
+    $rp_id = isset($_REQUEST['rp_id']) && !empty($_REQUEST['rp_id']) ?
             (int)$_REQUEST['rp_id'] : 0;
     if ($rp_id > 0) {
         $R = new evRepeat($rp_id);
@@ -232,8 +239,8 @@ case 'savereminder':
         $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
             (eid, rp_id, uid, email, days_notice)
         VALUES (
-            '{$Ev->Event->id}', 
-            '{$Ev->rp_id}', 
+            '{$Ev->Event->id}',
+            '{$Ev->rp_id}',
             '" . (int)$_USER['uid']. "',
             '" . DB_escapeString($_POST['rem_email']) . "',
             '" . (int)$_POST['notice']. "')";
@@ -297,7 +304,7 @@ case 'cancelreg':
     }
     echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;
- 
+
 case 'cancel':
     echo COM_refresh($_CONF['site_admin_url'].'/moderation.php');
     break;
@@ -390,7 +397,7 @@ case 'print':
         echo COM_refresh(EVLIST_URL . '/index.php');
         exit;
     }
-    break; 
+    break;
 
 case 'printtickets':
     if ($_EV_CONF['enable_rsvp'] && !COM_isAnonUser()) {
@@ -421,14 +428,13 @@ default:
             $query = '';
         }
         $query = isset($_GET['query']) ? $_GET['query'] : '';
-        $content .= $Rep->Render('', $query, $template);
+        $content .= $Rep->Render('', $query, $template, $mode, $order);
     } else {
         // Shouldn't be in this file without an event ID to display or edit
         echo COM_refresh(EVLIST_URL . '/index.php');
         exit;
     }
-
-    break; 
+    break;
 
 }
 

@@ -37,8 +37,9 @@
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
+*   @version    1.4.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -1834,6 +1835,58 @@ function plugin_deletecomment_evlist($cid,$id)
     } else {
         return false;
     }
+}
+
+
+/**
+*   Get the plugin base URL and item ID key
+*
+*   @return array   (url, 'eid')
+*/
+function plugin_getcommenturlid_evlist() {
+    $retval = array(
+        EVLIST_URL . '/event.php',
+        'eid',
+    );
+    return $retval;
+}
+
+
+/**
+*   How the plugin will display specific comments
+*
+*   @param   string  $id     Unique idenifier for item comment belongs to
+*   @param   int     $cid    Comment id to display
+*   @param   string  $title  Page/comment title
+*   @param   string  $order  'ASC' or 'DSC' or blank
+*   @param   string  $format 'threaded', 'nested', or 'flat'
+*   @param   int     $page   Page number of comments to display
+*   @param   boolean $view   True to view comment (by cid), false to display (by $pid)
+*   @return  mixed   results of calling the plugin_displaycomment_ function
+*/
+function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page, $view)
+{
+    global $LANG_ACCESS, $_USER;
+
+    if (!plugin_commentsupport_evlist())
+        return '';
+
+    USES_evlist_class_repeat();
+    $Rp = new evRepeat($id);
+
+    if (!$Rp->isNew) {
+        $delete_option = (plugin_ismoderator_evlist() ||
+                $Rp->Event->owner_id = $_USER['uid']);
+        $retval = CMT_userComments($id, $title, 'classifieds', $order, $format,
+                                     $cid, $page, $view, $delete_option,
+                                     plugin_commentsupport_classifieds());
+    } else {
+        $retval = COM_startBlock($LANG_ACCESS['accessdenied'], '',
+                        COM_getBlockTemplate ('_msg_block', 'header'))
+                . $LANG_ACCESS['storydenialmsg']
+                . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
+    }
+    return $retval;
 }
 
 

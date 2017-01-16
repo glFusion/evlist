@@ -3,9 +3,9 @@
  *  Class to manage event repeats or single instances for the EvList plugin
  *
  *  @author     Lee Garner <lee@leegarner.com>
- *  @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+ *  @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
  *  @package    evlist
- *  @version    1.3.0
+ *  @version    1.4.1
  *  @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  *  @filesource
@@ -318,7 +318,7 @@ class evRepeat
     *   @param  string  $tpl    Optional template filename, e.g. 'event_print'
     *   @return string      HTML for the page.
     */
-    public function Render($rp_id=0, $query='', $tpl='')
+    public function Render($rp_id=0, $query='', $tpl='', $cmtmode='nested', $cmtorder='ASC')
     {
         global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK;
 
@@ -510,7 +510,7 @@ class evRepeat
         if (plugin_commentsupport_evlist() && $this->Event->enable_comments < 2) {
             $T->set_var('usercomments',
                 CMT_userComments($this->rp_id, $this->Detail->title, 'evlist',
-                    '', '', 0, 1, false,
+                    $cmtorder, $cmtmode, 0, 1, false,
                     (plugin_ismoderator_evlist() || $this->Event->owner_id == $_USER['uid']),
                     $this->Event->enable_comments)
             );

@@ -3,6 +3,7 @@
 ## v1.4.1
 - Add comment support
 - Moved ticket list to new tab on event page
+- Add calendar view and replace home page to centerblock
 
 ## v1.4.0
 - Add event signups

@@ -562,22 +562,6 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 {
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
-    // overloading the previously-boolean enable_centerblock option to
-    // indicate the centerblock format.
-    switch ($_EV_CONF['enable_centerblock']) {
-    case 1:     // table format
-        $dup_chk = 'rp_id';
-        $tpl_file = 'centerblock.thtml';
-        break;
-    case 2:     // story format
-        $dup_chk = 'rp_ev_id';
-        $tpl_file = 'cblock_stories.thtml';
-        break;
-    case 0:     // disabled
-    default:
-        return '';
-    }
-
     if ( (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') ||
         $_EV_CONF['pos_centerblock'] != $where ) {
         return '';
@@ -646,6 +630,29 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         return '';
     }
 
+    // overloading the previously-boolean enable_centerblock option to
+    // indicate the centerblock format.
+    switch ($_EV_CONF['enable_centerblock']) {
+    case 1:     // table format
+        $dup_chk = 'rp_id';
+        $tpl_file = 'centerblock.thtml';
+        break;
+    case 2:     // story format
+        $dup_chk = 'rp_ev_id';
+        $tpl_file = 'cblock_stories.thtml';
+        break;
+    case 3:     // calendar format
+        USES_evlist_views();
+        return EVLIST_view('', 0, 0, 0);
+        break;
+    case 4:     // replace home page completely
+        echo COM_refresh(EVLIST_URL);
+        exit;
+    case 0:     // disabled
+    default:
+        return '';
+    }
+
     // Special handling needed to get the latest X past events.  We have a bunch
     // from the query (to make sure we got enough).  Now pick out the last X.
     if ($_EV_CONF['range_centerblock'] == 1) {
@@ -675,7 +682,8 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 
     $T->set_block('centerblock', 'eventRow', 'eRow');
     $rp_shown = array();    // Array to hold repeat id's to avoid dups
-    foreach ($events as $day) {
+    foreach ($events as $date=>$day) {
+        if ($date == '_empty_') continue;
         foreach ($day as $A) {
 
             // Make sure we only show each event once for multiday

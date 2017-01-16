@@ -415,7 +415,7 @@ $LANG_configsubgroups['evlist'] = array(
     'sg_integ'              => 'Integrations',
 );
 $LANG_fs['evlist'] = array(
-    'ev_access'             => 'Access Control',
+    'ev_access'             => 'General Settings',
     'ev_gui'                => 'GUI Settings',
     'ev_centerblock'        => 'Centerblock Settings',
     'ev_permissions'        => 'Default Permissions',
@@ -451,8 +451,8 @@ $LANG_configselects['evlist'] = array(
         ),
     7 => array('Top of page'=>1,'After featured story'=>2,'Bottom of page'=>3,'Entire page'=>0),
     8 => array('past'=>1,'upcoming'=>2,'this week'=>3,'this month'=>4),
-    9 => array('disabled' => 0, 'table' => 1, 'story' => 2),
-    12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
+    9 => array('Disabled' => 0, 'Table' => 1, 'Story' => 2, 'Calendar' => 3,
+                'Replace Home Page' => 4),
     13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
     14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),
     15 => array('Admins Only' => 0, 'Logged-In Users' => 1, 'Logged-In+Anon Users' => 2),

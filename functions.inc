@@ -553,6 +553,7 @@ function plugin_getheadercss_evlist()
 /**
 *   Create the centerblock.
 *
+*   @uses   EVLIST_cb_content()
 *   @param  string  $where  Position (top, etc.)
 *   @param  string  $page   Page currently being displayed
 *   @param  string  $topic  Topic currently being displayed
@@ -562,17 +563,12 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 {
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
-    if ( (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') ||
-        $_EV_CONF['pos_centerblock'] != $where ) {
+    if ($_EV_CONF['pos_centerblock'] != $where ||
+        (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')) {
         return '';
     }
 
     if (!EVLIST_isCurrentVersion()) return '';
-
-    // Retrieve Centerblock Settings
-    $range    = $_EV_CONF['range_centerblock'];
-    $limit    = (int)$_EV_CONF['limit_block'];
-    $length   = $_EV_CONF['limit_summary'];
 
     // If we show only on the homepage, check if that's where we are
     // If a topic is being displayed, then we're not on the homepage
@@ -592,16 +588,65 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         }
     }
 
-    // If we got this far, we're going to display something as long
-    // as there's something to be displayed.
+    // overloading the previously-boolean enable_centerblock option to
+    // indicate the centerblock format.
+    switch ($_EV_CONF['enable_centerblock']) {
+    case 1:     // table format
+    case 2:     // story format
+        $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
+        break;
+    case 3:     // calendar format
+        USES_evlist_views();
+        $display = EVLIST_view('', 0, 0, 0);
+        break;
+    case 0:     // disabled
+    default:
+        return '';
+    }
+
+    if ($where == 0) {      // replacing home page
+        $display = EVLIST_siteHeader() . $display . EVLIST_siteFooter();
+    }
+    return $display;
+}
+
+
+/**
+*   Get the content for a table- or story-formatted centerblock
+*
+*   @param  integer $format     Centerblock type, 1=table,2=story
+*   @return string      HTML for centerblock section
+*/
+function EVLIST_cb_content($format)
+{
+    global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
+
     USES_evlist_functions();
     USES_lglib_class_datecalc();
 
     $retval = '';
+    // Retrieve Centerblock Settings
+    $range    = $_EV_CONF['range_centerblock'];
+    $limit    = (int)$_EV_CONF['limit_block'];
+    $length   = $_EV_CONF['limit_summary'];
+
     $opts = array(
         'limit' => $limit,
         'show_upcoming' => 1,
     );
+
+    switch ($format) {
+    case 1:     // table format
+        $dup_chk = 'rp_id';
+        $tpl_file = 'centerblock.thtml';
+        break;
+    case 2:     // story format
+        $dup_chk = 'rp_ev_id';
+        $tpl_file = 'cblock_stories.thtml';
+        break;
+    default:
+        return '';
+    }
 
     switch ($_EV_CONF['range_centerblock']) {
     case 1:         // past events
@@ -627,29 +672,6 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 
     $events = EVLIST_getEvents($start, $end, $opts);
     if (empty($events) || !is_array($events)) {
-        return '';
-    }
-
-    // overloading the previously-boolean enable_centerblock option to
-    // indicate the centerblock format.
-    switch ($_EV_CONF['enable_centerblock']) {
-    case 1:     // table format
-        $dup_chk = 'rp_id';
-        $tpl_file = 'centerblock.thtml';
-        break;
-    case 2:     // story format
-        $dup_chk = 'rp_ev_id';
-        $tpl_file = 'cblock_stories.thtml';
-        break;
-    case 3:     // calendar format
-        USES_evlist_views();
-        return EVLIST_view('', 0, 0, 0);
-        break;
-    case 4:     // replace home page completely
-        echo COM_refresh(EVLIST_URL);
-        exit;
-    case 0:     // disabled
-    default:
         return '';
     }
 
@@ -755,7 +777,6 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 
     $T->parse('output', 'centerblock');
     $retval .= $T->finish($T->get_var('output'));
-
     return $retval;
 }
 

@@ -493,8 +493,7 @@ $LANG_configselects[ 'evlist'] = array(
 'venir'             =>2,
 'cette semaine'         =>3,
 'ce mois'           =>4),
-9 => array('Disabled' => 0, 'Table' => 1, 'Story' => 2, 'Calendar' => 3,
-                'Replace Home Page' => 4),
+9 => array('Disabled' => 0, 'Table' => 1, 'Story' => 2, 'Calendar' => 3),
 12              => array(
 'Aucun accès'           => 0,
 'Lecture seule'         => 2,

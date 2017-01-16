@@ -605,7 +605,10 @@ class evRepeat
                 USES_evlist_class_ticket();
                 $tickets = evTicket::GetTickets($this->ev_id, $this->rp_id, $this->uid, $paid);
                 if (count($tickets) > 0) {
-                    $T->set_var('have_tickets', 'true');
+                    $T->set_var(array(
+                        'have_tickets'  => 'true',
+                        'tic_rp_id' => $this->Event->options['use_rsvp'] == EV_RSVP_REPEAT ? $this->rp_id : 0,
+                    ) );
                 }
             }
 

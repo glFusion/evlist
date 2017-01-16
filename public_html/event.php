@@ -36,8 +36,9 @@
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
+*   @version    1.4.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -99,9 +100,9 @@ if (isset($_POST['rp_id'])) {
     $rp_id = 0;
 }
 if (isset($_POST['eid'])) {
-    $eid = $_POST['eid'];
+    $eid = COM_sanitizeId($_POST['eid'], false);
 } elseif (isset($_GET['eid'])) {
-    $eid = $_GET['eid'];
+    $eid = COM_sanitizeId($_GET['eid'], false);
 } else {
     $eid = '';
 }
@@ -136,9 +137,6 @@ case 'search':
     // search result returned.  eid value is the event ID, not the repeat
     $view = 'home';         // default on failure
     if (!empty($_GET['eid'])) {
-        // Default action, view the calendar or event
-        $eid = COM_sanitizeID($_GET['eid'], false);
-
         $sql = "SELECT rp.rp_id
                 FROM {$_TABLES['evlist_repeat']} rp
                 WHERE rp.rp_ev_id = '$eid'
@@ -402,8 +400,7 @@ case 'print':
 case 'printtickets':
     if ($_EV_CONF['enable_rsvp'] && !COM_isAnonUser()) {
         USES_evlist_class_ticket();
-        $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::PrintTickets($eid, 0, $_USER['uid']);
+        $doc = evTicket::PrintTickets($eid, $rp_id, $_USER['uid']);
         echo $doc;
         exit;
     } else {

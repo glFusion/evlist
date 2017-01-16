@@ -294,7 +294,7 @@
 {!endif}
 {!if have_tickets}
 <div class="evEventRegInfo">
-  <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
+  <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}&rp_id={tic_rp_id}" class="lgButton blue" target="_new">{$LANG_EVLIST['print_tickets']}</a>
 </div>
 {!endif}
 

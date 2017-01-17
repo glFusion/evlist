@@ -64,7 +64,7 @@ class evRepeat
                 $this->rp_id = '';
             } else {
                 // This gets used a few places, so save on function calls.
-                $this->isAdmin = $this->Event->hasAccess(3);
+                $this->isAdmin = plugin_ismoderator_evlist();
             }
         }
 

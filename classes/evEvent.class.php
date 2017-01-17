@@ -30,7 +30,6 @@ class evEvent
     *   @var boolean */
     var $isAdmin;           // Has evlist.admin privilege
     var $isSubmitter;       // Has evlist.submit privilege
-    var $AdminMode = false;
 
     var $isNew;             // Flags a new event record
     var $det_id;            // Detail record ID
@@ -782,7 +781,7 @@ class evEvent
         if (!$this->isSubmitter) {
             // At least submit privilege required
             COM_404();
-        } elseif ($eid != ''  && $rp_id == 0 && is_object($this)) {
+        } elseif ($eid != ''  && $rp_id == 0) {
             // If an id is passed in, then read that record
             if (!$this->Read($eid)) {
                 return 'Invalid object ID';
@@ -793,7 +792,10 @@ class evEvent
 
             // Make sure the current user has access to this event.
             if (!$this->hasAccess(3)) COM_404();
+        }
 
+        if (!$this->isNew && !plugin_ismoderator_evlist()) {
+            COM_404();
         }
 
         $T = new Template($_CONF['path'] . 'plugins/evlist/templates/');
@@ -805,12 +807,10 @@ class evEvent
 
         // Basic tabs for editing both events and instances, show up on
         // all edit forms
-        //$tabs = array('ev_info', 'ev_schedule', 'ev_location', 'ev_contact',);
         $tabs = array('ev_info', 'ev_location', 'ev_contact',);
 
         $rp_id = (int)$rp_id;
-
-        if ($rp_id > 0) {
+        if ($rp_id > 0) {   // Editing a single occurrence
             // Make sure the current user has access to this event.
             if (!$this->hasAccess(3)) COM_404();
 
@@ -852,8 +852,8 @@ class evEvent
                 $this->time_start2 = $Rep['rp_time_start2'];
                 $this->time_end2 = $Rep['rp_time_end2'];
             }
-        } else {
-            // Editing the main event record
+
+        } else {            // Editing the main event record
 
             if ($this->id != '' && $this->recurring == 1) {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_series'],
@@ -1078,11 +1078,8 @@ class evEvent
         }
         $navbar->set_selected($LANG_EVLIST['ev_info']);
 
-        if ($this->AdminMode) {
-            $action_url .= '?admin=true';
-        }
-
         $T->set_var(array(
+            'is_admin'      => $this->isAdmin,
             'action_url'    => $action_url,
             'navbar'        => $navbar->generate(),
             'alert_msg'     => $alert_msg,

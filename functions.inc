@@ -578,10 +578,6 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     }
 
     if ($_EV_CONF['topic_centerblock'] != 'all') {
-        // display on homepage or not at all
-        if (empty($topic) && $_EV_CONF['topic_centerblock'] != 'home') {
-            return '';
-        }
         // display on topic page or not at all
         if (!empty($topic) && $_EV_CONF['topic_centerblock'] != $topic) {
             return '';
@@ -648,6 +644,9 @@ function EVLIST_cb_content($format)
         return '';
     }
 
+    $Y = Date_Calc::getYear();
+    $D = Date_Calc::getDay();
+    $M = Date_Calc::getMonth();
     switch ($_EV_CONF['range_centerblock']) {
     case 1:         // past events
         $start = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 month"));
@@ -661,12 +660,12 @@ function EVLIST_cb_content($format)
         $end = EV_MAX_DATE;
         break;
     case 3:         // this week
-        $start = $_EV_CONF['_today'];
-        $end = date('Y-m-d', strtotime("{$_EV_CONF['_today']} + 7 day"));
+        $start = Date_Calc::beginOfWeek($D, $M, $Y);
+        $end = Date_Calc::endOfWeek($D, $M, $Y);
         break;
-    case 4:
-        $start = $_EV_CONF['_today'];
-        $end = date('Y-m-d', strtotime("{$_EV_CONF['_today']} + 1 month"));
+    case 4:         // upcoming month
+        $start = Date_Calc::beginOfMonth($M, $Y);
+        $end = Date_Calc::dateFormat(Date_Calc::daysInMonth($M, $Y), $M, $Y, '%Y-%m-%d');
         break;
     }
 
@@ -704,9 +703,12 @@ function EVLIST_cb_content($format)
 
     $T->set_block('centerblock', 'eventRow', 'eRow');
     $rp_shown = array();    // Array to hold repeat id's to avoid dups
+    $count = 0;
     foreach ($events as $date=>$day) {
         if ($date == '_empty_') continue;
         foreach ($day as $A) {
+            $count++;
+            if ($count > $limit) break;
 
             // Make sure we only show each event once for multiday
             if (array_key_exists($A[$dup_chk], $rp_shown))

@@ -121,10 +121,10 @@ class evMeetup
             $response = $M->getEvents($this->params);
             $events = array();
             foreach ($response->results as $event) {
-                /*$tz = $event->timezone;
+                $tz = $event->timezone;
                 $d = new Date($event->time / 1000, $tz);
                 $dt = $d->format('Y-m-d', true);
-                $tm = $d->format('H:i:s', true);*/
+                $tm = $d->format('H:i:s', true);
                 if (!isset($events[$dt])) $events[$dt] = array();
                 $events[$dt][] = $event;
             }

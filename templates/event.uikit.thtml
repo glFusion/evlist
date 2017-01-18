@@ -63,7 +63,7 @@
 
     {!if can_subscribe}
     <a href="javascript:void(0)" onclick='clickSubscribeButton()' 
-        title="Subscribe" class="uk-icon-justify uk-icon-calendar" data-uk-tooltip>
+        title="{$LANG_EVLIST['subscribe']}" class="uk-icon-justify uk-icon-calendar" data-uk-tooltip>
     </a>
     <div style="position:relative;display:inline;">
       <div id="subscribe_dialog">

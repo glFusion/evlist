@@ -199,6 +199,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'time'          => 'Time',
 'all_upcoming'      => 'All Upcoming Events',
 'subscribe_to'      => 'Subscribe to',
+'subscribe'     => 'Subscribe',
 'messages'          => array(
         1   => 'Gelukt!  Evenement is verwijderd.',
         2   => 'Gelukt!  Je evenement is opgeslagen.',

@@ -292,6 +292,7 @@ $LANG_EVLIST = array(
 'time'          => 'Time',
 'all_upcoming'          => 'Tous les événements à venir',
 'subscribe_to'          => 'abonner à',
+'subscribe'     => 'Subscribe',
 'event_editor'          => "Éditeur d'événement",
 'datestart_note'        => " * année de départ et le mois sont des champs requis. ",
 'custom_label'          => 'Spécifier %s sur laquelle cet événement se reproduira%s',

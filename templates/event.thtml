@@ -42,7 +42,7 @@
 
   {!if can_subscribe}
     <a href="javascript:void(0)" onclick='clickSubscribeButton()' 
-        title="Subscribe">
+        title="{$LANG_EVLIST['subscribe']}">
       <img src="{pi_url}/images/ical.png" alt="Subscribe" width="24" height="24" />
     </a>
     <div style="position:relative;display:inline;">

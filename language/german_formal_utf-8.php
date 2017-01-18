@@ -199,6 +199,7 @@ $LANG_EVLIST = array(
 'time'				=> 'Zeit',
 'all_upcoming'      => 'Alle bevorstehenden Veranstaltungen',
 'subscribe_to'      => 'Anmelden für',
+'subscribe'     => 'Subscribe',
 'messages'          => array(
 				1   => 'Erfolg! Ihre Veranstaltung wurde gelöscht.',
 				2   => 'Erfolg! Ihre Veranstaltung wurde gespeichert.',

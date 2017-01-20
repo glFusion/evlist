@@ -740,6 +740,7 @@ function EVLIST_cb_content($format)
 
             $T->set_var(array(
                 'cssid'     => $cssid,
+                'is_meetup' => $A['cal_id'] < 0 ? 'true' : '',
                 'eid'       => $A['rp_id'],
                 'pi_url'    => EVLIST_URL,
                 'title'     => $A['title'],
@@ -747,7 +748,7 @@ function EVLIST_cb_content($format)
                 'full_description' => $full_desc,
                 'contact'   => $A['contact'],
                 'location'  => $A['location'],
-                'url'       => $A['url'],
+                'ev_url'    => isset($A['url']) ? $A['url'] : '',
                 'street'    => $A['street'],
                 'city'      => $A['city'],
                 'province'  => $A['province'],
@@ -2373,6 +2374,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
                 'cal_ena_ical' => 0,
                 'cal_id' => -1,
                 'rp_id' => $event->id,
+                'rp_ev_id' => $event->id,
                 'rp_date_start' => $ev_date,
                 'rp_date_end' => $ev_date,
                 'rp_time_start1' => $ev_start,

@@ -3,10 +3,10 @@
 *   Class to manage calendars
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @version    1.4.1
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -65,7 +65,7 @@ class evCalendar
             $this->cal_id = $cal_id;
 
         $sql = "SELECT *
-            FROM {$_TABLES['evlist_calendars']} 
+            FROM {$_TABLES['evlist_calendars']}
             WHERE cal_id='{$this->cal_id}'";
         //echo $sql;
         $result = DB_query($sql);
@@ -137,7 +137,7 @@ class evCalendar
             $this->cal_id = $A['cal_id'];
 
         // These fields come in the same way from DB or form
-        $fields = array('cal_name', 'fgcolor', 'bgcolor', 
+        $fields = array('cal_name', 'fgcolor', 'bgcolor',
             'owner_id', 'group_id');
         foreach ($fields as $field) {
             if (isset($A[$field]))
@@ -207,7 +207,6 @@ class evCalendar
         $T->parse('output','modify');
         $display .= $T->finish($T->get_var('output'));
         return $display;
-
     }
 
 
@@ -242,10 +241,10 @@ class evCalendar
             group_id = '{$this->group_id}' ";
 
         if ($this->isNew) {
-            $sql = "INSERT INTO {$_TABLES['evlist_calendars']} SET 
+            $sql = "INSERT INTO {$_TABLES['evlist_calendars']} SET
                     $fld_sql";
         } else {
-            $sql = "UPDATE {$_TABLES['evlist_calendars']} SET 
+            $sql = "UPDATE {$_TABLES['evlist_calendars']} SET
                     $fld_sql
                     WHERE cal_id='{$this->cal_id}'";
         }
@@ -258,7 +257,6 @@ class evCalendar
         } else {
             return false;
         }
-
     }   // function Save()
 
 
@@ -304,9 +302,7 @@ class evCalendar
                 DB_delete($_TABLES['evlist_events'], 'id', $A['id']);
             }
         }
-
         DB_delete($_TABLES['evlist_calendars'], 'cal_id', $this->cal_id);
-
     }
 
 
@@ -330,7 +326,7 @@ class evCalendar
         ) );
         $events = DB_count($_TABLES['evlist_events'], 'cal_id', $this->cal_id);
         if ($events > 0) {
-            $cal_select = COM_optionList($_TABLES['evlist_calendars'], 
+            $cal_select = COM_optionList($_TABLES['evlist_calendars'],
                     'cal_id,cal_name', '1', 1, "cal_id <> {$this->cal_id}");
 
             $T->set_var(array(
@@ -345,32 +341,28 @@ class evCalendar
 
 
     /**
-     *  Sets the "enabled" field to the specified value.
-     *
-     *  @param  integer $id ID number of element to modify
-     *  @param  integer $value New value to set
-     *  @return         New value, or old value upon failure
-     */
-    public function toggleEnabled($oldvalue, $cal_id = 0)
+    *   Sets the "enabled" field to the specified value.
+    *
+    *   @param  integer $id ID number of element to modify
+    *   @param  integer $value New value to set
+    *   @return         New value, or old value upon failure
+    */
+    public static function toggleEnabled($oldvalue, $cal_id = 0)
     {
         global $_TABLES;
 
-        $oldvalue = $oldvalue == 0 ? 0 : 1;
         $cal_id = (int)$cal_id;
-        if ($cal_id == 0) {
-            if (is_object($this))
-                $cal_id = $this->cal_id;
-            else
-                return $oldvalue;
-        }
         $newvalue = $oldvalue == 0 ? 1 : 0;
         $sql = "UPDATE {$_TABLES['evlist_calendars']}
                 SET cal_status=$newvalue
                 WHERE cal_id='$cal_id'";
-        //echo $sql;die;
-        DB_query($sql);
-        return $newvalue;
-
+        DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("SQL Error: $sql");
+            return $oldvalue;
+        } else {
+            return $newvalue;
+        }
     }
 
 

@@ -1,15 +1,15 @@
 <?php
 /**
- *  Class to manage events for the EvList plugin
- *
- *  @author     Lee Garner <lee@leegarner.com>
- *  @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
- *  @package    evlist
- *  @version    1.3.0
- *  @license    http://opensource.org/licenses/gpl-2.0.php
- *              GNU Public License v2 or later
- *  @filesource
- */
+*   Class to manage events for the EvList plugin
+*
+*   @author     Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+*   @package    evlist
+*   @version    1.4.1
+*   @license    http://opensource.org/licenses/gpl-2.0.php
+*               GNU Public License v2 or later
+*   @filesource
+*/
 
 USES_lglib_class_datecalc();
 USES_evlist_class_detail();
@@ -692,7 +692,6 @@ class evEvent
         } else {
             return $this->PrintErrors();
         }
-
     }
 
 
@@ -759,7 +758,6 @@ class evEvent
         } else {
             return true;
         }
-
     }
 
 
@@ -1294,7 +1292,6 @@ class evEvent
 
         $retval .= COM_endBlock();
         return $retval;
-
     }   // function Edit()
 
 
@@ -1305,53 +1302,37 @@ class evEvent
      *  @param  integer $value New value to set
      *  @return         New value, or old value upon failure
      */
-    private function _toggle($oldvalue, $varname, $ev_id='')
+    private static function _toggle($oldvalue, $varname, $ev_id='')
     {
         global $_TABLES;
 
-        if ($ev_id == '') {
-            if (is_object($this))
-                $ev_id = $this->id;
-            else
-                return;
-        }
-
-        // If it's still an invalid ID, return the old value
-        if ($ev_id == '')
-            return $oldvalue;
-
-        // Determing the new value (opposite the old)
+        if ($ev_id == '') return $oldvalue;
         $newvalue = $oldvalue == 1 ? 0 : 1;
-
         $sql = "UPDATE {$_TABLES['evlist_events']}
                 SET $varname=$newvalue
                 WHERE id='" . DB_escapeString($ev_id) . "'";
         //echo $sql;die;
-        DB_query($sql);
-
-        return $newvalue;
+        DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("SQL Error: $sql");
+            return $oldvalue;
+        } else {
+            return $newvalue;
+        }
     }
 
 
     /**
-     *  Sets the "enabled" field to the specified value.
-     *
-     *  @param  integer $id ID number of element to modify
-     *  @param  integer $value New value to set
-     *  @return         New value, or old value upon failure
-     */
-    public function toggleEnabled($oldvalue, $ev_id='')
+    *  Sets the "enabled" field to the specified value.
+    *
+    *  @param  integer $id ID number of element to modify
+    *  @param  integer $value New value to set
+    *  @return         New value, or old value upon failure
+    */
+    public static function toggleEnabled($oldvalue, $ev_id='')
     {
         $oldvalue = $oldvalue == 0 ? 0 : 1;
-        if ($ev_id == '') {
-            if (is_object($this))
-                $ev_id = $this->id;
-            else
-                return $oldvalue;
-        } else {
-            $ev_id = COM_sanitizeID($ev_id, false);
-        }
-
+        $ev_id = COM_sanitizeID($ev_id, false);
         return evEvent::_toggle($oldvalue, 'status', $ev_id);
     }
 

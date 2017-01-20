@@ -3,10 +3,10 @@
 *   Class to manage categories
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @version    1.4.1
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -54,7 +54,7 @@ class evCategory
             $this->cat_id = $cat_id;
 
         $sql = "SELECT *
-            FROM {$_TABLES['evlist_categories']} 
+            FROM {$_TABLES['evlist_categories']}
             WHERE id='{$this->cat_id}'";
         //echo $sql;
         $result = DB_query($sql);
@@ -144,7 +144,6 @@ class evCategory
         $T->parse('output','modify');
         $display .= $T->finish($T->get_var('output'));
         return $display;
-
     }
 
 
@@ -170,10 +169,10 @@ class evCategory
             status = '{$this->cat_status}'";
 
         if ($this->isNew) {
-            $sql = "INSERT INTO {$_TABLES['evlist_categories']} SET 
+            $sql = "INSERT INTO {$_TABLES['evlist_categories']} SET
                     $fld_sql";
         } else {
-            $sql = "UPDATE {$_TABLES['evlist_categories']} SET 
+            $sql = "UPDATE {$_TABLES['evlist_categories']} SET
                     $fld_sql
                     WHERE id='{$this->cat_id}'";
         }
@@ -186,7 +185,6 @@ class evCategory
         } else {
             return false;
         }
-
     }   // function Save()
 
 
@@ -206,38 +204,32 @@ class evCategory
             $cat_id = $this->cat_if;
         }
         DB_delete($_TABLES['evlist_categories'], 'id', $cat_id);
-
     }
 
 
 
     /**
-     *  Sets the "enabled" field to the specified value.
-     *
-     *  @param  integer $id ID number of element to modify
-     *  @param  integer $value New value to set
-     *  @return         New value, or old value upon failure
-     */
-    public function toggleEnabled($oldvalue, $cat_id = 0)
+    *   Sets the "enabled" field to the specified value.
+    *
+    *   @param  integer $id ID number of element to modify
+    #   @param  integer $value New value to set
+    *   @return         New value, or old value upon failure
+    */
+    public static function toggleEnabled($oldvalue, $cat_id = 0)
     {
         global $_TABLES;
 
-        $oldvalue = $oldvalue == 0 ? 0 : 1;
         $cat_id = (int)$cat_id;
-        if ($cat_id == 0) {
-            if (is_object($this))
-                $cat_id = $this->cat_id;
-            else
-                return $oldvalue;
-        }
         $newvalue = $oldvalue == 0 ? 1 : 0;
         $sql = "UPDATE {$_TABLES['evlist_categories']}
                 SET status=$newvalue
                 WHERE id='$cat_id'";
-        //echo $sql;die;
-        DB_query($sql);
-        return $newvalue;
-
+        DB_query($sql, 1);
+        if (DB_error()) {
+            return $oldvalue;
+        } else {
+            return $newvalue;
+        }
     }
 
 }

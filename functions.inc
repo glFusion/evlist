@@ -39,7 +39,7 @@
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.1
+*   @version    1.4.2
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -1821,7 +1821,7 @@ function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
 {
     global $LANG03;
 
-    if (!plugin_commentsupport_classifieds())
+    if (!plugin_commentsupport_evlist())
         return;
 
     $title = strip_tags($title);
@@ -1911,7 +1911,7 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
                 $Rp->Event->owner_id = $_USER['uid']);
         $retval = CMT_userComments($id, $title, 'classifieds', $order, $format,
                                      $cid, $page, $view, $delete_option,
-                                     plugin_commentsupport_classifieds());
+                                     plugin_commentsupport_evlist());
     } else {
         $retval = COM_startBlock($LANG_ACCESS['accessdenied'], '',
                         COM_getBlockTemplate ('_msg_block', 'header'))

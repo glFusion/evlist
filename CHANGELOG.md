@@ -1,6 +1,11 @@
 # evList plugin for glFusion - Changelog
 
+## v1.4.2
+Released 2017-01-21
+- Fix calls to commentsupport function in another plugin
+
 ## v1.4.1
+Released 2017-01-21
 - Add comment support
 - Moved ticket list to new tab on event page
 - Add calendar view and replace home page to centerblock

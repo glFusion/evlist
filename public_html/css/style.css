@@ -83,7 +83,7 @@
 @media (min-width: 1250px) {
   #evlistEventDetail {
     min-width: 400px;
-    /*width: 100%;*/
+    width: 50%;
   }
   div.evdata {
     max-width: 80%;

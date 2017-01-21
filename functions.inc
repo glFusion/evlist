@@ -1909,7 +1909,7 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
     if (!$Rp->isNew) {
         $delete_option = (plugin_ismoderator_evlist() ||
                 $Rp->Event->owner_id = $_USER['uid']);
-        $retval = CMT_userComments($id, $title, 'classifieds', $order, $format,
+        $retval = CMT_userComments($id, $title, 'evlist', $order, $format,
                                      $cid, $page, $view, $delete_option,
                                      plugin_commentsupport_evlist());
     } else {

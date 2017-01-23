@@ -233,7 +233,7 @@ default:
     break;
 }
 
-$display = EVLIST_siteHeader($LANG_EVLIST['pi_title']);
+$display = EVLIST_siteHeader($LANG_EVLIST['pi_name']);
 if (!empty($msg)) {
     //msg block
     $display .= COM_startBlock('','','blockheader-message.thtml');

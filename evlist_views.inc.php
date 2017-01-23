@@ -847,7 +847,7 @@ function EVLIST_monthview($year=0, $month=0, $day=0, $cat=0, $cal=0, $opt='')
                 'urlfilt_cat' => $cat,
                 'urlfilt_cal' => $cal,
                 'weeknum' => $weekOfYear,
-                $tplx => 'true',
+                $tpl => 'true',
         ) );
         $weekOfYear++;
 

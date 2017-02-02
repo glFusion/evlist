@@ -2350,6 +2350,10 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
 {
     global $_EV_CONF, $_CONF;
 
+    // If there are options, skip this part. Meetup events don't
+    // have categories, calendars, etc.
+    if (!empty($opts)) return array();
+
     USES_evlist_class_meetup();
     // Create a unique key for the query for cache identification
     $key = $start . '-' . $end . @serialize($opts);

@@ -2350,9 +2350,9 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
 {
     global $_EV_CONF, $_CONF;
 
-    // If there are options, skip this part. Meetup events don't
-    // have categories, calendars, etc.
-    if (!empty($opts)) return array();
+    // Skip meetup events if certain options are set, such as
+    // a specific category.
+    if (isset($opts['cat']) && $opts['cat'] > 0) return array();
 
     USES_evlist_class_meetup();
     // Create a unique key for the query for cache identification

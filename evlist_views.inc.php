@@ -1208,12 +1208,15 @@ function EVLIST_listview($range = '', $category = '', $calendar = '',
         $opts['order'] = 'DESC';
         break;
     case 3:         //this week
-        $start = $_EV_CONF['_today'];
-        $end = date('Y-m-d', strtotime('+1 week', $_EV_CONF['_today_ts']));
+        $start = Date_Calc::beginOfWeek();
+        $end = Date_Calc::endOfWeek();
         break;
     case 4:         //this month
-        $start = $_EV_CONF['_today'];
-        $end = date('Y-m-d', strtotime('+1 month', $_EV_CONF['_today_ts']));
+        $start = Date_Calc::beginOfMonth();
+        $year = Date_Calc::getYear();
+        $month = Date_Calc::getMonth();
+        $day = Date_Calc::daysInMonth($month, $year);
+        $end = Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
         break;
     case 2:         //upcoming
     default:

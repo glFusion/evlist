@@ -19,7 +19,11 @@
     </td>
     <!-- BEGIN day -->
     <td class="month{dayclass}">
+{!if popup}
       <span class="tooltip gl_mootip" title="{popup}">
+{!else}
+      <span>
+{!endif}
         {!if no_day_link}
         <span class="{daylinkclass}">{day}</span>
         {!else}

@@ -1,11 +1,12 @@
 {# begin {templatelocation} #}
 <table class="smallmonthtable">
   <tr>
-    <td class="monthheader" colspan="7">
+    <td class="monthheader" colspan="8">
       <a href="{pi_url}/index.php?view=month&amp;year={thisyear}&amp;month={month}">{monthname}, {thisyear}</a>
     </td>
   </tr>
   <tr class="daynames">
+    <td>&nbsp;</td>
     <!-- BEGIN daynames -->
     <td>{dayname}</td>
     <!-- END daynames -->
@@ -13,9 +14,16 @@
 
   <!-- BEGIN week -->
   <tr>
-    <!-- BEGIN day -->
+    <td class="weeklink">
+      <a href="{pi_url}/index.php?view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={weekyear}&amp;month={weekmonth}&amp;day={weekday}">&gt;&gt;</a>
+    </td>
+     <!-- BEGIN day -->
     <td class="{dayclass}">
+{!if popup}
       <span class="tooltip gl_mootip" title="{popup}">
+{!else}
+      <span>
+{!endif}
         {!if no_day_link}
         <span class="{daylinkclass}">{day}</span>
         {!else}

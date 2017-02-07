@@ -38,7 +38,7 @@
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.1
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -178,7 +178,7 @@ case 'savefuturerepeat':
     }
     break;
 
- case 'saveevent':
+case 'saveevent':
     USES_evlist_class_event();
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
@@ -336,7 +336,6 @@ case 'tickreset_x':
 
 switch ($view) {
 case 'edit':
-    $admin = isset($_GET['admin']) ? true : false;
     switch ($actionval) {
     case 'repeat':
     case 'futurerepeat':
@@ -344,7 +343,6 @@ case 'edit':
             USES_evlist_class_repeat();
             $rp_id = (int)$_GET['rp_id'];
             $Ev = new evRepeat($rp_id);
-            $Ev->Event->AdminMode = $admin;
             $content .= $Ev->Edit(0, $actionval);
         }
         break;
@@ -352,7 +350,6 @@ case 'edit':
     default:
         USES_evlist_class_event();
         $Ev = new evEvent($_REQUEST['eid']);
-        $Ev->AdminMode = $admin;
         $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
         break;
     }

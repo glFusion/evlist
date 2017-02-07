@@ -497,7 +497,13 @@ function toggleRSVPdetail(val)
       <br />
       <div class="uk-form-row">
         <label class="uk-form-label">{$LANG_EVLIST['sel_category']}</label>
-        <div class="uk-form-controls">{catlist}</div>
+        <div class="uk-form-controls">
+          <select multiple name="categories">
+        <!-- BEGIN catSelect -->
+          <option value="{cat_id}" {cat_sel} >{cat_name}</option>
+        <!-- END catSelect -->
+          </select>
+        </div>
       </div>
       {!if add_cat_input}
       <div class="uk-form-row">
@@ -784,20 +790,18 @@ function toggleRSVPdetail(val)
         <label class="uk-form-label" for="use_rsvp">{$LANG_EVLIST['use_rsvp']}:</label>
         <div class="uk-form-controls">
           <input id="use_rsvp" type="radio" name="use_rsvp" value="0" {reg_chk0}
-              onclick="javascript:toggleRSVPdetail(0);" />
-          {$LANG_EVLIST['rsvp_none']}
+              onclick="javascript:toggleRSVPdetail(0);" />&nbsp;{$LANG_EVLIST['rsvp_none']}&nbsp;&nbsp;
           <input type="radio" name="use_rsvp" value="1" {reg_chk1}
-             onclick="javascript:toggleRSVPdetail(1);" />
-          {$LANG_EVLIST['rsvp_event']}
+             onclick="javascript:toggleRSVPdetail(1);" />&nbsp;{$LANG_EVLIST['rsvp_event']}&nbsp;&nbsp;
           <span id="rsvp_repeat">
           <input type="radio" name="use_rsvp" value="2" {reg_chk2}
-             onclick="javascript:toggleRSVPdetail(2);" />
-          {$LANG_EVLIST['rsvp_repeat']}
+             onclick="javascript:toggleRSVPdetail(2);" />&nbsp;{$LANG_EVLIST['rsvp_repeat']}
           </span>
         </div>
       </div>
 
-      <div class="uk-form-row" id="rsvp_detail">
+      <div id="rsvp_detail">
+      <div class="uk-form-row">
         <label class="uk-form-label" for="max_rsvp">{$LANG_EVLIST['max_rsvp']}:</label>
         <div class="uk-form-controls">
           <input type="text" id="max_rsvp" name="max_rsvp" maxlength="5"
@@ -838,24 +842,25 @@ function toggleRSVPdetail(val)
         </table>
         </div>
       </div>
-<!--
+{!if 0}
       <div class="uk-form-row">
         <label class="uk-form-label" for="txt_fields">{$LANG_EVLIST['txt_fields']}</label>
         <div class="uk-form-controls">
           <input id="txt_fields" name="txt_fields" type="text" maxlength="255" size="40" />
         </div>
       </div>
--->
-      {!if rsvp_print}
+{!endif}
+{!if rsvp_print}
       <div class="uk-form-row">
         <label class="uk-form-label" for="rsvp_print">{$LANG_EVLIST['allow_ticket_printing']}?:</label>
         <div class="uk-form-controls">
-        <input type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}> {$LANG_EVLIST['no']}
-        <input type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}> {$LANG_EVLIST['paid_only']}
-        <input type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}> {$LANG_EVLIST['paid_or_unpaid']}
+          <input type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}>&nbsp;{$LANG_EVLIST['no']}&nbsp;&nbsp;
+          <input type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}>&nbsp;{$LANG_EVLIST['paid_only']}&nbsp;&nbsp;
+          <input type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}>&nbsp;{$LANG_EVLIST['paid_or_unpaid']}
         </div>
       </div>
-     {!endif}
+{!endif}
+      </div>
     </fieldset>
     {!endif}
     </div>

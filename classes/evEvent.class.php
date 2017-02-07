@@ -892,7 +892,7 @@ class evEvent
             ) );
         }
 
-        $action_url = EVLIST_URL . '/event.php';
+        $action_url = $this->isAdmin ? EVLIST_ADMIN_URL . '/index.php' : EVLIST_URL . '/event.php';
         $delaction = 'delevent';
         if (isset($_GET['from']) && $_GET['from'] == 'admin') {
             $cancel_url = EVLIST_ADMIN_URL . '/index.php';
@@ -1218,20 +1218,38 @@ class evEvent
         // submitted form. Include the user-added category, if any.
         // If not from a form re-entry, get the checked categories from the
         // evlist_lookup table.
+        // Both "select" and "checkbox"-type values are supplied so the
+        // can use either form element.
         if ($_EV_CONF['enable_categories'] == '1') {
             $cresult = DB_query("SELECT tc.id, tc.name
                 FROM {$_TABLES['evlist_categories']} tc
                 WHERE tc.status='1' ORDER BY tc.name");
+            $T->set_block('editor', 'catSelect', 'catSel');
             while ($A = DB_fetchArray($cresult, false)) {
                 if (isset($_POST['categories']) && is_array($_POST['categories'])) {
                     // Coming from a form re-entry
-                    $chk = in_array($A['id'], $_POST['categories']) ? EVCHECKED : '';
+                    $cat_array = $_POST['categories'];
                 } else {
-                    $chk = in_array($A['id'], $this->categories) ? EVCHECKED : '';
+                    $cat_array = $this->categories;
+                }
+                if (in_array($A['id'], $cat_array)) {
+                    // category is currently selected
+                    $chk = EVCHECKED;
+                    $sel = EVSELECTED;
+                } else {
+                    $chk = '';
+                    $sel = '';
                 }
                 $catlist .= '<input type="checkbox" name="categories[]" ' .
                     'value="' . $A['id'] . '" ' . $chk . ' />' .
                     '&nbsp;' . $A['name'] . '&nbsp;&nbsp;';
+                $T->set_var(array(
+                    'cat_id'    => $A['id'],
+                    'cat_name'  => htmlspecialchars($A['name']),
+                    'cat_chk'   => $chk,
+                    'cat_sel'   => $sel,
+                ) );
+                $T->parse('catSel', 'catSelect', true);
             }
             $T->set_var('catlist', $catlist);
 

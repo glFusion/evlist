@@ -62,7 +62,7 @@ function EVLIST_adminHeader($page)
 
     $menu_arr = array();
     if ($page == 'events') {
-        $menu_arr[] = array('url' => EVLIST_URL . '/event.php?edit=event',
+        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editevent=x',
             'text' => $LANG_EVLIST['new_event']);
     } else {
         $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php',
@@ -516,8 +516,8 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 
     switch($fieldname) {
         case 'edit':
-            $retval = '<a href="' . EVLIST_URL . 
-                '/event.php?edit=event&amp;eid=' . $A['id'] . 
+            $retval = '<a href="' . EVLIST_ADMIN_URL . 
+                '/index.php?edit=event&amp;eid=' . $A['id'] . 
                 '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '">';
             if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-edit"></i>';
@@ -924,7 +924,7 @@ function EVLIST_importEvents()
 */
 $expected = array(
     // Actions to perform
-    'savecal', 'editcal', 'moderate',
+    'savecal', 'editcal', 'moderate', 'saveevent',
     'deletecal', 'delcalconfirm', 'approve', 'disapprove',
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
@@ -987,6 +987,27 @@ case 'delcalconfirm':
     USES_evlist_class_calendar();
     $Cal = new evCalendar($cal_id);
     $Cal->Delete($newcal);
+    break;
+
+case 'saveevent':
+    USES_evlist_class_event();
+    $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
+    $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
+    $Ev = new evEvent($eid);
+    $errors = $Ev->Save($_POST, $table);
+    if (!empty($errors)) {
+        $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
+        $content .= $Ev->Edit();
+        $view = 'none';
+    } else {
+        $view = 'home';
+        if ($Ev->table == 'evlist_submissions') {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][9]);
+        } else {
+            LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
+        }
+    }
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     break;
 
 case 'savecal':
@@ -1204,7 +1225,6 @@ case 'import':
 case 'edit':
     USES_evlist_class_event();
     $Ev = new evEvent($_REQUEST['eid']);
-    $Ev->AdminMode = $admin;
     $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
     break;
 

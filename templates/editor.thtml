@@ -485,7 +485,11 @@ function toggleRSVPdetail(val)
         {$LANG_EVLIST['cat_note1']}<br />
         <span class="evFieldNote">{$LANG_EVLIST['cats_not_req']}</span>
         <br />
-        {catlist}
+        <select multiple name="categories">
+        <!-- BEGIN catSelect -->
+          <option value="{cat_id}" {cat_sel} >{cat_name}</option>
+        <!-- END catSelect -->
+        </select>
         {!if add_cat_input}
         <p>
           <label for="addcat"><strong>{$LANG_EVLIST['new_category']}</strong>:</label>

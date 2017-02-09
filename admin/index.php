@@ -62,7 +62,7 @@ function EVLIST_adminHeader($page)
 
     $menu_arr = array();
     if ($page == 'events') {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editevent=x',
+        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?edit=x',
             'text' => $LANG_EVLIST['new_event']);
     } else {
         $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php',

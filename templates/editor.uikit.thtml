@@ -498,7 +498,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label">{$LANG_EVLIST['sel_category']}</label>
         <div class="uk-form-controls">
-          <select multiple name="categories">
+          <select multiple name="categories[]">
         <!-- BEGIN catSelect -->
           <option value="{cat_id}" {cat_sel} >{cat_name}</option>
         <!-- END catSelect -->

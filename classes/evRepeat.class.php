@@ -483,7 +483,7 @@ class evRepeat
             'title' => $title,
             'summary' => $summary,
             'full_description' => $fulldescription,
-            'can_edit' => $this->isAdmin ? 'true' : '',
+            'can_edit' => $this->Event->canEdit() ? 'true' : '',
             'start_time1' => $time_start1,
             'end_time1' => $time_end1,
             'start_time2' => $time_start2,
@@ -777,8 +777,8 @@ class evRepeat
 
         // Show the "manage reservations" link to the event owner
         if ($_EV_CONF['enable_rsvp'] == 1 &&
-                $this->Event->options['use_rsvp'] > 0 &&
-                $this->isAdmin) {
+                    $this->Event->options['use_rsvp'] > 0 &&
+                ($this->isAdmin || $this->Event->isOwner())) {
             $T->set_var(array(
                 'admin_rsvp'    => EVLIST_adminRSVP($this->rp_id),
                 'rsvp_count'    => $this->TotalRegistrations(),

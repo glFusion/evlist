@@ -1851,13 +1851,11 @@ function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
 */
 function plugin_deletecomment_evlist($cid,$id)
 {
-    global $_USER;
-
     USES_class_evlist_repeat();
     $Rp = new evRepeat($id);
     if ($Rp->isNew) return false;   // invalid item
 
-    if (plugin_ismoderator_evlist() || $Rp->Event->owner_id == $_USER['uid']) {
+    if (plugin_ismoderator_evlist() || $Rp->Event->isOwner() {
         if (CMT_deleteComment($cid, $id, 'evlist') == 0) {
             // Redirect back to the event view
             return (COM_refresh(EVLIST_URL . '/event.php?eid='  . $id));
@@ -2046,7 +2044,7 @@ function EVLIST_siteFooter()
 */
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
-    if (!EVLIST_isCurrentVersion()) return;
+//    if (!EVLIST_isCurrentVersion()) return;
     USES_evlist_functions();
 
     if ($cal > 0) {
@@ -2399,7 +2397,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
 }
 
 
-function EVLIST_getEvents_json($start='', $end='', $opts=array())
+function X_EVLIST_getEvents_json($start='', $end='', $opts=array())
 {
     $events = EVLIST_getEvents($start, $end, $opts);
     $json_events = array();

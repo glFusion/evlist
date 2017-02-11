@@ -1782,6 +1782,44 @@ class evEvent
         return $freq_str;
     }
 
+
+    /**
+    *   Check if the current user is the owner of this event.
+    *
+    *   @return boolean     True if the user is the owner, False if not
+    */
+    public function isOwner()
+    {
+        global $_USER;
+        return $this->owner_id == $_USER['uid'];
+    }
+
+
+    /**
+    *   Determine if the current user can edit this event.
+    *   If this is the event owner, and moderation is not required,
+    *   allow editing.
+    *
+    *   @return boolean     True if editing is allowed, False if not
+    */
+    public function canEdit()
+    {
+        global $_CONF;
+
+        static $canedit = NULL;
+
+        if ($canedit === NULL) {
+            $canedit = false;
+            if (plugin_ismoderator_evlist()) {
+                $canedit = true;
+            } elseif ($this->isOwner() &&
+                $_CONF['storysubmission'] == 0) {
+                $canedit = true;
+            }
+        }
+        return $canedit;
+    }
+
 }   // class evEvent
 
 ?>

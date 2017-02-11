@@ -115,7 +115,6 @@ function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
 
         $retval = COM_printPageNavigation($base_url, $page, $numpages);
     }
-
     return $retval;
 }
 
@@ -150,9 +149,11 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
         'smallmonth'  => 'phpblock_month.thtml',
     ) );
 
-    $T->set_var('thisyear', $year);
-    $T->set_var('month', $month);
-    $T->set_var('monthname', $LANG_MONTH[(int)$month]);
+    $T->set_var(array(
+        'thisyear' => $year,
+        'month' => $month,
+        'monthname' => $LANG_MONTH[(int)$month],
+    ));
 
     // Set each day column header to the first letter of the day name
     $T->set_block('smallmonth', 'daynames', 'nBlock');
@@ -191,6 +192,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
                 // Create the tooltip hover text
                 $daylinkclass = $dayclass == 'monthoff' ?
                                 'nolink-events' : 'day-events';
+                $dayspanclass='tooltip gl_mootip';
                 foreach ($events[$daydata] as $event) {
                     // Show event titles on different lines if more than one
                     if (!empty($popup)) $popup .= EVLIST_tooltip_newline();
@@ -207,12 +209,14 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
                 }
                 $T->set_var('popup', $popup);
             } else {
+                $dayspanclass='';
                 $daylinkclass = 'day-noevents';
                 $T->clear_var('popup');
             }
             $T->set_var(array(
                 'daylinkclass'      => $daylinkclass,
                 'dayclass'          => $dayclass,
+                'dayspanclass'      => $dayspanclass,
                 'day'               => substr($daydata, 8, 2),
                 'pi_url'            => EVLIST_URL,
             ) );
@@ -268,7 +272,6 @@ function EVLIST_TimeSelect($prefix, $curtime = '')
             'minute'    => $minuteselect,
             'ampm'      => $ampm_select
     );
-
 }
 
 
@@ -409,7 +412,6 @@ function EVLIST_getDayViewData($events, $today = '')
             }
         }
     }
-
     return array($alldaydata, $hourlydata);
 }
 
@@ -451,7 +453,6 @@ function EVLIST_deleteImageLink($A, $token)
                 ) );
 
     }
-
     return $retval;
 }
 
@@ -526,7 +527,6 @@ function EVLIST_GetOptions($options, $selected = '', $bias=0)
         }
         $retval .= ">$name</option>" . LB;
     }
-
     return $retval;
 }
 
@@ -796,9 +796,7 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
         $retval = $fieldvalue;
         break;
     }
-
     return $retval;
-
 }
 
 

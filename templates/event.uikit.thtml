@@ -5,6 +5,7 @@
   <button id="btn_rsvp" class="uk-button" onclick="changeView('rsvp')">RSVP ({rsvp_count})</button>
 </div>
 {!endif}
+
 <div id="evlistEventHeader">
   <h2 class="evlist_header">
     {title}
@@ -12,13 +13,9 @@
 
   <div id="evlistEventEditSelect">
     {!if can_edit}
-    <a href="javascript:void(0)" onclick='clickEditButton()' title="{$LANG_EVLIST['edit']}" data-uk-tooltip
-        class="uk-icon-edit"></a>
-    <div style="position:relative;display:inline">
-      <div id="action_dialog">
-        <div class="evlistCalendarDialogClose">
-          <a class="uk-alert-close uk-close" href="javascript:void(0)" onclick="closedialogs()"></a>
-        </div>
+    <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+      <a href="#" title="{$LANG_EVLIST['edit']}" data-uk-tooltip class="uk-icon-edit"></a>
+      <div class="uk-dropdown uk-dropdown-bottom">
         {!if is_recurring}
         <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat"
             id="edit_repeat" title="{$LANG_EVLIST['edit_repeat']}">
@@ -56,20 +53,14 @@
             id="delete_event"  title="{$LANG_EVLIST['del_all']}">
             <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_all']}</a>
-        <br />
       </div>
     </div>
     {!endif}
 
     {!if can_subscribe}
-    <a href="javascript:void(0)" onclick='clickSubscribeButton()' 
-        title="{$LANG_EVLIST['subscribe']}" class="uk-icon-justify uk-icon-calendar" data-uk-tooltip>
-    </a>
-    <div style="position:relative;display:inline;">
-      <div id="subscribe_dialog">
-        <div class="evlistCalendarDialogClose">
-          <a class="uk-alert-close uk-close" href="javascript:void(0)" onclick="closedialogs()"></a>
-        </div>
+    <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+      <a href="#" title="{$LANG_EVLIST['subscdribe']}" data-uk-tooltip class="uk-icon-calendar"></a>
+      <div class="uk-dropdown uk-dropdown-bottom">
         {$LANG_EVLIST['subscribe_to']} ...<br />
         <a href="{webcal_url}/ical.php?rp_id={rp_id}" 
             id="sub_instance" title="{$LANG_EVLIST['sub_this_instance']}">
@@ -83,6 +74,7 @@
             <i class="uk-icon-calendar"></i>
             {$LANG_EVLIST['sub_all_instances']}</a>
         <br />
+        {!endif}
         <a href="{webcal_url}/ical.php?cal={cal_id}" 
             id="sub_this_calendar" title="{$LANG_EVLIST['calendar']}">
             <i class="uk-icon-calendar"></i>
@@ -93,7 +85,6 @@
             <i class="uk-icon-calendar"></i>
             {$LANG_EVLIST['all_calendars']}</a>
         <br />
-        {!endif}
       </div>
     </div>
     {!endif}
@@ -329,30 +320,6 @@ function EV_toggleRegDiv() {
     } else {
         document.getElementById("regdiv").style.display="none";
     }
-}
-
-function clickEditButton() {
-    closedialogs();
-    var action = document.getElementById('action_dialog');
-    action.style.display="block";
-    action.style.visibility="visible";
-    return;
-}
-
-function clickSubscribeButton() {
-    closedialogs();
-    var div = document.getElementById('subscribe_dialog');
-    div.style.display = "block";
-    div.style.visibility = "visible";
-}
-
-function closedialogs() {
-    var div = document.getElementById('action_dialog');
-    //if (div) div.style.display="none";
-    if (div) div.style.visibility="hidden";
-    var div = document.getElementById('subscribe_dialog');
-    if (div) div.style.visibility="hidden";
-    return;
 }
 
 // Show the add-reminder or remove-reminder form

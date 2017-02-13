@@ -1855,7 +1855,7 @@ function plugin_deletecomment_evlist($cid,$id)
     $Rp = new evRepeat($id);
     if ($Rp->isNew) return false;   // invalid item
 
-    if (plugin_ismoderator_evlist() || $Rp->Event->isOwner() {
+    if (plugin_ismoderator_evlist() || $Rp->Event->isOwner()) {
         if (CMT_deleteComment($cid, $id, 'evlist') == 0) {
             // Redirect back to the event view
             return (COM_refresh(EVLIST_URL . '/event.php?eid='  . $id));
@@ -2328,7 +2328,6 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     if ($_EV_CONF['meetup_enabled']) {
         EVLIST_getMeetupEvents($start, $end, $opts, $events);
     }
-
     return $events;
 }
 

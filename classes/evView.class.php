@@ -201,8 +201,8 @@ class evView
             'iso_lang'  => EVLIST_getIsoLang(),
             'view'      => $this->view,
             'curdate'   => sprintf("%d-%02d-%02d", $year, $month, $day),
-            'urlfilt_cal' => $this->cal,
-            'urlfilt_cat' => $this->cat,
+            'urlfilt_cal' => (int)$this->cal,
+            'urlfilt_cat' => (int)$this->cat,
             'use_json' => $_EV_CONF['cal_tmpl'] == 'json'? 'true' : '',
             'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
             'view'  => $this->type,
@@ -428,8 +428,8 @@ class evView
         $T->set_var(array(
             'cal_header'    => $this->Header(),
             'calendar_content' => $this->Content(),
-            'urlfilt_cal' => $this->cal,
-            'urlfilt_cat' => $this->cat,
+            'urlfilt_cal' => (int)$this->cal,
+            'urlfilt_cat' => (int)$this->cat,
         ) );
         $T->parse('output', 'view');
         return $T->finish($T->get_var('output'));

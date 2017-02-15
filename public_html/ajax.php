@@ -3,10 +3,10 @@
 *   Common AJAX functions.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @version    1.4.2
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -33,7 +33,7 @@ case 'getloc':
 
     if ($_EV_CONF['use_locator'] && function_exists('GEO_getInfo')) {
 
-        $id = isset($_GET['id']) && !empty($_GET['id']) ? 
+        $id = isset($_GET['id']) && !empty($_GET['id']) ?
                     COM_sanitizeID($_GET['id']) : '';
         $A = GEO_getInfo($id);
         if (!$A) {
@@ -45,8 +45,8 @@ case 'getloc':
             if (isset($A[$name])) {
                 $value = $A[$name];
             }
-            $content .= "<{$name}>" . 
-                htmlspecialchars($value) . 
+            $content .= "<{$name}>" .
+                htmlspecialchars($value) .
                 "</{$name}>\n";
         }
     }
@@ -62,8 +62,8 @@ case 'addreminder':
         $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
             (eid, rp_id, uid, name, email, days_notice)
         VALUES (
-            '{$Ev->Event->id}', 
-            '{$Ev->rp_id}', 
+            '{$Ev->Event->id}',
+            '{$Ev->rp_id}',
             '" . (int)$_USER['uid']. "',
             '" . DB_escapeString($username) . "',
             '" . DB_escapeString($_GET['rem_email']) . "',
@@ -95,51 +95,51 @@ case 'delreminder':
     break;
 
 case 'getCalDay':
-    USES_evlist_views();
     $month = (int)$_GET['month'];
     $day = (int)$_GET['day'];
     $year = (int)$_GET['year'];
     $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
     $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
     $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
-    $content = EVLIST_dayview($year, $month, $day, $cat, $cal, $opt);
-    echo $content;
+    USES_evlist_class_view();
+    $V = new evView_day($year, $month, $day, $cat, $cal, $opt);
+    echo $V->Content();
     exit;
     break;
 
 case 'getCalWeek':
-    USES_evlist_views();
     $month = (int)$_GET['month'];
     $day = (int)$_GET['day'];
     $year = (int)$_GET['year'];
     $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
     $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
     $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
-    $content = EVLIST_weekview($year, $month, $day, $cat, $cal, $opt);
-    echo $content;
+    USES_evlist_class_view();
+    $V = new evView_week($year, $month, $day, $cat, $cal, $opt);
+    echo $V->Content();
     exit;
     break;
 
 case 'getCalMonth':
-    USES_evlist_views();
     $month = (int)$_GET['month'];
     $year = (int)$_GET['year'];
     $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
     $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
     $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
-    $content = EVLIST_monthview($year, $month, 1, $cat, $cal, $opt);
-    echo $content;
+    USES_evlist_class_view();
+    $V = new evView_month($year, $month, 1, $cat, $cal, $opt);
+    echo $V->Content();
     exit;
     break;
 
 case 'getCalYear':
-    USES_evlist_views();
     $year = (int)$_GET['year'];
     $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
     $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
     $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
-    $content = EVLIST_yearview($year, 1, 1, $cat, $cal, $opt);
-    echo $content;
+    USES_evlist_class_view();
+    $V = new evView_year($year, 1, 1, $cat, $cal, $opt);
+    echo $V->Content();
     exit;
     break;
 

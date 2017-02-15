@@ -4,23 +4,7 @@
   <span id="date_range">{thismonth_str}, {thisyear}</span>
   <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#!">&gt;&gt;</a>
 </h2>
-
-{!if cal_checkboxes}
-<div id="evlistCalCheckboxes">
-  <span onclick="clickCalendarButton()" 
-    title="{$LANG_EVLIST['select_cals']}">{$LANG_EVLIST['calendars']}
-    <img src="{site_url}/evlist/images/downarrow.png"
-        width="16" height="16" alt="{$LANG_EVLIST['select_cals']}" />
-  </span>
-  <div id="calendar_dialog">
-    <div class="evlistCalendarDialogClose">
-      <a href="javascript:void(0)" onclick="closedialog()">x</a>
-    </div>
-    {cal_checkboxes}
-  </div>
-</div>
-{!endif}
-
+{cal_checkboxes}
 <div id="calendar-wrap" style="clear:both;">
   <div id="calendar">
     <ul class="weekdays">

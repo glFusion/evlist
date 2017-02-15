@@ -59,11 +59,10 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
 }
 
 USES_evlist_functions();
-USES_evlist_views();
+USES_evlist_class_view();
 
-//var_dump($_GET);die;
 /*
-*   MAIN 
+*   MAIN
 */
 COM_setArgNames(array('view','range','cat'));
 if (isset($_GET['view'])) {
@@ -73,10 +72,6 @@ if (isset($_GET['view'])) {
 } else {
     $view = COM_applyFilter(COM_getArgument('view'));
 }
-
-/*if (empty($view)) {
-    $view = isset($_EV_CONF['default_view']) ? $_EV_CONF['default_view'] : '';
-}*/
 
 if (isset($_GET['range'])) {
     $range = COM_applyFilter($_GET['range'], true);
@@ -102,10 +97,8 @@ if (isset($_GET['cal'])) {
     $calendar = '';
 }
 
-//$_REQUEST['event_type'] = $category;   // Hack
-
 if (!empty($category)) {
-    $catname = DB_getItem($_TABLES['evlist_categories'], 'name', 
+    $catname = DB_getItem($_TABLES['evlist_categories'], 'name',
             "id = '$category'");
 }
 
@@ -116,14 +109,6 @@ if (!empty($_REQUEST['msg'])) {
 if (isset($_GET['date']) && !empty($_GET['date'])) {
     list($year, $month, $day) = explode('-', $_GET['date']);
 }
-// Fill in any missing values
-/*if (empty($year))
-    $year = isset($_REQUEST['year']) ? (int)$_REQUEST['year'] : date('Y');
-if (empty($month))
-    $month = isset($_REQUEST['month']) ? (int)$_REQUEST['month'] : date('m');
-if (empty($day))
-    $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : date('d');
-*/
 if (empty($year))
     $year = isset($_REQUEST['year']) ? (int)$_REQUEST['year'] : 0;
 if (empty($month))
@@ -133,35 +118,44 @@ if (empty($day))
 
 switch ($view) {
 case 'today':
-    list ($year, $month, $day) = explode('-', $_EV_CONF['_today']);
-    $content = EVLIST_view('', $year, $month, $day);
+    list($year, $month, $day) = explode('-', $_EV_CONF['_today']);
+    $content = evView::GetView('', $year, $month, $day);
     break;
 
 case 'pday':
-    $content = EVLIST_dayview($year, $month, $day, $category, $calendar, 'print');
+    $V = new evView_day($year, $month, $day, $category, $calendar);
+    $V->setPrint();
+    $content .= $V->Render();
     echo $content;
     exit;
 
 case 'day':
-    $content .= EVLIST_view('day', $year, $month, $day, $category, $calendar);
+    $V = new evView_day($year, $month, $day, $category, $calendar);
+    $content .= $V->Render();
     break;
 
 case 'pweek':
-    $content = EVLIST_weekview($year, $month, $day, $category, $calendar, 'print');
+    $V = new evView_week($year, $month, $day, $category, $calendar);
+    $V->setPrint();
+    $content .= $V->Render();
     echo $content;
     exit;
 
 case 'week':
-    $content .= EVLIST_view('week', $year, $month, $day, $category, $calendar);
+    $V = new evView_week($year, $month, $day, $category, $calendar);
+    $content .= $V->Render();
     break;
 
 case 'pmonth':
-    $content = EVLIST_monthview($year, $month, $day, $category, $calendar, 'print');
+    $V = new evView_month($year, $month, $day, $category, $calendar);
+    $V->setPrint();
+    $content .= $V->Render();
     echo $content;
     exit;
 
 case 'month':
-    $content .= EVLIST_view('month', $year, $month, $day, $category, $calendar);
+    $V = new evView_month($year, $month, $day, $category, $calendar);
+    $content .= $V->Render();
     break;
 
 case 'pyear':
@@ -169,9 +163,12 @@ case 'pyear':
     break;
 
 case 'year':
-    $content .= EVLIST_view('year', $year, 1, 1, $category, $calendar);
+    $V = new evView_year($year, 1, 1, $category, $calendar);
+    $content .= $V->Render();
     break;
 
+//case 'mylist':
+//    $content .= EVLIST
 case 'list':
     switch ($range) {
     case 1:         // Past events
@@ -190,13 +187,13 @@ case 'list':
         break;
     }
     if (!empty($category)) {
-        $block_title .= '&nbsp;/&nbsp;' . $LANG_EVLIST['category'] . 
+        $block_title .= '&nbsp;/&nbsp;' . $LANG_EVLIST['category'] .
             ':&nbsp;' . $catname;
     }
 
-    $content .= EVLIST_calHeader($year, $month, $day, 'list', $category, 
+    $V = new evView_list($year, $month, $day, $category,
                     $calendar, $range);
-    $content .= EVLIST_listview($range, $category, $calendar, $block_title);
+    $content .= $V->Render();
     break;
 
 case 'printtickets':
@@ -229,7 +226,7 @@ case 'exporttickets':
 
 
 default:
-    $content = EVLIST_view('', 0, 0, 0);
+    $content = evView::GetView('', 0, 0, 0);
     break;
 }
 
@@ -244,5 +241,144 @@ $display .= $content;
 $display .= EVLIST_siteFooter();
 echo $display;
 exit;
+
+/**
+*   Get the list of events
+*
+*   @return string      HTML for admin list
+*/
+function EVLIST_user_list_events()
+{
+    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+
+    USES_lib_admin();
+
+    $retval = '';
+
+    $header_arr = array();
+    if (!$_CONF['storysubmission']) {
+        $header_arr[] = array('text' => $LANG_EVLIST['edit'],
+                'field' => 'edit', 'sort' => false,
+                'align' => 'center',
+            );
+    }
+    $header_arr[] = array('text' => $LANG_EVLIST['id'],
+        'field' => 'id', 'sort' => true);
+    $header_arr[] = array('text' => $LANG_EVLIST['title'],
+                'field' => 'title', 'sort' => true);
+    $header_arr[] = array('text' => $LANG_EVLIST['start_date'],
+                'field' => 'date_start1', 'sort' => true);
+    $header_arr[] = array('text' => $LANG_EVLIST['enabled'],
+                'field' => 'status', 'sort' => false,
+                'align' => 'center',
+        );
+    if (!$_CONF['storysubmission']) {
+        $header_arr[] = array('text' => $LANG_ADMIN['delete'],
+                'field' => 'delete', 'sort' => false,
+                'align' => 'center',
+        );
+    }
+
+    $defsort_arr = array('field' => 'date_start1', 'direction' => 'DESC');
+    $text_arr = array('has_menu'     => true,
+                      'has_extras'   => true,
+                      'title'        => $LANG_EVLIST['pi_title'].': ' .
+                                        $LANG_EVLIST['events'],
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'help_url'     => ''
+    );
+
+    // Select distinct to get only one entry per event.  We can only edit/modify
+    // events here, not repeats
+    $sql = "SELECT DISTINCT(ev.id), det.title, ev.date_start1, ev.status
+            FROM {$_TABLES['evlist_events']} ev
+            LEFT JOIN {$_TABLES['evlist_detail']} det
+                ON det.ev_id = ev.id
+            WHERE owner_id = " . (int)$_USER['uid'] .
+                " AND ev.det_id = det.det_id ";
+    $query_arr = array('table' => 'users',
+            'sql' => $sql,
+            'query_fields' => array('id', 'title', 'summary',
+            'full_description', 'location', 'date_start1', 'status')
+    );
+    $retval .= ADMIN_list('evlist', 'EVLIST_user_getEventListField',
+        $header_arr, $text_arr, $query_arr, $defsort_arr);
+    return $retval;
+}
+
+
+/**
+*   Return the display value for an event field
+*
+*   @param  string  $fieldname  Name of the field
+*   @param  mixed   $fieldvalue Value of the field
+*   @param  array   $A          Name-value pairs for all fields
+*   @param  array   $icon_arr   Array of system icons
+*   @return string      HTML to display for the field
+*/
+function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
+{
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
+
+    static $del_icon = NULL;
+
+    switch($fieldname) {
+    case 'edit':
+        $retval = '<a href="' . EVLIST_URL .
+            '/event.php?eid=' . $fieldvalue . '&amp;edit=event">';
+            if ($_EV_CONF['_is_uikit']) {
+                $retval .= '<i class="uk-icon-edit"></i>';
+            } else {
+                $retval .= $icon_arr['edit'];
+            }
+            $retval .= '</a>';
+            break;
+        case 'copy':
+            $retval = '<a href="' . EVLIST_URL .
+                '/event.php?clone=x&amp;eid=' . $A['id'] .
+                '" title="' . $LANG_EVLIST['copy'] . '">';
+            if ($_EV_CONF['is_uikid']) {
+                $retval .= '<i class="uk-icon-clone"></i>';
+            } else {
+                $retval .= $icon_arr['copy'];
+            }
+            $retval .= '</a>';
+            break;
+        /*case 'status':
+            if ($A['status'] == '1') {
+                $switch = EVCHECKED;
+                $enabled = 1;
+            } else {
+                $switch = '';
+                $enabled = 0;
+            }
+            $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
+                id=\"event_{$A['id']}\"
+                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
+                '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
+            break;
+        case 'delete':
+            if ($del_icon === NULL) {
+                if ($_EV_CONF['_is_uikit']) {
+                    $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
+                } else {
+                    $del_icon = $icon_arr['delete'];
+                }
+            }
+            $retval = COM_createLink(
+                    $del_icon,
+                    EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'],
+                    array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
+                        'title' => $LANG_ADMIN['delete'],
+                    )
+                );
+            break;*/
+        default:
+            $retval = $fieldvalue;
+            break;
+    }
+    return $retval;
+}
+
 
 ?>

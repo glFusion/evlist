@@ -134,6 +134,9 @@ function USES_evlist_class_tickettype()
 function USES_evlist_class_ticket()
 {   require_once EVLIST_PI_PATH . '/classes/evTicket.class.php'; }
 
+function USES_evlist_class_view()
+{   require_once EVLIST_PI_PATH . '/classes/evView.class.php'; }
+
 function USES_evlist_class_meetup()
 {   require_once 'classes/evMeetup.class.php';  }
 
@@ -1160,9 +1163,31 @@ function plugin_moderationvalues_evlist()
         recurring, rec_data, allday, split,
         status, postmode, hits, enable_reminders, enable_comments,
         owner_id, group_id, perm_owner, perm_group, perm_members, perm_anon,
-        det_id, show_upcoming, cal_id, options',
+        det_id, show_upcoming, cal_id, options, tzid',
         $_TABLES['evlist_submissions']
     );
+}
+
+
+/**
+*   Determine if the current user has the "submit" privilege
+*
+*   @see    SEC_hasRights()
+*   @see    plugin_ismoderator_evlist()
+*   @return boolean     True if the user has access, False if not
+*/
+function plugin_issubmitter_evlist()
+{
+    static $retval = NULL;
+    if ($retval === NULL) {
+        if (plugin_ismoderator_evlist()) {
+            // moderators automatically have submit access
+            $retval = true;
+        } else {
+            $retval = SEC_hasRights('evlist.submit');
+        }
+    }
+    return $retval;
 }
 
 

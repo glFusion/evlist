@@ -1,0 +1,135 @@
+{# begin {templatelocation} #}
+<script type="text/javascript" 
+    src="{site_url}/evlist/js/colorpicker.js">
+</script>
+<script type="text/javascript">
+<!--
+{!if mootools}
+window.addEvent('domready', function() {
+    var myValidator = new fValidator("calendaredit");
+});
+{!endif}
+var ConfigDocUrl = '{help_url}';
+$(document).ready(function() {
+    $('.tooltip_cfg').tooltipster({
+        contentAsHTML: true,
+        animation: 'fade',
+        trigger: 'click',
+        iconDesktop: true,
+        iconTouch: true,
+        functionBefore: function(origin, continueTooltip) {
+            continueTooltip();
+            var attrHref = ConfigDocUrl;
+            var ajobj = $(this);
+            $.get(attrHref, function(data) {
+                var confVar = ajobj.attr('id');
+                if (data.indexOf(confVar) > 0) {
+                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
+                    origin.tooltipster('content', desc);
+                } else {
+                    origin.tooltipster('content', 'No Help Text Found');
+                    console.log('Unable to find help text for desc_%s',confVar);
+                }
+            });
+        }
+    });
+});
+
+-->
+</script>
+
+ <form id="calendaredit" method="post" class="uk-form uk-form-horizontal evForm"
+    action="{site_admin_url}/plugins/evlist/index.php">
+  <fieldset class="evForm">
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_cal__name">
+        {$LANG_EVLIST['cal_name']}:
+        <span id="cal_name" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        <input required type="text" id="fld_cal_name"
+            name="cal_name" length="50" size="20" value="{cal_name}" />
+      </div>
+    </div>
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_fgcolor">
+        {$LANG_EVLIST['colors']}:
+        <span id="colors" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        <label for="fld_fgcolor">{$LANG_EVLIST['foreground']}: </label>
+        <input name="fgcolor" type="text" id="fld_fgcolor" size="7" maxlength="7" 
+            value="{fgcolor}" style="background:{fgcolor}" /> 
+        <span onclick="openPicker('fgcolor')">
+          <img src="{site_url}/evlist/images/colors.png">
+        </span>
+        <label for="bgcolor">{$LANG_EVLIST['background']}: </label>
+        <input name="bgcolor" type="text" id="fld_bgcolor" size="7" maxlength="7" 
+            value="{bgcolor}" style="background:{bgcolor}" /> 
+        <span onclick="openPicker('bgcolor')">
+          <img src="{site_url}/evlist/images/colors.png" />
+        </span>
+      </div>
+    </div>
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_enabled">
+        {$LANG_EVLIST['enabled']}:
+        <span id="enabled" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        <input type="checkbox" id="fld_enabled" name="cal_status" value="1" {stat_chk} />
+      </div>
+    </div>
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_ical_enabled">
+        {$LANG_EVLIST['ical_enabled']}:
+        <span id="ical_enabled" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        <input type="checkbox" id="fld_ical_enabled" name="cal_ena_ical" value="1" {ical_chk} />
+      </div>
+    </div>
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_owner">
+        {$LANG_ACCESS['owner']}:
+        <span id="owner" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        {ownername}
+      </div>
+    </div>
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_group">
+        {$LANG_ACCESS['group']}:
+        <span id="group" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        {group_dropdown}
+      </div>
+    </div>
+
+    <div class="uk-form-row">
+      <label class="uk-form-label" for="fld_perms">
+        {$LANG_ACCESS['permissions']}:
+        <span id="perms" class="tooltip_cfg tooltipstered"></span> 
+      </label>
+      <div class="uk-form-controls">
+        {permissions_editor}
+      </div>
+    </div>
+  </fieldset>
+  <button type="submit" class="uk-button uk-button-success" name="savecal" value="{$LANG_ADMIN['save']}" />{$LANG_ADMIN['save']}</button>
+  <button type="reset" class="uk-button" name="reset" value="{$LANG_EVLIST['reset']}" />{$LANG_EVLIST['reset']}</button>
+{!if can_delete}
+  <button type="submit" class="uk-button uk-button-danger" name="deletecal" value="{$LANG_ADMIN['delete']}" />{$LANG_ADMIN['delete']}</button>
+{!endif}
+  <button type="reset" class="uk-button uk-button-primary" name="cancel" value="{$LANG_ADMIN['cancel']}"
+      onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
+</form>
+{# begin {templatelocation} #}

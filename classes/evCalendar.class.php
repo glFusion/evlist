@@ -5,7 +5,7 @@
 *   @author     Lee Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.1
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -180,10 +180,14 @@ class evCalendar
     */
     public function Edit()
     {
-        global $_SYSTEM;
+        global $_EV_CONF, $_SYSTEM;
 
         $T = new Template(EVLIST_PI_PATH . '/templates');
-        $T->set_file('modify', 'calEditForm.thtml');
+        if ($_EV_CONF['_is_uikit']) {
+            $T->set_file('modify', 'calEditForm.uikit.thtml');
+        } else {
+            $T->set_file('modify', 'calEditForm.thtml');
+        }
 
         $T->set_var(array(
             'cal_id'        => $this->cal_id,
@@ -202,6 +206,7 @@ class evCalendar
             'cancel_url'    => EVLIST_ADMIN_URL. '/index.php?admin=cal',
             'can_delete'    => $this->cal_id > 1 ? 'true' : '',
             'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
+            'help_url' => LGLIB_getDocUrl('calendar', 'evlist'),
         ) );
 
         $T->parse('output','modify');

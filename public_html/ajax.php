@@ -31,24 +31,25 @@ case 'getloc':
         'lng'       => '',
     );
 
-    if ($_EV_CONF['use_locator'] && function_exists('GEO_getInfo')) {
-
-        $id = isset($_GET['id']) && !empty($_GET['id']) ?
+    if (!$_EV_CONF['use_locator']) {
+        break;
+    }
+    $id = isset($_GET['id']) && !empty($_GET['id']) ?
                     COM_sanitizeID($_GET['id']) : '';
-        $A = GEO_getInfo($id);
+    $status = LGLIB_invokeService('getInfo', 'locator',
+            array('id' => $id), $A, $svc_msg);
+    if ($status == PLG_RET_OK) {
         if (!$A) {
             $A = $B;        // Use the default, empty array
             $A['id'] = $id;
         }
-        // Now form the XML return
-        foreach ($B as $name=>$value) {
-            if (isset($A[$name])) {
-                $value = $A[$name];
-            }
-            $content .= "<{$name}>" .
-                htmlspecialchars($value) .
-                "</{$name}>\n";
-        }
+        // Now form the JSON return
+        $A = array_merge($B, $A);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-cache, must-revalidate');
+        // A date in the past to force no caching
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        echo json_encode($A);
     }
     break;
 
@@ -145,13 +146,4 @@ case 'getCalYear':
 
 }
 
-if (!empty($content)) {
-    $content = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n" .
-        '<location>' . $content . "</location>\n";
-    header('Content-Type: text/xml');
-    header("Cache-Control: no-cache, must-revalidate");
-    //A date in the past
-    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-    echo $content;
-}
 ?>

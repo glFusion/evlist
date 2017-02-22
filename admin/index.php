@@ -40,7 +40,7 @@
 require_once '../../../lib-common.php';
 require_once '../../auth.inc.php';
 
-if (!in_array('evlist', $_PLUGINS) || !SEC_hasRights('evlist.admin')) {
+if (!in_array('evlist', $_PLUGINS) || !plugin_ismoderator_evlist()) {
     COM_404();
     exit;
 }
@@ -572,8 +572,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
                         'title' => $LANG_ADMIN['delete'],
                     ) 
                 );
-
-        break;
+            break;
         default:
             $retval = $fieldvalue;
             break;
@@ -599,6 +598,7 @@ function EVLIST_admin_list_calendars()
         array(  'text'  => $LANG_EVLIST['edit'], 
                 'field' => 'edit',
                 'sort'  => false,
+                'align' => 'center',
             ),
         array(  'text'  => $LANG_EVLIST['id'], 
                 'field' => 'cal_id',
@@ -611,10 +611,12 @@ function EVLIST_admin_list_calendars()
         array(  'text'  => $LANG_EVLIST['enabled'],
                 'field' => 'cal_status',
                 'sort'  => true,
+                'align' => 'center',
             ),
         array(  'text'  => $LANG_ADMIN['delete'],
                 'field' => 'delete',
                 'sort'  => 'false',
+                'align' => 'center',
             ),
     );
 
@@ -655,14 +657,19 @@ function EVLIST_admin_list_calendars()
 */
 function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
                 '/index.php?editcal=' . $A['cal_id'] . 
-                '" title="' . $LANG_EVLIST['edit_calendar'] . '" />' .
-                $icon_arr['edit'] . '</a>';
+                '" title="' . $LANG_EVLIST['edit_calendar'] . '" />';
+            if ($_EV_CONF['_is_uikit']) {
+                $retval .= '<i class="uk-icon-edit"></i>';
+            } else {
+                $retval .= $icon_arr['edit'];
+            }
+            $retval .= '</a>';
             break;
         case 'cal_status':
             if ($fieldvalue == '1') {
@@ -679,8 +686,13 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
             break;
         case 'delete':
             if ($A['cal_id'] > 1) {
+                if ($_EV_CONF['_is_uikit']) {
+                    $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
+                } else {
+                    $del_icon = $icon_arr['delete'];
+                }
                 $retval = COM_createLink(
-                    $icon_arr['delete'],
+                    $del_icon,
                     EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . 
                         $A['cal_id'],
                     array(
@@ -693,93 +705,6 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
             $retval = $fieldvalue;
             break;
     }
-    return $retval;
-}
-
-function X_EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ACCESS, $LANG_ADMIN;
-
-    $retval = '';
-
-    switch($fieldname) {
-    case 'uid':
-        $retval = COM_getDisplayName($fieldvalue);
-        break;
-
-    case 'rank':
-        if ($fieldvalue > $A['max_signups']) {
-            $retval = 'Yes';
-        } else {
-            $retval = 'No';
-        }
-        break;
-                
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-
-    return $retval;
-
-}
-
-
-function X_EVLIST_adminRSVP($rp_id)
-{
-    global $LANG_EVLIST, $LANG_ADMIN, $_TABLES;
-
-    USES_lib_admin();
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
-    if ($Ev->rp_id == 0) return '';
-
-    $sql = "SELECT rsvp_id, uid, rp_id, FROM_UNIXTIME(dt_reg) as dt
-            FROM {$_TABLES['evlist_rsvp']}
-            WHERE ev_id = '{$Ev->Event->id}' ";
-    $title = $LANG_EVLIST['pi_title'] . ': ' . 
-        $LANG_EVLIST['admin_rsvp'] . ' -- ' .
-        COM_createLink($Ev->Event->Detail->title . ' (' . $Ev->date_start . ')',
-        EVLIST_URL . '/event.php?eid=' . $rp_id);
-
-    if ($Ev->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
-        $sql .= " rp_id = '{$Ev->rp_id}' ";
-    }
-
-    $defsort_arr = array('field' => 'dt_reg', 'direction' => 'ASC');
-    $text_arr = array(
-        'has_menu'     => false,
-        'has_extras'   => false,
-        'title'        => $title,
-        'form_url'     => EVLIST_ADMIN_URL . '/index.php?rp_id=' . $rp_id,
-        'help_url'     => '',
-    );
-
-    $query_arr = array(
-            'table' => 'evlist_calendars',
-            'sql' => $sql,
-    );
-
-    $header_arr = array(
-        array(  'text'  => $LANG_EVLIST['date'],
-                'field' => 'dt', 
-                'sort'  => true,
-        ),
-        array(  'text'  => 'Name',
-                'field' => 'uid',
-                'sort'  => false,
-        ),
-    );
-
-    $options_arr = array(
-        'chkdelete' => true,
-        'chkfield'  => 'rsvp_id',
-        'chkname'   => 'delrsvp',
-    );
-
-    $retval .= ADMIN_list('evlist', 'EVLIST_getField_rsvp', 
-                $header_arr, $text_arr, $query_arr, $defsort_arr,
-                '', '', $options_arr);
     return $retval;
 }
 

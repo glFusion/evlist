@@ -112,6 +112,7 @@ class evDetail
 
         case 'lat':
         case 'lng':
+            $value = str_replace(',', '.', $value);
             $this->properties[$var] = (float)$value;
             break;
 

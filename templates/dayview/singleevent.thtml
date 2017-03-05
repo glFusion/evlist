@@ -4,7 +4,7 @@
 {!else}
   {delete_imagelink}&nbsp;
 {!endif}
-  {event_time} <span class="gl_mootip" title="{event_summary}">
+  {event_time} <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{event_summary}">
 {!if bgcolor}
   <span style="color:#FFFFFF;background-color:{bgcolor};">
 {!endif}

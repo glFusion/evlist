@@ -27,10 +27,11 @@
       <!-- BEGIN eventBlock -->
       <div class="show_cal{cal_id} evlistWeeklyEvent">
         {delete_imagelink} {event_times}
+        <a data-uk-tooltip="{cls:'evTooltip'}" class="cal-event" style="color:{fgcolor};" title="{event_summary}"
 {!if is_meetup}
-        <a class="cal-event" style="color:{fgcolor};" href="{ev_url}" target="_blank">
+        href="{ev_url}" target="_blank">
 {!else}
-        <a class="cal-event" style="color:{fgcolor};" href="{pi_url}/event.php?eid={event_id}">
+        href="{pi_url}/event.php?eid={event_id}">
 {!endif}
         {event_title}</a>
       </div>
@@ -42,72 +43,7 @@
     <td colspan="2">&nbsp;</td>
   </tr>
 <!-- END dayBlock -->
-
-<!--
-<tr class="{class1}">
-  <td style="width:80%;" class="cal-weekview-dayformat">{day1}</td>
-  <td class="cal-weekview-addevent">{langlink_addevent1}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day1}</td>
-</tr>
 <tr><td colspan="2">&nbsp;</td></tr>
-
-<tr class="{class2}">
-  <td class="cal-weekview-dayformat">{day2}</td>
-  <td class="cal-weekview-addevent">{langlink_addevent2}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day2}</td>
-</tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-
-<tr class="{class3}">
-  <td class="cal-weekview-dayformat">{day3}</td>
-  <td class="cal-weekview-addevent">{langlink_addevent3}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day3}</td>
-</tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-
-<tr class="{class4}">
-  <td class="cal-weekview-dayformat">{day4}</td><td class="cal-weekview-addevent">{langlink_addevent4}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day4}</td>
-</tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-
-<tr class="{class5}">
-  <td class="cal-weekview-dayformat">{day5}</td>
-  <td class="cal-weekview-addevent">{langlink_addevent5}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day5}</td>
-</tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-
-<tr class="{class6}">
-  <td class="cal-weekview-dayformat">{day6}</td>
-  <td class="cal-weekview-addevent">{langlink_addevent6}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day6}</td>
-</tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-
-<tr class="{class7}">
-  <td class="cal-weekview-dayformat">{day7}</td>
-  <td class="cal-weekview-addevent">{langlink_addevent7}</td>
-</tr>
-<tr>
-  <td colspan="2" class="cal-dayview-times">{events_day7}</td>
-</tr>
--->
-
-<tr><td colspan="2">&nbsp;</td></tr>
-
 </table>
 <br/>
 {quickadd_form}

@@ -685,3 +685,12 @@ div.evPrtDataItem div.evdata {
   clear:both;
   margin-top:10px;
 }
+.event_timezone {
+  font-size: small;
+}
+
+.evTooltip {
+    max-width: 25%;
+    word-break: break-word;
+    color: #eee;
+}

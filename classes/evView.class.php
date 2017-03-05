@@ -98,11 +98,11 @@ class evView
 
         $this->today = new Date($_EV_CONF['_today_ts'], $_CONF['timezone']);
         $this->today_sql = $this->today->format('Y-m-d', true);
-        $this->year = $year;
-        $this->month = $month;
-        $this->day = $day;
-        $this->cat = $cat;
-        $this->cal = $cal;
+        $this->year = (int)$year;
+        $this->month = (int)$month;
+        $this->day = (int)$day;
+        $this->cat = (int)$cat;
+        $this->cal = (int)$cal;
         $this->opt = is_array($opts) ? $opts : array();
         $this->setSession();
     }
@@ -159,7 +159,6 @@ class evView
         if ($_EV_CONF['cal_tmpl'] == 'json') {
             $T->set_file(array(
                 'header' => 'calendar_header.thtml',
-                'header_json' => 'calendar_header_json.thtml',
             ));
         } else {
             $T->set_file('header', 'calendar_header.thtml');
@@ -986,6 +985,7 @@ class evView_week extends evView
                 $T->set_var(array(
                     'event_times'   => $event_time,
                     'event_title'   => htmlspecialchars($A['title']),
+                    'event_summary' => htmlspecialchars($A['summary']),
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
                     'delete_imagelink' => EVLIST_deleteImageLink($A, $token),
@@ -1467,7 +1467,6 @@ class evView_list extends evView
         $T = new Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file('index', 'index.thtml');
 
-        //if ($_EV_CONF['_can_add']) {
         if (EVLIST_canSubmit()) {
             $add_event_link = EVLIST_URL . '/event.php?edit=x';
         } else {

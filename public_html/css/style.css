@@ -691,6 +691,5 @@ div.evPrtDataItem div.evdata {
 
 .evTooltip {
     max-width: 25%;
-    word-break: break-word;
-    color: #eee;
+    word-break: keep-all;
 }

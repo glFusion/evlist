@@ -19,17 +19,18 @@ date_default_timezone_set('UTC');
 
 class evView
 {
-    var $year;        // Year of display
-    var $month;       // Month of display
-    var $day;         // Day of display
-    var $cat;         // Category to display
-    var $cal;         // Calendar to display
+    protected $year;        // Year of display
+    protected $month;       // Month of display
+    protected $day;         // Day of display
+    protected $cat;         // Category to display
+    protected $cal;         // Calendar to display
     protected $cal_used;    // Array of calendars used in display
-    var $range;       // Range selector (past, future, etc)
+    protected $range;       // Range selector (past, future, etc)
     protected $today;       // Holder for today's date
     protected $today_sql;   // Today's date in YYYY-MM-DD format. Used often.
     protected $type;        // View type (month, year, etc)
     protected $tpl_opt;     // 'print' to create a printable view
+    protected $inc_dt_sel= true;   // true to include date/range opts
 
     /**
     *   Get a calendar view object for the specifiec type.
@@ -146,7 +147,7 @@ class evView
     *
     *   @return string          HTML for calendar header
     */
-    protected function Header()
+    public function Header()
     {
         global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES;
 
@@ -217,14 +218,9 @@ class evView
             $T->set_var('range_url', 'range=' . $_GET['range']);
         }
 
-        if ($this->type == 'detail') {
-            // Set marker to disable category/range dropdowns
-            $T->set_var('showing_detail', 'true');
-        }
+        if ($this->inc_dt_sel) {
+            $T->set_var('include_selections', 'true');
 
-        if ($this->view == 'list' || $this->view == 'detail') {
-            $T->set_var('event_type', $event_type);
-        } else {
             // Create the jump-to-date selectors
             $options = '';
             for ($i = 1; $i < 32; $i++) {
@@ -1446,6 +1442,7 @@ class evView_list extends evView
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
         $this->type = 'list';
+        $this->incl_dt_sel = false;  // disable date/range selections
         if (!isset($opts['range'])) {
             $this->range = (int)SESS_getVar('evlist.range');
         }
@@ -1729,6 +1726,32 @@ class evView_smallmonth extends evView
         }
         $T->parse('output', 'smallmonth');
         return $T->finish($T->get_var('output'));
+    }
+}
+
+
+/**
+*   Class to handle the event detail view. The actual view is created
+*   by evRepeat::Render(). This class is used simply to create the standard
+*   header.
+*/
+class evView_detail extends evView
+{
+    /*
+    *   Construct the event detail view
+    *
+    *   @param  integer $year   Year to display, default is current year
+    *   @param  integer $month  Starting month
+    *   @param  integer $day    Starting day
+    *   @param  integer $cat    Event category
+    *   @param  integer $cal    Calendar ID
+    *   @param  string  $opt    Optional template modifier, e.g. "print"
+    */
+    public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
+    {
+        $this->type = 'detail';
+        $this->inc_dt_sel = false;  // disable date/range selections
+        parent::__construct($year, $month, $day, $cat, $cal, $opts);
     }
 }
 

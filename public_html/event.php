@@ -64,7 +64,8 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
 
 // Import plugin-specific function library
 USES_evlist_functions();
-USES_evlist_views();
+//USES_evlist_views();
+USES_evlist_class_view();
 
 /*
  * Main function
@@ -433,8 +434,10 @@ default:
 }
 
 $display = EVLIST_siteHeader($pagetitle);
-$display .= EVLIST_calHeader(date('Y'), date('m'), date('d'), 'detail',
-                $cat_id, $cal_id);
+$V = new evView_detail();
+$display .= $V->Header('detail', 0, 0, 0, $cat_id, $cal_id);
+//$display .= EVLIST_calHeader(date('Y'), date('m'), date('d'), 'detail',
+//                $cat_id, $cal_id);
 
 if (!empty($msg)) {
     $display .= COM_startBlock($LANG_EVLIST['alert'],'','blockheader-message.thtml');

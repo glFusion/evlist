@@ -35,8 +35,7 @@
   {!endif}
 </div>
 
-{!if showing_detail}
-{!else}
+{!if include_selections}
 <div id="evlist_nav_left">
 <form action="{action_url}" method="get" name="hdrform" id="evlistHdrForm"
     enctype="application/x-www-form-urlencoded">

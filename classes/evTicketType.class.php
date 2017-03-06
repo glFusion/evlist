@@ -7,10 +7,10 @@
 *   to all occurrences of an event.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2015-2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @version    1.4.0
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -56,7 +56,7 @@ class evTicketType
         if ($id > 0)
             $this->id = $id;
 
-        $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']} 
+        $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']}
             WHERE id='{$this->id}'";
         //echo $sql;
         $result = DB_query($sql);
@@ -156,7 +156,6 @@ class evTicketType
         $T->parse('output','modify');
         $display .= $T->finish($T->get_var('output'));
         return $display;
-
     }
 
 
@@ -183,10 +182,10 @@ class evTicketType
             event_pass = '{$this->event_pass}'";
 
         if ($this->isNew) {
-            $sql = "INSERT INTO {$_TABLES['evlist_tickettypes']} SET 
+            $sql = "INSERT INTO {$_TABLES['evlist_tickettypes']} SET
                     $fld_sql";
         } else {
-            $sql = "UPDATE {$_TABLES['evlist_tickettypes']} SET 
+            $sql = "UPDATE {$_TABLES['evlist_tickettypes']} SET
                     $fld_sql
                     WHERE id='{$this->id}'";
         }
@@ -197,9 +196,9 @@ class evTicketType
             if ($this->isNew) $this->id = DB_insertId();
             return true;
         } else {
+            COM_errorLog("evTicketType::Save SQL Error: $sql");
             return false;
         }
-
     }   // function Save()
 
 
@@ -247,18 +246,19 @@ class evTicketType
 
 
     /**
-     *  Sets the "enabled" field to the specified value.
-     *
-     *  @param  integer $id ID number of element to modify
-     *  @param  integer $value New value to set
-     *  @return         New value, or old value upon failure
-     */
-    public function Toggle($item, $oldvalue, $id = 0)
+    *   Sets the field to the opposite of the specified value.
+    *
+    *   @param  string  $fld        DB Field to toggle
+    *   @param  integer $oldvalue   Old (current) value of field
+    *   @param  integer $id         ID number of element to modify
+    *   @return         New value, or old value upon failure
+    */
+    public static function Toggle($fld, $oldvalue, $id)
     {
         global $_TABLES;
 
         // Validate $item - only toggle-able fields
-        switch ($item) {
+        switch ($fld) {
         case 'event_pass':
         case 'enabled':
             break;
@@ -267,22 +267,20 @@ class evTicketType
             break;
         }
 
-        $oldvalue = $oldvalue == 0 ? 0 : 1;
         $id = (int)$id;
-        if ($id == 0) {
-            if (is_object($this))
-                $id = $this->id;
-            else
-                return $oldvalue;
-        }
+        if ($id == 0) return $oldvalue;
         $newvalue = $oldvalue == 0 ? 1 : 0;
         $sql = "UPDATE {$_TABLES['evlist_tickettypes']}
-                SET $item = $newvalue
-                WHERE id='$id'";
+                SET $fld = $newvalue
+                WHERE id = '$id'";
         //echo $sql;die;
-        DB_query($sql);
-        return $newvalue;
-
+        DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("evTicketType::Toggle SQL Error: $sql");
+            return $oldvalue;
+        } else {
+            return $newvalue;
+        }
     }
 
 

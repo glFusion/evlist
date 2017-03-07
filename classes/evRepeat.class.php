@@ -674,8 +674,8 @@ class evRepeat
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'map'   => $map,
-                    'lat'   => number_format($this->Event->Detail->lat, 8, '.', ''),
-                    'lng'   => number_format($this->Event->Detail->lng, 8, '.', ''),
+                    'lat'   => number_format($this->Event->Detail->lat, 6, '.', ''),
+                    'lng'   => number_format($this->Event->Detail->lng, 6, '.', ''),
                 ) );
             }
         }

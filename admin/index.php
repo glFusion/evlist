@@ -849,7 +849,7 @@ function EVLIST_importEvents()
 */
 $expected = array(
     // Actions to perform
-    'savecal', 'editcal', 'moderate', 'saveevent',
+    'savecal', 'editcal', 'moderate', 'saveevent', 'saverepeat',
     'deletecal', 'delcalconfirm', 'approve', 'disapprove',
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
@@ -933,6 +933,22 @@ case 'saveevent':
         }
     }
     echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
+    break;
+
+case 'saverepeat':
+    USES_evlist_class_repeat();
+    //$eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
+    $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? $_POST['rp_id'] : '';
+    $Rp = new evRepeat($rp_id);
+    $errors = $Rp->Save($_POST);
+    if (!empty($errors)) {
+        $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
+        $content .= $Rp->Edit();
+        $view = 'none';
+    } else {
+        LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
+        echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
+    }
     break;
 
 case 'savecal':

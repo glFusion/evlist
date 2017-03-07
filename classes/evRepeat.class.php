@@ -46,7 +46,7 @@ class evRepeat
      */
     public function __construct($rp_id=0)
     {
-        global $_USER;
+        global $_USER, $_CONF;
 
         if ($rp_id == 0) {
             $this->rp_id = 0;
@@ -58,6 +58,7 @@ class evRepeat
             $this->time_end1 = '';
             $this->time_start2 = '';
             $this->time_end2 = '';
+            $this->tzid = $_CONF['timezone'];
         } else {
             $this->rp_id = $rp_id;
             if (!$this->Read()) {
@@ -81,6 +82,8 @@ class evRepeat
     */
     public function __set($var, $value='')
     {
+        global $_USER;
+
         switch ($var) {
         case 'ev_id':
             $this->properties[$var] = COM_sanitizeId($value, false);
@@ -98,11 +101,23 @@ class evRepeat
             $this->properties[$var] = trim(COM_checkHTML($value));
             break;
 
+        case 'tzid':
+            $this->properties[$var] = $value == 'local' ? $_USER['tzid'] : $value;
+            break;
+
         case 'time_start1':
         case 'time_end1':
         case 'time_start2':
         case 'time_end2':
             $this->properties[$var] = empty($value) ? '00:00:00' : trim($value);
+            break;
+
+        case 'dtStart1':
+        case 'dtEnd1':
+        case 'dtStart2':
+        case 'dtEnd2':
+            // Date objects to track starting and ending timestamps
+            $this->properties[$var] = new Date($value, $this->tzid);
             break;
 
         default:
@@ -121,10 +136,17 @@ class evRepeat
     */
     public function __get($var)
     {
-        if (array_key_exists($var, $this->properties)) {
-            return $this->properties[$var];
-        } else {
-            return NULL;
+        switch($var) {
+        case 'use_tz':
+            return $this->Event->tzid == 'local' ? false : true;
+            break;
+        default:
+            if (array_key_exists($var, $this->properties)) {
+                return $this->properties[$var];
+            } else {
+                return NULL;
+            }
+            break;
         }
     }
 
@@ -221,6 +243,7 @@ class evRepeat
             $this->time_end2    = $A['rp_time_end2'];
 
             $this->Event = new evEvent($this->ev_id, $this->det_id);
+            $this->tzid = $this->Event->tzid;
             return true;
         }
     }
@@ -334,8 +357,6 @@ class evRepeat
         $name = '';
         $email = '';
         $phone = '';
-		$lat = '';
-		$lng = '';
 
         if ($rp_id != 0) {
             $this->Read($rp_id);
@@ -394,28 +415,31 @@ class evRepeat
                 $location = COM_highlightQuery($location, $query);
             }
         }
-        $date_start = EVLIST_formattedDate($this->date_start);
-        if ($this->date_start != $this->date_end) {
-            $date_end = EVLIST_formattedDate($this->date_end);
-        } else {
-            $date_end = '';
-        }
-
+        $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
+        $this->dtEnd1 = $this->date_start . ' ' . $this->time_end1;
+        $date_start = $this->dtStart1->format($_CONF['dateonly'], $this->use_tz);
+        $date_end = $this->dtEnd1->format($_CONF['dateonly'], $this->use_tz);
+        if ($date_end == $date_start) $date_end = '';
         if ($this->Event->allday == '1') {
             $allday = '<br />' . $LANG_EVLIST['all_day_event'];
         } else {
             $allday = '';
             if ($this->time_start1 != '') {
-                $time_start1 = EVLIST_formattedTime($this->time_start1);
-                $time_end1 =  EVLIST_formattedTime($this->time_end1);
+                $time_start1 = $this->dtStart1->format($_CONF['timeonly'], $this->use_tz);
+                $time_end1 =  $this->dtEnd1->format($_CONF['timeonly'], $this->use_tz);
             } else {
                 $time_start1 = '';
                 $time_end1 = '';
             }
             //$time_period = $time_start . $time_end;
             if ($this->Event->split == '1') {
-                $time_start2 = EVLIST_formattedTime($this->time_start2);
-                $time_end2 = EVLIST_formattedTime($this->time_end2);
+                $this->dtStart2 = $this->date_start . ' ' . $this->time_start2;
+                $this->dtEnd2 = $this->date_start . ' ' . $this->time_end2;
+                $time_start2 = $this->dtStart2->format($_CONF['timeonly'], $this->use_tz);
+                $time_end2 = $this->dtEnd2->format($_CONF['timeonly'], $this->use_tz);
+            } else {
+                $time_start2 = '';
+                $time_end2 = '';
             }
         }
 
@@ -437,8 +461,6 @@ class evRepeat
         $province = $this->Event->Detail->province;
         $postal = $this->Event->Detail->postal;
         $country = $this->Event->Detail->country;
-		$lat = $this->Event->Detail->lat;
-		$lng = $this->Event->Detail->lng;
 
         // Now get the text description of the recurring interval, if any
         if ($this->Event->recurring &&
@@ -472,8 +494,9 @@ class evRepeat
             }
             if ($this->Event->rec_data['stop'] != '' &&
                 $this->Event->rec_data['stop'] < EV_MAX_DATE) {
+                $stop_date = new Date($this->Event->rec_data['stop'], $this->tzid);
                 $rec_string .= ' ' . sprintf($LANG_EVLIST['recur_stop_desc'],
-                    EVLIST_formattedDate($this->Event->rec_data['stop']));
+                    $stop_date->format($_CONF['dateonly'], $this->use_tz));
             }
         } else {
             $rec_string = '';
@@ -506,7 +529,10 @@ class evRepeat
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
             'more_info_link' => $more_info_link,
-            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
+            'mootools'  => $_SYSTEM['disable_mootools'] ? '' : 'true',
+            'show_tz'   => $this->use_tz,
+            'timezone'  => $this->tzid,
+            'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
         ) );
 
         // Show the user comments. Moderators and event owners can delete comments
@@ -523,8 +549,7 @@ class evRepeat
         if ($_EV_CONF['enable_rsvp'] == 1 &&
                 $this->Event->options['use_rsvp'] > 0) {
             if ($this->Event->options['rsvp_cutoff'] > 0) {
-                $dt = new Date($this->event->date_start1 . ' ' . $this->Event->time_start1, $_CONF['timezone']);
-                if (time() > $dt->toUnix() - ($this->Event->options['rsvp_cutoff'] * 86400)) {
+                if (time() > $this->dtStart1->toUnix() - ($this->Event->options['rsvp_cutoff'] * 86400)) {
                     $past_cutoff = false;
                 } else {
                     $past_cutoff = true;
@@ -639,18 +664,23 @@ class evRepeat
             // Get info from the Weather plugin, if configured and available
             // There has to be at least some location data for this to work.
             if ($_EV_CONF['use_weather']) {
-                // The postal code works best, but not internationally.
-                // Try the regular address first.
-                $loc = '';
-                if (!empty($city) && !empty($province)) {
-                    $loc = $city . ', ' . $province . ' ' . $country;
+                // Try coordinates first, if present
+                $lat = $this->Event->Detail->lat;
+                $lng = $this->Event->Detail->lng;
+                if (!empty($lat) && !empty($lng)) {
+                    $loc = $lat . ',' . $lng;
+                } else {
+                    // The postal code works best, but not internationally.
+                    // Try the regular address first.
+                    if (!empty($city) && !empty($province)) {
+                        $loc = $city . ', ' . $province . ' ' . $country;
+                    }
+                    if (!empty($postal)) {
+                        $loc .= ' ' . $postal;
+                    }
                 }
-                if (!empty($postal)) {
-                    $loc .= ' ' . $postal;
-                }
-				if (!empty($lat) and !empty($lng)) {
-                    $loc = str_replace(',', '.', $lat).','.str_replace(',', '.', $lng);
-                }
+                $weather = '';
+
                 if (!empty($loc)) {
                     // Location info was found, get the weather
                     LGLIB_invokeService('weather', 'embed',
@@ -720,7 +750,7 @@ class evRepeat
             $catlinks = array();
             for ($i = 0; $i < $catcount; $i++) {
                 $catlinks[] = '<a href="' .
-                COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange .
+                COM_buildURL(EVLIST_URL . '/index.php?view=list' . $andrange .
                 '&cat=' . $cats[$i]['id']) .
                 '">' . $cats[$i]['name'] . '</a>&nbsp;';
             }
@@ -752,7 +782,7 @@ class evRepeat
             $show_reminders = false;
         }
 
-        if ($this->Event->options['contactlink'] == 1) {
+        if ($this->Event->options['contactlink'] == 1 && $this->Event->owner_id > 1) {
             $ownerlink = $_CONF['site_url'] . '/profiles.php?uid=' .
                     $this->Event->owner_id;
             $ownerlink = sprintf($LANG_EVLIST['contact_us'], $ownerlink);

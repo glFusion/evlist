@@ -242,6 +242,11 @@ function evlist_upgrade()
                 0, 0, 0, 100, true, 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
+
+        case '1.4.1':
+            $currentVersion = '1.4.2';
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+            if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
     CTL_clearCache();

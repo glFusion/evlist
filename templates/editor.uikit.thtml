@@ -4,6 +4,7 @@ $(document).ready(function() {
     toggleRSVPdetail({use_rsvp});
     showhiderecurringoptions();
     showhideformatoptions({format_opt});
+    showhide_tzselect(document.getElementById("tz_local"));
 });
 
 // Global variables to track date/time field contents
@@ -85,6 +86,11 @@ function showhideEventDiv(selected, selindex)
     }
 }
 
+function showhide_tzselect(cbox)
+{
+    document.getElementById("tz_select").style.display = cbox.checked ? "none" : "";
+}
+
 function showhideallday()
 {
     // If event is split, hide allday and show 2nd time fields
@@ -105,6 +111,7 @@ function chk_allday()
         showhidesplit(0);
         document.getElementById("starttime1").style.display="none";
         document.getElementById("endtime1").style.display="none";
+        document.getElementById("timezone").style.display = "none";
     } else {
         // Not an all-day event.  Check start & end dates to see if it
         // can be a split (split only allowed on 1-day events.
@@ -117,6 +124,7 @@ function chk_allday()
         }
         document.getElementById("starttime1").style.display="";
         document.getElementById("endtime1").style.display="";
+        document.getElementById("timezone").style.display = "";
     }
 }
 
@@ -271,66 +279,19 @@ function EVstateChanged()
 
   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
   {
-    xmlDoc = xmlHttp.responseXML;
-    locId = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
+    jsonObj = JSON.parse(xmlHttp.responseText)
+    lat = jsonObj.lat > 0 ? jsonObj.lat : 0;
+    lng = jsonObj.lng > 0 ? jsonObj.lng : 0;
 
-    if (xmlDoc.getElementsByTagName("title")[0].hasChildNodes())
-      loc = xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-    else
-      loc = '';
-
-    //address = xmlDoc.getElementsByTagName("address")[0].childNodes[0].nodeValue;
-
-    if (xmlDoc.getElementsByTagName("street")[0].hasChildNodes())
-      street = xmlDoc.getElementsByTagName("street")[0].childNodes[0].nodeValue;
-    else
-      street = '';
-
-    if (xmlDoc.getElementsByTagName("city")[0].hasChildNodes())
-      city = xmlDoc.getElementsByTagName("city")[0].childNodes[0].nodeValue;
-    else
-      city = '';
-
-    if (xmlDoc.getElementsByTagName("province")[0].hasChildNodes())
-      province = xmlDoc.getElementsByTagName("province")[0].childNodes[0].nodeValue;
-    else
-      province = '';
-
-    if (xmlDoc.getElementsByTagName("postal")[0].hasChildNodes())
-      postal = xmlDoc.getElementsByTagName("postal")[0].childNodes[0].nodeValue;
-    else
-      postal = '';
-
-    if (xmlDoc.getElementsByTagName("country")[0].hasChildNodes())
-      country = xmlDoc.getElementsByTagName("country")[0].childNodes[0].nodeValue;
-    else
-      country = '';
-
-    if (typeof(xmlDoc.getElementsByTagName("lat")[0]) !== "undefined") {
-      if (xmlDoc.getElementsByTagName("lat")[0].hasChildNodes())
-        lat = xmlDoc.getElementsByTagName("lat")[0].childNodes[0].nodeValue;
-      else
-        lat = 0;
-
-      if (xmlDoc.getElementsByTagName("lng")[0].hasChildNodes())
-        lng = xmlDoc.getElementsByTagName("lng")[0].childNodes[0].nodeValue;
-      else
-        lng = 0;
-    } else {
-      lat = 0;
-      lng = 0;
-    }
-
-    document.getElementById("location").value = loc;
-    document.getElementById("street").value = street;
-    document.getElementById("city").value = city;
-    document.getElementById("province").value = province;
-    document.getElementById("postal").value = postal;
-    document.getElementById("country").value = country;
+    document.getElementById("location").value = jsonObj.title;
+    document.getElementById("street").value = jsonObj.street;
+    document.getElementById("city").value = jsonObj.city;
+    document.getElementById("province").value = jsonObj.province;
+    document.getElementById("postal").value = jsonObj.postal;
+    document.getElementById("country").value = jsonObj.country;
     document.getElementById("lat").value = lat;
     document.getElementById("lng").value = lng;
   }
-
 }
 
 function EVgetXmlHttpObject()
@@ -521,7 +482,7 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_startdate1">
           {$LANG_EVLIST['start_date']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_date_start', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <span id="date_start" class="tooltip_cfg tooltipstered"></span> 
         </label>
         <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="startdt1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
@@ -547,7 +508,7 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_enddate1">
           {$LANG_EVLIST['end_date']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_date_end', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <span id="date_end" class="tooltip_cfg tooltipstered"></span> 
         </label>
         <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
@@ -569,6 +530,15 @@ function toggleRSVPdetail(val)
         </div>
       </div>
 
+      <div class="uk-form-row" id="timezone">
+        <label for="tzid" class="uk-form-label">{$LANG_EVLIST['timezone']}:
+          <span id="tz" class="tooltip_cfg tooltipstered"></span> 
+        </label>
+        <div class="uk-form-controls">
+          <input type="checkbox" id="tz_local" name="tz_local" onclick="showhide_tzselect(this)" {tz_islocal}>&nbsp;{$LANG_EVLIST['tz_local']}<br />
+          <span id="tz_select">{$LANG_EVLIST['tz_select']}: {tz_select}</span>
+        </div>
+      </div>
       <div class="uk-form-row">
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
@@ -1178,6 +1148,31 @@ for (i = 0; i < el.length; i++) {
   }
 }
 
-</script>
+var ConfigDocUrl = '{help_url}';
+$(document).ready(function() {
+    $('.tooltip_cfg').tooltipster({
+        contentAsHTML: true,
+        animation: 'fade',
+        trigger: 'click',
+        iconDesktop: true,
+        iconTouch: true,
+        functionBefore: function(origin, continueTooltip) {
+            continueTooltip();
+            var attrHref = ConfigDocUrl;
+            var ajobj = $(this);
+            $.get(attrHref, function(data) {
+                var confVar = ajobj.attr('id');
+                if (data.indexOf(confVar) > 0) {
+                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
+                    origin.tooltipster('content', desc);
+                } else {
+                    origin.tooltipster('content', 'No Help Text Found');
+                    console.log('Unable to find help text for desc_%s',confVar);
+                }
+            });
+        }
+    });
+});
 
+</script>
 {# end {templatelocation} #}

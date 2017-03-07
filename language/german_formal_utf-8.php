@@ -401,6 +401,9 @@ $LANG_confignames['evlist'] = array(
 'enable_comments' => 'Enable Comments?',
 'closed'        => 'Closed',
 'event'         => 'Event',
+'timezone'      => 'Timezone',
+'tz_local'      => 'Guest&apos;s local timezone',
+'tz_select'     => 'Select Timezone',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Haupteinstellungen',

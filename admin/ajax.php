@@ -16,7 +16,7 @@ require_once '../../../lib-common.php';
 
 // This is for administrators only.  It's called by Javascript,
 // so don't try to display a message
-if (!SEC_hasRights('evlist.admin')) {
+if (plugin_isadmin_evlist()) {
     COM_accessLog("User {$_USER['username']} tried to illegally access the evlist admin ajax function.");
     exit;
 }

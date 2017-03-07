@@ -108,7 +108,7 @@ $LANG_EVLIST = array(
 'ev_perms'          => 'Permissions',
 'ev_contact'        => 'Contact',
 'ev_location'       => 'Location',
-'show_upcoming'     => 'Show in Upcoming Events',
+'show_upcoming'     => 'Show in Upcoming Events Block',
 'misc'              => 'Miscellaneous',
 'foreground'        => 'Foreground',
 'background'        => 'Background',
@@ -357,6 +357,9 @@ You may either move existing events to a new calendar, or delete those events.',
 'enable_comments' => 'Enable Comments?',
 'closed'        => 'Closed',
 'event'         => 'Event',
+'timezone'      => 'Timezone',
+'tz_local'      => 'Guest&apos;s local timezone',
+'tz_select'     => 'Select Timezone',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

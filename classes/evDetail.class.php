@@ -232,8 +232,8 @@ class evDetail
         $fld_sql = implode(',', $fld_set);
 
         // Fix decimal if PHP locale uses the comma.
-        $lat = number_format($this->lat, 8, '.', '');
-        $lng = number_format($this->lng, 8, '.', '');
+        $lat = number_format($this->lat, 6, '.', '');
+        $lng = number_format($this->lng, 6, '.', '');
 
         // Insert or update the record, as appropriate
         if (!$this->isNew) {

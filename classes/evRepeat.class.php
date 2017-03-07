@@ -334,6 +334,8 @@ class evRepeat
         $name = '';
         $email = '';
         $phone = '';
+		$lat = '';
+		$lng = '';
 
         if ($rp_id != 0) {
             $this->Read($rp_id);
@@ -435,6 +437,8 @@ class evRepeat
         $province = $this->Event->Detail->province;
         $postal = $this->Event->Detail->postal;
         $country = $this->Event->Detail->country;
+		$lat = $this->Event->Detail->lat;
+		$lng = $this->Event->Detail->lng;
 
         // Now get the text description of the recurring interval, if any
         if ($this->Event->recurring &&
@@ -644,6 +648,9 @@ class evRepeat
                 if (!empty($postal)) {
                     $loc .= ' ' . $postal;
                 }
+				if (!empty($lat) and !empty($lng)) {
+                    $loc = str_replace(',', '.', $lat).','.str_replace(',', '.', $lng);
+                }
                 if (!empty($loc)) {
                     // Location info was found, get the weather
                     LGLIB_invokeService('weather', 'embed',
@@ -667,8 +674,8 @@ class evRepeat
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'map'   => $map,
-                    'lat'   => number_format($this->Event->Detail->lat, 8, '.', ''),
-                    'lng'   => number_format($this->Event->Detail->lng, 8, '.', ''),
+                    'lat'   => number_format($this->Event->Detail->lat, 6, '.', ''),
+                    'lng'   => number_format($this->Event->Detail->lng, 6, '.', ''),
                 ) );
             }
         }

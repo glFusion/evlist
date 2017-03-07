@@ -1,129 +1,104 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" class="uk-height-1-1">
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
-  <link href="../../../docs/docstyle.css" type="text/css" rel="stylesheet" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon-precomposed" href="../../layout/cms/images/apple-touch-icon.png">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.26.3/css/uikit.almost-flat.min.css">
   <meta name="robots" content="noindex,nofollow" />
-  <title>EvList Plugin - glFusion CMS</title>
+  <title>glFusion Evlist Plugin Configuration</title>
+  <style>
+    html{background:#f9f9f9}.tm-dropdown,.tm-navbar{background:#325482!important}.uk-form label{font-weight:700}.tm-navbar{border-radius:0!important;padding:1px 0 6px!important;border:none!important}.tm-navbar-brand{color:#eee!important}.tm-navbar-brand a{text-shadow:none;color:#fff}.tm-navbar-brand a:hover{color:#ababab;text-decoration:none}.tm-navbar-brand-oc a{text-shadow:none;color:#fff}.tm-navbar-brand-oc a:hover{color:#ababab;text-decoration:none}.tm-navbar-nav>li>a{border:none;border-radius:3px!important;font-size:15px!important;height:40px!important;margin:0!important}.tm-dropdown{color:#000;border-radius:0!important;border:0!important}.tm-nav-navbar>li>a{color:#fff!important}.tm-navbar::after,.tm-navbar::before{margin-top:7px!important}.tm-navbar-nav>li.uk-open>a,.tm-navbar-nav>li:hover>a,.tm-navbar-nav>li>a:focus{color:#fff;outline:0;background:#35B3EE!important}.tm-navbar-nav>li>a{color:#fff!important;text-shadow:none!important}.tm-navbar-toggle{color:#ccc!important;text-shadow:none!important}.tm-navbar-toggle:focus,.tm-navbar-toggle:hover{color:#fff!important}.tm-footer{background:#252525;border-top:1px solid #232425;margin-bottom:0;bottom:0;padding:10px;color:#fff}.tm-wrapper{min-height:100%;margin:0 auto -51px!important}.tm-push,footer{height:51px}.uk-navbar-content > a {color:#fff !important;}
+  </style>
 </head>
 
-<body style="direction: ltr;">
-<div id="gl_container_fluid">
-  <div id="gl_header"><span style="color: rgb(255, 255, 255); float: left; padding-left: 10px; padding-top: 5px; vertical-align: middle;">glFusion Documentation Project
-  </span><a style="float: right; padding-right: 10px; padding-top: 5px; vertical-align: middle;" href="http://www.glfusion.org/wiki/doku.php">glFusion Wiki</a>
-</div>
-<div id="gl_wrapper">
-<div class="body-container">
-<h1><a name="advt_plugin" id="advt_plugin">EvList Plugin</a></h1>
+<body class="uk-height-1-1">
+  <div class="tm-wrapper">
+    <nav class="uk-navbar uk-navbar-attached tm-navbar uk-margin-bottom">
+      <div class="uk-navbar-brand tm-navbar-brand">
+        glFusion Evlist Plugin Configuration
+      </div>
+      <div class="uk-navbar-flip uk-hidden-small">
+        <div class="uk-navbar-content tm-navbar-content" style="text-shadow:none;">
+          <a href="https://www.glfusion.org/wiki/">glFusion Wiki</a>
+        </div>
+      </div>
+    </nav>
 
-<div class="level1">
-<h1><a name="evlist_plugin_product_form" id="evlist_plugin_product_form">EvList Plugin - Event Form Help</a></h1>
+    <div class="uk-container uk-container-center uk-margin-bottom">
 
-<table class="inline">
-  <tbody>
-    <tr>
-      <th class="col0 leftalign" colspan="2">General Information</th>
-    </tr>
+      <dl id="desc_bid">
+        <dt>Banner ID</dt>
+        <dd>Each banner must have a unique ID. If one is not entered here, an ID will be automatically generated when the banner is saved.</dd>
+      </dl>
 
-    <tr class="row0">
-      <th class="col0 leftalign">Option </th>
-      <th class="col1 leftalign">Description </th>
-    </tr>
+      <dl id="desc_calendar">
+        <dt>Calendar</dt>
+        <dd>Select the calendar where this event will appear. Calendars can be included or excluded from views and feeds.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_calendar"></a>Calendar</td>
-      <td class="col1 leftalign">
-        Select the calendar where this event will appear. Calendars can be included or excluded from views and feeds.
-      </td>
-    </tr>
+      <dl id="desc_title">
+        <dt>Event Title</dt>
+        <dd>Enter the title for this event. This text will appear in most calendars as a hover link to the event summary.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_title"></a>Event Title</td>
-      <td class="col1 leftalign">
-        Enter the title for this event. This text will appear in most calendars as a hover link to the event summary.
-      </td>
-    </tr>
+      <dl id="desc_summary">
+        <dt>Event Summary</dt>
+        <dd>Enter a fairly short description of the event. This will appear on the event display, and also when a user hovers the mouse over the event title in calendar views.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_summary"></a>Event Summary</td>
-      <td class="col1 leftalign">
-        Enter a fairly short description of the event. This will appear on the event display, and also when a user hovers the mouse over the event title in calendar views.
-      </td>
-    </tr>
+      <dl id="desc_description">
+        <dt>Full Description</dt>
+        <dd>Enter an optional detailed description of this event. This text appears only on the event detail page.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_description"></a>Full Description</td>
-      <td class="col1 leftalign">
-        Enter an optional detailed description of this event. This text appears only on the event detail page.
-      </td>
-    </tr>
+      <dl id="desc_url">
+        <dt>URL</dt>
+        <dd>Enter an optional URL for the event, such as a link to a site article or an external web page.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_url"></a>URL</td>
-      <td class="col1 leftalign">
-        Enter an optional URL for the event, such as a link to a site article or an external web page.
-      </td>
-    </tr>
+      <dl id="desc_enabled">
+        <dt>Enabled</dt>
+        <dd>Check this box to enable the event. Events can be temporarily hidden from view without deleting them.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_enabled"></a>Enabled</td>
-      <td class="col1 leftalign">
-        Check this box to enable the event. Events can be temporarily hidden from view without deleting them.
-      </td>
-    </tr>
+      <dl id="desc_reminders">
+        <dt>Enable Email Reminders?</dt>
+        <dd>If this box is checked, users can enter an email address to have a reminder sent to them a number of days before the event.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_reminders"></a>Enable Email Reminders?</td>
-      <td class="col1 leftalign">
-        If this box is checked, users can enter an email address to have a reminder sent to them a number of days before the event.
-      </td>
-    </tr>
+      <dl id="desc_categories">
+        <dt>Categories</dt>
+        <dd>Categories are optional and a way to relate events together. Select one or more existing categories by checking their checkboxes, or create a new category by entering some text in the provided field.</dd>
+      </dl>
 
-    <tr>
-      <th class="col0 leftalign" colspan="2">Categories</th>
-    </tr>
+      <dl id="desc_date_start">
+        <dt>Start Date</dt>
+        <dd>Enter the start date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the starting time by using the dropdown selections.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" colspan="2">
-        Categories are optional and a way to relate events together. Select one or more existing categories by checking their checkboxes, or create a new category by entering some text in the provided field.
-      </td>
-    </tr>
+      <dl id="desc_date_end">
+        <dt>End Date</dt>
+        <dd>Enter the ending date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the ending time by using the dropdown selections.</dd>
+      </dl>
 
-    <tr>
-      <th class="col0 leftalign" colspan="2">Date and Time</th>
-    </tr>
+      <dl id="desc_tz">
+        <dt>Timezone</dt>
+        <dd>If the &quot;local timezone&quot; checkbox is unchecked, you can select a timezone for this event which will be displayed next to the date/time information</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_date_start"></a>Start Date</td>
-      <td class="col1 leftalign">
-        Enter the start date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the starting time by using the dropdown selections.
-      </td>
-    </tr>
+      <dl id="desc_split">o
+        <dt>Split</dt>
+        <dd>Check this box if the event is split into two times each day, e.g. 9:00am - 11:00am and 1:00pm - 4:00pm. If this box is checked, additional fields will appear where you can enter the starting and ending times for the second session.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_date_end"></a>End Date</td>
-      <td class="col1 leftalign">
-        Enter the ending date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the ending time by using the dropdown selections.
-      </td>
-    </tr>
+      <dl id="desc_allday">
+        <dt>All Day</dt>
+        <dd>Check this box if this is an all-day event, such as a holiday. If this is checked, the starting and ending time fields will disappear.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_split"></a>Split</td>
-      <td class="col1 leftalign">Check this box if the event is split into two times each day, e.g. 9:00am - 11:00am and 1:00pm - 4:00pm. If this box is checked, additional fields will appear where you can enter the starting and ending times for the second session.
-      </td>
-    </tr>
-
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_allday"></a>All Day</td>
-      <td class="col1 leftalign">Check this box if this is an all-day event, such as a holiday. If this is checked, the starting and ending time fields will disappear.
-    </tr>
-
-  </tbody>
-</table>
-<p></p>
-</div>
-</div>
-</div>
+    </div>
+  </div>
 </div>
 </body>
 </html>

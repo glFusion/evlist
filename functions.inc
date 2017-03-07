@@ -1198,33 +1198,29 @@ function plugin_issubmitter_evlist()
 
 /**
 *   Determine if the current user is a plugin admin
-*   Currently the permission is the same, so just call ismoderator function
 *
 *   @see    plugin_ismoderator_evlist()
 *   @return boolean     True if the current user is an admin, False if not
 */
 function plugin_isadmin_evlist()
 {
-    static $retval = NULL;
-    if ($retval === NULL) {
-        $retval = plugin_ismoderator_evlist();
+    static $isadmin = NULL;
+    if ($isadmin === NULL) {
+        $isadmin = SEC_hasRights('evlist.admin');
     }
-    return $retval;
+    return $isadmin;
 }
 
 
 /**
 *   Determine if the current user is a plugin moderator
+*   Currently the permission is the same, so just call isadmin function
 *
 *   @see SEC_hasRights()
 */
 function plugin_ismoderator_evlist()
 {
-    static $ismod = NULL;
-    if ($ismod === NULL) {
-        $ismod = SEC_hasRights('evlist.admin');
-    }
-    return $ismod;
+    return plugin_isadmin_evlist();
 }
 
 

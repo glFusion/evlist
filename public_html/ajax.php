@@ -36,7 +36,7 @@ case 'getloc':
     }
     $id = isset($_GET['id']) && !empty($_GET['id']) ?
                     COM_sanitizeID($_GET['id']) : '';
-    $status = LGLIB_invokeService('getInfo', 'locator',
+    $status = LGLIB_invokeService('locator', 'getInfo',
             array('id' => $id), $A, $svc_msg);
     if ($status == PLG_RET_OK) {
         if (!$A) {

@@ -1309,7 +1309,7 @@ class evEvent
 
         // Latitude & Longitude part of location, if Location plugin is used
         if ($_EV_CONF['use_locator']) {
-            $status = LGLIB_invokeService('optionList', 'locator', '',
+            $status = LGLIB_invokeService('locator', 'optionList', '',
                 $output, $svc_msg);
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(

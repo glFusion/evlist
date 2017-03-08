@@ -64,6 +64,7 @@ $event_table =
   `show_upcoming` tinyint(1) NOT NULL DEFAULT '1',
   `cal_id` int(10) unsigned NOT NULL DEFAULT '1',
   `options` varchar(255),
+  `tzid` varchar(125) NOT NULL DEFAULT 'local'
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM";
 
@@ -131,8 +132,8 @@ $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
   `contact` varchar(64) DEFAULT NULL,
   `email` varchar(64) DEFAULT NULL,
   `phone` varchar(32) DEFAULT NULL,
-  `lat` float(10,5) DEFAULT NULL,
-  `lng` float(10,5) DEFAULT NULL,
+  `lat` float(10,6) DEFAULT NULL,
+  `lng` float(10,6) DEFAULT NULL,
   PRIMARY KEY (`det_id`)
 ) ENGINE=MyISAM";
 
@@ -296,8 +297,16 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_submissions']}
         CHANGE id id varchar(128) NOT NULL",
     ),
+'1.4.2' => array(
+    "ALTER TABLE {$_TABLES['evlist_events']}
+        ADD `tzid` varchar(125) NOT NULL DEFAULT 'local' AFTER options", 
+    "ALTER TABLE {$_TABLES['evlist_submissions']}
+        ADD `tzid` varchar(125) NOT NULL DEFAULT 'local' AFTER options", 
+    "ALTER TABLE {$_TABLES['evlist_detail']}
+        CHANGE lat lat float(10,6) default NULL,
+        CHANGE lng lng float(10,6) default NULL",
+    ),
 );
-
 $_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];

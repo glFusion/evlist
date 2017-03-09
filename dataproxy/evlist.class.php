@@ -136,33 +136,34 @@ class Dataproxy_evlist extends DataproxyDriver
         global $_CONF, $_TABLES, $_EV_CONF;
 
         $entries = array();
-
-        $sql = "SELECT e.id, d.title, UNIX_TIMESTAMP(e.date_start1) AS day
-                FROM {$_TABLES['evlist_events']} e
+        $sql = "SELECT r.rp_id, e.id, d.title, UNIX_TIMESTAMP(r.rp_date_start) AS day
+                FROM {$_TABLES['evlist_repeat']} r
+                LEFT JOIN {$_TABLES['evlist_events']} e
+                    ON e.id = r.rp_ev_id
                 LEFT JOIN {$_TABLES['evlist_detail']} d
                     ON d.ev_id=e.id ";
         if ($this->uid > 0) {
             $sql .= COM_getPermSql('WHERE', $this->uid, 2, 'e');
         }
+        $sql .= " AND r.rp_date_end >= '{$_EV_CONF['_today']}'
+                AND r.rp_date_start <= DATE_ADD('{$_EV_CONF['_today']}', INTERVAL 6 month)
+                ORDER BY r.rp_date_start";
 
-        $sql .= ' ORDER BY e.date_start1';
-
-        $result = DB_query($sql);
+        $result = DB_query($sql, 1);
         if (DB_error()) {
+            COM_errorLog("Evlist dataproxy error- SQL: $sql");
             return $entries;
         }
-
         while (($A = DB_fetchArray($result, false)) !== FALSE) {
-            $entry = array();
-            $entry['id']        = $A['id'];
-            $entry['title']     = $A['title'];
-            $entry['uri']       = COM_buildURL(
-                $_CONF['site_url'] . '/evlist/event.php?eid='
-                . $A['id']
+            $entries[] = array(
+                'id'    => $A['rp_id'],
+                'title' => $A['title'],
+                'uri'   => COM_buildURL(
+                        $_CONF['site_url'] . '/evlist/event.php?eid='
+                            . $A['rp_id']),
+                'date'  => $A['day'],
+                'image_uri' => false,
             );
-            $entry['date']      = $A['day'];
-            $entry['image_uri'] = false;
-            $entries[] = $entry;
         }
         return $entries;
     }

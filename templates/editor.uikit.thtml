@@ -278,9 +278,9 @@ function EVstateChanged()
   if (evHttpObj.readyState==4 || evHttpObj.readyState=="complete") {
     jsonObj = JSON.parse(evHttpObj.responseText)
     document.getElementById("location").value = jsonObj.title;
-    document.getElementById("street").value = jsonObj.street;
+    document.getElementById("street").value = jsonObj.address;
     document.getElementById("city").value = jsonObj.city;
-    document.getElementById("province").value = jsonObj.province;
+    document.getElementById("province").value = jsonObj.state;
     document.getElementById("postal").value = jsonObj.postal;
     document.getElementById("country").value = jsonObj.country;
     document.getElementById("lat").value = jsonObj.lat;

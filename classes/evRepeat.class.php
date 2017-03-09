@@ -177,6 +177,7 @@ class evRepeat
             // dates are YYYY-MM-DD
             list($startyear, $startmonth, $startday) = explode('-', $row['rp_start_date']);
             list($endyear, $endmonth, $endday) = explode('-', $row['rp_end_date']);
+
         } else {            // Coming from the form
 
             $this->date_start = $row['date_start1'];
@@ -704,8 +705,8 @@ class evRepeat
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'map'   => $map,
-                    'lat'   => number_format($this->Event->Detail->lat, 6, '.', ''),
-                    'lng'   => number_format($this->Event->Detail->lng, 6, '.', ''),
+                    'lat'   => COM_numberFormat($this->Event->Detail->lat, 6),
+                    'lng'   => COM_numberFormat($this->Event->Detail->lng, 6),
                 ) );
             }
         }

@@ -22,9 +22,9 @@ case 'getloc':
     $B = array(
         'id'        => '',
         'title'     => '',
-        'street'    => '',
+        'address'    => '',
         'city'      => '',
-        'province'  => '',
+        'state'  => '',
         'country'   => '',
         'postal'    => '',
         'lat'       => '',

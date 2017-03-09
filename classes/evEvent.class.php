@@ -872,7 +872,7 @@ class evEvent
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $option),
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->rec_data['type']),
                 'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
@@ -983,15 +983,14 @@ class evEvent
             //    $T->set_var('format' . $i . 'show', ' style="display:none;"');
             //}
         } else {
-            $option = empty($this->rec_data['type']) ?
-                        '0' : (int)$this->rec_data['type'];
-
+            $rec_type = (int)$this->rec_data['type'];
             $T->set_var(array(
                 'recurring_show' => '',
                 'recurring_checked' => EVCHECKED,
-                'format_opt'    => $option,
+                'format_opt'    => $rec_type,
             ) );
         }
+
         if (isset($this->rec_data['stop']) &&
                     !empty($this->rec_data['stop'])) {
             $T->set_var(array(
@@ -1026,7 +1025,7 @@ class evEvent
         }
 
         // Set up the recurring options needed for the current event
-        switch ($option) {
+        switch ($rec_type) {
         case 0:
             // Not a recurring event
             break;

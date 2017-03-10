@@ -18,5 +18,9 @@
 {!endif}
 {!if allday_event}
 <br />{$LANG_EVLIST['allday']}
+{!else}
+{!if show_tz}
+&nbsp;&nbsp;<span class="event_timezone">{timezone} (UTC{tz_offset})</span>
+{!endif}
 {!endif}
 {# end {templatelocation} #}

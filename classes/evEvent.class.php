@@ -29,7 +29,6 @@ class evEvent
     /** Indicate whether the current user is an administrator
     *   @var boolean */
     var $isAdmin;           // Has evlist.admin privilege
-    var $isSubmitter;       // Has evlist.submit privilege
 
     var $isNew;             // Flags a new event record
     var $det_id;            // Detail record ID
@@ -82,11 +81,12 @@ class evEvent
             $this->owner_id = $_USER['uid'];
             $this->group_id = 13;
             $this->enable_comments = $_EV_CONF['commentsupport'] ? 0 : 2;
+            $this->tzid = 'local';  // Defautl to backward compatible
 
             // Create dates & times based on individual URL parameters,
             // or defaults.
             // Start date/time defaults to now
-            $dt = new Date('now', $_CONF['timezone']);
+            $dt = new Date('now', $this->tzid);
             $startday1 = isset($_GET['day']) ? (int)$_GET['day'] : '';
             if ($startday1 < 1 || $startday1 > 31)
                     $startday1 = $dt->format('j', true);
@@ -159,13 +159,8 @@ class evEvent
                     $this->Detail = new evDetail($this->det_id);
                 }
             }
-            //var_dump($this);die;
         }
-
-        $this->isAdmin = SEC_hasRights('evlist.admin') ? 1 : 0;
-        //$this->isSubmitter = $this->isAdmin || SEC_hasRights('evlist.submit') ?
-        //            1 : 0;
-        $this->isSubmitter = EVLIST_canSubmit();
+        $this->isAdmin = plugin_isadmin_evlist();
     }
 
 
@@ -212,6 +207,7 @@ class evEvent
         case 'date_start1':
         case 'date_end1':
         case 'postmode':
+        case 'tzid':
             // String values
             $this->properties[$var] = trim(COM_checkHTML($value));
             break;
@@ -309,6 +305,8 @@ class evEvent
         $this->owner_id = $row['owner_id'];
         $this->group_id = $row['group_id'];
         $this->enable_comments = $row['enable_comments'];
+        // If read from DB, tzid may be 'local' or an actual timezone
+        $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
 
         if (isset($row['categories']) && is_array($row['categories'])) {
             $this->categories = $row['categories'];
@@ -495,7 +493,7 @@ class evEvent
             );
         } else {
             // submit privilege required to submit new events
-            if (!$this->isSubmitter) return false;
+            if (!EVLIST_canSubmit()) return false;
             $this->old_schedule = array();
         }
 
@@ -511,7 +509,7 @@ class evEvent
         }
 
         // Authorized to bypass the queue
-        if ($this->isAdmin) {
+        if ($this->isAdmin || plugin_ismoderator_evlist()) {
             $table = 'evlist_events';
         }
         $this->table = $table;
@@ -574,6 +572,7 @@ class evEvent
             }
 
         } else {
+
             // New event
 
             if (!$this->isAdmin) {
@@ -657,6 +656,7 @@ class evEvent
             det_id = '{$this->det_id}',
             cal_id = '{$this->cal_id}',
             show_upcoming = '{$this->show_upcoming}',
+            tzid = '" . DB_escapeString($this->tzid) . "',
             options = '" . DB_escapeString(serialize($this->options)) . "' ";
 
         $sql = $sql1 . $fld_sql . $sql2;
@@ -776,7 +776,7 @@ class evEvent
         // editing a repeat and already have the info we need.
         // This probably needs to change, since we should always read event
         // data during construction.
-        if (!$this->isSubmitter) {
+        if (!EVLIST_canSubmit()) {
             // At least submit privilege required
             COM_404();
         } elseif ($eid != ''  && $rp_id == 0) {
@@ -872,7 +872,7 @@ class evEvent
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $option),
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->rec_data['type']),
                 'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
@@ -889,6 +889,7 @@ class evEvent
                 'custom_label' => sprintf($LANG_EVLIST['custom_label'],
                         $LANG_EVLIST['dates'], ''),
                 'datestart_note' => $LANG_EVLIST['datestart_note'],
+                'help_url' => LGLIB_getDocURL($file='event', $pi_name='evlist'),
             ) );
         }
 
@@ -982,15 +983,14 @@ class evEvent
             //    $T->set_var('format' . $i . 'show', ' style="display:none;"');
             //}
         } else {
-            $option = empty($this->rec_data['type']) ?
-                        '0' : (int)$this->rec_data['type'];
-
+            $rec_type = (int)$this->rec_data['type'];
             $T->set_var(array(
                 'recurring_show' => '',
                 'recurring_checked' => EVCHECKED,
-                'format_opt'    => $option,
+                'format_opt'    => $rec_type,
             ) );
         }
+
         if (isset($this->rec_data['stop']) &&
                     !empty($this->rec_data['stop'])) {
             $T->set_var(array(
@@ -1025,7 +1025,7 @@ class evEvent
         }
 
         // Set up the recurring options needed for the current event
-        switch ($option) {
+        switch ($rec_type) {
         case 0:
             // Not a recurring event
             break;
@@ -1063,9 +1063,12 @@ class evEvent
         $start2 = EVLIST_TimeSelect('start2', $this->time_start2);
         $end1 = EVLIST_TimeSelect('end1', $this->time_end1);
         $end2 = EVLIST_TimeSelect('end2', $this->time_end2);
+        $cal_where = 'cal_status = 1';
+        if (!plugin_ismoderator_evlist()) {
+            $cal_where .= COM_getPermSQL('AND', 0, 3);
+        }
         $cal_select = COM_optionList($_TABLES['evlist_calendars'],
-            'cal_id,cal_name', $this->cal_id, 1,
-            'cal_status = 1 ' . COM_getPermSQL('AND', 0, 3));
+            'cal_id,cal_name', $this->cal_id, 1, $cal_where);
 
         USES_class_navbar();
         $navbar = new navbar;
@@ -1135,6 +1138,13 @@ class evEvent
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event.html'),
             'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
+            // If the event timezone is "local", just use some valid timezone
+            // for the selection. The checkbox will be checked which will
+            // hide the timezone selection anyway.
+            'tz_select'     => Date::getTimeZoneDropDown(
+                        $this->tzid == 'local' ? $_CONF['timezone'] : $this->tzid,
+                        array('id' => 'tzid', 'name' => 'tzid')),
+            'tz_islocal'    => $this->tzid == 'local' ? EVCHECKED : '',
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
@@ -1283,8 +1293,7 @@ class evEvent
             $T->set_var(array(
                 'owner_username' => COM_stripslashes($ownerusername),
                 'owner_dropdown' => COM_optionList($_TABLES['users'],
-                        'uid,username', $this->owner_id, 1,
-                        "uid <> 1"),
+                        'uid,username', $this->owner_id, 1),
                 'group_dropdown' => SEC_getGroupDropdown ($this->group_id, 3),
             ) );
             if ($rp_id == 0) {  // can only change permissions on main event
@@ -1299,10 +1308,14 @@ class evEvent
 
         // Latitude & Longitude part of location, if Location plugin is used
         if ($_EV_CONF['use_locator']) {
-            $T->set_var(array(
-                'use_locator'   => 'true',
-                'loc_selection' => GEO_optionList(),
-            ) );
+            $status = LGLIB_invokeService('locator', 'optionList', '',
+                $output, $svc_msg);
+            if ($status == PLG_RET_OK) {
+                $T->set_var(array(
+                    'use_locator'   => 'true',
+                    'loc_selection' => $output,
+                ) );
+            }
         }
 
         $T->parse('output', 'editor');
@@ -1314,17 +1327,20 @@ class evEvent
 
 
     /**
-     *  Sets the "enabled" field to the specified value.
-     *
-     *  @param  integer $id ID number of element to modify
-     *  @param  integer $value New value to set
-     *  @return         New value, or old value upon failure
-     */
-    private static function _toggle($oldvalue, $varname, $ev_id='')
+    *   Sets the "enabled" field to the specified value.
+    *
+    *   @param  integer $oldvalue   Original value
+    *   @param  string  $varname    DB field name to toggle
+    *   @param  string  $ev_id      Event record ID
+    *   @return integer     New value, or old value upon failure
+    */
+    private static function _toggle($oldvalue, $varname, $ev_id)
     {
         global $_TABLES;
 
+        $ev_id = COM_sanitizeID($ev_id, false);
         if ($ev_id == '') return $oldvalue;
+        $oldvalue = $oldvalue == 0 ? 0 : 1;
         $newvalue = $oldvalue == 1 ? 0 : 1;
         $sql = "UPDATE {$_TABLES['evlist_events']}
                 SET $varname=$newvalue
@@ -1332,7 +1348,7 @@ class evEvent
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("SQL Error: $sql");
+            COM_errorLog("evEvent::_toggle SQL Error: $sql");
             return $oldvalue;
         } else {
             return $newvalue;
@@ -1341,17 +1357,15 @@ class evEvent
 
 
     /**
-    *  Sets the "enabled" field to the specified value.
+    *   Sets the "enabled" field to the specified value.
     *
-    *  @param  integer $id ID number of element to modify
-    *  @param  integer $value New value to set
-    *  @return         New value, or old value upon failure
+    *   @param  integer $oldvalue   Original value
+    *   @param  string  $ev_id      Event record ID
+    *   @return         New value, or old value upon failure
     */
     public static function toggleEnabled($oldvalue, $ev_id='')
     {
-        $oldvalue = $oldvalue == 0 ? 0 : 1;
-        $ev_id = COM_sanitizeID($ev_id, false);
-        return evEvent::_toggle($oldvalue, 'status', $ev_id);
+        return self::_toggle($oldvalue, 'status', $ev_id);
     }
 
 
@@ -1646,7 +1660,6 @@ class evEvent
 
         // If all tests fail, return false (no need to update repeats
         return false;
-
     }
 
 
@@ -1654,26 +1667,27 @@ class evEvent
     *   Creates the rec_data array.
     *
     *   @param  array   $A      Array of data, default to $_POST
+    *   @return none        Sets $this->rec_data values
     */
     public function MakeRecData($A = '')
     {
         if ($A == '') $A = $_POST;
 
         // Re-initialize the array, and make sure this is really a
+        // recurring event
         $this->rec_data = array();
-        if (!isset($A['recurring']) ||$A['recurring'] != 1) {
+        if (!isset($A['recurring']) || $A['recurring'] != 1) {
             $this->rec_data['type'] = 0;
             $this->rec_data['stop'] = EV_MAX_DATE;
             $this->rec_data['freq'] = 1;
             return;
-        } else {
-            $this->rec_data['type'] = isset($A['format']) ?
-                    (int)$A['format'] : 0;
-            $this->rec_data['freq'] = isset($A['rec_freq']) ?
-                    (int)$A['rec_freq'] : 1;
-            if ($this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
         }
 
+        $this->rec_data['type'] = isset($A['format']) ? (int)$A['format'] : 0;
+        $this->rec_data['freq'] = isset($A['rec_freq']) ? (int)$A['rec_freq'] : 1;
+        if ($this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
+
+        // Validate the user-supplied stopdate
         if (!empty($A['stopdate'])) {
             list($stop_y, $stop_m, $stop_d) = explode('-', $A['stopdate']);
             if (Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
@@ -1710,33 +1724,16 @@ class evEvent
                     $A['interval'] : array($A['interval']);
             break;
         case EV_RECUR_DATES:
-            // Specific dates.  Simple handling.
+            // Specific dates. Dates are space- or comma-delmited
             $recDates = preg_split('/[\s,]+/', $A['custom']);
-            sort($recDates);        // why not keep them in order...
+            // keep them in order to minimize schedule-based changes.
+            sort($recDates);
             $this->rec_data['custom'] = $recDates;
-
-            /*foreach($recDates as $occurrence) {
-                list($y, $m, $d) = explode('-', $occurrence);
-                if (Date_Calc::isValidDate($d, $m, $y)) {
-                    $events[] = array(
-                                'dt_start'  => $occurrence,
-                                'dt_end'    => $occurrence,
-                                'tm_start1'  => $this->time_start1,
-                                'tm_end1'    => $this->time_end1,
-                                'tm_start2'  => $this->time_start2,
-                                'tm_end2'    => $this->time_end2,
-                    );
-                }
-            }
-            // We have the dates, don't need to go through the loop.
-            return $events;*/
             break;
-
         default:
             // Unknown value, nothing to do
             break;
         }
-
     }
 
 
@@ -1797,8 +1794,10 @@ class evEvent
 
     /**
     *   Determine if the current user can edit this event.
-    *   If this is the event owner, and moderation is not required,
-    *   allow editing.
+    *   Editing is allowed for:
+    *   - Moderators
+    *   - All owners if moderation is not required
+    *   - Owners who have the evlist.submit privilege
     *
     *   @return boolean     True if editing is allowed, False if not
     */
@@ -1812,12 +1811,27 @@ class evEvent
             $canedit = false;
             if (plugin_ismoderator_evlist()) {
                 $canedit = true;
-            } elseif ($this->isOwner() &&
-                $_CONF['storysubmission'] == 0) {
-                $canedit = true;
+            } elseif ($this->isOwner()) {
+                if ($_CONF['storysubmission'] == 0) {
+                    $canedit = true;
+                } elseif (plugin_issubmitter_evlist()) {
+                    $canedit = true;
+                }
             }
         }
         return $canedit;
+    }
+
+
+    /**
+    *   Check if this event is one from meetup.com
+    *   Indicated by a calendar ID of "-1"
+    *
+    *   @return boolean     True if this is a meetup event, False if not.
+    */
+    public function isMeetup()
+    {
+        return $this->cal_id == -1;
     }
 
 }   // class evEvent

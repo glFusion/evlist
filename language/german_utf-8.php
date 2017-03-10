@@ -355,6 +355,9 @@ $LANG_EVLIST = array(
 'enable_comments' => 'Enable Comments?',
 'closed'        => 'Closed',
 'event'         => 'Event',
+'timezone'      => 'Timezone',
+'tz_local'      => 'Guest&apos;s local timezone',
+'tz_select'     => 'Select Timezone',
 );
 
 // Localization of the Admin Configuration UI

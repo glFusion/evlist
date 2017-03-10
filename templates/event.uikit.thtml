@@ -95,6 +95,15 @@
 </div>
 
 <div id="evlistEvent">
+{!if summary}
+  <div class="evEventItem uikit">
+    <label>{$LANG_EVLIST['what']}:</label>
+    <div class="evdata" id="what">
+      {summary}
+    </div>
+  </div>
+{!endif}
+
 {!if map}
 <div id="evlistMapOuter">
   {map}
@@ -113,17 +122,8 @@
 <div id="evlistEventDetail">
 
   {# event detail elements #}
-  {!if summary}
-  <div class="evEventItem">
-    <label>{$LANG_EVLIST['what']}:</label>
-    <div class="evdata" id="what">
-      {summary}
-    </div>
-  </div>
-  {!endif}
-
   {!if datetime_info}
-  <div class="evEventItem">
+  <div class="evEventItem uikit">
     <label>{$LANG_EVLIST['when']}:</label>
     <div class="evdata" id="when">
       {datetime_info}
@@ -132,7 +132,7 @@
   {!endif}
 
   {!if address_info}
-  <div class="evEventItem">
+  <div class="evEventItem uikit">
     <label>{$LANG_EVLIST['where']}:</label>
     <div class="evdata" id="where">
       {address_info}
@@ -141,7 +141,7 @@
   {!endif}
 
   {!if contact_info}
-  <div class="evEventItem">
+  <div class="evEventItem uikit">
     <label>{$LANG_EVLIST['ev_contact']}:</label>
     <div class="evdata" id="contact">
     {contact_info}
@@ -150,7 +150,7 @@
   {!endif}
 
   {!if more_info_link}
-  <div class="evEventItem">
+  <div class="evEventItem uikit">
     <label>&nbsp;</label>
     <div class="evdata">
       {more_info_link}
@@ -158,13 +158,13 @@
   </div>
   {!endif}
 
-  <div class="evEventItem uk-hidden-small">
+  <div class="evEventItem uikit uk-hidden-small">
     <label>{$LANG_EVLIST['calendar']}</label>
     <div class="evdata">{cal_name}</div>
   </div>
 
   {!if category_link}
-  <div class="evEventItem">
+  <div class="evEventItem uikit">
     <label>{$LANG_EVLIST['categories']}</label>
     <div class="evdata" id="categories">{category_link}</div>
   </div>
@@ -193,7 +193,7 @@
 </div>
 
 {!if login_to_register}
-<div class="evEventRegInfo uk-alert">{$LANG_EVLIST['login_to_register']}</div>
+<div class="evEventRegInfo uikit uk-alert">{$LANG_EVLIST['login_to_register']}</div>
 {!endif}
 
 {!if is_registered}

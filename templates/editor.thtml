@@ -252,106 +252,48 @@ function showhideformatoptions(option) {
 }
 
 {!if use_locator}
-var xmlHttp;
+var evHttpObj;
 function EVupdateLoc(locId)
 {
   if (locId == '') return;
 
-  xmlHttp=EVgetXmlHttpObject();
-  if (xmlHttp==null) {
+  evHttpObj=EVgetXmlHttpObject();
+  if (evHttpObj==null) {
     //alert ("Browser does not support HTTP Request");
     return;
   }
   var url="{site_url}/evlist/ajax.php?action=getloc&id=" + locId;
-  xmlHttp.onreadystatechange=EVstateChanged;
-  xmlHttp.open("GET",url,true);
-  xmlHttp.send(null);
+  evHttpObj.onreadystatechange=EVstateChanged;
+  evHttpObj.open("GET",url,true);
+  evHttpObj.send(null);
 }
 
 function EVstateChanged()
 {
-  var newstate;
-
-  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
-  {
-    xmlDoc = xmlHttp.responseXML;
-    locId = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
-
-    if (xmlDoc.getElementsByTagName("title")[0].hasChildNodes())
-      loc = xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-    else
-      loc = '';
-
-    //address = xmlDoc.getElementsByTagName("address")[0].childNodes[0].nodeValue;
-
-    if (xmlDoc.getElementsByTagName("street")[0].hasChildNodes())
-      street = xmlDoc.getElementsByTagName("street")[0].childNodes[0].nodeValue;
-    else
-      street = '';
-
-    if (xmlDoc.getElementsByTagName("city")[0].hasChildNodes())
-      city = xmlDoc.getElementsByTagName("city")[0].childNodes[0].nodeValue;
-    else
-      city = '';
-
-    if (xmlDoc.getElementsByTagName("province")[0].hasChildNodes())
-      province = xmlDoc.getElementsByTagName("province")[0].childNodes[0].nodeValue;
-    else
-      province = '';
-
-    if (xmlDoc.getElementsByTagName("postal")[0].hasChildNodes())
-      postal = xmlDoc.getElementsByTagName("postal")[0].childNodes[0].nodeValue;
-    else
-      postal = '';
-
-    if (xmlDoc.getElementsByTagName("country")[0].hasChildNodes())
-      country = xmlDoc.getElementsByTagName("country")[0].childNodes[0].nodeValue;
-    else
-      country = '';
-
-    if (typeof(xmlDoc.getElementsByTagName("lat")[0]) !== "undefined") {
-      if (xmlDoc.getElementsByTagName("lat")[0].hasChildNodes())
-        lat = xmlDoc.getElementsByTagName("lat")[0].childNodes[0].nodeValue;
-      else
-        lat = 0;
-
-      if (xmlDoc.getElementsByTagName("lng")[0].hasChildNodes())
-        lng = xmlDoc.getElementsByTagName("lng")[0].childNodes[0].nodeValue;
-      else
-        lng = 0;
-    } else {
-      lat = 0;
-      lng = 0;
-    }
-
-    document.getElementById("location").value = loc;
-    document.getElementById("street").value = street;
-    document.getElementById("city").value = city;
-    document.getElementById("province").value = province;
-    document.getElementById("postal").value = postal;
-    document.getElementById("country").value = country;
-    document.getElementById("lat").value = lat;
-    document.getElementById("lng").value = lng;
+  if (evHttpObj.readyState==4 || evHttpObj.readyState=="complete") {
+    jsonObj = JSON.parse(evHttpObj.responseText)
+    document.getElementById("location").value = jsonObj.title;
+    document.getElementById("street").value = jsonObj.address;
+    document.getElementById("city").value = jsonObj.city;
+    document.getElementById("province").value = jsonObj.state;
+    document.getElementById("postal").value = jsonObj.postal;
+    document.getElementById("country").value = jsonObj.country;
+    document.getElementById("lat").value = jsonObj.lat;
+    document.getElementById("lng").value = jsonObj.lng;
   }
-
 }
 
 function EVgetXmlHttpObject()
 {
   var objXMLHttp=null
-  if (window.XMLHttpRequest)
-  {
+  if (window.XMLHttpRequest) {
     objXMLHttp=new XMLHttpRequest()
-  }
-  else if (window.ActiveXObject)
-  {
+  } else if (window.ActiveXObject) {
     objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
   }
   return objXMLHttp
 }
-
 {!endif}
-
 
 function toggleRSVPdetail(val)
 {

@@ -219,12 +219,14 @@ function plugin_cclabel_evlist()
 {
     global $_EV_CONF;
 
-    if (SEC_hasRights('evlist.admin')) {
+    if (plugin_isadmin_evlist()) {
         return array(
                 $_EV_CONF['pi_name'],
                 EVLIST_ADMIN_URL . '/index.php',
                 plugin_geticon_evlist(),
         );
+    } else {
+        return false;
     }
 }
 
@@ -238,13 +240,15 @@ function plugin_getadminoption_evlist()
 {
     global $_TABLES, $LANG_EVLIST;
 
-    if (SEC_hasRights('evlist.admin')) {
+    if (plugin_isadmin_evlist()) {
         $numevents = DB_count($_TABLES['evlist_events']);
         return array(
                 $LANG_EVLIST['pi_title'],
                 EVLIST_ADMIN_URL . '/index.php',
                 $numevents
         );
+    } else {
+        return false;
     }
 }
 
@@ -256,13 +260,9 @@ function plugin_getadminoption_evlist()
 */
 function plugin_getuseroption_evlist()
 {
-    global $_EV_CONF, $LANG_EVLIST;
+    global $_EV_CONF, $LANG_EVLIST, $_TABLES, $_USER;
 
-    $retval = NULL;
-
-    if (!EVLIST_isCurrentVersion()) {
-        return $retval;
-    }
+    $retval = array();
 
     $add_option = array($LANG_EVLIST['add_event'],
                 EVLIST_URL . '/event.php?edit=x', 0);
@@ -270,18 +270,23 @@ function plugin_getuseroption_evlist()
     switch ($_EV_CONF['can_add']) {
     case 0:     // only admins can add events
         if (plugin_ismoderator_evlist()) {
-            $retval = $add_option;
+            $retval[] = $add_option;
         }
         break;
     case 1:     // logged-in users can add events
         if (!COM_isAnonUser()) {
-            $retval = $add_option;
+            $retval[] = $add_option;
         }
         break;
     case 2:     // logged-in + anonymous users can add
-        $retval = $add_option;
+        $retval[] = $add_option;
         break;
     }
+    /*
+    if (DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']) > 0) {
+        $retval[] = array('My Events', EVLIST_URL . '/index.php?view=myevents');
+    }
+    */
     return $retval;
 }
 
@@ -295,11 +300,11 @@ function plugin_getmenuitems_evlist()
 {
     global $_EV_CONF, $LANG_EVLIST;
 
+    $menuitems = array();
     if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
-        return NULL;
+        return $menuitems;
     }
 
-    $menuitems = array();
     if ($_EV_CONF['enable_menuitem'] == '1') {
         $menuitems[$LANG_EVLIST['pi_title']] = EVLIST_URL . '/index.php';
     }
@@ -314,10 +319,10 @@ function plugin_showstats_evlist($showsitestats)
     $retval = '';
 
     if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
-        return;
+        return false;
     }
 
-    if (SEC_hasRights('evlist.admin')) {
+    if (plugin_isadmin_evlist()) {
         $permSQL = '';
     } else {
         $permSQL = COM_getPermSQL('AND');
@@ -362,7 +367,6 @@ function plugin_showstats_evlist($showsitestats)
         $retval .= $LANG_EVLIST['no_events_viewable'];
         $retval .= COM_endBlock();
     }
-
     return $retval;
 }
 
@@ -372,10 +376,10 @@ function plugin_statssummary_evlist()
     global $_EV_CONF, $_TABLES, $LANG_EVLIST;
 
     if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
-        return;
+        return false;
     }
 
-    if (SEC_hasRights('evlist.admin')) {
+    if (plugin_isadmin_evlist()) {
         $permSQL = '';
     } else {
         $permSQL = COM_getPermSQL('AND');
@@ -423,7 +427,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
 
     $query = DB_escapeString(htmlspecialchars(trim($query)));
 
-    if (SEC_hasRights('evlist.admin')) {
+    if (plugin_isadmin_evlist()) {
         $permSQL = '';
     } else {
         $permSQL = COM_getPermSQL('AND');
@@ -548,7 +552,6 @@ function plugin_getheadercss_evlist()
             $styles[] = $_CONF['path_layout'].'plugins/evlist/' . $file;
         }
     }
-
     return $styles;
 }
 
@@ -595,8 +598,10 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
         break;
     case 3:     // calendar format
-        USES_evlist_views();
-        $display = EVLIST_view('', 0, 0, 0);
+        USES_evlist_class_view();
+        $content = evView::GetView();
+        //USES_evlist_views();
+        //$display = EVLIST_view('', 0, 0, 0);
         break;
     case 0:     // disabled
     default:
@@ -1192,17 +1197,30 @@ function plugin_issubmitter_evlist()
 
 
 /**
+*   Determine if the current user is a plugin admin
+*
+*   @see    plugin_ismoderator_evlist()
+*   @return boolean     True if the current user is an admin, False if not
+*/
+function plugin_isadmin_evlist()
+{
+    static $isadmin = NULL;
+    if ($isadmin === NULL) {
+        $isadmin = SEC_hasRights('evlist.admin');
+    }
+    return $isadmin;
+}
+
+
+/**
 *   Determine if the current user is a plugin moderator
+*   Currently the permission is the same, so just call isadmin function
 *
 *   @see SEC_hasRights()
 */
 function plugin_ismoderator_evlist()
 {
-    static $ismod = NULL;
-    if ($ismod === NULL) {
-        $ismod = SEC_hasRights('evlist.admin');
-    }
-    return $ismod;
+    return plugin_isadmin_evlist();
 }
 
 
@@ -1433,7 +1451,7 @@ function EVLIST_getCatLinks($eid, $andrange)
         $catlinks = array();
         while ($C = DB_fetchArray($cresult, false)) {
             $catlinks[] = '<a href="' .
-                COM_buildURL(EVLIST_URL . '/index.php?op=list' . $andrange .
+                COM_buildURL(EVLIST_URL . '/index.php?view=list' . $andrange .
                 '&amp;cat=' . $C['id']) . '">' . COM_stripslashes($C['name']) .
                 '</a>';
         }
@@ -1725,7 +1743,7 @@ function plugin_configmanager_select_topic_centerblock_evlist()
     $topics[$LANG_EVLIST['topic_home']] = 'home';
 
     // Check topic access if not an admin
-    if ( SEC_hasRights('evlist.admin') ) {
+    if ( plugin_isadmin_evlist() ) {
         $permSQL = '';
     } else {
         $permSQL = COM_getPermSQL('WHERE');
@@ -2200,6 +2218,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     $opt_join = '';
     $opt_where = '';
     $opt_order = 'ASC';
+    $grp_by = 'rep.rp_id';
     $limit = 0;
     $page = 0;
     $cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
@@ -2245,6 +2264,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             case 'select':
                 $selection = $value;
                 break;
+            case 'unique':
+                $grp_by = 'ev.id';
+                break;
             }
         }
     }
@@ -2276,7 +2298,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
             COM_getPermSQL('AND', 0, 2, 'cal') .
             " $opt_where
-            GROUP BY rep.rp_id
+            GROUP BY $grp_by ASC
             ORDER BY rep.rp_date_start $opt_order,
                     rep.rp_time_start1 $opt_order";
     if ($limit > 0) {
@@ -2287,7 +2309,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             $sql .= " LIMIT $limit";
         }
     }
-
+    //echo $sql;die;
     return $sql;
 }
 
@@ -2463,6 +2485,55 @@ if ($_EV_CONF['enable_rsvp']) {
 
 
 /**
+*   Determine if the current user can submit an event.
+*   Checks config and logged-in status.
+*   Also sets a global $_EV_CONF['_can_add'] for legacy use
+*
+*   @return boolean     True if subbmission is allowed, False if not
+*/
+function EVLIST_canSubmit()
+{
+    global $_EV_CONF;
+
+    static $canSubmit = NULL;
+
+    if ($canSubmit === NULL) {
+        // Determine if the current user is allowed to add an event, and borrow
+        // some space in $_EV_CONF to store a flag for other functions to use.
+        if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD ||
+            (!COM_isAnonUser() &&
+            ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) ||
+            plugin_ismoderator_evlist()) {
+            $_EV_CONF['_can_add'] = 1;
+            $canSubmit = true;
+        } else {
+            $_EV_CONF['_can_add'] = 0;
+            $canSubmit = false;
+        }
+    }
+    return $canSubmit;
+}
+
+
+/**
+*   Return the newline characters to use for the tooltips.
+*   UIkit themes need <br />, Vintage only uses LB
+*
+*   @return string      Newline characters
+*/
+function EVLIST_tooltip_newline()
+{
+    global $_EV_CONF;
+
+    if ($_EV_CONF['_is_uikit']) {
+        return '<br />' . LB;
+    } else {
+        return LB;
+    }
+}
+
+
+/**
 *   Log activity to a plugin-specific log file
 *
 *   @param string $logentry Text to log
@@ -2505,56 +2576,6 @@ function EVLIST_Log($logentry = '')
 
     // Write the log entry to the file
     fputs($file, "$timestamp ($byuser) - $logentry\n");
-}
-
-
-/**
-*   Determine if the current user can submit an event.
-*   Checks config and logged-in status.
-*   Also sets a global $_EV_CONF['_can_add'] for legacy use
-*
-*   @return boolean     True if subbmission is allowed, False if not
-*/
-function EVLIST_canSubmit()
-{
-    global $_EV_CONF;
-
-    static $canSubmit = NULL;
-
-    if ($canSubmit === NULL) {
-        // Determine if the current user is allowed to add an event, and borrow
-        // some space in $_EV_CONF to store a flag for other functions to use.
-    $isAnon = COM_isAnonUser();
-        if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD ||
-            (!COM_isAnonUser() &&
-            ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) ||
-            plugin_ismoderator_evlist()) {
-            $_EV_CONF['_can_add'] = 1;
-            $canSubmit = true;
-        } else {
-            $_EV_CONF['_can_add'] = 0;
-            $canSubmit = false;
-        }
-    }
-    return $canSubmit;
-}
-
-
-/**
-*   Return the newline characters to use for the tooltips.
-*   UIkit themes need <br />, Vintage only uses LB
-*
-*   @return string      Newline characters
-*/
-function EVLIST_tooltip_newline()
-{
-    global $_EV_CONF;
-
-    if ($_EV_CONF['_is_uikit']) {
-        return '<br />' . LB;
-    } else {
-        return LB;
-    }
 }
 
 ?>

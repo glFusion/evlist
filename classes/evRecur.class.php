@@ -3,17 +3,17 @@
 *   Class to create recurrences for the evList plugin.
 *   Each class is derived from evRecurBase, and should override either
 *   MakeRecurrences() or incrementDate().
-*   MakeRecurrences is the only public function and the only one that is 
+*   MakeRecurrences is the only public function and the only one that is
 *   required.  Derived classes may also implement the base MakeRecurrences()
-*   function, in which case they should at least provide their own 
+*   function, in which case they should at least provide their own
 *   incrementDate().
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
 *   @version    1.3.2
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*              GNU Public License v2 or later
+*   @license    http://opensource.org/licenses/gpl-2.0.php
+*               GNU Public License v2 or later
 *   @filesource
 */
 
@@ -50,15 +50,15 @@ class evRecurBase
 
         // Initialize array of events to be loaded
         $this->events = array();
-        $this->freq = isset($event->rec_data['freq']) ? 
+        $this->freq = isset($event->rec_data['freq']) ?
                 (int)$event->rec_data['freq'] : 1;
         if ($this->freq < 1) $this->freq = 1;
         $this->skip = isset($event->rec_data['skip']) ?
                 (int)$event->rec_data['skip'] : 0;
 
-        $this->dt_start = $this->event->date_start1 != '' ? 
+        $this->dt_start = $this->event->date_start1 != '' ?
                     $this->event->date_start1 : $_EV_CONF['_today'];
-        $this->dt_end = $this->event->date_end1 > $this->event->date_start1 ? 
+        $this->dt_end = $this->event->date_end1 > $this->event->date_start1 ?
                     $this->event->date_end1 : $this->event->date_start1;
 
         if ($this->dt_start != $this->dt_end) {
@@ -151,7 +151,7 @@ class evRecurBase
 
         // Get any occurrences before our stop.  Keep these.
         $count = 0;
-        while ($occurrence[1] <= $this->event->rec_data['stop'] && 
+        while ($occurrence[1] <= $this->event->rec_data['stop'] &&
                 $occurrence[1] >= '1971-01-01' &&
                 $count < $_EV_CONF['max_repeats']) {
             $this->storeEvent($occurrence[1]);
@@ -251,11 +251,11 @@ class evRecurDOM extends evRecurBase
         $last_interval = $intervalA[$num_intervals - 1];
 
         $count = 0;
-        // reduce the weekday number, since evlist uses Sun=1 while 
+        // reduce the weekday number, since evlist uses Sun=1 while
         // Date_Calc uses Sun=0
         $datecalc_weekday = (int)$this->event->rec_data['weekday'] - 1;
 
-        while ($occurrence <= $this->event->rec_data['stop'] && 
+        while ($occurrence <= $this->event->rec_data['stop'] &&
                     $occurrence >= '1971-01-01' &&
                     $count < $_EV_CONF['max_repeats']) {
 
@@ -273,7 +273,7 @@ class evRecurDOM extends evRecurBase
                 // for the last (5th) week, then re-adjust to use the 4th week.
                 // If we already have a 4th, this will just overwrite it
                 if ($occurrence == -1 && $interval == 5) {
-                    $occurrence = Date_Calc::NWeekdayOfMonth( 
+                    $occurrence = Date_Calc::NWeekdayOfMonth(
                                 4, $datecalc_weekday,
                                 $m, $y, '%Y-%m-%d');
                 }
@@ -286,7 +286,7 @@ class evRecurDOM extends evRecurBase
                 $count++;
 
                 list($y, $m, $d) = explode('-', $occurrence);
- 
+
             }   // foreach intervalA
 
             // We've gone through all the intervals this month, now
@@ -376,7 +376,7 @@ class evRecurMonthly extends evRecurBase
         //$occurrence = Date_Calc::prevDay($d, $m, $y);
         //$count = 1;
         $count = 0;
-        while ($occurrence <= $this->event->rec_data['stop'] && 
+        while ($occurrence <= $this->event->rec_data['stop'] &&
                     //$occurrence >= '1971-01-01' &&
                     $count < $_EV_CONF['max_repeats']) {
 
@@ -500,7 +500,7 @@ class evRecurWeekly extends evRecurBase
         list($y, $m, $d) = explode('-', $occurrence);
         $occurrence = Date_Calc::prevDay($d, $m, $y);
         $count = 1;
-        while ($occurrence <= $this->event->rec_data['stop'] && 
+        while ($occurrence <= $this->event->rec_data['stop'] &&
                     $occurrence >= '1971-01-01' &&
                     $count < $_EV_CONF['max_repeats']) {
 
@@ -531,6 +531,5 @@ class evRecurWeekly extends evRecurBase
     }   // function MakeRecurrences
 
 }   // class evRecurWeekly
-
 
 ?>

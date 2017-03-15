@@ -103,7 +103,8 @@
     clear: both;
 }
 
-#evlistEventDetail div label {
+#evlistEventDetail div label,
+#evlistEvent div label {
     float: left;
     font-weight: bold;
     width: 100px;

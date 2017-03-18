@@ -1,5 +1,11 @@
 # evList plugin for glFusion - Changelog
 
+## v1.4.3
+Release TBD
+- Add css to format long tooltips
+- Remove HTML calendar template, use AJAX only
+- Use configured numeric separators in location fields
+
 ## v1.4.2
 Released 2017-01-21
 - Fix calls to commentsupport function in another plugin

@@ -1132,8 +1132,8 @@ class evEvent
             'cal_select'    => $cal_select,
             'contactlink_chk' => $this->options['contactlink'] == 1 ?
                                 EVCHECKED : '',
-            'lat'           => $this->Detail->lat,
-            'lng'           => $this->Detail->lng,
+            'lat'           => self::float2str($this->Detail->lat),
+            'lng'           => self::float2str($this->Detail->lng),
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event.html'),
@@ -1832,6 +1832,22 @@ class evEvent
     public function isMeetup()
     {
         return $this->cal_id == -1;
+    }
+
+
+    /**
+    *   Convert a number to a string based on the configured separators.
+    *
+    *   @param  float   $val    Value to convert
+    *   @return string      Formatted numeric string
+    */
+    private function float2str($val)
+    {
+        global $_CONF;
+        if (!is_numeric($val)) return '';
+        return number_format($val, 5,
+                $_CONF['decimal_separator'],
+                $_CONF['thousands_separator']);
     }
 
 }   // class evEvent

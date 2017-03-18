@@ -151,8 +151,6 @@ function plugin_initconfig_evlist()
                 0, 1, 14, 90, true, 'evlist');
         $c->add('max_upcoming_days', $CONF_EVLIST_DEFAULT['max_upcoming_days'], 'text',
                 0, 1, 0, 100, true, 'evlist');
-        $c->add('cal_tmpl', $CONF_EVLIST_DEFAULT['cal_tmpl'], 'select',
-                0, 1, 16, 130, true, 'evlist');
 
         $c->add('ev_centerblock', NULL, 'fieldset', 0, 2, NULL, 0, true,
                 'evlist');

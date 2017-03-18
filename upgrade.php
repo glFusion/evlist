@@ -245,6 +245,7 @@ function evlist_upgrade()
 
         case '1.4.1':
             $currentVersion = '1.4.2';
+            $c->del('cal_tmpl', 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
     }

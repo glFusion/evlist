@@ -6,7 +6,7 @@
 *   @author     Lee P. Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2017 Lee Garner <lee@leegarner.com
 *   @package    evlist
-*   @version    1.4.2
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -135,7 +135,7 @@ class evView
         $tpl = $view == '' ? $this->type . 'view' : $view;
         if ($this->opt == 'print') {
             $tpl .= '_print';
-        } elseif ($_EV_CONF['cal_tmpl'] == 'json') {
+        } else {
             $tpl .= '_json';
         }
         return $tpl;
@@ -157,13 +157,8 @@ class evView
         $thisday = $this->today->format('d', true);
 
         $T = new Template(EVLIST_PI_PATH . '/templates');
-        if ($_EV_CONF['cal_tmpl'] == 'json') {
-            $T->set_file(array(
-                'header' => 'calendar_header.thtml',
-            ));
-        } else {
-            $T->set_file('header', 'calendar_header.thtml');
-        }
+        $T->set_file('header', 'calendar_header.thtml');
+
         $type_options = COM_optionList($_TABLES['evlist_categories'],
             'id,name', $this->cat, 1, 'status=1');
         $range_options = EVLIST_GetOptions($LANG_EVLIST['ranges'], $this->range);
@@ -203,7 +198,7 @@ class evView
             'curdate'   => sprintf("%d-%02d-%02d", $year, $month, $day),
             'urlfilt_cal' => (int)$this->cal,
             'urlfilt_cat' => (int)$this->cat,
-            'use_json' => $_EV_CONF['cal_tmpl'] == 'json'? 'true' : '',
+            'use_json' => 'true',
             'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
             'view'  => $this->type,
         ) );
@@ -263,10 +258,10 @@ class evView
         }
 
         $T->set_var('view_select', $options);
-        if ($_EV_CONF['cal_tmpl'] == 'json') {
+        /*if ($_EV_CONF['cal_tmpl'] == 'json') {
             $T->parse('output', 'header_json');
             $retval .= $T->finish($T->get_var('output'));
-        }
+        }*/
         $T->parse('output', 'header');
         $retval .= $T->finish($T->get_var('output'));
         return $retval;
@@ -383,13 +378,7 @@ class evView
 
     public function Render()
     {
-        global $_EV_CONF;
-
-        if ($_EV_CONF['cal_tmpl'] == 'json') {
-            return $this->viewJson();
-        } else {
-            return $this->viewHTML();
-        }
+        return $this->viewJSON();
     }
 
 
@@ -432,28 +421,6 @@ class evView
 
 
     /**
-    *   Prepare variables for view functions when called from a URL (not AJAX).
-    *   Reads values from the session, if available. If no session present,
-    *   get values from parameters or current date
-    *
-    *   @uses   SESS_getVar()
-    *   @uses   EVLIST_view_json()
-    *   @uses   EVLIST_{xxx}view() functions
-    *   @param  string  $type   Type of view. 'month', 'day', 'list', 'year'
-    *   @param  integer $year   Year override
-    *   @param  integer $month  Month override
-    *   @param  integer $day    Day override
-    *   @param  integer $cat    Category pass-through
-    *   @param  mixed   $opts   Calendar options pass=through
-    *   @return string      Complete HTML for requested calendar
-    */
-    function viewHTML($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
-    {
-        return $this->Render();
-    }
-
-
-    /**
     *   Create the calendar selection checkboxes to be shown in the javascript
     *   dropdown.
     *
@@ -476,11 +443,6 @@ class evView
                 'cal_name'  => $cal['cal_name'],
             ) );
             $T->parse('item', 'cal_item', true);
-            /*$boxes .= '<div style="float:left;width:100%;' .
-                'color:' . $cal['fgcolor'] . '">
-                <input checked="checked" type="checkbox" id="cal' . $key .
-                '" onclick="SelectCal(this)">&nbsp;' .
-                $cal['cal_name'] . '</div><br >' . LB;*/
         }
         return $T->parse('output', 'boxes');
     }
@@ -872,7 +834,7 @@ class evView_week extends evView
         $T = new Template(EVLIST_PI_PATH . '/templates/weekview');
         if ($this->opt == 'print') {
             $tpl .= '_print';
-        } elseif ($_EV_CONF['cal_tmpl'] == 'json') {
+        } else {
             $tpl .= '_json';
         }
         $T->set_file(array(

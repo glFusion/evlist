@@ -258,10 +258,6 @@ class evView
         }
 
         $T->set_var('view_select', $options);
-        /*if ($_EV_CONF['cal_tmpl'] == 'json') {
-            $T->parse('output', 'header_json');
-            $retval .= $T->finish($T->get_var('output'));
-        }*/
         $T->parse('output', 'header');
         $retval .= $T->finish($T->get_var('output'));
         return $retval;
@@ -488,7 +484,9 @@ class evView_day extends evView
         $dtPrev = new Date($today->toUnix() - 86400, $_CONF['timezone']);
         $dtNext = new Date($today->toUnix() + 86400, $_CONF['timezone']);
         $monthname = $LANG_MONTH[$today->month];
-        $dayname = $LANG_WEEK[$today->dayofweek + 1];
+        $dayofweek = $today->dayofweek;
+        if ($dayofweek == 7) $dayofweek = 0;
+        $dayname = $LANG_WEEK[$dayofweek + 1];
 
         $tpl = $this->getTemplate();
         $T = new Template(EVLIST_PI_PATH . '/templates/dayview');

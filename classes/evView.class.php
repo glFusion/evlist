@@ -243,7 +243,7 @@ class evView
         $images = array('day', 'week', 'month', 'year', 'list');
         $options = '';
         foreach ($images as $v) {
-            if ($v == $view) {
+            if ($v == $this->type) {
                 $sel = EVSELECTED;
                 $T->set_var($v .'_img', $v . '_on.png');
             } else {

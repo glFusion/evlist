@@ -58,7 +58,7 @@ class evRepeat
             $this->time_end1 = '';
             $this->time_start2 = '';
             $this->time_end2 = '';
-            $this->tzid = $_CONF['timezone'];
+            $this->tzid = 'local';
         } else {
             $this->rp_id = $rp_id;
             if (!$this->Read()) {
@@ -97,12 +97,9 @@ class evRepeat
 
         case 'date_start':
         case 'date_end':
+        case 'tzid':
             // String values
             $this->properties[$var] = trim(COM_checkHTML($value));
-            break;
-
-        case 'tzid':
-            $this->properties[$var] = $value == 'local' ? $_USER['tzid'] : $value;
             break;
 
         case 'time_start1':
@@ -315,12 +312,15 @@ class evRepeat
 
     /**
     *   Delete the current instance from the database
+    *
+    *   @return boolean     True on success, False on failure
     */
     public function Delete()
     {
         global $_TABLES;
 
-        if ($this->rp_id < 1) {
+        if ($this->rp_id < 1 || !$this->Event->canEdit()) {
+            // non-existent repeat ID or no edit access
             return false;
         }
 
@@ -1063,6 +1063,11 @@ class evRepeat
     public function DeleteFuture()
     {
         global $_TABLES;
+
+        if ($this->rp_id < 1 || !$this->Event->canEdit()) {
+            // non-existent repeat ID or no edit access
+            return false;
+        }
 
         if ($this->date_start <= $this->Event->date_start1) {
             // This is easy- we're deleting ALL repeats, so also

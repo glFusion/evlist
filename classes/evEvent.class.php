@@ -305,8 +305,6 @@ class evEvent
         $this->owner_id = $row['owner_id'];
         $this->group_id = $row['group_id'];
         $this->enable_comments = $row['enable_comments'];
-        // If read from DB, tzid may be 'local' or an actual timezone
-        $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
 
         if (isset($row['categories']) && is_array($row['categories'])) {
             $this->categories = $row['categories'];
@@ -331,6 +329,7 @@ class evEvent
             $this->time_end2 = $row['time_end2'];
             $this->options = unserialize($row['options']);
             if (!$this->options) $this->options = array();
+            $this->tzid = $row['tzid'];
 
         } else {        // Coming from the form
 
@@ -406,6 +405,7 @@ class evEvent
                 $this->options['max_user_rsvp'] = 1;
                 $this->options['rsvp_print'] = 0;
             }
+            $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
         }
 
     }

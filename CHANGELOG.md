@@ -5,11 +5,11 @@ Release TBD
 - Add css to format long tooltips
 - Remove HTML calendar template, use AJAX only
 - Use configured numeric separators in location fields
+- Add timezone support for events
 
 ## v1.4.2
 Released 2017-01-21
 - Fix calls to commentsupport function in another plugin
-- Add timezone support for events
 
 ## v1.4.1
 Released 2017-01-21

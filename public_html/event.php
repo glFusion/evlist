@@ -77,6 +77,7 @@ $expected = array('edit', 'cancel',
     'savereminder', 'delreminder', 'clone',
     'register', 'cancelreg', 'search', 'print',
     'printtickets', 'tickdelete_x', 'tickreset_x',
+    'view',
 );
 $action = 'view';
 $view = '';
@@ -215,7 +216,9 @@ case 'delrepeat':
             (int)$_REQUEST['rp_id'] : 0;
     if ($rp_id > 0) {
         $R = new evRepeat($rp_id);
-        $R->Delete();
+        if ($R->Event->canEdit()) {
+            $R->Delete();
+        }
     }
     $view = 'home';
     break;
@@ -344,14 +347,22 @@ case 'edit':
             USES_evlist_class_repeat();
             $rp_id = (int)$_GET['rp_id'];
             $Ev = new evRepeat($rp_id);
-            $content .= $Ev->Edit(0, $actionval);
+            if ($Ev->Event->canEdit()) {
+                $content .= $Ev->Edit(0, $actionval);
+            } else {
+                COM_404();
+            }
         }
         break;
     case 'event':
     default:
         USES_evlist_class_event();
         $Ev = new evEvent($_REQUEST['eid']);
-        $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+        if ($Ev->canEdit()) {
+            $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+        } else {
+            COM_404();
+        }
         break;
     }
     break;
@@ -360,7 +371,7 @@ case 'clone':
     if (isset($_GET['eid'])) {
         USES_evlist_class_event();
         $Ev = new evEvent($_GET['eid']);
-        if ($Ev->id == '')      // Event not found
+        if ($Ev->id == '' || !$Ev->canEdit())      // Event not found
             break;
         // Now prep it to be saved as a new record
         $Ev->id = '';
@@ -396,6 +407,7 @@ case 'print':
     break;
 
 case 'printtickets':
+    // Print the current user's own tickets to the event
     if ($_EV_CONF['enable_rsvp'] && !COM_isAnonUser()) {
         USES_evlist_class_ticket();
         $doc = evTicket::PrintTickets($eid, $rp_id, $_USER['uid']);
@@ -408,15 +420,26 @@ case 'printtickets':
 
 case 'view':
 default:
-    if (empty($eid)) {
-        // Default action, view the calendar or event
-        COM_setArgNames(array('eid','ts','range','cat'));
+    // Default action, view the event
+    if (empty($eid) && empty($rp_id)) {
+        // No ID params given, try getting from the friendly URL
+        COM_setArgNames(array('view', 'eid','ts','range','cat'));
+        $actionval = COM_getArgument('view');
         $eid = COM_sanitizeID(COM_getArgument('eid'),false);
     }
-
-    if (!empty($eid)) {
-        USES_evlist_class_repeat();
-        $Rep = new evRepeat($eid);
+    USES_evlist_class_repeat();
+    if ($actionval == 'event' && !empty($eid)) {
+        // Given an event ID, get the next instance to display
+        $rp_id = evRepeat::getFirst($eid);
+        if ($rp_id === false) {
+            COM_refresh($EVLIST_URL . '/index.php');
+        }
+    } else {
+        // Use the event ID param as an instance ID
+        $rp_id = $eid;
+    }
+    if (!empty($rp_id)) {
+        $Rep = new evRepeat($rp_id);
         $pagetitle = COM_stripslashes($Rep->Event->title);
         if ($view == 'print') {
             $template = 'print';
@@ -430,7 +453,6 @@ default:
         exit;
     }
     break;
-
 }
 
 $display = EVLIST_siteHeader($pagetitle);

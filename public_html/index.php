@@ -190,7 +190,6 @@ case 'list':
         $block_title .= '&nbsp;/&nbsp;' . $LANG_EVLIST['category'] .
             ':&nbsp;' . $catname;
     }
-
     $V = new evView_list($year, $month, $day, $category,
                     $calendar, $range);
     $content .= $V->Render();
@@ -224,6 +223,9 @@ case 'exporttickets':
     }
     break;
 
+case 'myevents':
+    $content = EVLIST_list_user_events();
+    break;
 
 default:
     $content = evView::GetView('', 0, 0, 0);
@@ -242,28 +244,32 @@ $display .= EVLIST_siteFooter();
 echo $display;
 exit;
 
+
 /**
-*   Get the list of events
+*   Get the list of events owned by the current user
 *
 *   @return string      HTML for admin list
 */
-function EVLIST_user_list_events()
+function EVLIST_list_user_events()
 {
-    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN, $_USER;
 
     USES_lib_admin();
 
     $retval = '';
 
     $header_arr = array();
-    if (!$_CONF['storysubmission']) {
+
+    // Allow editing if the queue is not used or this is an autorized
+    // submitter.
+    if (!$_CONF['storysubmission'] || plugin_issubmitter_evlist()) {
         $header_arr[] = array('text' => $LANG_EVLIST['edit'],
                 'field' => 'edit', 'sort' => false,
                 'align' => 'center',
             );
     }
     $header_arr[] = array('text' => $LANG_EVLIST['id'],
-        'field' => 'id', 'sort' => true);
+        'field' => 'ev_id', 'sort' => true);
     $header_arr[] = array('text' => $LANG_EVLIST['title'],
                 'field' => 'title', 'sort' => true);
     $header_arr[] = array('text' => $LANG_EVLIST['start_date'],
@@ -272,7 +278,7 @@ function EVLIST_user_list_events()
                 'field' => 'status', 'sort' => false,
                 'align' => 'center',
         );
-    if (!$_CONF['storysubmission']) {
+    if (!$_CONF['storysubmission'] || plugin_ismoderator_evlist()) {
         $header_arr[] = array('text' => $LANG_ADMIN['delete'],
                 'field' => 'delete', 'sort' => false,
                 'align' => 'center',
@@ -290,7 +296,7 @@ function EVLIST_user_list_events()
 
     // Select distinct to get only one entry per event.  We can only edit/modify
     // events here, not repeats
-    $sql = "SELECT DISTINCT(ev.id), det.title, ev.date_start1, ev.status
+    $sql = "SELECT DISTINCT(ev.id) as ev_id, det.title, ev.date_start1, ev.status
             FROM {$_TABLES['evlist_events']} ev
             LEFT JOIN {$_TABLES['evlist_detail']} det
                 ON det.ev_id = ev.id
@@ -323,59 +329,66 @@ function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
     static $del_icon = NULL;
 
     switch($fieldname) {
+    case 'ev_id':
+        $retval = COM_createLink($fieldvalue,
+                COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $fieldvalue));
+        break;
     case 'edit':
         $retval = '<a href="' . EVLIST_URL .
-            '/event.php?eid=' . $fieldvalue . '&amp;edit=event">';
-            if ($_EV_CONF['_is_uikit']) {
-                $retval .= '<i class="uk-icon-edit"></i>';
-            } else {
-                $retval .= $icon_arr['edit'];
-            }
-            $retval .= '</a>';
-            break;
-        case 'copy':
-            $retval = '<a href="' . EVLIST_URL .
+            '/event.php?eid=' . $A['ev_id'] . '&amp;edit=event">';
+        if ($_EV_CONF['_is_uikit']) {
+            $retval .= '<i class="uk-icon-edit"></i>';
+        } else {
+            $retval .= $icon_arr['edit'];
+        }
+        $retval .= '</a>';
+        break;
+    case 'copy':
+        $retval = '<a href="' . EVLIST_URL .
                 '/event.php?clone=x&amp;eid=' . $A['id'] .
                 '" title="' . $LANG_EVLIST['copy'] . '">';
-            if ($_EV_CONF['is_uikid']) {
-                $retval .= '<i class="uk-icon-clone"></i>';
-            } else {
-                $retval .= $icon_arr['copy'];
-            }
-            $retval .= '</a>';
-            break;
-        /*case 'status':
-            if ($A['status'] == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
+        if ($_EV_CONF['_is_uikit']) {
+            $retval .= '<i class="uk-icon-clone"></i>';
+        } else {
+            $retval .= $icon_arr['copy'];
+        }
+        $retval .= '</a>';
+        break;
+    /*case 'id':
+        $retval = COM_createLink($fieldvalue, EVLIST_URL . '/event.php?eid=' . $fieldvalue);
+        break;*/
+    case 'status':
+        if ($A['status'] == '1') {
+            $switch = EVCHECKED;
+            $enabled = 1;
+        } else {
+            $switch = '';
+            $enabled = 0;
+        }
+        $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
                 id=\"event_{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
                 '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
-            break;
-        case 'delete':
-            if ($del_icon === NULL) {
-                if ($_EV_CONF['_is_uikit']) {
-                    $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
-                } else {
-                    $del_icon = $icon_arr['delete'];
-                }
+        break;
+    case 'delete':
+        if ($del_icon === NULL) {
+            if ($_EV_CONF['_is_uikit']) {
+                $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
+            } else {
+                $del_icon = $icon_arr['delete'];
             }
-            $retval = COM_createLink(
+        }
+        $retval = COM_createLink(
                     $del_icon,
-                    EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'],
+                    EVLIST_URL. '/actions.php?delevent=x&eid=' . $A['id'],
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
                         'title' => $LANG_ADMIN['delete'],
                     )
-                );
-            break;*/
-        default:
-            $retval = $fieldvalue;
-            break;
+            );
+        break;
+    default:
+        $retval = $fieldvalue;
+        break;
     }
     return $retval;
 }

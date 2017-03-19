@@ -305,8 +305,6 @@ class evEvent
         $this->owner_id = $row['owner_id'];
         $this->group_id = $row['group_id'];
         $this->enable_comments = $row['enable_comments'];
-        // If read from DB, tzid may be 'local' or an actual timezone
-        $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
 
         if (isset($row['categories']) && is_array($row['categories'])) {
             $this->categories = $row['categories'];
@@ -331,6 +329,7 @@ class evEvent
             $this->time_end2 = $row['time_end2'];
             $this->options = unserialize($row['options']);
             if (!$this->options) $this->options = array();
+            $this->tzid = $row['tzid'];
 
         } else {        // Coming from the form
 
@@ -406,6 +405,7 @@ class evEvent
                 $this->options['max_user_rsvp'] = 1;
                 $this->options['rsvp_print'] = 0;
             }
+            $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
         }
 
     }
@@ -1132,8 +1132,8 @@ class evEvent
             'cal_select'    => $cal_select,
             'contactlink_chk' => $this->options['contactlink'] == 1 ?
                                 EVCHECKED : '',
-            'lat'           => $this->Detail->lat,
-            'lng'           => $this->Detail->lng,
+            'lat'           => self::float2str($this->Detail->lat),
+            'lng'           => self::float2str($this->Detail->lng),
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event.html'),
@@ -1832,6 +1832,22 @@ class evEvent
     public function isMeetup()
     {
         return $this->cal_id == -1;
+    }
+
+
+    /**
+    *   Convert a number to a string based on the configured separators.
+    *
+    *   @param  float   $val    Value to convert
+    *   @return string      Formatted numeric string
+    */
+    private function float2str($val)
+    {
+        global $_CONF;
+        if (!is_numeric($val)) return '';
+        return number_format($val, 5,
+                $_CONF['decimal_separator'],
+                $_CONF['thousands_separator']);
     }
 
 }   // class evEvent

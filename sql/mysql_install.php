@@ -297,7 +297,7 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_submissions']}
         CHANGE id id varchar(128) NOT NULL",
     ),
-'1.4.2' => array(
+'1.4.3' => array(
     "ALTER TABLE {$_TABLES['evlist_events']}
         ADD `tzid` varchar(125) NOT NULL DEFAULT 'local' AFTER options", 
     "ALTER TABLE {$_TABLES['evlist_submissions']}

@@ -135,7 +135,8 @@ class evRepeat
     {
         switch($var) {
         case 'use_tz':
-            return $this->Event->tzid == 'local' ? false : true;
+            return false;
+            //return $this->Event->tzid == 'local' ? false : true;
             break;
         default:
             if (array_key_exists($var, $this->properties)) {
@@ -531,7 +532,7 @@ class evRepeat
             'site_slogan'   => $_CONF['site_slogan'],
             'more_info_link' => $more_info_link,
             'mootools'  => $_SYSTEM['disable_mootools'] ? '' : 'true',
-            'show_tz'   => $this->use_tz,
+            'show_tz'   => $this->tzid == 'local' ? '' : 'true',
             'timezone'  => $this->tzid,
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
         ) );

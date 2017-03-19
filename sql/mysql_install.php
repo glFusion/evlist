@@ -64,7 +64,7 @@ $event_table =
   `show_upcoming` tinyint(1) NOT NULL DEFAULT '1',
   `cal_id` int(10) unsigned NOT NULL DEFAULT '1',
   `options` varchar(255),
-  `tzid` varchar(125) NOT NULL DEFAULT 'local'
+  `tzid` varchar(125) NOT NULL DEFAULT 'local',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM";
 

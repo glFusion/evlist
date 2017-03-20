@@ -357,11 +357,20 @@ case 'edit':
     case 'event':
     default:
         USES_evlist_class_event();
-        $Ev = new evEvent($_REQUEST['eid']);
-        if ($Ev->canEdit()) {
-            $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+        if (isset($_REQUEST['eid'])) {
+            $Ev = new evEvent($_REQUEST['eid']);
+            if ($Ev->canEdit()) {
+                // allowed to edit an existing event
+                $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+            } else {
+                COM_404();
+            }
         } else {
-            COM_404();
+            // Submitting a new event
+            if (EVLIST_canSubmit()) {
+                $Ev = new evEvent();
+                $content .= $Ev->Edit();
+            }
         }
         break;
     }
@@ -429,7 +438,7 @@ default:
     }
     USES_evlist_class_repeat();
     if ($actionval == 'event' && !empty($eid)) {
-        // Given an event ID, get the next instance to display
+        // Given an event ID, get the first instance to display
         $rp_id = evRepeat::getFirst($eid);
         if ($rp_id === false) {
             COM_refresh($EVLIST_URL . '/index.php');

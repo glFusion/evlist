@@ -135,7 +135,8 @@ class evRepeat
     {
         switch($var) {
         case 'use_tz':
-            return $this->Event->tzid == 'local' ? false : true;
+            return false;
+            //return $this->Event->tzid == 'local' ? false : true;
             break;
         default:
             if (array_key_exists($var, $this->properties)) {
@@ -531,7 +532,7 @@ class evRepeat
             'site_slogan'   => $_CONF['site_slogan'],
             'more_info_link' => $more_info_link,
             'mootools'  => $_SYSTEM['disable_mootools'] ? '' : 'true',
-            'show_tz'   => $this->use_tz,
+            'show_tz'   => $this->tzid == 'local' ? '' : 'true',
             'timezone'  => $this->tzid,
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
         ) );
@@ -1178,7 +1179,73 @@ class evRepeat
         );
         LGLIB_invokeService('paypal', 'addCartItem', $evCart, $output, $msg);
         return $evCart;
-     }
+    }
+
+
+    /**
+    *   Get the ID of the next upcoming instance of a given event.
+    *
+    *   @param  string  $ev_id  Event ID
+    *   @param  integer $ts     Starting timestamp, default to "now"
+    *   @return integer         ID of the next instance of this event
+    */
+    public static function getUpcoming($ev_id, $ts = NULL)
+    {
+        global $_EV_CONF, $_TABLES, $_CONF;
+
+        if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
+        $D = new Date($ts, $_CONF['timezone']);
+        $sql_date = $D->format('Y-m-d', false);
+        $sql_time = $D->format('H:i:s', false);
+        $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
+                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+                AND (rp_date_start > '$sql_date'
+                OR (rp_date_start = '$sql_date'
+                    AND rp_time_start1 >= '$sql_time'))
+                ORDER BY rp_date_start, rp_time_start1 ASC
+                LIMIT 1";
+        $res = DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("evRepeat::getUpcoming() error: $sql");
+        }
+        if (DB_numRows($res) != 1) {
+            return false;
+        } else {
+            $A = DB_fetchArray($res, false);
+            return $A['rp_id'];
+        }
+    }
+
+
+    /**
+    *   Get the ID of the first instance of a given event.
+    *
+    *   @param  string  $ev_id  Event ID
+    *   @return integer         ID of the first instance of this event
+    */
+    public static function getFirst($ev_id)
+    {
+        global $_EV_CONF, $_TABLES, $_CONF;
+
+        if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
+        $D = new Date($ts, $_CONF['timezone']);
+        $sql_date = $D->format('Y-m-d', false);
+        $sql_time = $D->format('H:i:s', false);
+        $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
+                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+                ORDER BY rp_date_start, rp_time_start1 ASC
+                LIMIT 1";
+        $res = DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("evRepeat::getFirst() error: $sql");
+        }
+        if (DB_numRows($res) != 1) {
+            return false;
+        } else {
+            $A = DB_fetchArray($res, false);
+            return $A['rp_id'];
+        }
+    }
 
 }   // class evRepeat
 

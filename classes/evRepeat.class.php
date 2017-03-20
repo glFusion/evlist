@@ -751,12 +751,13 @@ class evRepeat
         if ($catcount > 0) {
             $catlinks = array();
             for ($i = 0; $i < $catcount; $i++) {
+                $catname = str_replace(' ', '&nbsp;', $cats[$i]['name']);
                 $catlinks[] = '<a href="' .
                 COM_buildURL(EVLIST_URL . '/index.php?view=list' . $andrange .
                 '&cat=' . $cats[$i]['id']) .
-                '">' . $cats[$i]['name'] . '</a>&nbsp;';
+                '">' . $catname . '</a>&nbsp;';
             }
-            $catlink = join('|&nbsp;', $catlinks);
+            $catlink = implode(' | ', $catlinks);
             $T->set_var('category_link', $catlink, true);
         }
 

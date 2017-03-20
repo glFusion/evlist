@@ -86,17 +86,17 @@ class evEvent
             // Create dates & times based on individual URL parameters,
             // or defaults.
             // Start date/time defaults to now
-            $dt = new Date('now', $this->tzid);
+            $dt = new Date('now');
             $startday1 = isset($_GET['day']) ? (int)$_GET['day'] : '';
             if ($startday1 < 1 || $startday1 > 31)
-                    $startday1 = $dt->format('j', true);
+                    $startday1 = $dt->format('j');
             $startmonth1 = isset($_GET['month']) ? (int)$_GET['month'] : '';
             if ($startmonth1 < 1 || $startmonth1 > 12)
-                    $startmonth1 = $dt->format('n', true);
+                    $startmonth1 = $dt->format('n');
             $startyear1 = isset($_GET['year']) ?
-                    (int)$_GET['year'] : $dt->format('Y', true);
+                    (int)$_GET['year'] : $dt->format('Y');
             $starthour1 = isset($_GET['hour']) ?
-                    (int)$_GET['hour'] : $dt->format('H', true);
+                    (int)$_GET['hour'] : $dt->format('H');
             $startminute1 = '0';
 
             // End date & time defaults to same day, 1 hour ahead

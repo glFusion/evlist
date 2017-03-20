@@ -557,8 +557,8 @@ class evTicket
 
         //$tic_types = array();
         $counter = 0;
-        $dt_tick = new Date('now', $_CONF['timezone']);
-        $dt_used = new Date('now', $_CONF['timezone']);
+        $dt_tick = new Date('now');
+        $dt_used = new Date('now');
         foreach ($tickets as $tic_id=>$ticket) {
             $counter++;
             $dt_tick->setTimestamp($ticket->dt);

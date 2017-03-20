@@ -1194,7 +1194,7 @@ class evRepeat
         global $_EV_CONF, $_TABLES, $_CONF;
 
         if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new Date($ts, $_CONF['timezone']);
+        $D = new Date($ts);
         $sql_date = $D->format('Y-m-d', false);
         $sql_time = $D->format('H:i:s', false);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
@@ -1227,10 +1227,6 @@ class evRepeat
     {
         global $_EV_CONF, $_TABLES, $_CONF;
 
-        if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new Date($ts, $_CONF['timezone']);
-        $sql_date = $D->format('Y-m-d', false);
-        $sql_time = $D->format('H:i:s', false);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
                 ORDER BY rp_date_start, rp_time_start1 ASC

@@ -1508,7 +1508,7 @@ class evView_list extends evView
                     // Prepare the link to the event, internal for internal
                     // events, new window for meetup events
                     if ($A['cal_id'] > 0) {
-                        $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' .
+                        $url = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                             $A['rp_id'] . $timestamp . $andrange . $andcat);
                         $url_attr = array();
                     } elseif (!empty($A['url'])) {

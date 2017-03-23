@@ -289,6 +289,7 @@ function EVLIST_admin_list_events()
     global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
+    USES_evlist_class_repeat(); // to get link to event
 
     $retval = '';
 
@@ -538,11 +539,13 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= '</a>';
             break;
         case 'title':
-            $title = $A['title'];
-            //$url = EVLIST_URL . '/event.php?eid=' . $A['id'];
-            //$retval = '<a href="' . $url . '" title="' . 
-            //    $LANG_EVLIST['display_event'] . '">' . $title . '</a>';
-            $retval = $title;
+            $rp_id = evRepeat::getNearest($A['id']);
+            if ($rp_id !== false) {
+                $retval = COM_createLink($fieldvalue, EVLIST_URL .
+                        '/event.php?eid=' . $rp_id);
+            } else {
+                $retval = $fieldvalue;
+            }
             break;
         case 'status':
             if ($A['status'] == '1') {

@@ -86,7 +86,7 @@ class evEvent
             // Create dates & times based on individual URL parameters,
             // or defaults.
             // Start date/time defaults to now
-            $dt = new Date('now');
+            $dt = new Date('now', $_CONF['timezone']);
             $startday1 = isset($_GET['day']) ? (int)$_GET['day'] : '';
             if ($startday1 < 1 || $startday1 > 31)
                     $startday1 = $dt->format('j');
@@ -96,7 +96,7 @@ class evEvent
             $startyear1 = isset($_GET['year']) ?
                     (int)$_GET['year'] : $dt->format('Y');
             $starthour1 = isset($_GET['hour']) ?
-                    (int)$_GET['hour'] : $dt->format('H');
+                    (int)$_GET['hour'] : $dt->format('H', true);
             $startminute1 = '0';
 
             // End date & time defaults to same day, 1 hour ahead
@@ -1078,7 +1078,6 @@ class evEvent
             $cnt++;
         }
         $navbar->set_selected($LANG_EVLIST['ev_info']);
-
         $T->set_var(array(
             'is_admin'      => $this->isAdmin,
             'action_url'    => $action_url,
@@ -1132,8 +1131,8 @@ class evEvent
             'cal_select'    => $cal_select,
             'contactlink_chk' => $this->options['contactlink'] == 1 ?
                                 EVCHECKED : '',
-            'lat'           => self::float2str($this->Detail->lat),
-            'lng'           => self::float2str($this->Detail->lng),
+            'lat'           => EVLIST_coord2str($this->Detail->lat),
+            'lng'           => EVLIST_coord2str($this->Detail->lng),
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event.html'),
@@ -1832,22 +1831,6 @@ class evEvent
     public function isMeetup()
     {
         return $this->cal_id == -1;
-    }
-
-
-    /**
-    *   Convert a number to a string based on the configured separators.
-    *
-    *   @param  float   $val    Value to convert
-    *   @return string      Formatted numeric string
-    */
-    private function float2str($val)
-    {
-        global $_CONF;
-        if (!is_numeric($val)) return '';
-        return number_format($val, 5,
-                $_CONF['decimal_separator'],
-                $_CONF['thousands_separator']);
     }
 
 }   // class evEvent

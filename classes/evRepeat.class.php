@@ -751,12 +751,13 @@ class evRepeat
         if ($catcount > 0) {
             $catlinks = array();
             for ($i = 0; $i < $catcount; $i++) {
+                $catname = str_replace(' ', '&nbsp;', $cats[$i]['name']);
                 $catlinks[] = '<a href="' .
                 COM_buildURL(EVLIST_URL . '/index.php?view=list' . $andrange .
                 '&cat=' . $cats[$i]['id']) .
-                '">' . $cats[$i]['name'] . '</a>&nbsp;';
+                '">' . $catname . '</a>&nbsp;';
             }
-            $catlink = join('|&nbsp;', $catlinks);
+            $catlink = implode(' | ', $catlinks);
             $T->set_var('category_link', $catlink, true);
         }
 
@@ -1194,7 +1195,7 @@ class evRepeat
         global $_EV_CONF, $_TABLES, $_CONF;
 
         if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new Date($ts, $_CONF['timezone']);
+        $D = new Date($ts);
         $sql_date = $D->format('Y-m-d', false);
         $sql_time = $D->format('H:i:s', false);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
@@ -1227,10 +1228,6 @@ class evRepeat
     {
         global $_EV_CONF, $_TABLES, $_CONF;
 
-        if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new Date($ts, $_CONF['timezone']);
-        $sql_date = $D->format('Y-m-d', false);
-        $sql_time = $D->format('H:i:s', false);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
                 ORDER BY rp_date_start, rp_time_start1 ASC

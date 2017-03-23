@@ -60,8 +60,8 @@ require_once dirname(__FILE__) . '/evlist.php';
 
 // Some variables are used all over, so get them once to avoid a lot of
 // function calls
-$dt = new Date('now', $_CONF['timezone']);
-$_EV_CONF['_today'] = $dt->format('Y-m-d', true);
+$dt = new Date('now');
+$_EV_CONF['_today'] = $dt->format('Y-m-d', false);
 $_EV_CONF['_today_ts'] = $dt->toUnix();
 
 // Check the version of the locator plugin and reset the use_locator
@@ -282,11 +282,12 @@ function plugin_getuseroption_evlist()
         $retval[] = $add_option;
         break;
     }
-    /*
-    if (DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']) > 0) {
+
+    if (!COM_isAnonUser() &&
+        DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']) > 0) {
         $retval[] = array('My Events', EVLIST_URL . '/index.php?view=myevents');
     }
-    */
+
     return $retval;
 }
 
@@ -1450,9 +1451,10 @@ function EVLIST_getCatLinks($eid, $andrange)
     if ($catcount > 0) {
         $catlinks = array();
         while ($C = DB_fetchArray($cresult, false)) {
+            $catname = str_replace(' ', '&nbsp;', $C['name']);
             $catlinks[] = '<a href="' .
                 COM_buildURL(EVLIST_URL . '/index.php?view=list' . $andrange .
-                '&amp;cat=' . $C['id']) . '">' . COM_stripslashes($C['name']) .
+                '&amp;cat=' . $C['id']) . '">' . COM_stripslashes($catname) .
                 '</a>';
         }
         $retval = implode('&nbsp;|&nbsp;', $catlinks);
@@ -2407,7 +2409,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
     foreach ($Mevents as $ev_date=>$ev_events) {
         foreach ($ev_events as $event) {
             // Format the meetup.com date information into the expected layout
-            $dt = new Date($event->time / 1000, $_CONF['timezone']);
+            $dt = new Date($event->time / 1000);
             $ev_start = $dt->format($_CONF['timeonly'], true);
             if (!isset($event->duration)) {
                 $duration = 3600000;     // duration required, default one hour

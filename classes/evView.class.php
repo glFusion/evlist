@@ -97,8 +97,8 @@ class evView
     {
         global $_EV_CONF;
 
-        $this->today = new Date($_EV_CONF['_today_ts'], $_CONF['timezone']);
-        $this->today_sql = $this->today->format('Y-m-d', true);
+        $this->today = new Date($_EV_CONF['_today_ts']);
+        $this->today_sql = $this->today->format('Y-m-d');
         $this->year = (int)$year;
         $this->month = (int)$month;
         $this->day = (int)$day;
@@ -152,9 +152,9 @@ class evView
         global $_CONF, $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES;
 
         $retval = '';
-        $thisyear = $this->today->format('Y', true);
-        $thismonth = $this->today->format('m', true);
-        $thisday = $this->today->format('d', true);
+        $thisyear = $this->today->format('Y');
+        $thismonth = $this->today->format('m');
+        $thisday = $this->today->format('d');
 
         $T = new Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('header', 'calendar_header.thtml');
@@ -219,14 +219,14 @@ class evView
             // Create the jump-to-date selectors
             $options = '';
             for ($i = 1; $i < 32; $i++) {
-                $sel = $i == $day ? EVSELECTED : '';
+                $sel = $i == $this->day ? EVSELECTED : '';
                 $options .= "<option value=\"$i\" $sel>$i</option>" . LB;
             }
             $T->set_var('day_select', $options);
 
             $options = '';
             for ($i = 1; $i < 13; $i++) {
-                $sel = $i == $month ? EVSELECTED : '';
+                $sel = $i == $this->month ? EVSELECTED : '';
                 $options .= "<option value=\"$i\" $sel>{$LANG_MONTH[$i]}</option>" .
                     LB;
             }
@@ -480,9 +480,9 @@ class evView_day extends evView
 
         $retval = '';
         $today_sql = sprintf('%d-%02d-%02d', $this->year, $this->month, $this->day);
-        $today = new Date($today_sql, $_CONF['timezone']);
-        $dtPrev = new Date($today->toUnix() - 86400, $_CONF['timezone']);
-        $dtNext = new Date($today->toUnix() + 86400, $_CONF['timezone']);
+        $today = new Date($today_sql);
+        $dtPrev = new Date($today->toUnix() - 86400);
+        $dtNext = new Date($today->toUnix() + 86400);
         $monthname = $LANG_MONTH[$today->month];
         $dayofweek = $today->dayofweek;
         if ($dayofweek == 7) $dayofweek = 0;
@@ -819,11 +819,11 @@ class evView_week extends evView
         $start_date = $calendarView[0];
         $end_date = $calendarView[6];
 
-        $dtStart = new Date(strtotime($start_date), $_CONF['timezone']);
+        $dtStart = new Date(strtotime($start_date));
         $dtToday = $dtStart;    // used to update date strings each day
         $week_secs = 86400 * 7;
-        $dtPrev = new Date($dtStart->toUnix() - $week_secs, $_CONF['timezone']);
-        $dtNext = new Date($dtStart->toUnix() + $week_secs, $_CONF['timezone']);
+        $dtPrev = new Date($dtStart->toUnix() - $week_secs);
+        $dtNext = new Date($dtStart->toUnix() + $week_secs);
 
         // Set up next and previous week links
         list($sYear, $sMonth, $sDay) = explode('-', $start_date);
@@ -1258,7 +1258,7 @@ class evView_year extends evView
         $events = EVLIST_getEvents($starting_date, $ending_date,
             array('cat'=>$this->cat, 'cal'=>$this->cal));
         // A date object to handle formatting
-        $dt = new Date('now', $_CONF['timezone']);
+        $dt = new Date('now');
 
         $T = new Template(EVLIST_PI_PATH . '/templates/yearview');
         $tpl = $this->getTemplate();
@@ -1508,7 +1508,7 @@ class evView_list extends evView
                     // Prepare the link to the event, internal for internal
                     // events, new window for meetup events
                     if ($A['cal_id'] > 0) {
-                        $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' .
+                        $url = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                             $A['rp_id'] . $timestamp . $andrange . $andcat);
                         $url_attr = array();
                     } elseif (!empty($A['url'])) {
@@ -1625,7 +1625,7 @@ class evView_smallmonth extends evView
         $T->set_block('smallmonth', 'week', 'wBlock');
 
         USES_class_date();
-        $dt = new Date('now', $_CONF['timezone']);
+        $dt = new Date('now');
 
         foreach ($calendarView as $weeknum => $weekdata) {
             list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);

@@ -165,8 +165,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
 
     $T->set_block('smallmonth', 'week', 'wBlock');
 
-    USES_class_date();
-    $dt = new Date('now', $_CONF['timezone']);
+    $dt = new Date('now');
 
     foreach ($calendarView as $weeknum => $weekdata) {
         list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);
@@ -785,7 +784,7 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
     case 'dt':
     case 'used':
         if ($fieldvalue > 0) {
-            $d = new Date($fieldvalue, $_CONF['timezone']);
+            $d = new Date($fieldvalue);
             $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeformat'], false);
         } else {
             $retval = '';

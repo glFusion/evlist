@@ -224,6 +224,11 @@ case 'exporttickets':
     break;
 
 case 'myevents':
+    if (COM_isAnonUser()) {
+        // Anonymous users can't access event list
+        COM_404();
+        exit;
+    }
     $content = EVLIST_list_user_events();
     break;
 

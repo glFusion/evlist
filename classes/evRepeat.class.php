@@ -649,6 +649,10 @@ class evRepeat
             $T->parse('datetime_info', 'datetime');
         }
 
+        // Get coordinates for easy use in Weather and Locator blocks
+        $lat = $this->Event->Detail->lat;
+        $lng = $this->Event->Detail->lng;
+
         // Only process the location block if at least one element exists.
         // Don't want an empty block showing.
         if (!empty($location) || !empty($street) ||
@@ -667,8 +671,6 @@ class evRepeat
             // There has to be at least some location data for this to work.
             if ($_EV_CONF['use_weather']) {
                 // Try coordinates first, if present
-                $lat = $this->Event->Detail->lat;
-                $lng = $this->Event->Detail->lng;
                 if (!empty($lat) && !empty($lng)) {
                     $loc = $lat . ',' . $lng;
                 } else {
@@ -696,18 +698,15 @@ class evRepeat
         }
 
         // Get a map from the Locator plugin, if configured and available
-        if ($_EV_CONF['use_locator'] == 1 &&
-                $this->Event->Detail->lat != 0 &&
-                $this->Event->Detail->lng != 0) {
+        if ($_EV_CONF['use_locator'] == 1 && !empty($lat) && !empty($lng)) {
             $status = LGLIB_invokeService('locator', 'getMap',
-                    array('lat' => $this->Event->Detail->lat,
-                            'lng' => $this->Event->Detail->lng),
+                    array('lat' => $lat, 'lng' => $lng),
                     $map, $svc_msg);
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'map'   => $map,
-                    'lat'   => COM_numberFormat($this->Event->Detail->lat, 6),
-                    'lng'   => COM_numberFormat($this->Event->Detail->lng, 6),
+                    'lat'   => EVLIST_coord2str($this->Event->Detail->lat),
+                    'lng'   => EVLIST_coord2str($this->Event->Detail->lng),
                 ) );
             }
         }
@@ -1192,7 +1191,7 @@ class evRepeat
     */
     public static function getUpcoming($ev_id, $ts = NULL)
     {
-        global $_EV_CONF, $_TABLES, $_CONF;
+        global $_EV_CONF, $_TABLES;
 
         if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
         $D = new Date($ts);
@@ -1219,6 +1218,34 @@ class evRepeat
 
 
     /**
+    *   Get the ID of the last instance of a given event.
+    *   Used to find an instance to display for events that have passed.
+    *
+    *   @param  string  $ev_id  Event ID
+    *   @return integer         ID of the next instance of this event
+    */
+    public static function getLast($ev_id)
+    {
+        global $_TABLES;
+
+        $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
+                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+                ORDER BY rp_date_start, rp_time_start1 DESC
+                LIMIT 1";
+        $res = DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("evRepeat::getLast() error: $sql");
+        }
+        if (DB_numRows($res) != 1) {
+            return false;
+        } else {
+            $A = DB_fetchArray($res, false);
+            return $A['rp_id'];
+        }
+    }
+
+
+    /**
     *   Get the ID of the first instance of a given event.
     *
     *   @param  string  $ev_id  Event ID
@@ -1226,7 +1253,7 @@ class evRepeat
     */
     public static function getFirst($ev_id)
     {
-        global $_EV_CONF, $_TABLES, $_CONF;
+        global $_TABLES;
 
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
@@ -1241,6 +1268,39 @@ class evRepeat
         } else {
             $A = DB_fetchArray($res, false);
             return $A['rp_id'];
+        }
+    }
+
+
+    /**
+    *   Get the nearest event, upcoming or past.
+    *   If the event has not passed, get the closest upcoming instance.
+    *   For past events, get the last instance.
+    *
+    *   @uses   evEvent::getLast()
+    *   @uses   evEvent::getUpcoming()
+    *   @param  string  $ev_id  Event ID
+    *   @return mixed       Instance ID, or False on an error
+    */
+    public static function getNearest($ev_id)
+    {
+        global $_TABLES, $_EV_CONF;
+
+        $sql = "SELECT id, date_end1, time_end1, time_end2
+                FROM {$_TABLES['evlist_events']}
+                WHERE id = '" . DB_escapeString($ev_id) . "'";
+        $res = DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("evRepeat::getNearest() error: $sql");
+            return false;
+        }
+        $A = DB_fetchArray($res, false);
+        $time_end = max($A['time_end1'], $A['time_end2']);
+        $ts_end = strtotime($A['date_end1'] . ' ' . $time_end);
+        if ($ts_end > $_EV_CONF['_today_ts']) {
+            return self::getUpcoming($ev_id);
+        } else {
+            return self::getLast($ev_id);
         }
     }
 

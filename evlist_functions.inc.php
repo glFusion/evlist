@@ -828,4 +828,17 @@ function EVLIST_getDayNames($letters = 0)
     return $retval;
 }
 
+
+/**
+*   Convert a latitude or longitude to a string based on the configured separators.
+*
+*   @param  float   $val    Value to convert
+*   @return string      Formatted numeric string
+*/
+function EVLIST_coord2str($val)
+{
+    if (!is_numeric($val)) return '';
+    return COM_numberFormat($val, 6);
+}
+
 ?>

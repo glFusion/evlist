@@ -232,13 +232,16 @@ class evDetail
         }
         $fld_sql = implode(',', $fld_set);
 
+            $lat = number_format($this->lat, 6, '.', '');
+            $lng = number_format($this->lng, 6, '.', '');
+
         // Insert or update the record, as appropriate
         if (!$this->isNew) {
             // For updates, delete the event from the cache table.
            $sql = "UPDATE {$_TABLES['evlist_detail']}
                     SET $fld_sql,
-                    lat = {$this->lat},
-                    lng = {$this->lng}
+                    lat = {$lat},
+                    lng = {$lng}
                     WHERE det_id='" . (int)$this->det_id . "'";
             //echo $sql;die;
             DB_query($sql);
@@ -246,8 +249,8 @@ class evDetail
             $sql = "INSERT INTO {$_TABLES['evlist_detail']}
                     SET 
                     det_id = 0,
-                    lat = {$this->lat},
-                    lng = {$this->lng},
+                    lat = {$lat},
+                    lng = {$lng},
                     $fld_sql";
             //echo $sql;die;
             DB_query($sql);

@@ -238,6 +238,8 @@ class evDetail
             $fld_set[] = "$fld_name='" . DB_escapeString($this->$fld_name) . "'";
         }
         $fld_sql = implode(',', $fld_set);
+COM_errorLog("Lat/Lng values: {$this->lat}, {$this->lng}");
+COM_errorLog("Lag/Lng saved as: $lat, $lng");
 
         // Insert or update the record, as appropriate
         if (!$this->isNew) {

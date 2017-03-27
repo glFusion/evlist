@@ -226,6 +226,13 @@ class evDetail
             }
         }
 
+        $lat = (string)$this->lat;
+        $lat = str_replace(',', '.', $lat);
+        $lat = (float)$lat;
+        $lng = (string)$this->lng;
+        $lng = str_replace(',', '.', $lng);
+        $lng = (float)$lng;
+
         $fld_set = array();
         foreach ($this->fields as $fld_name) {
             $fld_set[] = "$fld_name='" . DB_escapeString($this->$fld_name) . "'";
@@ -237,8 +244,8 @@ class evDetail
             // For updates, delete the event from the cache table.
            $sql = "UPDATE {$_TABLES['evlist_detail']}
                     SET $fld_sql,
-                    lat = {$this->lat},
-                    lng = {$this->lng}
+                    lat = {$lat},
+                    lng = {$lng}
                     WHERE det_id='" . (int)$this->det_id . "'";
             //echo $sql;die;
             DB_query($sql);
@@ -246,8 +253,8 @@ class evDetail
             $sql = "INSERT INTO {$_TABLES['evlist_detail']}
                     SET 
                     det_id = 0,
-                    lat = {$this->lat},
-                    lng = {$this->lng},
+                    lat = {$lat},
+                    lng = {$lng},
                     $fld_sql";
             //echo $sql;die;
             DB_query($sql);

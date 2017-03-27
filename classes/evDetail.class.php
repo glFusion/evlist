@@ -228,10 +228,8 @@ class evDetail
 
         $lat = (string)$this->lat;
         $lat = str_replace(',', '.', $lat);
-        $lat = (float)$lat;
         $lng = (string)$this->lng;
         $lng = str_replace(',', '.', $lng);
-        $lng = (float)$lng;
 
         $fld_set = array();
         foreach ($this->fields as $fld_name) {
@@ -246,8 +244,8 @@ COM_errorLog("Lag/Lng saved as: $lat, $lng");
             // For updates, delete the event from the cache table.
            $sql = "UPDATE {$_TABLES['evlist_detail']}
                     SET $fld_sql,
-                    lat = {$lat},
-                    lng = {$lng}
+                    lat = '{$lat}',
+                    lng = '{$lng}'
                     WHERE det_id='" . (int)$this->det_id . "'";
             //echo $sql;die;
             DB_query($sql);
@@ -255,8 +253,8 @@ COM_errorLog("Lag/Lng saved as: $lat, $lng");
             $sql = "INSERT INTO {$_TABLES['evlist_detail']}
                     SET 
                     det_id = 0,
-                    lat = {$lat},
-                    lng = {$lng},
+                    lat = '{$lat}',
+                    lng = '{$lng}',
                     $fld_sql";
             //echo $sql;die;
             DB_query($sql);

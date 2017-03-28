@@ -39,7 +39,7 @@
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.2
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -60,8 +60,8 @@ require_once dirname(__FILE__) . '/evlist.php';
 
 // Some variables are used all over, so get them once to avoid a lot of
 // function calls
-$dt = new Date('now');
-$_EV_CONF['_today'] = $dt->format('Y-m-d', false);
+$dt = new Date('now', $_CONF['timezone']);
+$_EV_CONF['_today'] = $dt->format('Y-m-d', true);
 $_EV_CONF['_today_ts'] = $dt->toUnix();
 
 // Check the version of the locator plugin and reset the use_locator
@@ -2532,6 +2532,60 @@ function EVLIST_tooltip_newline()
     } else {
         return LB;
     }
+}
+
+
+// EVLIST_xxxReuturn() functions simply set and read a session variable
+// so the calling routines don't have to know what the designated variable
+// name is.
+
+/**
+*   Set the return url to be used after an action is completed
+*
+*   @param  string  $key    Key to the URL array (see EVLIST_getReturn())
+*/
+function EVLIST_setReturn($key)
+{
+    SESS_setVar('evlist_fromurl', $key);
+}
+
+
+/**
+*   Get the value of the return key, if set.
+*   Used to check if a return URL has been set so other actions can
+*   be taken if necessary.
+*
+*   @return mixed   URL key, or zero if not set
+*/
+function EVLIST_checkReturn()
+{
+    return SESS_getVar('evlist_fromurl');
+}
+
+
+/**
+*   Get the return URL set in the session variable.
+*   This function always returns something, even if there's no return set. So
+*   EVLIST_checkReturn should be used if you need to check for a return url.
+*
+*   @return string      URL associated with the key in the session var
+*/
+function EVLIST_getReturn()
+{
+    $urls = array(
+        'myevents'  => EVLIST_URL . '/index.php?view=myevents',
+        'adminevents' => EVLIST_ADMIN_URL . '/index.php?view=events',
+        'admincategories' => EVLIST_ADMIN_URL . '/index.php?view=categories',
+        'admintickets' => EVLIST_ADMIN_URL . '/index.php?view=tickets',
+        'admintickettypes' => EVLIST_ADMIN_URL . '/index.php?view=tickettypes',
+        'home'      => EVLIST_URL . '/index.php',
+    );
+
+    $from = SESS_getVar('evlist_fromurl');
+    if (!isset($urls[$from])) {
+        $from = 'home';
+    }
+    return $urls[$from];
 }
 
 

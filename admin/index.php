@@ -45,7 +45,6 @@ if (!in_array('evlist', $_PLUGINS) || !plugin_ismoderator_evlist()) {
     exit;
 }
 
-
 /**
 *   Create the common header for all admin functions
 *
@@ -126,6 +125,7 @@ function EVLIST_adminlist_categories()
     global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
+    EVLIST_setReturn('admincategories');
 
     $retval = '';
 
@@ -180,6 +180,7 @@ function EVLIST_adminlist_tickettypes()
     global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
+    EVLIST_setReturn('admintickettypes');
 
     $retval = '';
 
@@ -235,6 +236,7 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
     global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
+    EVLIST_setReturn('admintickets');
 
     $retval = '';
 
@@ -290,6 +292,7 @@ function EVLIST_admin_list_events()
 
     USES_lib_admin();
     USES_evlist_class_repeat(); // to get link to event
+    EVLIST_setReturn('adminevents');
 
     $retval = '';
 

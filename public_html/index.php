@@ -116,6 +116,10 @@ if (empty($month))
 if (empty($day))
     $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
 
+$x = SESS_getVar('evlist.current');
+//var_dump($x);die;
+EVLIST_setReturn($view);
+
 switch ($view) {
 case 'today':
     list($year, $month, $day) = explode('-', $_EV_CONF['_today']);
@@ -339,16 +343,30 @@ function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
                 COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $fieldvalue));
         break;
     case 'edit':
-        $retval = '<a href="' . EVLIST_URL .
-            '/event.php?eid=' . $A['ev_id'] . '&amp;edit=event">';
+        $retval = COM_createLink('',
+                EVLIST_URL . '/event.php?eid=' . $A['ev_id'] . '&amp;edit=event&from=myevents',
+                array(
+                    'class' => 'uk-icon-edit',
+                )
+        );
+        break;
+        /*$retval = '<a href="' . EVLIST_URL .
+            '/event.php?eid=' . $A['ev_id'] . '&amp;edit=event&from=myevents">';
         if ($_EV_CONF['_is_uikit']) {
             $retval .= '<i class="uk-icon-edit"></i>';
         } else {
             $retval .= $icon_arr['edit'];
         }
-        $retval .= '</a>';
+        $retval .= '</a>';*/
         break;
     case 'copy':
+        $retval = COM_createLink('',
+                EVLIST_URL . '/event.php?clone=x&amp;eid=' . $A['id'],
+                array(
+                    'title' => $LANG_EVLIST['copy'],
+                    'class' => 'uk-icon-clone',
+                ) );
+        break;
         $retval = '<a href="' . EVLIST_URL .
                 '/event.php?clone=x&amp;eid=' . $A['id'] .
                 '" title="' . $LANG_EVLIST['copy'] . '">';
@@ -385,7 +403,8 @@ function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
         }
         $retval = COM_createLink(
                     $del_icon,
-                    EVLIST_URL. '/actions.php?delevent=x&eid=' . $A['id'],
+                    EVLIST_URL. '/actions.php?delevent=x&eid=' . $A['ev_id'] .
+                        '&from=myevents',
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
                         'title' => $LANG_ADMIN['delete'],
                     )

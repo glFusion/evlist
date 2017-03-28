@@ -3,9 +3,9 @@
  *  Class to manage event detail records for the EvList plugin
  *
  *  @author     Lee Garner <lee@leegarner.com>
- *  @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+ *  @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
  *  @package    evlist
- *  @version    1.3.0
+ *  @version    1.4.3
  *  @license    http://opensource.org/licenses/gpl-2.0.php 
  *              GNU Public License v2 or later
  *  @filesource
@@ -226,18 +226,14 @@ class evDetail
             }
         }
 
-        $lat = (string)$this->lat;
-        $lat = str_replace(',', '.', $lat);
-        $lng = (string)$this->lng;
-        $lng = str_replace(',', '.', $lng);
+        $lat = EVLIST_coord2str($this->lat, true);
+        $lng = EVLIST_coord2str($this->lng, true);
 
         $fld_set = array();
         foreach ($this->fields as $fld_name) {
             $fld_set[] = "$fld_name='" . DB_escapeString($this->$fld_name) . "'";
         }
         $fld_sql = implode(',', $fld_set);
-COM_errorLog("Lat/Lng values: {$this->lat}, {$this->lng}");
-COM_errorLog("Lag/Lng saved as: $lat, $lng");
 
         // Insert or update the record, as appropriate
         if (!$this->isNew) {
@@ -260,9 +256,7 @@ COM_errorLog("Lag/Lng saved as: $lat, $lng");
             DB_query($sql);
             $this->det_id = DB_insertID();
         }
-
         return $this->det_id;
-
     }
 
 

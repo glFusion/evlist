@@ -833,12 +833,17 @@ function EVLIST_getDayNames($letters = 0)
 *   Convert a latitude or longitude to a string based on the configured separators.
 *
 *   @param  float   $val    Value to convert
+*   @param  boolean $us     True to force US formatting, False for locale-based
 *   @return string      Formatted numeric string
 */
-function EVLIST_coord2str($val)
+function EVLIST_coord2str($val, $us = false)
 {
     if (!is_numeric($val)) return '';
-    return COM_numberFormat($val, 6);
+    if ($us) {
+        return number_format($val, 6, '.', ',');
+    } else {
+        return COM_numberFormat($val, 6);
+    }
 }
 
 ?>

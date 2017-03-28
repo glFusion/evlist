@@ -91,7 +91,7 @@
 }
  
 #evlistEventDetail {
-    /*clear: both;*/
+    clear: left;
     position: relative;
     float: left;
    /* min-width: 300px;
@@ -308,6 +308,7 @@ a.cal-event {
   font-weight:bold;
   font-size:1.0em;
   vertical-align:bottom;
+  white-space: nowrap;
 }
 .cal-dayx-body {
   background:#E7E7E7
@@ -336,6 +337,7 @@ table.cal-dayx-body {
   border-right:#FFFFFF 1px solid;
   width:1%;
   vertical-align:top;
+  white-space: nowrap;
 }
 .cal-dayx-times2 {
   background:#FFFFFF

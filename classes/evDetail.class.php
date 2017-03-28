@@ -226,11 +226,18 @@ class evDetail
             }
         }
 
+        $lat = (string)$this->lat;
+        $lat = str_replace(',', '.', $lat);
+        $lng = (string)$this->lng;
+        $lng = str_replace(',', '.', $lng);
+
         $fld_set = array();
         foreach ($this->fields as $fld_name) {
             $fld_set[] = "$fld_name='" . DB_escapeString($this->$fld_name) . "'";
         }
         $fld_sql = implode(',', $fld_set);
+COM_errorLog("Lat/Lng values: {$this->lat}, {$this->lng}");
+COM_errorLog("Lag/Lng saved as: $lat, $lng");
 
             $lat = number_format($this->lat, 6, '.', '');
             $lng = number_format($this->lng, 6, '.', '');
@@ -240,8 +247,13 @@ class evDetail
             // For updates, delete the event from the cache table.
            $sql = "UPDATE {$_TABLES['evlist_detail']}
                     SET $fld_sql,
+<<<<<<< HEAD
                     lat = {$lat},
                     lng = {$lng}
+=======
+                    lat = '{$lat}',
+                    lng = '{$lng}'
+>>>>>>> refs/remotes/leegarner-glfusion/master
                     WHERE det_id='" . (int)$this->det_id . "'";
             //echo $sql;die;
             DB_query($sql);
@@ -249,8 +261,13 @@ class evDetail
             $sql = "INSERT INTO {$_TABLES['evlist_detail']}
                     SET 
                     det_id = 0,
+<<<<<<< HEAD
                     lat = {$lat},
                     lng = {$lng},
+=======
+                    lat = '{$lat}',
+                    lng = '{$lng}',
+>>>>>>> refs/remotes/leegarner-glfusion/master
                     $fld_sql";
             //echo $sql;die;
             DB_query($sql);

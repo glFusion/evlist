@@ -54,7 +54,7 @@
     {!endif}
 
     <div class="evPrtDataItem">
-      <label>{$LANG_EVLIST['calendar']}</label>
+      <label>{$LANG_EVLIST['calendar']}:</label>
       <div class="evdata">
       {cal_name}
       </div>
@@ -62,7 +62,7 @@
 
     {!if category_link}
     <div class="evPrtDataItem">
-      <label>{$LANG_EVLIST['categories']}</label>
+      <label>{$LANG_EVLIST['categories']}:</label>
       <div class="evdata">
       {category_link}
       </div>

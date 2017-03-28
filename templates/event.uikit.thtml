@@ -13,48 +13,57 @@
 
   <div id="evlistEventEditSelect">
     {!if can_edit}
-    <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
-      <a href="#" title="{$LANG_EVLIST['edit']}" data-uk-tooltip class="uk-icon-edit"></a>
-      <div class="uk-dropdown uk-dropdown-bottom">
-        {!if is_recurring}
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat"
-            id="edit_repeat" title="{$LANG_EVLIST['edit_repeat']}">
+      {!if is_recurring}
+      <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+        <a href="#" title="{$LANG_ADMIN['edit']}" data-uk-tooltip class="uk-icon-edit"></a>
+        <div class="uk-dropdown uk-dropdown-bottom">
+          <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat"
+              id="edit_repeat" title="{$LANG_EVLIST['edit_repeat']}">
             <i class="uk-icon-edit"></i>
             {$LANG_EVLIST['edit_repeat']}</a>
-        <br />
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=futurerepeat"
-            id="edit_futurerepeat" title="{$LANG_EVLIST['edit_future']}">
+          <br />
+          <a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=futurerepeat"
+              id="edit_futurerepeat" title="{$LANG_EVLIST['edit_future']}">
             <i class="uk-icon-edit"></i>
             {$LANG_EVLIST['edit_future']}</a>
-        <br />
-        {!endif}
-        <a href="{pi_url}/event.php?eid={ev_id}&amp;edit=event"
-            id="edit_event" title="{$LANG_EVLIST['evit_event']}">
+          <br />
+          <a href="{pi_url}/event.php?eid={ev_id}&amp;edit=event"
+              id="edit_event" title="{$LANG_EVLIST['edit_event']}">
             <i class="uk-icon-edit"></i>
             {$LANG_EVLIST['edit_event']}</a>
-        <br />
-        {!if is_recurring}
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delrepeat=x" 
-            onclick="return confirm('{$LANG_EVLIST['conf_del_repeat']}')" 
-            id="delete_repeat"  title="{$LANG_EVLIST['del_repeat']}">
+        </div>
+      </div>
+      {!else}
+      <a href="{pi_url}/event.php?eid={ev_id}&amp;edit=event" id="edit_event" title="{$LANG_ADMIN['edit']}" class="uk-icon-edit"  data-uk-tooltip></a>
+      {!endif}
+      {!if is_recurring}
+      <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+        <a href="#" title="{$LANG_ADMIN['delete']}" data-uk-tooltip class="uk-icon-trash-o ev-icon-danger"></a>
+        <div class="uk-dropdown uk-dropdown-bottom">
+          <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delrepeat=x" 
+              onclick="return confirm('{$LANG_EVLIST['conf_del_repeat']}')" 
+              id="delete_repeat"  title="{$LANG_EVLIST['del_repeat']}">
             <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_repeat']}</a>
-        <br />
-        <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delfuture=x" 
-            onclick="return confirm('{$LANG_EVLIST['conf_del_future']}')" 
-            id="delete_eventfuture" 
-            title="{$LANG_EVLIST['del_future']}">
+          <br />
+          <a href="{pi_url}/event.php?rp_id={rp_id}&amp;delfuture=x" 
+              onclick="return confirm('{$LANG_EVLIST['conf_del_future']}')" 
+              id="delete_eventfuture" 
+              title="{$LANG_EVLIST['del_future']}">
             <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_future']}</a>
-        <br />
-        {!endif}
-        <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x"
-            onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
-            id="delete_event"  title="{$LANG_EVLIST['del_all']}">
+          <br />
+          <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x"
+              onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
+              id="delete_event"  title="{$LANG_EVLIST['del_all']}">
             <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_all']}</a>
-      </div>
-    </div>
+      </div>   
+      {!else}           
+      <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x" onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
+          id="delete_event"  title="{$LANG_ADMIN['delete']}" class="uk-icon-trash-o ev-icon-danger"  data-uk-tooltip></a>
+      {!endif}           
+      <a href="{pi_url}/event.php?clone=x&eid={ev_id}" title="{$LANG_ADMIN['copy']}" class="uk-icon-files-o" data-uk-tooltip></a>
     {!endif}
 
     {!if can_subscribe}

@@ -239,13 +239,21 @@ class evDetail
 COM_errorLog("Lat/Lng values: {$this->lat}, {$this->lng}");
 COM_errorLog("Lag/Lng saved as: $lat, $lng");
 
+            $lat = number_format($this->lat, 6, '.', '');
+            $lng = number_format($this->lng, 6, '.', '');
+
         // Insert or update the record, as appropriate
         if (!$this->isNew) {
             // For updates, delete the event from the cache table.
            $sql = "UPDATE {$_TABLES['evlist_detail']}
                     SET $fld_sql,
+<<<<<<< HEAD
+                    lat = {$lat},
+                    lng = {$lng}
+=======
                     lat = '{$lat}',
                     lng = '{$lng}'
+>>>>>>> refs/remotes/leegarner-glfusion/master
                     WHERE det_id='" . (int)$this->det_id . "'";
             //echo $sql;die;
             DB_query($sql);
@@ -253,8 +261,13 @@ COM_errorLog("Lag/Lng saved as: $lat, $lng");
             $sql = "INSERT INTO {$_TABLES['evlist_detail']}
                     SET 
                     det_id = 0,
+<<<<<<< HEAD
+                    lat = {$lat},
+                    lng = {$lng},
+=======
                     lat = '{$lat}',
                     lng = '{$lng}',
+>>>>>>> refs/remotes/leegarner-glfusion/master
                     $fld_sql";
             //echo $sql;die;
             DB_query($sql);

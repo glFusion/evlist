@@ -803,6 +803,24 @@ class evEvent
             $T->set_file('editor', 'editor.thtml');
         }
 
+        // Set up the wysiwyg editor, if available
+        switch (PLG_getEditorType()) {
+        case 'ckeditor':
+            $T->set_var('show_htmleditor', true);
+            PLG_requestEditor('evlist','evlist_entry','ckeditor_evlist.thtml');
+            PLG_templateSetVars('evlist_entry', $T);
+            break;
+        case 'tinymce' :
+            $T->set_var('show_htmleditor',true);
+            PLG_requestEditor('evlist','evlist_entry','tinymce_evlist.thtml');
+            PLG_templateSetVars('evlist_entry', $T);
+            break;
+        default :
+            // don't support others right now
+            $T->set_var('show_htmleditor', false);
+            break;
+        }
+
         // Basic tabs for editing both events and instances, show up on
         // all edit forms
         $tabs = array('ev_info', 'ev_location', 'ev_contact',);
@@ -895,7 +913,9 @@ class evEvent
 
         $action_url = $this->isAdmin ? EVLIST_ADMIN_URL . '/index.php' : EVLIST_URL . '/event.php';
         $delaction = 'delevent';
-        if (isset($_GET['from']) && $_GET['from'] == 'admin') {
+        if (EVLIST_checkReturn()) {
+            $cancel_url = EVLIST_getReturn();
+        } elseif (isset($_GET['from']) && $_GET['from'] == 'admin') {
             $cancel_url = EVLIST_ADMIN_URL . '/index.php';
         } else {
             $cancel_url = EVLIST_URL . '/index.php';

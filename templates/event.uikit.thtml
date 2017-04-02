@@ -58,7 +58,8 @@
               id="delete_event"  title="{$LANG_EVLIST['del_all']}">
             <i class="uk-icon-trash-o ev-icon-danger"></i>
             {$LANG_EVLIST['del_all']}</a>
-      </div>   
+        </div>
+      </div>  
       {!else}           
       <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x" onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
           id="delete_event"  title="{$LANG_ADMIN['delete']}" class="uk-icon-trash-o ev-icon-danger"  data-uk-tooltip></a>

@@ -305,6 +305,8 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_detail']}
         CHANGE lat lat float(10,6) default NULL,
         CHANGE lng lng float(10,6) default NULL",
+    "UPDATE {$_TABLES['conf_values']} SET type = '%text' WHERE
+        name = 'meetup_gid' AND group_name = 'evlist'",
     ),
 );
 $_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];

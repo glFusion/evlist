@@ -6,6 +6,7 @@ Release TBD
 - Remove HTML calendar template, use AJAX only
 - Use configured numeric separators in location fields
 - Add timezone support for events
+- Change Meetup.com group IDs to array
 
 ## v1.4.2
 Released 2017-01-21

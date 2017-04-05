@@ -251,6 +251,18 @@ function evlist_upgrade()
         case '1.4.2':
             $currentVersion = '1.4.3';
             $c->del('cal_tmpl', 'evlist');
+            if (!empty($_EV_CONF['meetup_gid'])) {
+                // Changing meetup_gid type to array, first get the current
+                // value and convert it.
+                $meetup_gid = @serialize(array($_EV_CONF['meetup_gid']));
+                DB_query("UPDATE {$_TABLES['conf_values']}
+                    SET value = '" . DB_escapeString($meetup_gid) . "'
+                    WHERE name = 'meetup_gid' AND group_name = 'evlist'", 1);
+                if (DB_error()) {
+                    COM_errorLog("1.4.3 update error: $sql");
+                    return false;
+                }
+            }
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
     }

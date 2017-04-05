@@ -1,14 +1,4 @@
 {# begin {templatelocation} #}
-<script type="text/javascript">
-<!--
-{!if mootools}
-window.addEvent('domready', function() {
-    var myValidator = new fValidator("ticketedit");
-});
-{!endif}
--->
-</script>
-
 <form id="ticketedit" method="post" class="uk-form uk-form-horizontal"
     action="{site_admin_url}/plugins/evlist/index.php">
   <input type="hidden" name="id" value="{id}" />
@@ -17,7 +7,7 @@ window.addEvent('domready', function() {
         <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
     </label>
     <div class="uk-form-controls">
-      <input required type="text" id="description" class="fValidate['required']" 
+      <input required type="text" id="description"
             name="description" length="50" size="20" value="{description}" />
     </div>
   </div>

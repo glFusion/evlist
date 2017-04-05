@@ -136,10 +136,10 @@ class evTicketType
     */
     public function Edit()
     {
-        global $_SYSTEM;
+        global $_EV_CONF;
 
         $T = new Template(EVLIST_PI_PATH . '/templates');
-        if ($_SYSTEM['disable_jquery_slimbox']) {
+        if ($_EV_CONF['_is_uikit']) {
             $T->set_file('modify', 'ticketForm.uikit.thtml');
         } else {
             $T->set_file('modify', 'ticketForm.thtml');

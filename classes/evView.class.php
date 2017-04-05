@@ -1526,7 +1526,7 @@ class evView_list extends evView
                     $summary = PLG_replaceTags(COM_stripslashes($A['summary']));
                     $datesummary = sprintf($LANG_EVLIST['event_begins'],
                         EVLIST_formattedDate(strtotime($A['rp_date_start'])));
-                    $morelink = COM_buildURL(EVLIST_URL . '/event.php?eid=' .
+                    $morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                         $A['rp_id'] . $andrange . $andcat);
                     $morelink = '<a href="' . $morelink . '">' .
                         $LANG_EVLIST['read_more'] . '</a>';

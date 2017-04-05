@@ -513,6 +513,7 @@ function plugin_getheaderjs_evlist()
     $path = $_CONF['path_html'] . '/evlist/js';
     $files = array(
         $path . '/toggleEnabled.js',
+        //$path . '/ckeditor.js',
     );
 
     return $files;
@@ -2542,7 +2543,7 @@ function EVLIST_tooltip_newline()
 /**
 *   Set the return url to be used after an action is completed
 *
-*   @param  string  $key    Key to the URL array (see EVLIST_getReturn())
+*   @param  string  $key    URL or key to the URL array (see EVLIST_getReturn())
 */
 function EVLIST_setReturn($key)
 {
@@ -2565,10 +2566,12 @@ function EVLIST_checkReturn()
 
 /**
 *   Get the return URL set in the session variable.
-*   This function always returns something, even if there's no return set. So
-*   EVLIST_checkReturn should be used if you need to check for a return url.
+*   Returns either the URL associated with a key or the actual URL, depending
+*   on which is set. This function always returns a URL, so 
+*   EVLIST_checkReturn should be used if you need to check for the existance
+*   of a return url.
 *
-*   @return string      URL associated with the key in the session var
+*   @return string      URL associated with the key in the session var, or home
 */
 function EVLIST_getReturn()
 {
@@ -2582,10 +2585,16 @@ function EVLIST_getReturn()
     );
 
     $from = SESS_getVar('evlist_fromurl');
-    if (!isset($urls[$from])) {
-        $from = 'home';
+    if (isset($urls[$from])) {
+        // A key value is set, return the associated URL
+        return $urls[$from];
+    } elseif ($from !== 0) {
+        // A session var is set, return it (should be a URL)
+        return $from;
+    } else {
+        // Nothing set in the session var, return the home URL
+        return $urls['home'];
     }
-    return $urls[$from];
 }
 
 

@@ -363,7 +363,7 @@ class evRecurMonthly extends evRecurBase
         global $_EV_CONF;
 
         $days_on = $this->event->rec_data['listdays'];
-        if (!is_array($days_on)) return $this->events;
+        if (!is_array($days_on)) return false;
 
         $occurrence = $this->dt_start;
 
@@ -481,7 +481,9 @@ class evRecurYearly extends evRecurBase
 /**
 *   Class to handle weekly recurrences.
 *   This handles multiple occurrences per week, specified by day number.
+*
 *   @package evlist
+*   @return mixed   Array of events on success, False on failure
 */
 class evRecurWeekly extends evRecurBase
 {
@@ -490,6 +492,8 @@ class evRecurWeekly extends evRecurBase
         global $_EV_CONF;
 
         $days_on = $this->event->rec_data['listdays'];
+        if (empty($days_on)) return false;
+
         $occurrence = $this->dt_start;
 
         $num_intervals = count($days_on);

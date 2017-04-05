@@ -58,6 +58,7 @@ $LANG_EVLIST = array(
 'err_cal_import'        => 'Il y a eu %d erreurs importation à partir du calendrier. Vérifier votre journal d erreurs pour plus de détails',
 'err_import_event'      => 'Erreur d importation événement %s',
 'err_cal_notavail'      => 'le calendrier plugin les données ne sont pas disponibles. ',
+'err_upd_repeats'   => 'Error updating repeat events',
 'info'              => 'Information',
 'warning'           => 'Avertissement',
 'alerte'            => 'Alerte',

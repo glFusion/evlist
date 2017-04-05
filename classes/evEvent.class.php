@@ -556,7 +556,7 @@ class evEvent
                             WHERE ev_id = '{$this->id}'
                             AND det_id <> '{$this->det_id}'");
                     // This function sets the rec_data value.
-                    $this->UpdateRepeats();
+                    if (!$this->UpdateRepeats()) return $LANG_EVLIST['err_upd_repeats'];
                 } else {
                     // this is a one-time event, update the existing instance
                     $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
@@ -604,7 +604,7 @@ class evEvent
 
             if ($this->table != 'evlist_submissions') {
                 // This function gets the rec_data value.
-                $this->UpdateRepeats();
+                if (!$this->UpdateRepeats()) return $LANG_EVLIST['err_upd_repeats'];
                 //var_dump($this);die;
             }
 
@@ -1392,7 +1392,7 @@ class evEvent
     *   Create the individual occurrances of a the current event.
     *   If the event is not recurring, returns an array with only one element.
     *
-    *   @return array           Array of matching events, keyed by date
+    *   @return array           Array of matching events, keyed by date, or false
     */
     public function MakeRecurrences()
     {
@@ -1451,6 +1451,8 @@ class evEvent
     *   Deletes all existing repeats, then creates new ones.  Not very
     *   efficient; it might make sense to check all related values, but there
     *   are several.
+    *
+    *   @return boolean     True on success, False on failure
     */
     public function UpdateRepeats()
     {
@@ -1462,11 +1464,12 @@ class evEvent
         }
         if ((int)$this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
 
-        // Delete all existing instances
-        DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);
-
         // Get the actual repeat occurrences.
         $days = $this->MakeRecurrences();
+        if ($days === false) return false;
+
+        // Delete all existing instances
+        DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);
 
         $i = 0;
         foreach($days as $event) {
@@ -1483,6 +1486,7 @@ class evEvent
             //echo $sql;
             DB_query($sql, 1);
         }
+        return true;
     }
 
 

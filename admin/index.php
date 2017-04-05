@@ -937,8 +937,8 @@ case 'saveevent':
         } else {
             LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
         }
+        echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     }
-    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     break;
 
 case 'saverepeat':

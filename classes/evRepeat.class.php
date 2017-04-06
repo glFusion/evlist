@@ -418,7 +418,7 @@ class evRepeat
             }
         }
         $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
-        $this->dtEnd1 = $this->date_start . ' ' . $this->time_end1;
+        $this->dtEnd1 = $this->date_end . ' ' . $this->time_end1;
         $date_start = $this->dtStart1->format($_CONF['dateonly'], $this->use_tz);
         $date_end = $this->dtEnd1->format($_CONF['dateonly'], $this->use_tz);
         if ($date_end == $date_start) $date_end = '';

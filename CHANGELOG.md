@@ -7,6 +7,7 @@ Release TBD
 - Use configured numeric separators in location fields
 - Add timezone support for events
 - Change Meetup.com group IDs to array
+- Fix recurring multi-day events
 
 ## v1.4.2
 Released 2017-01-21

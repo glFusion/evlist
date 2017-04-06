@@ -11,7 +11,7 @@
 *   @author     Lee Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.3.2
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -70,7 +70,6 @@ class evRecurBase
         } else {
             $this->duration = 0;      // single day event
         }
-
     }
 
 
@@ -179,8 +178,12 @@ class evRecurBase
     */
     public function storeEvent($start)
     {
+        global $_CONF;
+
         if ($this->duration > 0) {
-            $enddate = strtotime("+$duration day" , strtotime($start)) ;
+            $d = new Date($start, $_CONF['timezone']);
+            $e = $d->Add(new DateInterval("P{$this->duration}D"));
+            $enddate = $e->format('Y-m-d', true);
         } else {
             $enddate = $start;
         }
@@ -195,9 +198,7 @@ class evRecurBase
                         'tm_start2'  => $this->event->time_start2,
                         'tm_end2'    => $this->event->time_end2,
         );
-
     }   // function storeEvent()
-
 
 }   // class evRecurBase
 
@@ -401,14 +402,12 @@ class evRecurMonthly extends evRecurBase
                 if ($this->skip > 0) {
                     $occurrence = $this->SkipWeekend($occurrence);
                 }
-                if ($occurrence != NULL) {
+                if ($occurrence !== NULL) {
                     $this->storeEvent($occurrence);
                     $count++;
                 }
 
                 if ($count > $_EV_CONF['max_repeats']) break;
-
-                //list($y, $m, $d) = explode('-', $occurrence);
 
             }   // foreach days_on
 

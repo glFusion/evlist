@@ -6,8 +6,9 @@ function loadEditor(id) {
     var instance = CKEDITOR.replace( id, {
         toolbar: 'standard',
         contentsCss: '{site_url}/css.php?t={theme}',
-        bodyClass: 'forumpost',
-        removePlugins: 'elementspath',
+        bodyClass: 'tm-container uk-article tm-article',
+        //bodyClass: 'forumpost',
+        removePlugins: 'elementspath fileman vimeo',
         resize_enabled: false,
      } );
      return instance;

@@ -556,7 +556,9 @@ class evEvent
                             WHERE ev_id = '{$this->id}'
                             AND det_id <> '{$this->det_id}'");
                     // This function sets the rec_data value.
-                    if (!$this->UpdateRepeats()) return $LANG_EVLIST['err_upd_repeats'];
+                    if (!$this->UpdateRepeats()) {
+                        return $this->PrintErrors();
+                    }
                 } else {
                     // this is a one-time event, update the existing instance
                     $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
@@ -604,7 +606,9 @@ class evEvent
 
             if ($this->table != 'evlist_submissions') {
                 // This function gets the rec_data value.
-                if (!$this->UpdateRepeats()) return $LANG_EVLIST['err_upd_repeats'];
+                if (!$this->UpdateRepeats()) {
+                    return $this->PrintErrors();
+                }
                 //var_dump($this);die;
             }
 
@@ -660,7 +664,6 @@ class evEvent
             options = '" . DB_escapeString(serialize($this->options)) . "' ";
 
         $sql = $sql1 . $fld_sql . $sql2;
-
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
@@ -685,7 +688,6 @@ class evEvent
             $to = COM_formatEmailAddress('', $_CONF['site_mail']);
             COM_mail($to, $subject, $mailbody, '', true);
         }
-
 
         if (empty($this->Errors)) {
             return '';
@@ -1466,7 +1468,10 @@ class evEvent
 
         // Get the actual repeat occurrences.
         $days = $this->MakeRecurrences();
-        if ($days === false) return false;
+        if ($days === false) {
+            $this->Errors[] = $LANG_EVLIST['err_upd_repeats'];
+            return false;
+        }
 
         // Delete all existing instances
         DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);

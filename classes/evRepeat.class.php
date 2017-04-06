@@ -1277,8 +1277,8 @@ class evRepeat
     *   If the event has not passed, get the closest upcoming instance.
     *   For past events, get the last instance.
     *
-    *   @uses   evEvent::getLast()
-    *   @uses   evEvent::getUpcoming()
+    *   @uses   evRepeat::getLast()
+    *   @uses   evRepeat::getUpcoming()
     *   @param  string  $ev_id  Event ID
     *   @return mixed       Instance ID, or False on an error
     */
@@ -1286,18 +1286,16 @@ class evRepeat
     {
         global $_TABLES, $_EV_CONF;
 
-        $sql = "SELECT id, date_end1, time_end1, time_end2
-                FROM {$_TABLES['evlist_events']}
-                WHERE id = '" . DB_escapeString($ev_id) . "'";
+        $sql = "SELECT COUNT(*) as C FROM {$_TABLES['evlist_repeat']}
+                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+                    AND rp_date_end >= '{$_EV_CONF['_today']}'";
         $res = DB_query($sql, 1);
         if (DB_error()) {
             COM_errorLog("evRepeat::getNearest() error: $sql");
             return false;
         }
         $A = DB_fetchArray($res, false);
-        $time_end = max($A['time_end1'], $A['time_end2']);
-        $ts_end = strtotime($A['date_end1'] . ' ' . $time_end);
-        if ($ts_end > $_EV_CONF['_today_ts']) {
+        if ((int)$A['C'] > 0) {
             return self::getUpcoming($ev_id);
         } else {
             return self::getLast($ev_id);

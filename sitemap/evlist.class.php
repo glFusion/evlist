@@ -57,17 +57,17 @@ class sitemap_evlist extends sitemap_base
         $entries = array();
 
         $sql = "SELECT e.id, d.title, UNIX_TIMESTAMP(e.date_start1) AS day
-                FROM {$_TABLES['evlist_events']} e
-                LEFT JOIN {$_TABLES['evlist_detail']} d
-                    ON d.ev_id=e.id
+                FROM {$_TABLES['evlist_repeat']} r
+                LEFT JOIN {$_TABLES['evlist_events']} e ON e.id = r.rp_ev_id
+                LEFT JOIN {$_TABLES['evlist_detail']} d ON d.ev_id=r.rp_ev_id
                 WHERE 1=1 ";
         if ($this->uid > 0) {
             $sql .= COM_getPermSql('AND', $this->uid, 2, 'e');
         }
         if ($this->isHTML()) {
-            $sql .= " AND e.date_end1 >= '{$_EV_CONF['_today']}'";
+            $sql .= " AND r.rp_date_end >= '{$_EV_CONF['_today']}'";
         }
-        $sql .= ' ORDER BY e.date_start1 DESC';
+        $sql .= ' GROUP BY e.id ORDER BY r.rp_date_start DESC';
         $result = DB_query($sql, 1);
         if (DB_error()) {
             COM_errorLog("sitemap_evlist::getItems() error: $sql");

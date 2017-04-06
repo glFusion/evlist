@@ -144,6 +144,37 @@ case 'getCalYear':
     exit;
     break;
 
+case 'toggle':
+    // Toggle the enabled flag for an event or other item.
+    // This is the same as the admin ajax function and takes the same $_GET
+    // parameters, but checks that the user is the event owner or other
+    // authorized user before acting.
+    switch($_GET['component']) {
+    case 'event':
+        USES_evlist_class_event();
+        $Ev = new evEvent($_REQUEST['id']);
+        if (!plugin_ismoderator_evlist() || !$Ev->isOwner() || $Ev->isNew) {
+            $newval = $_REQUEST['oldval'];
+            break;
+        }
+        switch ($_GET['type']) {
+        case 'enabled':
+            $newval = evEvent::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            break;
+
+         default:
+            exit;
+        }
+    }
+    $response = array(
+        'newval' => $newval,
+        'id'    => $_REQUEST['id'],
+        'type'  => $_REQUEST['type'],
+        'component' => $_REQUEST['component'],
+        'baseurl'   => EVLIST_URL,
+    );
+    echo json_encode($response);
+    break;
 }
 
 ?>

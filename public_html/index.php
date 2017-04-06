@@ -116,8 +116,6 @@ if (empty($month))
 if (empty($day))
     $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
 
-$x = SESS_getVar('evlist.current');
-//var_dump($x);die;
 EVLIST_setReturn($view);
 
 switch ($view) {
@@ -299,8 +297,8 @@ function EVLIST_list_user_events()
                       'has_extras'   => true,
                       'title'        => $LANG_EVLIST['pi_title'].': ' .
                                         $LANG_EVLIST['events'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
-                      'help_url'     => ''
+                      'form_url'     => EVLIST_URL . '/index.php',
+                      'help_url'     => '',
     );
 
     // Select distinct to get only one entry per event.  We can only edit/modify
@@ -389,9 +387,9 @@ function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
             $enabled = 0;
         }
         $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
-                id=\"event_{$A['id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
-                '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
+                id=\"event_{$A['ev_id']}\"
+                onclick='EVLIST_toggle(this,\"{$A['ev_id']}\",\"enabled\",".
+                '"event","'.EVLIST_URL."\");' />" . LB;
         break;
     case 'delete':
         if ($del_icon === NULL) {

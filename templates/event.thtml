@@ -113,9 +113,6 @@
     <label>{$LANG_EVLIST['when']}:</label>
     <div class="evdata" id="when">
       {datetime_info}
-      {!if recurring_event}
-      <br />{recurring_event}
-      {!endif}
     </div>
   </div>
   {!endif}

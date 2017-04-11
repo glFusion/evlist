@@ -58,7 +58,8 @@ USES_lglib_class_datecalc();
 *   @param  integer $range  Range being displayed (upcoming, past, etc)
 *   @return string          HTML for page navigation
 */
-function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
+//function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
+function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
 {
     global $_TABLES, $_EV_CONF;
 
@@ -70,7 +71,7 @@ function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
 
     $base_url = EVLIST_URL.
         "/index.php?cat=$cat&amp;cal=$cal&amp;range=$range&amp;view=list";
-
+/*
     if (!empty($cat)) {
         $cat_join = " LEFT JOIN {$_TABLES['evlist_lookup']} l
                     ON l.eid = ev.id ";
@@ -108,6 +109,7 @@ function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
     //echo $sql;die;
     $res = DB_query($sql);
     list($numrows) = DB_fetchArray($res);
+    */
 
     if ($numrows > $limit) {
         $numpages = ceil($numrows / $limit);

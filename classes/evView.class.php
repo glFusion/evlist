@@ -1446,8 +1446,10 @@ class evView_list extends evView
             );
         switch ($this->range) {
         case 1:         // past
+            $dt = new Date('now', $_CONF['timezone']);
             $start = EV_MIN_DATE;
-            $end = $_EV_CONF['_today'];
+            //$end = $_EV_CONF['_today'];
+            $end = $dt->toMySQL(true);
             $opts['order'] = 'DESC';
             break;
         case 3:         //this week
@@ -1463,11 +1465,14 @@ class evView_list extends evView
             break;
         case 2:         //upcoming
         default:
+            $opts['upcoming'] = true;
             $start = $_EV_CONF['_today'];
-            $end = EV_MAX_DATE;
+            $dt = new Date($_EV_CONF['_today_ts'] + (86400 * $_EV_CONF['max_upcoming_days']), $_CONF['timezone']);
+            $end = $dt->format('Y-m-d', true);
             break;
         }
 
+        //$_EV_CONF['meetup_enabled'] = false;
         $events = EVLIST_getEvents($start, $end, $opts);
         $andrange = '&amp;range=' . $this->range;
         $T->set_var('range', $this->range);
@@ -1565,7 +1570,8 @@ class evView_list extends evView
         $retval .= $T->finish($T->get_var('output'));
 
         // Set page navigation
-        $retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
+        $retval .= EVLIST_pagenav(count($events));
+        //$retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
         return $retval;
     }
 }

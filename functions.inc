@@ -187,7 +187,6 @@ function plugin_autouninstall_evlist()
         'php_blocks' => array('phpblock_evlist_upcoming',
                         'phpblock_evlist_smallmonth'),
     );
-
     return $out;
 }
 
@@ -1614,6 +1613,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
             'cal' => $cal,
             'show_upcoming' => 1,
             'limit' => $limit,
+            'upcoming' => true,
     );
     $events = EVLIST_getEvents($_EV_CONF['_today'], $end, $opts);
     if (empty($events)) return $retval;
@@ -2225,6 +2225,8 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     $limit = 0;
     $page = 0;
     $cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
+    // default date range for fixed calendars, "upcoming" may be different
+    $dt_sql = "rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start'";
     if (is_array($opts) && !empty($opts)) {
         foreach ($opts as $key => $value) {
             $value = DB_escapeString($value);
@@ -2264,6 +2266,28 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                 // or may not be numeric.
                 $opt_where .= " AND ev.{$key} = '$value'";
                 break;
+            case 'upcoming':
+                // Alters the date range based on the setting for upcoming
+                // events.
+                $dt = new Date('now', $_CONF['timezone']);
+                switch ($_EV_CONF['event_passing']) {
+                case 1:     // exclude if start time has passed
+                    $dt_sql = "rep.rp_date_start > '" . $dt->toMySQL(true) .
+                        "' AND rep.rp_date_start <= '$end'";
+                    break;
+                case 2:     // exclude if start date has passed
+                    list($y, $m, $d) = explode('-', $dt->format('Y-m-d', true));
+                    $start = Date_Calc::nextDay($d, $m, $y);
+                    $dt_sql = "rep.rp_date_start > '$start' AND rep.rp_date_start <= '$end'";
+                    break;
+                case 3:     // exclude if end time has passed
+                    $dt_sql = "rep.rp_date_end > '" . $dt->toMySQL(true) . "'";
+                    break;
+                case 4:     // exclude if end date has passed
+                    $dt_sql = "rep.rp_date_end > '" . $dt->format('Y-m-d', true) . "'";
+                    break;
+                }
+                break;
             case 'select':
                 $selection = $value;
                 break;
@@ -2295,7 +2319,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             LEFT JOIN {$_TABLES['evlist_categories']} cat
                 ON cat.id = l.cid
             WHERE ev.status = 1
-            AND (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
+            AND ($dt_sql)
             AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
             $cat_status " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
@@ -2567,7 +2591,7 @@ function EVLIST_checkReturn()
 /**
 *   Get the return URL set in the session variable.
 *   Returns either the URL associated with a key or the actual URL, depending
-*   on which is set. This function always returns a URL, so 
+*   on which is set. This function always returns a URL, so
 *   EVLIST_checkReturn should be used if you need to check for the existance
 *   of a return url.
 *

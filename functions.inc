@@ -2605,6 +2605,7 @@ function EVLIST_getReturn()
         'admincategories' => EVLIST_ADMIN_URL . '/index.php?view=categories',
         'admintickets' => EVLIST_ADMIN_URL . '/index.php?view=tickets',
         'admintickettypes' => EVLIST_ADMIN_URL . '/index.php?view=tickettypes',
+        'list' => EVLIST_URL . '/index.php?view=list',
         'home'      => EVLIST_URL . '/index.php',
     );
 

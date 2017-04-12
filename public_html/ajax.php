@@ -34,8 +34,8 @@ case 'getloc':
     if (!$_EV_CONF['use_locator']) {
         break;
     }
-    $id = isset($_REQUEST['id']) && !empty($_REQUEST['id']) ?
-                    COM_sanitizeID($_REQUEST['id']) : '';
+    $id = isset($_POST['id']) && !empty($_POST['id']) ?
+                    COM_sanitizeID($_POST['id']) : '';
     $status = LGLIB_invokeService('locator', 'getInfo',
             array('id' => $id), $A, $svc_msg);
     if ($status == PLG_RET_OK) {
@@ -54,7 +54,7 @@ case 'getloc':
     break;
 
 case 'addreminder':
-    $rp_id = (int)$_REQUEST['rp_id'];
+    $rp_id = (int)$_POST['rp_id'];
     $status = array();
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
@@ -67,8 +67,8 @@ case 'addreminder':
             '{$Ev->rp_id}',
             '" . (int)$_USER['uid']. "',
             '" . DB_escapeString($username) . "',
-            '" . DB_escapeString($_REQUEST['rem_email']) . "',
-            '" . (int)$_REQUEST['notice']. "')";
+            '" . DB_escapeString($_POST['rem_email']) . "',
+            '" . (int)$_POST['notice']. "')";
         //COM_errorLog($sql);
         DB_query($sql, 1);
         if (!DB_error()) {
@@ -82,7 +82,7 @@ case 'addreminder':
     break;
 
 case 'delreminder':
-    $rp_id = (int)$_REQUEST['rp_id'];
+    $rp_id = (int)$_POST['rp_id'];
     $uid = (int)$_USER['uid'];
     if (!COM_isAnonUser() && $rp_id > 0) {
         USES_evlist_class_repeat();

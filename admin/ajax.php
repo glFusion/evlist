@@ -21,96 +21,55 @@ if (!plugin_isadmin_evlist()) {
     exit;
 }
 
-switch ($_GET['action']) {
+switch ($_POST['action']) {
 case 'toggle':
-    switch ($_GET['component']) {
+    $oldval = $_POST['oldval'] == 1 ? 1 : 0;
+    switch ($_POST['component']) {
     case 'category':
         USES_evlist_class_category();
 
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
-            $newval = evCategory::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = evCategory::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
             exit;
         }
-
-        /*header('Content-Type: text/xml');
-        header("Cache-Control: no-cache, must-revalidate");
-        //A date in the past
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-        echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-        <info>'. "\n";
-        echo "<newval>$newval</newval>\n";
-        echo "<id>{$_REQUEST['id']}</id>\n";
-        echo "<type>{$_REQUEST['type']}</type>\n";
-        echo "<component>{$_REQUEST['component']}</component>\n";
-        echo "<baseurl>" . EVLIST_ADMIN_URL . "</baseurl>\n";
-        echo "</info>\n";*/
         break;
 
     case 'calendar':
         USES_evlist_class_calendar();
 
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
-            $newval = evCalendar::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = evCalendar::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
             exit;
         }
-
-        /*header('Content-Type: text/xml');
-        header("Cache-Control: no-cache, must-revalidate");
-        //A date in the past
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-        echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-        <info>'. "\n";
-        echo "<newval>$newval</newval>\n";
-        echo "<id>{$_REQUEST['id']}</id>\n";
-        echo "<type>{$_REQUEST['type']}</type>\n";
-        echo "<component>{$_REQUEST['component']}</component>\n";
-        echo "<baseurl>" . EVLIST_ADMIN_URL . "</baseurl>\n";
-        echo "</info>\n";*/
         break;
 
     case 'event':
         USES_evlist_class_event();
 
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
-            $newval = evEvent::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = evEvent::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
             exit;
         }
-
-        /*header('Content-Type: text/xml');
-        header("Cache-Control: no-cache, must-revalidate");
-        //A date in the past
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-        echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-        <info>'. "\n";
-        echo "<newval>$newval</newval>\n";
-        echo "<id>{$_REQUEST['id']}</id>\n";
-        echo "<type>{$_REQUEST['type']}</type>\n";
-        echo "<component>{$_REQUEST['component']}</component>\n";
-        echo "<baseurl>" . EVLIST_ADMIN_URL . "</baseurl>\n";
-        echo "</info>\n";*/
         break;
 
     case 'tickettype':
         USES_evlist_class_tickettype();
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
         case 'event_pass':
-            $newval = evTicketType::Toggle($_GET['type'], $_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = evTicketType::Toggle($_POST['type'], $oldval, $_POST['id']);
             break;
 
          default:
@@ -125,30 +84,14 @@ case 'toggle':
 
     $response = array(
         'newval' => $newval,
-        'id'    => $_REQUEST['id'],
-        'type'  => $_REQUEST['type'],
-        'component' => $_REQUEST['component'],
+        'id'    => $_POST['id'],
+        'type'  => $_POST['type'],
+        'component' => $_POST['component'],
         'baseurl'   => EVLIST_ADMIN_URL,
+        'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
     );
     echo json_encode($response);
     break;
-/* 
-        header('Content-Type: text/xml');
-        header("Cache-Control: no-cache, must-revalidate");
-        //A date in the past
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-        echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-        <info>'. "\n";
-        echo "<newval>$newval</newval>\n";
-        echo "<id>{$_REQUEST['id']}</id>\n";
-        echo "<type>{$_REQUEST['type']}</type>\n";
-        echo "<component>{$_REQUEST['component']}</component>\n";
-        echo "<baseurl>" . EVLIST_ADMIN_URL . "</baseurl>\n";
-        echo "</info>\n";
-        break;
-*/
-
 }
 
 ?>

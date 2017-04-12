@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/../lib-common.php';
 
 $content = '';
 
-switch ($_GET['action']) {
+switch ($_REQUEST['action']) {
 case 'getloc':
     // Create an array to return so the javascript won't choke.
     $B = array(
@@ -34,8 +34,8 @@ case 'getloc':
     if (!$_EV_CONF['use_locator']) {
         break;
     }
-    $id = isset($_GET['id']) && !empty($_GET['id']) ?
-                    COM_sanitizeID($_GET['id']) : '';
+    $id = isset($_REQUEST['id']) && !empty($_REQUEST['id']) ?
+                    COM_sanitizeID($_REQUEST['id']) : '';
     $status = LGLIB_invokeService('locator', 'getInfo',
             array('id' => $id), $A, $svc_msg);
     if ($status == PLG_RET_OK) {
@@ -54,12 +54,12 @@ case 'getloc':
     break;
 
 case 'addreminder':
-    $rp_id = (int)$_GET['rp_id'];
+    $rp_id = (int)$_REQUEST['rp_id'];
     $status = array();
     USES_evlist_class_repeat();
     $Ev = new evRepeat($rp_id);
     if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess(2)) {
-        $username = COM_getDisplayName($_GET['uid']);
+        $username = COM_getDisplayName($_USER['uid']);
         $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
             (eid, rp_id, uid, name, email, days_notice)
         VALUES (
@@ -67,8 +67,8 @@ case 'addreminder':
             '{$Ev->rp_id}',
             '" . (int)$_USER['uid']. "',
             '" . DB_escapeString($username) . "',
-            '" . DB_escapeString($_GET['rem_email']) . "',
-            '" . (int)$_GET['notice']. "')";
+            '" . DB_escapeString($_REQUEST['rem_email']) . "',
+            '" . (int)$_REQUEST['notice']. "')";
         //COM_errorLog($sql);
         DB_query($sql, 1);
         if (!DB_error()) {
@@ -82,7 +82,7 @@ case 'addreminder':
     break;
 
 case 'delreminder':
-    $rp_id = (int)$_GET['rp_id'];
+    $rp_id = (int)$_REQUEST['rp_id'];
     $uid = (int)$_USER['uid'];
     if (!COM_isAnonUser() && $rp_id > 0) {
         USES_evlist_class_repeat();
@@ -96,12 +96,12 @@ case 'delreminder':
     break;
 
 case 'getCalDay':
-    $month = (int)$_GET['month'];
-    $day = (int)$_GET['day'];
-    $year = (int)$_GET['year'];
-    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
-    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
-    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $month = (int)$_REQUEST['month'];
+    $day = (int)$_REQUEST['day'];
+    $year = (int)$_REQUEST['year'];
+    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
+    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
+    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
     USES_evlist_class_view();
     $V = new evView_day($year, $month, $day, $cat, $cal, $opt);
     echo $V->Content();
@@ -109,12 +109,12 @@ case 'getCalDay':
     break;
 
 case 'getCalWeek':
-    $month = (int)$_GET['month'];
-    $day = (int)$_GET['day'];
-    $year = (int)$_GET['year'];
-    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
-    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
-    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $month = (int)$_REQUEST['month'];
+    $day = (int)$_REQUEST['day'];
+    $year = (int)$_REQUEST['year'];
+    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
+    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
+    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
     USES_evlist_class_view();
     $V = new evView_week($year, $month, $day, $cat, $cal, $opt);
     echo $V->Content();
@@ -122,11 +122,11 @@ case 'getCalWeek':
     break;
 
 case 'getCalMonth':
-    $month = (int)$_GET['month'];
-    $year = (int)$_GET['year'];
-    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
-    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
-    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $month = (int)$_REQUEST['month'];
+    $year = (int)$_REQUEST['year'];
+    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
+    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
+    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
     USES_evlist_class_view();
     $V = new evView_month($year, $month, 1, $cat, $cal, $opt);
     echo $V->Content();
@@ -134,10 +134,10 @@ case 'getCalMonth':
     break;
 
 case 'getCalYear':
-    $year = (int)$_GET['year'];
-    $cat = isset($_GET['cat']) ? (int)$_GET['cat'] : 0;
-    $cal = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
-    $opt = isset($_GET['opt']) ? $_GET['opt'] : '';
+    $year = (int)$_REQUEST['year'];
+    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
+    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
+    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
     USES_evlist_class_view();
     $V = new evView_year($year, 1, 1, $cat, $cal, $opt);
     echo $V->Content();
@@ -146,20 +146,21 @@ case 'getCalYear':
 
 case 'toggle':
     // Toggle the enabled flag for an event or other item.
-    // This is the same as the admin ajax function and takes the same $_GET
+    // This is the same as the admin ajax function and takes the same $_REQUEST
     // parameters, but checks that the user is the event owner or other
     // authorized user before acting.
-    switch($_GET['component']) {
+    $oldval = $_POST['oldval'] == 1 ? 1 : 0;
+    switch($_POST['component']) {
     case 'event':
         USES_evlist_class_event();
-        $Ev = new evEvent($_REQUEST['id']);
+        $Ev = new evEvent($_POST['id']);
         if (!plugin_ismoderator_evlist() || !$Ev->isOwner() || $Ev->isNew) {
-            $newval = $_REQUEST['oldval'];
+            $newval = $oldval;
             break;
         }
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
-            $newval = evEvent::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = evEvent::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
@@ -168,10 +169,11 @@ case 'toggle':
     }
     $response = array(
         'newval' => $newval,
-        'id'    => $_REQUEST['id'],
-        'type'  => $_REQUEST['type'],
-        'component' => $_REQUEST['component'],
+        'id'    => $_POST['id'],
+        'type'  => $_POST['type'],
+        'component' => $_POST['component'],
         'baseurl'   => EVLIST_URL,
+        'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
     );
     echo json_encode($response);
     break;

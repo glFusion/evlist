@@ -360,6 +360,8 @@ You may either move existing events to a new calendar, or delete those events.',
 'timezone'      => 'Timezone',
 'tz_local'      => 'Guest&apos;s local timezone',
 'tz_select'     => 'Select Timezone',
+'msg_item_updated' => 'Item has been updated',
+'msg_item_nochange' => 'Item was not changed',
 );
 
 // Localization of the Admin Configuration UI

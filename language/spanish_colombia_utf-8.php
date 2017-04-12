@@ -362,6 +362,8 @@ You may either move existing events to a new calendar, or delete those events.',
 'timezone'      => 'Timezone',
 'tz_local'      => 'Guest&apos;s local timezone',
 'tz_select'     => 'Select Timezone',
+'msg_item_updated' => 'Item has been updated',
+'msg_item_nochange' => 'Item was not changed',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

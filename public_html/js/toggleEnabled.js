@@ -1,76 +1,29 @@
 /*  Updates database values as checkboxes are checked.
  */
-var xmlHttp;
-function EVLIST_toggle(ckbox, id, type, component, base_url)
-{
-  xmlHttp=EV_getXmlHttpObject();
-  if (xmlHttp==null) {
-    alert ("Browser does not support HTTP Request")
-    return
-  }
-  // value is reversed since we send the oldvalue to ajax
-  var oldval = ckbox.checked == true ? 0 : 1;
-  var url=base_url + "/ajax.php?action=toggle";
-
-  url=url+"&id="+id;
-  url=url+"&type="+type;
-  url=url+"&component="+component;
-  url=url+"&oldval="+oldval;
-  url=url+"&sid="+Math.random();
-  xmlHttp.onreadystatechange=EV_stateChanged;
-  xmlHttp.open("GET",url,true);
-  xmlHttp.send(null);
+var EVLIST_toggle = function(cbox, id, type, component, base_url) {
+    oldval = cbox.checked ? 0 : 1;
+    var dataS = {
+        "action" : "toggle",
+        "id": id,
+        "type": type,
+        "oldval": oldval,
+        "component": component,
+    };
+    data = $.param(dataS);
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: base_url + "/ajax.php",
+        data: data,
+        success: function(result) {
+            cbox.checked = result.newval == 1 ? true : false;
+            try {
+                $.UIkit.notify("<i class='uk-icon-check'></i>&nbsp;" + result.statusMessage, {timeout: 1000,pos:'top-center'});
+            }
+            catch(err) {
+                alert(result.statusMessage);
+            }
+        }
+    });
+    return false;
 }
-
-function EV_stateChanged()
-{
-  var newstate;
-
-  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") {
-    jsonObj = JSON.parse(xmlHttp.responseText)
-
-    id = jsonObj.id;
-    baseurl = jsonObj.baseurl;
-    type = jsonObj.type;
-    component = jsonObj.component;
-    // Set the span ID of the updated checkbox
-    var spanid = jsonObj.component + "_" + jsonObj.id;
-    if (jsonObj.newval == 1) {
-        document.getElementById(spanid).checked = true;
-    } else {
-        document.getElementById(spanid).checked = false;
-    }
-/*
-  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
-  {
-    xmlDoc=xmlHttp.responseXML;
-    id = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
-    baseurl = xmlDoc.getElementsByTagName("baseurl")[0].childNodes[0].nodeValue;
-    type = xmlDoc.getElementsByTagName("type")[0].childNodes[0].nodeValue;
-    component = xmlDoc.getElementsByTagName("component")[0].childNodes[0].nodeValue;
-    if (xmlDoc.getElementsByTagName("newval")[0].childNodes[0].nodeValue == 1) {
-        document.getElementById("togenabled"+id).checked=true;
-        newval = 1;
-    } else {
-        document.getElementById("togenabled"+id).checked=false;
-        newval = 0;
-    }
-  }*/
-
-}
-}
-
-function EV_getXmlHttpObject()
-{
-  var objXMLHttp=null
-  if (window.XMLHttpRequest)
-  {
-    objXMLHttp=new XMLHttpRequest()
-  }
-  else if (window.ActiveXObject)
-  {
-    objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
-  }
-  return objXMLHttp
-}
-

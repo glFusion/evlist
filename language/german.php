@@ -359,6 +359,8 @@ $LANG_EVLIST = array(
 'timezone'                => 'Zeitzone',
 'tz_local'                => 'Benutzer-Zeitzone',
 'tz_select'                => 'Wähle Zeitzone',
+'msg_item_updated' => 'Item has been updated',
+'msg_item_nochange' => 'Item was not changed',
 );
 
 // Localization of the Admin Configuration UI

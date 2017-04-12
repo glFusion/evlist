@@ -8,6 +8,7 @@ Release TBD
 - Add timezone support for events
 - Change Meetup.com group IDs to array
 - Fix recurring multi-day events
+- Require glFusion 1.6+
 
 ## v1.4.2
 Released 2017-01-21

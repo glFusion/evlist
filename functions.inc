@@ -665,6 +665,7 @@ function EVLIST_cb_content($format)
         break;
     case 2:         // upcoming events
     default:
+        $opts['upcoming'] = true;
         $start = $_EV_CONF['_today'];
         $end = EV_MAX_DATE;
         break;
@@ -826,6 +827,8 @@ function plugin_user_move_evlist($origUID, $destUID)
     DB_query("UPDATE {$_TABLES['evlist_submissions']}
             SET owner_id = $destUID WHERE owner_id = $origUID", 1);
     DB_query("UPDATE {$_TABLES['evlist_remlookup']}
+            SET uid = $destUID WHERE uid = $origUID", 1);
+    DB_query("UPDATE {$_TABLES['evlist_tickets']}
             SET uid = $destUID WHERE uid = $origUID", 1);
 }
 
@@ -1581,9 +1584,9 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     $max_days = (int)$_EV_CONF['max_upcoming_days'];
 
     // Set the start & ending periods.
-    $end = date('Y-m-d', $_EV_CONF['_today_ts'] + (86400 * $max_days));
-    $limit = $_EV_CONF['limit_block'];
-    $now = date('Y-m-d H:i:s');
+    $dt = new Date($_EV_CONF['_today_ts'] + (86400 * $max_days));
+    $end = $dt->format('Y-m-d', true);
+    $limit = (int)$_EV_CONF['limit_block'];
 
     // Figure out the selected category & calendar.  Only one supported now,
     // defaults to category.
@@ -1633,36 +1636,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
         $daycount = 0;      // Count events shown each day.
 
         foreach ($daydata as $ev_id=>$ev) {
-            // Get the timestamps for quick comparisons.  If split, use time2
-            $s_ts = $ev['rp_date_start'] . ' ' . $ev['rp_time_start1'];
-            if ($ev['split'] == 1) {
-                $e_ts = $ev['rp_date_end'] . ' ' . $ev['rp_time_end2'];
-            } else {
-                $e_ts = $ev['rp_date_end'] . ' ' . $ev['rp_time_end1'];
-            }
-
-            // Determine if this event is "past" for the purpose of this list.
-            switch ($_EV_CONF['event_passing']) {
-            case 1:     // start time has passed
-                if ($s_ts < $now)
-                    continue 2;
-                break;
-            case 2:     // start date is past
-                if ($ev['rp_date_start'] < $_EV_CONF['_today'])
-                    continue 2;
-                break;
-            case 3:     // end time has passed, maybe same day
-                if ($e_ts < $now)
-                    continue 2;
-                break;
-            case 4:     // end date has passed
-                if ($ev['rp_date_end'] < $_EV_CONF['_today'])
-                    continue 2;
-                break;
-            default:    // show the event
-                break;
-            }
-
             // Check that this event should be shown as upcoming at all, and
             // only show multi-day events once.
             if ($ev['show_upcoming'] != 1 ||
@@ -1711,7 +1684,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
             $T->parse('bDay', 'blkDay', true);
             $T->clear_var('bItem');
         }
-
         if ($count >= $limit) break;
     }
     if ($count > 0) {
@@ -2201,7 +2173,7 @@ function EVLIST_isCurrentVersion()
 */
 function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 {
-    global $_TABLES, $_EV_CONF;
+    global $_TABLES, $_EV_CONF, $_CONF, $_USER;
 
     USES_lglib_class_datecalc();
 
@@ -2212,8 +2184,8 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     if (!Date_Calc::isValidDate($d, $m, $y)) $start = $_EV_CONF['_today'];
     list($y, $m, $d) = explode('-', $end);
     if (!Date_Calc::isValidDate($d, $m, $y)) $end = $start;
-    $start = DB_escapeString($start);
-    $end = DB_escapeString($end);
+    $start = DB_escapeString($start . ' 00:00:00');
+    $end = DB_escapeString($end . ' 23:59:59');
 
     // Set up other search options.
     $selection = '';
@@ -2226,7 +2198,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     $page = 0;
     $cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
     // default date range for fixed calendars, "upcoming" may be different
-    $dt_sql = "rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start'";
+    $dt_sql = "rep.rp_start <= '$end' AND rep.rp_end >= '$start'";
     if (is_array($opts) && !empty($opts)) {
         foreach ($opts as $key => $value) {
             $value = DB_escapeString($value);
@@ -2269,24 +2241,24 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             case 'upcoming':
                 // Alters the date range based on the setting for upcoming
                 // events.
-                $dt = new Date('now', $_CONF['timezone']);
                 switch ($_EV_CONF['event_passing']) {
-                case 1:     // exclude if start time has passed
-                    $dt_sql = "rep.rp_date_start > '" . $dt->toMySQL(true) .
-                        "' AND rep.rp_date_start <= '$end'";
+                case 1:     // include if start time has not passed
+                    $dt = new Date('now', $_CONF['timezone']);
+                    $dt_sql = "rep.rp_start >= '" . $dt->toMySQL(true) . "'";
                     break;
-                case 2:     // exclude if start date has passed
-                    list($y, $m, $d) = explode('-', $dt->format('Y-m-d', true));
-                    $start = Date_Calc::nextDay($d, $m, $y);
-                    $dt_sql = "rep.rp_date_start > '$start' AND rep.rp_date_start <= '$end'";
+                case 2:     // include if start date has not passed
+                    $dt_sql = "rep.rp_start >= '$start 00:00:00'";
                     break;
-                case 3:     // exclude if end time has passed
-                    $dt_sql = "rep.rp_date_end > '" . $dt->toMySQL(true) . "'";
+                case 3:     // include if end time has not passed
+                    $dt = new Date('now', $_CONF['timezone']);
+                    $dt_sql = "rep.rp_end >= '" . $dt->toMySQL(true) . "'";
                     break;
-                case 4:     // exclude if end date has passed
-                    $dt_sql = "rep.rp_date_end > '" . $dt->format('Y-m-d', true) . "'";
+                case 4:     // include if end date has not passed
+                    $dt_sql = "rep.rp_end >= '$end 23:59:59'";
                     break;
                 }
+                // Always limit to events starting before the specified end date
+                $dt_sql .= " AND rep.rp_start <= '$end 23:59:59'";
                 break;
             case 'select':
                 $selection = $value;
@@ -2393,11 +2365,9 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 list($y, $m, $d) = explode('-', $newdate);
                 $newdate = Date_Calc::nextDay($d, $m, $y, '%Y-%m-%d');
             }
-
         }
 
     }   // while
-
     // Now, get Meetup events
     if ($_EV_CONF['meetup_enabled']) {
         EVLIST_getMeetupEvents($start, $end, $opts, $events);
@@ -2580,7 +2550,7 @@ function EVLIST_setReturn($key)
 *   Used to check if a return URL has been set so other actions can
 *   be taken if necessary.
 *
-*   @return mixed   URL key, or zero if not set
+*   @return mixed   URL, key, or zero if not set
 */
 function EVLIST_checkReturn()
 {
@@ -2609,7 +2579,7 @@ function EVLIST_getReturn()
         'home'      => EVLIST_URL . '/index.php',
     );
 
-    $from = SESS_getVar('evlist_fromurl');
+    $from = EVLIST_checkReturn();
     if (isset($urls[$from])) {
         // A key value is set, return the associated URL
         return $urls[$from];

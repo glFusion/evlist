@@ -1,15 +1,15 @@
 <?php
 /**
- *  Class to manage event repeats or single instances for the EvList plugin
- *
- *  @author     Lee Garner <lee@leegarner.com>
- *  @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
- *  @package    evlist
- *  @version    1.4.1
- *  @license    http://opensource.org/licenses/gpl-2.0.php
- *              GNU Public License v2 or later
- *  @filesource
- */
+*   Class to manage event repeats or single instances for the EvList plugin
+*
+*   @author     Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+*   @package    evlist
+*   @version    1.4.3
+*   @license    http://opensource.org/licenses/gpl-2.0.php
+*               GNU Public License v2 or later
+*   @filesource
+*/
 
 USES_evlist_class_event();
 USES_evlist_class_detail();
@@ -295,19 +295,27 @@ class evRepeat
             $D->SetVars($A);
             $D->ev_id = $this->ev_id;
             $this->det_id = $D->Save();
+            $date_start = DB_escapeString($this->date_start);
+            $date_end = DB_escapeString($this->date_end);
+            $time_start1 = DB_escapeString($this->time_start1);
+            $time_start2 = DB_escapeString($this->time_start2);
+            $time_end1 = DB_escapeString($this->time_end1);
+            $time_end2 = DB_escapeString($this->time_end2);
+            $t_end = $this->split ? $time_end2 : $time_end1;
             $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
-                rp_date_start = '" . DB_escapeString($this->date_start) . "',
-                rp_date_end= '" . DB_escapeString($this->date_end) . "',
-                rp_time_start1 = '" . DB_escapeString($this->time_start1) . "',
-                rp_time_end1 = '" . DB_escapeString($this->time_end1) . "',
-                rp_time_start2 = '" . DB_escapeString($this->time_start2) . "',
-                rp_time_end2 = '" . DB_escapeString($this->time_end2) . "',
+                rp_date_start = '$date_start',
+                rp_date_end= '$date_end',
+                rp_time_start1 = '$time_start1',
+                rp_time_end1 = '$time_end1',
+                rp_time_start2 = '$time_start2',
+                rp_time_end2 = '$time_end2',
+                rp_start = '$date_start $time_start1',
+                rp_end = '$date_end $t_end',
                 rp_det_id='" . (int)$this->det_id . "'
             WHERE rp_id='{$this->rp_id}'";
             //echo $sql;die;
             DB_query($sql);
         }
-
     }
 
 
@@ -1191,28 +1199,26 @@ class evRepeat
     */
     public static function getUpcoming($ev_id, $ts = NULL)
     {
-        global $_EV_CONF, $_TABLES;
+        global $_EV_CONF, $_TABLES, $_CONF;
 
         if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new Date($ts);
-        $sql_date = $D->format('Y-m-d', false);
-        $sql_time = $D->format('H:i:s', false);
+        $D = new Date($ts, $_CONF['timezone']);
+        $sql_date = $D->toMySQL(true);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
-                AND (rp_date_start > '$sql_date'
-                OR (rp_date_start = '$sql_date'
-                    AND rp_time_start1 >= '$sql_time'))
-                ORDER BY rp_date_start, rp_time_start1 ASC
+                    AND (rp_end >= '$sql_date'
+                ORDER BY rp_start ASC
                 LIMIT 1";
         $res = DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("evRepeat::getUpcoming() error: $sql");
-        }
-        if (DB_numRows($res) != 1) {
+            COM_errorLog(__METHOD__ . "() error: $sql");
             return false;
-        } else {
+        }
+        if (DB_numRows($res) == 1) {
             $A = DB_fetchArray($res, false);
             return $A['rp_id'];
+        } else {
+            return false;
         }
     }
 
@@ -1230,17 +1236,18 @@ class evRepeat
 
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
-                ORDER BY rp_date_start, rp_time_start1 DESC
+                ORDER BY rp_end DESC
                 LIMIT 1";
         $res = DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("evRepeat::getLast() error: $sql");
-        }
-        if (DB_numRows($res) != 1) {
+            COM_errorLog(__METHOD__ . "() error: $sql");
             return false;
-        } else {
+        }
+        if (DB_numRows($res) == 1) {
             $A = DB_fetchArray($res, false);
             return $A['rp_id'];
+        } else {
+            return false;
         }
     }
 
@@ -1257,11 +1264,11 @@ class evRepeat
 
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
-                ORDER BY rp_date_start, rp_time_start1 ASC
+                ORDER BY rp_start ASC
                 LIMIT 1";
         $res = DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("evRepeat::getFirst() error: $sql");
+            COM_errorLog(__METHOD__ . "() error: $sql");
         }
         if (DB_numRows($res) != 1) {
             return false;
@@ -1274,32 +1281,21 @@ class evRepeat
 
     /**
     *   Get the nearest event, upcoming or past.
-    *   If the event has not passed, get the closest upcoming instance.
-    *   For past events, get the last instance.
+    *   Try first to get the closest upcoming instance, then try for the
+    *   most recent past instance.
     *
     *   @uses   evRepeat::getLast()
     *   @uses   evRepeat::getUpcoming()
     *   @param  string  $ev_id  Event ID
-    *   @return mixed       Instance ID, or False on an error
+    *   @return mixed       Instance ID, or False on an or not found
     */
     public static function getNearest($ev_id)
     {
-        global $_TABLES, $_EV_CONF;
-
-        $sql = "SELECT COUNT(*) as C FROM {$_TABLES['evlist_repeat']}
-                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
-                    AND rp_date_end >= '{$_EV_CONF['_today']}'";
-        $res = DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog("evRepeat::getNearest() error: $sql");
-            return false;
+        $rp_id = self::getUpcoming($ev_id);
+        if ($rp_id === false) {
+            $rp_id = self::getLast($ev_id);
         }
-        $A = DB_fetchArray($res, false);
-        if ((int)$A['C'] > 0) {
-            return self::getUpcoming($ev_id);
-        } else {
-            return self::getLast($ev_id);
-        }
+        return $rp_id;
     }
 
 }   // class evRepeat

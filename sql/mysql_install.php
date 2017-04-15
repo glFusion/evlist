@@ -84,9 +84,12 @@ $_SQL['evlist_repeat'] = "CREATE TABLE {$_TABLES['evlist_repeat']} (
   `rp_time_end1` time DEFAULT NULL,
   `rp_time_start2` time DEFAULT NULL,
   `rp_time_end2` time DEFAULT NULL,
+  `rp_start` DATETIME,
+  `rp_end` DATETIME,
   PRIMARY KEY (`rp_id`),
   KEY `event` (`rp_ev_id`),
-  KEY `start` (`rp_date_start`)
+  KEY `start` (`rp_start`),
+  KEY `end` (`rp_end`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_categories'] = "CREATE TABLE {$_TABLES['evlist_categories']} (
@@ -307,6 +310,15 @@ $_EV_UPGRADE = array(
         CHANGE lng lng float(10,6) default NULL",
     "UPDATE {$_TABLES['conf_values']} SET type = '%text' WHERE
         name = 'meetup_gid' AND group_name = 'evlist'",
+    "ALTER TABLE {$_TABLES['evlist_repeat']}
+        ADD rp_start DATETIME, ADD rp_end DATETIME",
+    "ALTER TABLE {$_TABLES['evlist_repeat']}
+        DROP KEY `start`,
+        ADD KEY `start`(rp_start),
+        ADD KEY `end`(rp_end)",
+    "UPDATE {$_TABLES['evlist_repeat']} SET
+        rp_start = CONCAT(rp_date_start, ' ', rp_time_end1),
+        rp_end = concat(rp_date_end, ' ', IF (rp_time_end2 > '00:00:00', rp_time_end2, rp_time_end1))",
     ),
 );
 $_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];

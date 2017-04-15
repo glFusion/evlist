@@ -561,13 +561,16 @@ class evEvent
                     }
                 } else {
                     // this is a one-time event, update the existing instance
+                    $t_end = $this->split ? $this->time_end2 : $this->time_end1;
                     $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
                             rp_date_start = '{$this->date_start1}',
                             rp_date_end = '{$this->date_end1}',
                             rp_time_start1 = '{$this->time_start1}',
                             rp_time_end1 = '{$this->time_end1}',
                             rp_time_start2 = '{$this->time_start2}',
-                            rp_time_end2 = '{$this->time_end2}'
+                            rp_time_end2 = '{$this->time_end2}',
+                            rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
+                            rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end')
                         WHERE rp_ev_id = '{$this->id}'";
                     DB_query($sql, 1);
                 }

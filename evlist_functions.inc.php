@@ -39,7 +39,7 @@
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.1
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -351,27 +351,16 @@ function EVLIST_getDayViewData($events, $today = '')
                     list($hr, $min, $sec) = explode(':', $A['rp_time_start1']);
                     $hr = '00';
                     $A['rp_times_start1'] = implode(':', array($hr, $min, $sec));
-                //} else {
-                //    $starthour = date('G', strtotime($A['rp_date_start'] .
-                //                    ' ' . $A['rp_time_start^1']));
                 }
                 if ($A['rp_date_end'] > $today) {
                     list($hr, $min, $sec) = explode(':', $A['rp_time_end1']);
                     $hr = '23';
                     $A['rp_times_end1'] = implode(':', array($hr, $min, $sec));
-                //} else {
-                //    $endhour = date('G', strtotime($A['rp_date_end'] .
-                //                    ' ' . $A['rp_time_end1']));
                 }
                 $dtStart = new Date(strtotime($A['rp_date_start'] .
                                     ' ' . $A['rp_time_start1']));
                 $dtEnd = new Date(strtotime($A['rp_date_end'] .
                                     ' ' . $A['rp_time_end1']));
-
-                //if (date('i', strtotime($A['rp_date_end'] . ' ' .
-                //            $A['rp_time_end1'])) == '00') {
-                //    $endhour = $endhour - 1;
-                //}
 
                 // Save the start & end times in separate variables.
                 // This way we can add $A to a different hour if it's a split.
@@ -393,8 +382,6 @@ function EVLIST_getDayViewData($events, $today = '')
                     // This is a split event, second half occurs later today.
                     // Events spanning multiple days can't be split, so we
                     // know that the start and end times are on the same day.
-                    //$starthour = date('G', strtotime($A['rp_date_start'] .
-                    //                ' ' . $A['rp_time_start2']));
                     $dtStart->setTimestamp(strtotime($event['rp_date_start'] .
                                 ' ' . $event['rp_time_start2']));
                     $starthour = $dtStart->format('G', false);

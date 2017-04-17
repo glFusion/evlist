@@ -60,9 +60,9 @@ require_once dirname(__FILE__) . '/evlist.php';
 
 // Some variables are used all over, so get them once to avoid a lot of
 // function calls
-$dt = new Date('now', $_CONF['timezone']);
-$_EV_CONF['_today'] = $dt->format('Y-m-d', true);
-$_EV_CONF['_today_ts'] = $dt->toUnix();
+$_EV_CONF['_now'] = new Date('now', $_CONF['timezone']);
+$_EV_CONF['_today'] = $_EV_CONF['_now']->format('Y-m-d', true);
+$_EV_CONF['_today_ts'] = $_EV_CONF['_now']->toUnix();
 
 // Check the version of the locator plugin and reset the use_locator
 // config value if it's inadequate.
@@ -2243,15 +2243,13 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                 // events.
                 switch ($_EV_CONF['event_passing']) {
                 case 1:     // include if start time has not passed
-                    $dt = new Date('now', $_CONF['timezone']);
-                    $dt_sql = "rep.rp_start >= '" . $dt->toMySQL(true) . "'";
+                    $dt_sql = "rep.rp_start >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 2:     // include if start date has not passed
                     $dt_sql = "rep.rp_start >= '$start 00:00:00'";
                     break;
                 case 3:     // include if end time has not passed
-                    $dt = new Date('now', $_CONF['timezone']);
-                    $dt_sql = "rep.rp_end >= '" . $dt->toMySQL(true) . "'";
+                    $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 4:     // include if end date has not passed
                     $dt_sql = "rep.rp_end >= '$end 23:59:59'";

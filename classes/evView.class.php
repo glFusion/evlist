@@ -14,7 +14,6 @@
 
 USES_evlist_functions();
 USES_lglib_class_datecalc();
-USES_class_date();
 date_default_timezone_set('UTC');
 
 class evView
@@ -687,8 +686,6 @@ class evView_day extends evView
         );
         $alldaydata = array();
 
-        USES_class_date();
-
         // Events are keyed by hour, so read through each hour
         foreach ($events as $date=>$E) {
             // Now read each event contained in each hour
@@ -1257,8 +1254,6 @@ class evView_year extends evView
         $daynames = self::DayNames(1);
         $events = EVLIST_getEvents($starting_date, $ending_date,
             array('cat'=>$this->cat, 'cal'=>$this->cal));
-        // A date object to handle formatting
-        $dt = new Date('now');
 
         $T = new Template(EVLIST_PI_PATH . '/templates/yearview');
         $tpl = $this->getTemplate();
@@ -1446,10 +1441,8 @@ class evView_list extends evView
             );
         switch ($this->range) {
         case 1:         // past
-            $dt = new Date('now', $_CONF['timezone']);
             $start = EV_MIN_DATE;
-            //$end = $_EV_CONF['_today'];
-            $end = $dt->toMySQL(true);
+            $end = $_EV_CONF['_now']->toMySQL(true);
             $opts['order'] = 'DESC';
             break;
         case 3:         //this week
@@ -1629,9 +1622,6 @@ class evView_smallmonth extends evView
         }
 
         $T->set_block('smallmonth', 'week', 'wBlock');
-
-        USES_class_date();
-        $dt = new Date('now');
 
         foreach ($calendarView as $weeknum => $weekdata) {
             list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);

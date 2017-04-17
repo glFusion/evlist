@@ -65,7 +65,8 @@ class sitemap_evlist extends sitemap_base
             $sql .= COM_getPermSql('AND', $this->uid, 2, 'e');
         }
         if ($this->isHTML()) {
-            $sql .= " AND r.rp_date_end >= '{$_EV_CONF['_today']}'";
+            // Includes events that end anytime today
+            $sql .= " AND r.rp_end >= '{$_EV_CONF['_today']}'";
         }
         $sql .= ' GROUP BY e.id ORDER BY r.rp_date_start DESC';
         $result = DB_query($sql, 1);

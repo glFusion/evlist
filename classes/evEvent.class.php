@@ -1480,15 +1480,19 @@ class evEvent
 
         $i = 0;
         foreach($days as $event) {
+            $t_end = $this->split ? $event['tm_end2'] : $event['tm_end1'];
             $sql = "INSERT INTO {$_TABLES['evlist_repeat']} (
                         rp_ev_id, rp_det_id, rp_date_start, rp_date_end,
                         rp_time_start1, rp_time_end1,
-                        rp_time_start2, rp_time_end2
+                        rp_time_start2, rp_time_end2,
+                        rp_start, rp_end
                     ) VALUES (
                         '{$this->id}', '{$this->det_id}',
                         '{$event['dt_start']}', '{$event['dt_end']}',
                         '{$event['tm_start1']}', '{$event['tm_end1']}',
-                        '{$event['tm_start2']}', '{$event['tm_end2']}'
+                        '{$event['tm_start2']}', '{$event['tm_end2']}',
+                        '{$event['dt_start']} {$event['tm_start1']}',
+                        '{$event['dt_end']} {$t_end}'
                     )";
             //echo $sql;
             DB_query($sql, 1);

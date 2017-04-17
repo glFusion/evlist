@@ -114,7 +114,8 @@ class evRepeat
         case 'dtStart2':
         case 'dtEnd2':
             // Date objects to track starting and ending timestamps
-            $this->properties[$var] = new Date($value, $this->tzid);
+            //$this->properties[$var] = new Date($value, $this->tzid);
+            $this->properties[$var] = new Date($value, $_CONF['timezone']);
             break;
 
         default:
@@ -135,7 +136,7 @@ class evRepeat
     {
         switch($var) {
         case 'use_tz':
-            return false;
+            return true;
             //return $this->Event->tzid == 'local' ? false : true;
             break;
         default:
@@ -301,7 +302,7 @@ class evRepeat
             $time_start2 = DB_escapeString($this->time_start2);
             $time_end1 = DB_escapeString($this->time_end1);
             $time_end2 = DB_escapeString($this->time_end2);
-            $t_end = $this->split ? $time_end2 : $time_end1;
+            $t_end = $this->Event->split ? $time_end2 : $time_end1;
             $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
                 rp_date_start = '$date_start',
                 rp_date_end= '$date_end',
@@ -313,7 +314,6 @@ class evRepeat
                 rp_end = '$date_end $t_end',
                 rp_det_id='" . (int)$this->det_id . "'
             WHERE rp_id='{$this->rp_id}'";
-            //echo $sql;die;
             DB_query($sql);
         }
     }
@@ -842,6 +842,7 @@ class evRepeat
     *   Register a user for an event.
     *
     *   @param  integer $num_attendees  Number of attendees, default 1
+    *   @param  integer $tick_type      Id of ticket type
     *   @param  integer $uid    User ID to register, 0 for current user
     *   @return integer         Message code, zero for success
     */
@@ -1181,7 +1182,7 @@ class evRepeat
                     $this->Event->Detail->title . ' ' . $this->start_date1 .
                     ' ' . $this->start_time1,
 
-            'amount' => sprintf("%5.2f", (float)$fee),
+            'amount' => number_format((float)$fee, 2, '.', ''),
             'quantity' => $qty,
             'extras' => array('shipping' => 0),
         );
@@ -1206,7 +1207,7 @@ class evRepeat
         $sql_date = $D->toMySQL(true);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
-                    AND (rp_end >= '$sql_date'
+                    AND rp_end >= '$sql_date'
                 ORDER BY rp_start ASC
                 LIMIT 1";
         $res = DB_query($sql, 1);

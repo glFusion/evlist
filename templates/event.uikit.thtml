@@ -351,7 +351,7 @@ function showReminder(status) {
 var updateReminder = function(el) {
     var dataS = {
         "action" : el.action.value,
-        "email": el.rem_email.value,
+        "rem_email": el.rem_email.value,
         "notice": el.notice.value,
         "rp_id": "{rp_id}",
         "eid": "{ev_id}",

@@ -320,6 +320,10 @@ class evView
     */
     protected function setSession()
     {
+        // Only used to set the calendar view, no change when
+        // viewing an event
+        if ($this->type == 'detail') return;
+
         $A = SESS_getVar('evlist.current');
         if (is_array($A['date'])) {
             if ($this->year == 0) $this->year = $A['date'][0];

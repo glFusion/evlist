@@ -311,9 +311,10 @@ class evTicket
     *   @param  string  $ev_id      Event ID
     *   @param  integer $rp_id      Repeat ID, 0 for all occurrences
     *   @param  integer $uid        User ID, 0 for all users
+    *   @param  string  $paid       'paid', 'unpaid', or empty for all
     *   @return array       Array of evTicket objects, indexed by ID
     */
-    public static function GetTickets($ev_id='', $rp_id = 0, $uid = 0, $paid='')
+    public static function GetTickets($ev_id, $rp_id = 0, $uid = 0, $paid='')
     {
         global $_TABLES;
 
@@ -322,7 +323,7 @@ class evTicket
         $ev_id = DB_escapeString($ev_id);
         $rp_id = (int)$rp_id;
         $uid = (int)$uid;
-        $where = array();
+        $where = array('1 = 1');    // Initialize in case of no other clauses
         if ($ev_id != '') {
             $where[] = "ev_id = '$ev_id'";
         }
@@ -340,7 +341,6 @@ class evTicket
         }
 
         if (!empty($where)) {
-            // Have to have some where clause
             $sql_where = implode(' AND ', $where);
             $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE $sql_where
                     ORDER BY dt ASC";
@@ -555,10 +555,10 @@ class evTicket
         );
         $retval .= '"' . implode('","', $header) . '"' . "\n";
 
-        //$tic_types = array();
         $counter = 0;
-        $dt_tick = new Date('now');
-        $dt_used = new Date('now');
+        // For display, use the site timezone
+        $dt_tick = new Date('now', $_CONF['timezone']);
+        $dt_used = new Date('now', $_CONF['timezone']);
         foreach ($tickets as $tic_id=>$ticket) {
             $counter++;
             $dt_tick->setTimestamp($ticket->dt);
@@ -570,7 +570,7 @@ class evTicket
                 str_replace('"', "'", COM_getDisplayName($ticket->uid)),
                 $ticket->fee,
                 $ticket->paid,
-                $ticket->used > $ticket->dt ? $dt_used->toMySQL(): '',
+                $ticket->used > $ticket->dt ? $dt_used->toMySQL(true): '',
             );
             if ($Rp->Event->options['max_rsvp'] > 0) {
                 $is_waitlisted = ($counter > $Rp->Event->options['max_rsvp']) ? 'Yes': 'No';
@@ -625,7 +625,8 @@ class evTicket
     {
         global $_TABLES;
 
-        $amt = (float)$amt;
+        // Use US floating point format for MySQL
+        $amt = number_format((float)$amt, 2, '.', '');
         $tick_id = DB_escapeString($tick_id);
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
                 SET paid = paid + $amt
@@ -661,6 +662,14 @@ class evTicket
     }
 
 
+    /**
+    *   Get a cound of the unpaid tickets for a user/event.
+    *
+    *   @param  string  $ev_id      Event ID
+    *   @param  integer $rp_id      Instance ID, default 0 (event)
+    *   @param  integer $uid        User ID, default to current user
+    *   @return integer     Number of unpaid tickets
+    */
     public static function CountUnpaid($ev_id, $rp_id=0, $uid=0)
     {
         global $_TABLES, $_USER;
@@ -681,6 +690,16 @@ class evTicket
     }
 
 
+    /**
+    *   Mark a number of tickets paid for a user/event
+    *
+    *   @uses   evTicket::CountUnpaid()
+    *   @param  integer $count      Number of tickets paid
+    *   @param  string  $ev_id      Event ID
+    *   @param  integer $rp_id      Instance ID, default 0 (event)
+    *   @param  integer $uid        User ID, default to current user
+    *   @return integer     Number of user/event tickets remainint unpaid
+    */
     public static function MarkPaid($count, $ev_id, $rp_id=0, $uid=0)
     {
         global $_TABLES, $_USER;
@@ -691,14 +710,13 @@ class evTicket
         $rp_id = (int)$rp_id;
         $ev_id = DB_escapeString($ev_id);
 
-        $unpaid = self::CountUnpaid($ev_id, $rp_id, $uid);
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
                 SET paid = fee
                 WHERE ev_id = '$ev_id' AND uid = $uid";
         if ($rp_id > 0) $sql .= " AND rp_id = $rp_id";
         $sql .= " LIMIT $count";
         DB_query($sql);
-        return ($unpaid - $count);
+        return self::CountUnpaid($ev_id, $rp_id, $uid);
     }
 
 }   // class evTicket

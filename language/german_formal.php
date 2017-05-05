@@ -4,9 +4,9 @@
 // +--------------------------------------------------------------------------+
 // | german_formal.php                                                        |
 // |                                                                          |
-// | German language file, addressing the user as "Sie"                        |
+// | German language file, addressing the user as "Sie"                       |
 // | Modifiziert: August 09 Tony Kluever                                      |
-// | Siegfried Gutschi (Dezember 2016) <sigi AT modellbaukalender DOT info>   |
+// | Siegfried Gutschi (Mai 2017) <sigi AT modellbaukalender DOT info>        |
 // +--------------------------------------------------------------------------+
 // | Based on the evList Plugin for Geeklog CMS                               |
 // | Copyright (C) 2007 by the following authors:                             |
@@ -60,7 +60,7 @@ $LANG_EVLIST = array(
 'err_cal_import'    => 'Beim importieren aus dem Kalender gab es %d Fehler. Überprüfe die Datei "error.log" für weitere Informationen',
 'err_import_event'  => 'Fehler beim importieren des Ereignisses %s',
 'err_cal_notavail'  => 'Die Kalender-Daten stehen nicht zur Verfügung.',
-'err_upd_repeats'   => 'Error updating repeat events',
+'err_upd_repeats'   => 'Fehler beim Aktualisieren der Wiederholungen',
 'info'              => 'Information',
 'warning'           => 'Warnung',
 'alert'             => 'Warnhinweis',
@@ -138,7 +138,7 @@ $LANG_EVLIST = array(
 'topic_home'        => 'Nur auf der Startseite',
 'recur_stop_desc'   => ' bis %s',
 'recur_freq_txt'    => 'Intervall: Wiederholen nach',
-'interval_label'    => 'Geben Sie einen Tag und einen Intervall für die Wiederholungen an',
+'interval_label'    => 'Wähle Sie einen bestimmten Wochentag und den Intervall für die Wiederholungen',
 'interval_note'     => 'Die erste Wiederholungen wird an, bzw. nach dem, oben angegebenen Datum-Beginn liegen.',
 'all_calendars'     => 'Alle Kalender',
 'all_categories'    => 'Alle Kategorien',
@@ -175,7 +175,7 @@ $LANG_EVLIST = array(
 'split_q'           => 'Veranstaltung aufteilen?',
 'rec_event_info'    => 'Veranstaltungs-Wiederholungen',
 'rec_event_q'       => 'Wiederholende Veranstaltung?',
-'event_recurs'      => 'Veranstaltung wiederholt sich',
+'event_recurs'      => 'Art der Wiederholung',
 'select_format'     => 'Format wählen',
 'jump_today'        => 'Gehe zu Heute',
 'day_view'          => 'Tages-Ansicht',
@@ -240,12 +240,12 @@ $LANG_EVLIST = array(
         'tickettypes'    => '<ul><li>Eintrittskarten können für kostenlose oder kostenpflichtige Eintritte erstellt werden und entweder für eine Veranstaltung oder für all seine Wiederholungen (Saisonkarte) vergeben werden.</li><li>Tickets werden nur verwendet, wenn die globale Einstellung "Tickets und Reservierung" aktiviert ist.</li><li>Ticket-Kategorien können nur gelöscht werden, wenn sie nicht für Veranstaltungen verwendet wurden.</li></ul>',
     ),
 'rec_formats'       => array(
-                    1   => 'Täglich neu im bestimmten Zeitraum (z.B. von 4. Mai bis 7. Mai)',
-                    2   => 'Monatlich nach Tag (z.B. der erste und vierte Tag im Monat)',
-                    3   => 'Jährlich nach Datum (z.B. der 25. Dezember im Jahr)',
-                    4   => 'Wöchentlich nach Wochen-Tag (z.B. Montag, Dienstag und Freitag)',
-                    5   => 'Monatlich nach Wochen-Tag (z.B. der dritte Freitag des Monats)',
-                    6   => 'Benutzerdef. Daten: ein Liste mit Kalenderdaten, mit Komma getrennt',
+                    1   => 'Täglich NEU von - bis          (z.B. von 4. Mai bis 7. Mai jeden Tag NEU)',
+                    2   => 'Bestimmte Tage im Monat        (z.B. der 1. und 15. Tag jedes Monats)',
+                    3   => 'Bestimmter Tag im Jahr         (z.B. der 25. Dezember jedes Jahres)',
+                    4   => 'Bestimmte Wochentage pro Woche (z.B. Montags und Freitags jeder Woche)',
+                    5   => 'Bestimmter Wochentag pro Monat (z.B. der 3. Freitag jedes Monats)',
+                    6   => 'Eine Liste mit Kalenderdaten   (z.B. 2017-11-23,2018-05-01,......)',
     ),
 'rec_periods'       => array(
                     1    => 'Tag(e)',
@@ -293,13 +293,13 @@ $LANG_EVLIST = array(
 'every_num'                => 'jeden %d',
 'event_editor'            => 'Veranstaltungs-Editor',
 'datestart_note'        => '* Tag, Jahr und Monat sind benötige Felder.',
-'custom_label'            => 'Wähle %s für die %s Wiederholungen',
-'stop_label'            => 'Wähle %s nach dem es keine %s Wiederholungen mehr gibt',
-'day_by_date'            => 'ein Datum',
+'custom_label'            => 'Wähle %s der %s Wiederholungen',
+'stop_label'            => '%s nach dem es keine %s Wiederholungen mehr gibt',
+'day_by_date'            => 'Datum',
 'dates'                    => 'die Daten',
 'year_and_month'        => 'Jahr und Monat',
 'year'                    => 'Jahr',
-'days_of_week'            => 'die Wochen-Tage und einen Intervall',
+'days_of_week'            => 'die Wochen-Tage und den Intervall',
 'date_l'                => 'Datum',
 'if_any'                => ', wenn überhaupt,',
 'all_day_event'            => 'Dies ist eine Ganztages-Veranstaltung',
@@ -325,7 +325,7 @@ $LANG_EVLIST = array(
 'registration'            => 'Reservierung',
 'rsvp_waitlist'            => 'Wartelisten für Reservierungen aktivieren?',
 'rsvp_cutoff'            => 'Reservierung möglich bis (Tage) vor Veranstaltung',
-'sel_monthdays'            => 'Wählen Sie die Tage im Monat und den Intervall, an denen sich die Veranstaltung wiederholt',
+'sel_monthdays'            => 'Wählen Sie die Tage im Monat und den Intervall der Wiederholungen.',
 'sub_this_instance'        => 'Diese Wiederholung',
 'sub_all_instances'        => 'Alle Wiederholungen',
 'description'            => 'Beschreibung',
@@ -359,8 +359,8 @@ $LANG_EVLIST = array(
 'timezone'                => 'Zeitzone',
 'tz_local'                => 'Benutzer-Zeitzone',
 'tz_select'                => 'Wähle Zeitzone',
-'msg_item_updated' => 'Item has been updated',
-'msg_item_nochange' => 'Item was not changed',
+'msg_item_updated' => 'Eintrag wurde aktualisiert',
+'msg_item_nochange' => 'Eintrag wurde nicht geändert',
 );
 
 // Localization of the Admin Configuration UI

@@ -23,4 +23,7 @@
 &nbsp;&nbsp;<span class="event_timezone">{timezone} (UTC{tz_offset})</span>
 {!endif}
 {!endif}
+{!if recurring_event}
+<br />{recurring_event}
+{!endif}
 {# end {templatelocation} #}

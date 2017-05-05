@@ -19,8 +19,8 @@ categories, and more.
 ## SYSTEM REQUIREMENTS
 evList has the following system requirements:
 
-    * PHP 5.3 and higher.
-    * glFusion v1.4.0 or newer
+    * PHP 5.6 and higher.
+    * glFusion v1.6.0 or newer
     * lgLib plugin
 
 evList makes use of the lgLib plugin to handle messages, Paypal integration

@@ -14,7 +14,6 @@
 
 USES_evlist_functions();
 USES_lglib_class_datecalc();
-USES_class_date();
 date_default_timezone_set('UTC');
 
 class evView
@@ -321,6 +320,10 @@ class evView
     */
     protected function setSession()
     {
+        // Only used to set the calendar view, no change when
+        // viewing an event
+        if ($this->type == 'detail') return;
+
         $A = SESS_getVar('evlist.current');
         if (is_array($A['date'])) {
             if ($this->year == 0) $this->year = $A['date'][0];
@@ -686,8 +689,6 @@ class evView_day extends evView
             20  => array(), 21  => array(), 22  => array(), 23  => array(),
         );
         $alldaydata = array();
-
-        USES_class_date();
 
         // Events are keyed by hour, so read through each hour
         foreach ($events as $date=>$E) {
@@ -1257,8 +1258,6 @@ class evView_year extends evView
         $daynames = self::DayNames(1);
         $events = EVLIST_getEvents($starting_date, $ending_date,
             array('cat'=>$this->cat, 'cal'=>$this->cal));
-        // A date object to handle formatting
-        $dt = new Date('now');
 
         $T = new Template(EVLIST_PI_PATH . '/templates/yearview');
         $tpl = $this->getTemplate();
@@ -1447,7 +1446,7 @@ class evView_list extends evView
         switch ($this->range) {
         case 1:         // past
             $start = EV_MIN_DATE;
-            $end = $_EV_CONF['_today'];
+            $end = $_EV_CONF['_now']->toMySQL(true);
             $opts['order'] = 'DESC';
             break;
         case 3:         //this week
@@ -1463,11 +1462,14 @@ class evView_list extends evView
             break;
         case 2:         //upcoming
         default:
+            $opts['upcoming'] = true;
             $start = $_EV_CONF['_today'];
-            $end = EV_MAX_DATE;
+            $dt = new Date($_EV_CONF['_today_ts'] + (86400 * $_EV_CONF['max_upcoming_days']), $_CONF['timezone']);
+            $end = $dt->format('Y-m-d', true);
             break;
         }
 
+        //$_EV_CONF['meetup_enabled'] = false;
         $events = EVLIST_getEvents($start, $end, $opts);
         $andrange = '&amp;range=' . $this->range;
         $T->set_var('range', $this->range);
@@ -1526,7 +1528,7 @@ class evView_list extends evView
                     $summary = PLG_replaceTags(COM_stripslashes($A['summary']));
                     $datesummary = sprintf($LANG_EVLIST['event_begins'],
                         EVLIST_formattedDate(strtotime($A['rp_date_start'])));
-                    $morelink = COM_buildURL(EVLIST_URL . '/event.php?eid=' .
+                    $morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                         $A['rp_id'] . $andrange . $andcat);
                     $morelink = '<a href="' . $morelink . '">' .
                         $LANG_EVLIST['read_more'] . '</a>';
@@ -1565,7 +1567,8 @@ class evView_list extends evView
         $retval .= $T->finish($T->get_var('output'));
 
         // Set page navigation
-        $retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
+        $retval .= EVLIST_pagenav(count($events));
+        //$retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
         return $retval;
     }
 }
@@ -1623,9 +1626,6 @@ class evView_smallmonth extends evView
         }
 
         $T->set_block('smallmonth', 'week', 'wBlock');
-
-        USES_class_date();
-        $dt = new Date('now');
 
         foreach ($calendarView as $weeknum => $weekdata) {
             list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);

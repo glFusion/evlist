@@ -60,9 +60,9 @@ require_once dirname(__FILE__) . '/evlist.php';
 
 // Some variables are used all over, so get them once to avoid a lot of
 // function calls
-$dt = new Date('now', $_CONF['timezone']);
-$_EV_CONF['_today'] = $dt->format('Y-m-d', true);
-$_EV_CONF['_today_ts'] = $dt->toUnix();
+$_EV_CONF['_now'] = new Date('now', $_CONF['timezone']);
+$_EV_CONF['_today'] = $_EV_CONF['_now']->format('Y-m-d', true);
+$_EV_CONF['_today_ts'] = $_EV_CONF['_now']->toUnix();
 
 // Check the version of the locator plugin and reset the use_locator
 // config value if it's inadequate.
@@ -187,7 +187,6 @@ function plugin_autouninstall_evlist()
         'php_blocks' => array('phpblock_evlist_upcoming',
                         'phpblock_evlist_smallmonth'),
     );
-
     return $out;
 }
 
@@ -513,6 +512,7 @@ function plugin_getheaderjs_evlist()
     $path = $_CONF['path_html'] . '/evlist/js';
     $files = array(
         $path . '/toggleEnabled.js',
+        //$path . '/ckeditor.js',
     );
 
     return $files;
@@ -665,6 +665,7 @@ function EVLIST_cb_content($format)
         break;
     case 2:         // upcoming events
     default:
+        $opts['upcoming'] = true;
         $start = $_EV_CONF['_today'];
         $end = EV_MAX_DATE;
         break;
@@ -826,6 +827,8 @@ function plugin_user_move_evlist($origUID, $destUID)
     DB_query("UPDATE {$_TABLES['evlist_submissions']}
             SET owner_id = $destUID WHERE owner_id = $origUID", 1);
     DB_query("UPDATE {$_TABLES['evlist_remlookup']}
+            SET uid = $destUID WHERE uid = $origUID", 1);
+    DB_query("UPDATE {$_TABLES['evlist_tickets']}
             SET uid = $destUID WHERE uid = $origUID", 1);
 }
 
@@ -1581,9 +1584,9 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     $max_days = (int)$_EV_CONF['max_upcoming_days'];
 
     // Set the start & ending periods.
-    $end = date('Y-m-d', $_EV_CONF['_today_ts'] + (86400 * $max_days));
-    $limit = $_EV_CONF['limit_block'];
-    $now = date('Y-m-d H:i:s');
+    $dt = new Date($_EV_CONF['_today_ts'] + (86400 * $max_days));
+    $end = $dt->format('Y-m-d', true);
+    $limit = (int)$_EV_CONF['limit_block'];
 
     // Figure out the selected category & calendar.  Only one supported now,
     // defaults to category.
@@ -1613,6 +1616,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
             'cal' => $cal,
             'show_upcoming' => 1,
             'limit' => $limit,
+            'upcoming' => true,
     );
     $events = EVLIST_getEvents($_EV_CONF['_today'], $end, $opts);
     if (empty($events)) return $retval;
@@ -1632,36 +1636,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
         $daycount = 0;      // Count events shown each day.
 
         foreach ($daydata as $ev_id=>$ev) {
-            // Get the timestamps for quick comparisons.  If split, use time2
-            $s_ts = $ev['rp_date_start'] . ' ' . $ev['rp_time_start1'];
-            if ($ev['split'] == 1) {
-                $e_ts = $ev['rp_date_end'] . ' ' . $ev['rp_time_end2'];
-            } else {
-                $e_ts = $ev['rp_date_end'] . ' ' . $ev['rp_time_end1'];
-            }
-
-            // Determine if this event is "past" for the purpose of this list.
-            switch ($_EV_CONF['event_passing']) {
-            case 1:     // start time has passed
-                if ($s_ts < $now)
-                    continue 2;
-                break;
-            case 2:     // start date is past
-                if ($ev['rp_date_start'] < $_EV_CONF['_today'])
-                    continue 2;
-                break;
-            case 3:     // end time has passed, maybe same day
-                if ($e_ts < $now)
-                    continue 2;
-                break;
-            case 4:     // end date has passed
-                if ($ev['rp_date_end'] < $_EV_CONF['_today'])
-                    continue 2;
-                break;
-            default:    // show the event
-                break;
-            }
-
             // Check that this event should be shown as upcoming at all, and
             // only show multi-day events once.
             if ($ev['show_upcoming'] != 1 ||
@@ -1710,7 +1684,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
             $T->parse('bDay', 'blkDay', true);
             $T->clear_var('bItem');
         }
-
         if ($count >= $limit) break;
     }
     if ($count > 0) {
@@ -2200,7 +2173,7 @@ function EVLIST_isCurrentVersion()
 */
 function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 {
-    global $_TABLES, $_EV_CONF;
+    global $_TABLES, $_EV_CONF, $_CONF, $_USER;
 
     USES_lglib_class_datecalc();
 
@@ -2211,8 +2184,8 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     if (!Date_Calc::isValidDate($d, $m, $y)) $start = $_EV_CONF['_today'];
     list($y, $m, $d) = explode('-', $end);
     if (!Date_Calc::isValidDate($d, $m, $y)) $end = $start;
-    $start = DB_escapeString($start);
-    $end = DB_escapeString($end);
+    $start = DB_escapeString($start . ' 00:00:00');
+    $end = DB_escapeString($end . ' 23:59:59');
 
     // Set up other search options.
     $selection = '';
@@ -2224,6 +2197,8 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     $limit = 0;
     $page = 0;
     $cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
+    // default date range for fixed calendars, "upcoming" may be different
+    $dt_sql = "rep.rp_start <= '$end' AND rep.rp_end >= '$start'";
     if (is_array($opts) && !empty($opts)) {
         foreach ($opts as $key => $value) {
             $value = DB_escapeString($value);
@@ -2263,6 +2238,26 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                 // or may not be numeric.
                 $opt_where .= " AND ev.{$key} = '$value'";
                 break;
+            case 'upcoming':
+                // Alters the date range based on the setting for upcoming
+                // events.
+                switch ($_EV_CONF['event_passing']) {
+                case 1:     // include if start time has not passed
+                    $dt_sql = "rep.rp_start >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
+                    break;
+                case 2:     // include if start date has not passed
+                    $dt_sql = "rep.rp_start >= '$start 00:00:00'";
+                    break;
+                case 3:     // include if end time has not passed
+                    $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
+                    break;
+                case 4:     // include if end date has not passed
+                    $dt_sql = "rep.rp_end >= '$end 23:59:59'";
+                    break;
+                }
+                // Always limit to events starting before the specified end date
+                $dt_sql .= " AND rep.rp_start <= '$end 23:59:59'";
+                break;
             case 'select':
                 $selection = $value;
                 break;
@@ -2294,7 +2289,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             LEFT JOIN {$_TABLES['evlist_categories']} cat
                 ON cat.id = l.cid
             WHERE ev.status = 1
-            AND (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
+            AND ($dt_sql)
             AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
             $cat_status " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
@@ -2368,11 +2363,9 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 list($y, $m, $d) = explode('-', $newdate);
                 $newdate = Date_Calc::nextDay($d, $m, $y, '%Y-%m-%d');
             }
-
         }
 
     }   // while
-
     // Now, get Meetup events
     if ($_EV_CONF['meetup_enabled']) {
         EVLIST_getMeetupEvents($start, $end, $opts, $events);
@@ -2542,7 +2535,7 @@ function EVLIST_tooltip_newline()
 /**
 *   Set the return url to be used after an action is completed
 *
-*   @param  string  $key    Key to the URL array (see EVLIST_getReturn())
+*   @param  string  $key    URL or key to the URL array (see EVLIST_getReturn())
 */
 function EVLIST_setReturn($key)
 {
@@ -2555,7 +2548,7 @@ function EVLIST_setReturn($key)
 *   Used to check if a return URL has been set so other actions can
 *   be taken if necessary.
 *
-*   @return mixed   URL key, or zero if not set
+*   @return mixed   URL, key, or zero if not set
 */
 function EVLIST_checkReturn()
 {
@@ -2565,10 +2558,12 @@ function EVLIST_checkReturn()
 
 /**
 *   Get the return URL set in the session variable.
-*   This function always returns something, even if there's no return set. So
-*   EVLIST_checkReturn should be used if you need to check for a return url.
+*   Returns either the URL associated with a key or the actual URL, depending
+*   on which is set. This function always returns a URL, so
+*   EVLIST_checkReturn should be used if you need to check for the existance
+*   of a return url.
 *
-*   @return string      URL associated with the key in the session var
+*   @return string      URL associated with the key in the session var, or home
 */
 function EVLIST_getReturn()
 {
@@ -2578,14 +2573,21 @@ function EVLIST_getReturn()
         'admincategories' => EVLIST_ADMIN_URL . '/index.php?view=categories',
         'admintickets' => EVLIST_ADMIN_URL . '/index.php?view=tickets',
         'admintickettypes' => EVLIST_ADMIN_URL . '/index.php?view=tickettypes',
+        'list' => EVLIST_URL . '/index.php?view=list',
         'home'      => EVLIST_URL . '/index.php',
     );
 
-    $from = SESS_getVar('evlist_fromurl');
-    if (!isset($urls[$from])) {
-        $from = 'home';
+    $from = EVLIST_checkReturn();
+    if (isset($urls[$from])) {
+        // A key value is set, return the associated URL
+        return $urls[$from];
+    } elseif ($from !== 0) {
+        // A session var is set, return it (should be a URL)
+        return $from;
+    } else {
+        // Nothing set in the session var, return the home URL
+        return $urls['home'];
     }
-    return $urls[$from];
 }
 
 

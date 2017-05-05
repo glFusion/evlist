@@ -438,8 +438,8 @@ default:
     }
     USES_evlist_class_repeat();
     if ($actionval == 'event' && !empty($eid)) {
-        // Given an event ID, get the first instance to display
-        $rp_id = evRepeat::getFirst($eid);
+        // Given an event ID, get the nearest instance to display
+        $rp_id = evRepeat::getNearest($eid);
         if ($rp_id === false) {
             COM_refresh($EVLIST_URL . '/index.php');
         }

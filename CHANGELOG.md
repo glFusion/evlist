@@ -2,10 +2,15 @@
 
 ## v1.4.3
 Release TBD
+- Require glFusion 1.6+
 - Add css to format long tooltips
 - Remove HTML calendar template, use AJAX only
 - Use configured numeric separators in location fields
 - Add timezone support for events
+- Change Meetup.com group IDs to array
+- Fix recurring multi-day events
+- Add key fields to repeats to help searching by date/time
+- Change AJAX functions to use Jquery
 
 ## v1.4.2
 Released 2017-01-21

@@ -348,41 +348,32 @@ function showReminder(status) {
 }
 
 // Save or delete the event reminder
-function updateReminder(el) {
-  var email = escape(el.rem_email.value);
-  var action = escape(el.action.value);
-  var notice = escape(el.notice.value);
-  var http = createRequestObject();
-  var url = "{site_url}/evlist/ajax.php?action="+action+"&eid={ev_id}&rp_id={rp_id}&rem_email="+email+"&notice="+notice;
-  http.open("get", url, true);
-  http.onreadystatechange = function() {
-    if (http.readyState == 4) { //Finished loading the response
-      if (http.status == 200) {
-        var obj = JSON.parse(http.responseText);
-        showReminder(obj.reminder_set);
-      }
-    }
-  };
-  http.send(null);
+var updateReminder = function(el) {
+    var dataS = {
+        "action" : el.action.value,
+        "rem_email": el.rem_email.value,
+        "notice": el.notice.value,
+        "rp_id": "{rp_id}",
+        "eid": "{ev_id}",
+    };
+    data = $.param(dataS);
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: glfusionSiteUrl + "/evlist/ajax.php",
+        data: data,
+        success: function(result) {
+            try {
+                showReminder(result.reminder_set);
+            }
+            catch(err) {
+            }
+        }
+    });
+    return false;
 }
 
-function createRequestObject() {
-  var request;
-  var browser = navigator.appName;
-  if (browser == "Microsoft Internet Explorer") {
-    request = new ActiveXObject("Microsoft.XMLHTTP");
-  } else {
-    request = new XMLHttpRequest();
-  }
-  return request;
-}
-
-{!if mootools}
-window.addEvent('load',
-{!else}
-$(document).ready(
-{!endif}
-function() {
+$(document).ready(function() {
   // update the add/del reminder section depending on whether one is set
   showReminder({reminder_set});
 });

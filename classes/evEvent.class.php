@@ -86,17 +86,16 @@ class evEvent
             // Create dates & times based on individual URL parameters,
             // or defaults.
             // Start date/time defaults to now
-            $dt = new Date('now', $_CONF['timezone']);
             $startday1 = isset($_GET['day']) ? (int)$_GET['day'] : '';
             if ($startday1 < 1 || $startday1 > 31)
-                    $startday1 = $dt->format('j');
+                    $startday1 = $_EV_CONF['_now']->format('j', true);
             $startmonth1 = isset($_GET['month']) ? (int)$_GET['month'] : '';
             if ($startmonth1 < 1 || $startmonth1 > 12)
-                    $startmonth1 = $dt->format('n');
+                    $startmonth1 = $_EV_CONF['_now']->format('n', true);
             $startyear1 = isset($_GET['year']) ?
-                    (int)$_GET['year'] : $dt->format('Y');
+                    (int)$_GET['year'] : $_EV_CONF['_now']->format('Y', true);
             $starthour1 = isset($_GET['hour']) ?
-                    (int)$_GET['hour'] : $dt->format('H', true);
+                    (int)$_GET['hour'] : $_EV_CONF['_now']->format('H', true);
             $startminute1 = '0';
 
             // End date & time defaults to same day, 1 hour ahead
@@ -556,16 +555,21 @@ class evEvent
                             WHERE ev_id = '{$this->id}'
                             AND det_id <> '{$this->det_id}'");
                     // This function sets the rec_data value.
-                    $this->UpdateRepeats();
+                    if (!$this->UpdateRepeats()) {
+                        return $this->PrintErrors();
+                    }
                 } else {
                     // this is a one-time event, update the existing instance
+                    $t_end = $this->split ? $this->time_end2 : $this->time_end1;
                     $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
                             rp_date_start = '{$this->date_start1}',
                             rp_date_end = '{$this->date_end1}',
                             rp_time_start1 = '{$this->time_start1}',
                             rp_time_end1 = '{$this->time_end1}',
                             rp_time_start2 = '{$this->time_start2}',
-                            rp_time_end2 = '{$this->time_end2}'
+                            rp_time_end2 = '{$this->time_end2}',
+                            rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
+                            rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end')
                         WHERE rp_ev_id = '{$this->id}'";
                     DB_query($sql, 1);
                 }
@@ -604,7 +608,9 @@ class evEvent
 
             if ($this->table != 'evlist_submissions') {
                 // This function gets the rec_data value.
-                $this->UpdateRepeats();
+                if (!$this->UpdateRepeats()) {
+                    return $this->PrintErrors();
+                }
                 //var_dump($this);die;
             }
 
@@ -660,7 +666,6 @@ class evEvent
             options = '" . DB_escapeString(serialize($this->options)) . "' ";
 
         $sql = $sql1 . $fld_sql . $sql2;
-
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
@@ -685,7 +690,6 @@ class evEvent
             $to = COM_formatEmailAddress('', $_CONF['site_mail']);
             COM_mail($to, $subject, $mailbody, '', true);
         }
-
 
         if (empty($this->Errors)) {
             return '';
@@ -1392,7 +1396,7 @@ class evEvent
     *   Create the individual occurrances of a the current event.
     *   If the event is not recurring, returns an array with only one element.
     *
-    *   @return array           Array of matching events, keyed by date
+    *   @return array           Array of matching events, keyed by date, or false
     */
     public function MakeRecurrences()
     {
@@ -1451,6 +1455,8 @@ class evEvent
     *   Deletes all existing repeats, then creates new ones.  Not very
     *   efficient; it might make sense to check all related values, but there
     *   are several.
+    *
+    *   @return boolean     True on success, False on failure
     */
     public function UpdateRepeats()
     {
@@ -1462,27 +1468,36 @@ class evEvent
         }
         if ((int)$this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
 
+        // Get the actual repeat occurrences.
+        $days = $this->MakeRecurrences();
+        if ($days === false) {
+            $this->Errors[] = $LANG_EVLIST['err_upd_repeats'];
+            return false;
+        }
+
         // Delete all existing instances
         DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);
 
-        // Get the actual repeat occurrences.
-        $days = $this->MakeRecurrences();
-
         $i = 0;
         foreach($days as $event) {
+            $t_end = $this->split ? $event['tm_end2'] : $event['tm_end1'];
             $sql = "INSERT INTO {$_TABLES['evlist_repeat']} (
                         rp_ev_id, rp_det_id, rp_date_start, rp_date_end,
                         rp_time_start1, rp_time_end1,
-                        rp_time_start2, rp_time_end2
+                        rp_time_start2, rp_time_end2,
+                        rp_start, rp_end
                     ) VALUES (
                         '{$this->id}', '{$this->det_id}',
                         '{$event['dt_start']}', '{$event['dt_end']}',
                         '{$event['tm_start1']}', '{$event['tm_end1']}',
-                        '{$event['tm_start2']}', '{$event['tm_end2']}'
+                        '{$event['tm_start2']}', '{$event['tm_end2']}',
+                        '{$event['dt_start']} {$event['tm_start1']}',
+                        '{$event['dt_end']} {$t_end}'
                     )";
             //echo $sql;
             DB_query($sql, 1);
         }
+        return true;
     }
 
 

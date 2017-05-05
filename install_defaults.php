@@ -84,7 +84,7 @@ $CONF_EVLIST_DEFAULT = array(
     'enable_rsvp'       => 0,   // 0=false, 1=default no, 2=default yes
     'rsvp_print'        => 0,   // 0=false, 1=default no, 2=default yes paid, 3=default yes all
     'meetup_key'        => '',  // Meetup API key
-    'meetup_gid'        => '',  // Meetup group IDs
+    'meetup_gid'        => array(),  // Meetup group IDs
     'meetup_cache_minutes' => 30,
     'meetup_enabled'    => 0,   // 1 to enable meetup event inclusion
     'commentsupport'    => 1,   // 1 = yes, 0 = no
@@ -186,7 +186,7 @@ function plugin_initconfig_evlist()
                 30, 10, 0, 10, true, 'evlist');
         $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
                 30, 10, 0, 20, true, 'evlist');
-        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
+        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], '%text',
                 30, 10, 0, 30, true, 'evlist');
         $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
                 30, 10, 0, 40, true, 'evlist');

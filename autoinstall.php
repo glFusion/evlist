@@ -37,9 +37,9 @@ if (!defined ('GVERSION')) {
 global $_DB_dbms;
 
 /** Include plugin-required files */
-require_once $_CONF['path'].'plugins/evlist/evlist.php';
-require_once $_CONF['path'].'plugins/evlist/sql/'.$_DB_dbms.'_install.php';
-require_once $_CONF['path'].'plugins/evlist/sql/def_events.php';
+require_once dirname(__FILE__) . '/evlist.php';
+require_once dirname(__FILE__) . '/sql/'.$_DB_dbms.'_install.php';
+require_once dirname(__FILE__) . '/sql/def_events.php';
 
 // +--------------------------------------------------------------------------+
 // | Plugin installation options                                              |
@@ -187,6 +187,7 @@ function plugin_install_evlist()
 
 // These are required for the evEvent class.  They're included here
 // since functions.inc isn't available until the plugin is installed
+/*
 define(EVLIST_PI_PATH, dirname(__FILE__));
 
 function USES_evlist_functions()
@@ -206,34 +207,7 @@ function USES_evlist_class_repeat()
 
 function USES_evlist_class_calendar()
 {   require_once EVLIST_PI_PATH . '/classes/evCalendar.class.php'; }
-
-
-/**
-*   Post-installation activity.
-*   Create the repeating event records for the sample data that was loaded.
 */
-function X_plugin_postinstall_evlist()
-{
-    global $_TABLES, $_CONF, $_EV_CONF;
-
-    require_once $_CONF['path'].'/plugins/evlist/functions.inc';
-
-    // Now create the repeat records for the default events
-    USES_evlist_class_event();
-    $sql = "SELECT id FROM {$_TABLES['evlist_events']}";
-    $res = DB_query($sql);
-    $Ev = new evEvent();
-    while ($A = DB_fetchArray($res, false)) {
-        $Ev->Read($A['id']);
-        $Ev->UpdateRepeats();
-    }
-
-    // Clear the template cache since we've introduced some new css.
-    // Might not be needed outside of testing where the plugin is repeatedly
-    // installed & removed, but doesn't hurt.
-    CTL_clearCache();
-}
-
 
 /**
 * Loads the configuration records for the Online Config Manager
@@ -243,12 +217,8 @@ function X_plugin_postinstall_evlist()
 */
 function plugin_load_configuration_evlist()
 {
-    global $_CONF;
-
-    require_once $_CONF['path'] . 'plugins/evlist/install_defaults.php';
-
+    require_once dirname(__FILE__) . '/install_defaults.php';
     return plugin_initconfig_evlist();
 }
-
 
 ?>

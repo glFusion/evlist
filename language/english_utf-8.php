@@ -57,7 +57,8 @@ $LANG_EVLIST = array(
 'err_db_saving'     => 'A database error occurred while saving your record.',
 'err_cal_import'    => 'There were %d errors importing from the calendar. Check your error log for details',
 'err_import_event'  => 'Error importing event %s',
-'err_cal_notavail' => 'The calendar plugin data is not available.',
+'err_cal_notavail'  => 'The calendar plugin data is not available.',
+'err_upd_repeats'   => 'Error updating repeat events',
 'info'              => 'Information',
 'warning'           => 'Warning',
 'alert'             => 'Alert',
@@ -360,6 +361,8 @@ You may either move existing events to a new calendar, or delete those events.',
 'timezone'      => 'Timezone',
 'tz_local'      => 'Guest&apos;s local timezone',
 'tz_select'     => 'Select Timezone',
+'msg_item_updated' => 'Item has been updated',
+'msg_item_nochange' => 'Item was not changed',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

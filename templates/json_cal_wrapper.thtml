@@ -15,7 +15,7 @@ var newmonth = 0;
 var newday = 0;
 function ChangeDate(year, month, day, type)
 {
-  var action;
+ var action;
   switch (type) {
     case 'year': action = "getCalYear"; break;
     case 'month': action = "getCalMonth"; break;
@@ -23,31 +23,35 @@ function ChangeDate(year, month, day, type)
     case 'day': action = "getCalDay"; break;
     default: return;
   }
-  xmlHttp = EV_getXmlHttpObject();
-  if (xmlHttp==null) {
-    alert ("Browser does not support HTTP Request");
-    return;
-  }
   newyear = year;
   newmonth = month;
   newday = day;
-  var url = "{site_url}/evlist/ajax.php?action=" + action +
-        "&cat=" + cat +
-        "&cal=" + cal +
-        "&year=" + year + "&month=" + month + "&day=" + day;
-  xmlHttp.onreadystatechange=EV_calChanged;
-  xmlHttp.open("GET",url,true);
-  xmlHttp.send(null);
-}
-
-function EV_calChanged()
-{
-  if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete") {
-    document.getElementById("evlist_content").innerHTML = xmlHttp.responseText;
-    document.getElementById("year_sel").value = newyear;
-    document.getElementById("month_sel").value = newmonth;
-    document.getElementById("day_sel").value = newday;
-  }
+  var dataS = {
+    "action" : action,
+    "cat": cat,
+    "cal": cal,
+    "year": year,
+    "month": month,
+    "day": day,
+  };
+  data = $.param(dataS);
+  $.ajax({
+    type: "POST",
+    dataType: "text",
+    url: glfusionSiteUrl + "/evlist/ajax.php",
+    data: data,
+    success: function(result) {
+      try {
+        document.getElementById("evlist_content").innerHTML = result;
+        document.getElementById("year_sel").value = newyear;
+        document.getElementById("month_sel").value = newmonth;
+        document.getElementById("day_sel").value = newday;
+      }
+      catch(err) {
+      }
+    }
+  });
+  return false;
 }
 </script>
 {cal_header}

@@ -5,7 +5,7 @@
 *   @author     Lee Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2016 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.0
+*   @version    1.4.3
 *   @since      1.4.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
@@ -30,13 +30,12 @@ class evMeetup
     {
         global $_EV_CONF;
         $this->params = array(
-            'group_id' => $_EV_CONF['meetup_gid'],
+            'group_id' => implode(',', $_EV_CONF['meetup_gid']),
             'text_format' => 'plain',
             'fields' => 'timezone',
             //'page' => $_EV_CONF['meetup_page'],
             'only' => 'id,name,time,description,event_url,timezone,duration',
         );
-
         $this->key = $key;
     }
 

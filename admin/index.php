@@ -109,7 +109,7 @@ function EVLIST_adminHeader($page)
         $LANG_EVLIST['admin_instr'][$page],
         plugin_geticon_evlist()
     );
-    $retval .= COM_endBlock();
+    $retval .= COM_endBlock (COM_getBlockTemplate ('_admin_block', 'footer'));
 
     return $retval;
 }

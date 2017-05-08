@@ -109,8 +109,7 @@ function EVLIST_adminHeader($page)
         $LANG_EVLIST['admin_instr'][$page],
         plugin_geticon_evlist()
     );
-    $retval .= COM_endBlock (COM_getBlockTemplate ('_admin_block', 'footer'));
-
+    $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $retval;
 }
 
@@ -1081,7 +1080,7 @@ case 'exporttickets':
         $eid = COM_sanitizeID($_GET['eid'], false);
         $doc = evTicket::ExportTickets($eid);
         header('Content-type: text/csv');
-        header('Content-Disposition: attachment; filename="event-'.$ev_id.'.csv');
+        header('Content-Disposition: attachment; filename="event-'.$eid.'.csv');
         echo $doc;
         exit;
     } else {

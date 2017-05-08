@@ -217,7 +217,7 @@ case 'exporttickets':
         $eid = COM_sanitizeID($_GET['eid'], false);
         $doc = evTicket::ExportTickets($eid);
         header('Content-type: text/csv');
-        header('Content-Disposition: attachment; filename="event-'.$ev_id.'.csv');
+        header('Content-Disposition: attachment; filename="event-'.$eid.'.csv');
         echo $doc;
         exit;
     } else {

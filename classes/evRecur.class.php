@@ -175,6 +175,8 @@ class evRecurBase
     *   Store an event in the array.
     *   Figures out the ending date based on the duration.
     *   The events array is keyed by start date to avoid duplicates.
+    *
+    *   @param  string  $start  Starting date in Y-m-d format
     */
     public function storeEvent($start)
     {
@@ -220,7 +222,6 @@ class evRecurDates extends evRecurBase
                 $this->storeEvent($occurrence);
             }
         }
-
         return $this->events;
     }
 
@@ -248,8 +249,8 @@ class evRecurDOM extends evRecurBase
         $occurrence = $this->dt_start;
         list($y, $m, $d) = explode('-', $occurrence);
 
-        $num_intervals = count($intervalA);
-        $last_interval = $intervalA[$num_intervals - 1];
+        //$num_intervals = count($intervalA);
+        //$last_interval = $intervalA[$num_intervals - 1];
 
         $count = 0;
         // reduce the weekday number, since evlist uses Sun=1 while
@@ -343,11 +344,9 @@ class evRecurDaily extends evRecurBase
                 return NULL;
             }
         }
-
         return $occurrence;
 
     }   // function SkipWeekend
-
 
 }   // class evRecurDaily
 
@@ -368,8 +367,8 @@ class evRecurMonthly extends evRecurBase
 
         $occurrence = $this->dt_start;
 
-        $num_intervals = count($days_on);
-        $last_interval = $days_on[$num_intervals - 1];
+        //$num_intervals = count($days_on);
+        //$last_interval = $days_on[$num_intervals - 1];
 
         // Start by reducing the starting date by one day. Then the for
         // loop can handle all the events.
@@ -441,16 +440,16 @@ class evRecurMonthly extends evRecurBase
                     $occurrence = Date_Calc::nextWeekday($d, $m, $y);
                 } else {
                     // Monthly recurrences are on specific dates, so don't
-                    // just stip to the next one- return NULL so the
+                    // just skip to the next one- return NULL so the
                     // calling function knows to ignore this instance
                     $occurrence = NULL;
                 }
             }
         }
-
         return $occurrence;
 
     }   // function SkipWeekend
+
 
     private function incrementDate($d, $m, $y)
     {
@@ -495,8 +494,8 @@ class evRecurWeekly extends evRecurBase
 
         $occurrence = $this->dt_start;
 
-        $num_intervals = count($days_on);
-        $last_interval = $days_on[$num_intervals - 1];
+        //$num_intervals = count($days_on);
+        //$last_interval = $days_on[$num_intervals - 1];
 
         // Start by reducing the starting date by one day. Then the for
         // loop can handle all the events.

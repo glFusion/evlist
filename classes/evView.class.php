@@ -200,6 +200,7 @@ class evView
             'use_json' => 'true',
             'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
             'view'  => $this->type,
+            'iconset'   => $_EV_CONF['_iconset'],
         ) );
 
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -302,7 +303,8 @@ class evView
             'webcal_url'    => $webcal_url,
             'feed_links'    => $rss_links,
             'ical_links'    => $ical_links,
-            'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
+            'is_uikit'  => $_EV_CONF['_is_uikit'] ? 'true' : '',
+            'iconset'   => $_EV_CONF['_iconset'],
         ) );
 
         $T->parse('output', 'calendar_footer');
@@ -427,6 +429,8 @@ class evView
     */
     protected function getCalCheckboxes()
     {
+        global $_EV_CONF;
+
         $boxes = '';
         if (!is_array($this->cal_used) || empty($this->cal_used))
             return $boxes;
@@ -440,6 +444,7 @@ class evView
                 'fgcolor'   => $cal['fgcolor'],
                 'key'       => $key,
                 'cal_name'  => $cal['cal_name'],
+                'iconset'   => $_EV_CONF['_iconset'],
             ) );
             $T->parse('item', 'cal_item', true);
         }
@@ -1208,6 +1213,7 @@ class evView_month extends evView
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
             'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
+            'iconset'       => $_EV_CONF['_iconset'],
         ) );
 
         $T->parse('output', 'monthview');

@@ -87,6 +87,7 @@ if ($_CONF['loginrequired'] == 1) {
 // Mark whether this is a uikit theme. Save to global conf var
 // so it's available where needed.
 $_EV_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
+$_EV_CONF['_iconset'] = $_EV_CONF['_is_uikit'] ? 'uk-icon' : 'fa fa';
 
 if (empty($_EV_CONF['meetup_gid']) || empty($_EV_CONF['meetup_key'])) {
     $_EV_CONF['meetup_enabled'] = 0;
@@ -306,7 +307,8 @@ function plugin_getmenuitems_evlist()
     }
 
     if ($_EV_CONF['enable_menuitem'] == '1') {
-        $menuitems[$LANG_EVLIST['pi_title']] = EVLIST_URL . '/index.php';
+        $icon = '&nbsp;<i class="' . EVLIST_getIcon('calendar', ''). '"></i>';
+        $menuitems[$LANG_EVLIST['pi_title'] . $icon] = EVLIST_URL . '/index.php';
     }
     return $menuitems;
 }
@@ -2592,6 +2594,23 @@ function EVLIST_getReturn()
 
 
 /**
+*   Get an icon from the CSS icon set, either UIkit or FontAwesome
+*
+*   @param  string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
+*   @param  string  $style  Style name from local CSS
+*   @return string      Class names for icon
+*/
+function EVLIST_getIcon($name, $style='info')
+{
+    global $_EV_CONF;
+
+    if ($style != '')
+        $style = ' ev-icon-' . $style;
+    return $_EV_CONF['_iconset'] . '-' . $name . $style;
+}
+
+
+/**
 *   Log activity to a plugin-specific log file
 *
 *   @param string $logentry Text to log
@@ -2619,7 +2638,7 @@ function EVLIST_Log($logentry = '')
 
     // Can't open the log file?  Return an error
     if (!$file = fopen($logfile, 'a')) {
-        return $LANG01[33] . $logfile . ' (' . $timestamp . ')' . PHBR;
+        return $LANG01[33] . $logfile . ' (' . $timestamp . ')<br />' . LB;
     }
 
     // Get the user name if it's not anonymous

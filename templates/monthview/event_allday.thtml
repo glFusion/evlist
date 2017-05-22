@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip monthview_allday show_cal{cal_id} event" 
+<div class="monthview_allday show_cal{cal_id} event" 
     title="{ev_hover}"
     style="background-color:{bgcolor};">
 {!if is_meetup}
@@ -7,6 +7,6 @@
 {!else}
   <a href="{pi_url}/event.php?eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}" 
 {!endif}
-    style="color:{fgcolor};">{ev_title}</a>
+    class="tooltip" title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
 </div>
 {# end {templatelocation} #}

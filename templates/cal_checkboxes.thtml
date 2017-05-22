@@ -1,9 +1,8 @@
 {# begin {templatelocation} #}
 <div id="evlistCalCheckboxes">
   <div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
-    <a href="#" title="{$LANG_EVLIST['select_cals']}" data-uk-tooltip="{cls:'evTooltip'}">{$LANG_EVLIST['calendars']}
-      <img src="{site_url}/evlist/images/downarrow.png"
-        width="16" height="16" alt="{$LANG_EVLIST['select_cals']}" />
+    <a href="#" title="{$LANG_EVLIST['select_cals']}" class="tooltip">{$LANG_EVLIST['calendars']}
+      <i class="{iconset}-arrow-down"></i>
     </a>
     <div class="uk-dropdown uk-dropdown-bottom">
 <!-- BEGIN cal_item -->

@@ -373,6 +373,7 @@ $LANG_EVLIST = array(
 'tz_select'     => 'Select Timezone',
 'msg_item_updated' => 'Item has been updated',
 'msg_item_nochange' => 'Item was not changed',
+'print'         => 'Print',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";
@@ -417,7 +418,6 @@ $LANG_confignames[ 'evlist'] = array(
 'max_upcoming_days'         => 'Max. Les prochains jours à afficher dans la liste',
 'use_locator'           => 'intégrer avec le Locator plugin ? ',
 'use_weather'           => 'intégrer avec la météo plugin ? ',
-    'cal_tmpl'              => 'Use HTML or JSON templates',
     'enable_rsvp'           => 'Enable Registration/Ticketing?',
     'rsvp_print'            => 'Enable Ticket Printing?',
     'meetup_key'            => 'Meetup API Key',

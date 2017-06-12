@@ -362,6 +362,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'tz_select'     => 'Select Timezone',
 'msg_item_updated' => 'Item has been updated',
 'msg_item_nochange' => 'Item was not changed',
+'print'         => 'Print',
 );
 
 // Localization of the Admin Configuration UI
@@ -400,7 +401,6 @@ $LANG_confignames['evlist'] = array(
     'max_upcoming_days'     => 'Max. Upcoming days to show in list',
     'use_locator'           => 'Integrate with the Locator plugin?',
     'use_weather'           => 'Integrate with the Weather plugin?',
-    'cal_tmpl'              => 'Use HTML or JSON templates',
     'enable_rsvp'           => 'Enable Registration/Ticketing?',
     'rsvp_print'            => 'Enable Ticket Printing?',
     'meetup_key'            => 'Meetup API Key',

@@ -80,7 +80,6 @@ $CONF_EVLIST_DEFAULT = array(
     'max_upcoming_days' => 90,  // max days in future for list and block
     'use_locator'       => 0,   // integrate with locater plugin
     'use_weather'       => 0,   // integrate with westher plugin
-    'cal_tmpl'          => 'json',   // json or html calendar display
     'enable_rsvp'       => 0,   // 0=false, 1=default no, 2=default yes
     'rsvp_print'        => 0,   // 0=false, 1=default no, 2=default yes paid, 3=default yes all
     'meetup_key'        => '',  // Meetup API key

@@ -361,6 +361,7 @@ $LANG_EVLIST = array(
 'tz_select'                => 'Wähle Zeitzone',
 'msg_item_updated' => 'Eintrag wurde aktualisiert',
 'msg_item_nochange' => 'Eintrag wurde nicht geändert',
+'print'         => 'Print',
 );
 
 // Localization of the Admin Configuration UI
@@ -399,7 +400,6 @@ $LANG_confignames['evlist'] = array(
     'max_upcoming_days'     => 'Max. Tage für Bevorstehend',
     'use_locator'           => 'Locator-Plugin integrieren',
     'use_weather'           => 'Wetter-Plugin integrieren',
-    'cal_tmpl'              => 'HTML oder JSON Templates',
     'enable_rsvp'           => 'Tickets und Reservierung aktivieren',
     'rsvp_print'            => 'Tickets drucken aktivieren',
     'meetup_key'            => 'Meetup API Key',

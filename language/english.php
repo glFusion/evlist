@@ -415,6 +415,7 @@ $LANG_confignames['evlist'] = array(
     'meetup_cache_minutes'  => 'Cache Minutes',
     'meetup_enabled'        => 'Enable Meetup.com integration?',
     'commentsupport'        => 'Enable Comments?',
+    'ticket_format'         => 'Ticket Format String',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',

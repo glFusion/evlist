@@ -139,25 +139,12 @@ class evTicket
     */
     public static function MakeTicketId($A = array())
     {
-        /*if (empty($A)) {
-            return NULL;
-        }
-        if (!is_array($A)) {
-            $A = array($A);
-        }*/
+        global $_EV_CONF;
 
-       /* $str = 'EVT';   // some meaningless string to start
-        foreach ($A as $val) {
-            $str .= $val;
-        }
-        $str .= rand(0,100) . time();
-
-        return md5($str);
-        */
         // md5 makes a long value to put in a qrcode url.
         // makeSid() should be sufficient since it includes some
         // random characters.
-        return 'EV' . COM_makeSid();
+        return sprintf($_EV_CONF['ticket_format'], COM_makeSid());
     }
 
 

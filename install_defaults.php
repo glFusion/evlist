@@ -87,6 +87,7 @@ $CONF_EVLIST_DEFAULT = array(
     'meetup_cache_minutes' => 30,
     'meetup_enabled'    => 0,   // 1 to enable meetup event inclusion
     'commentsupport'    => 1,   // 1 = yes, 0 = no
+    'ticket_format'     => 'EV%s',  // Ticket number format
 );
 
 /**
@@ -177,6 +178,8 @@ function plugin_initconfig_evlist()
                 20, 10, 0, 10, true, 'evlist');
         $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
                 20, 10, 17, 20, true, 'evlist');
+        $c->add('ticket_format',$CONF_EVLIST_DEFAULT['ticket_format'], 'text',
+                20, 10, 0, 30, true, 'evlist');
 
         // External integrations
         $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');

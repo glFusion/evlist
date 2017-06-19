@@ -455,7 +455,7 @@ class evTicket
 
                 $pdf->SetFont('Times','',12);
                 $pdf->SetX(-40);
-                $pdf->Cell(0,30,'Fee: '. $fee);
+                $pdf->Cell(0, 30, $LANG_EVLIST['fee'] . ': '. $fee);
                 if ($ticket->fee > 0) {
                         $pdf->Ln(5);
                     if ($ticket->paid >= $ticket->fee) {

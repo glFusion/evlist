@@ -364,6 +364,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'msg_item_updated' => 'Item has been updated',
 'msg_item_nochange' => 'Item was not changed',
 'print'         => 'Print',
+'balance_due'   => 'Balance Due',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

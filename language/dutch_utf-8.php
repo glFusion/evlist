@@ -363,6 +363,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'msg_item_updated' => 'Item has been updated',
 'msg_item_nochange' => 'Item was not changed',
 'print'         => 'Print',
+'balance_due'   => 'Balance Due',
 );
 
 // Localization of the Admin Configuration UI

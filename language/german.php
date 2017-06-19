@@ -362,6 +362,7 @@ $LANG_EVLIST = array(
 'msg_item_updated' => 'Eintrag wurde aktualisiert',
 'msg_item_nochange' => 'Eintrag wurde nicht geändert',
 'print'         => 'Print',
+'balance_due'   => 'Balance Due',
 );
 
 // Localization of the Admin Configuration UI

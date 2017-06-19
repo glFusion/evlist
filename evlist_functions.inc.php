@@ -650,7 +650,7 @@ function EVLIST_adminRSVP($rp_id)
     $title = $LANG_EVLIST['admin_rsvp'] .
             '&nbsp;&nbsp;<a href="'.EVLIST_URL .
             '/index.php?view=printtickets&eid=' . $Ev->ev_id .
-            '" class="lgButton blue" target="_new">' . $LANG_EVLIST['print_tickets'] . '</a>' .
+            '" class="lgButton blue" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
             '&nbsp;&nbsp;<a href="'.EVLIST_URL .
             '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
             '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';

@@ -37,9 +37,9 @@ if (!defined ('GVERSION')) {
 global $_DB_dbms;
 
 /** Include plugin-required files */
-require_once dirname(__FILE__) . '/evlist.php';
-require_once dirname(__FILE__) . '/sql/'.$_DB_dbms.'_install.php';
-require_once dirname(__FILE__) . '/sql/def_events.php';
+require_once __DIR__ . '/evlist.php';
+require_once __DIR__ . '/sql/'.$_DB_dbms.'_install.php';
+require_once __DIR__ . '/sql/def_events.php';
 
 // +--------------------------------------------------------------------------+
 // | Plugin installation options                                              |
@@ -188,7 +188,7 @@ function plugin_install_evlist()
 // These are required for the evEvent class.  They're included here
 // since functions.inc isn't available until the plugin is installed
 /*
-define(EVLIST_PI_PATH, dirname(__FILE__));
+define(EVLIST_PI_PATH, __DIR__);
 
 function USES_evlist_functions()
 {    require_once EVLIST_PI_PATH . '/evlist_functions.inc.php'; }
@@ -217,7 +217,7 @@ function USES_evlist_class_calendar()
 */
 function plugin_load_configuration_evlist()
 {
-    require_once dirname(__FILE__) . '/install_defaults.php';
+    require_once __DIR__ . '/install_defaults.php';
     return plugin_initconfig_evlist();
 }
 

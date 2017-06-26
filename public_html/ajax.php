@@ -12,7 +12,7 @@
 */
 
 /** Include required glFusion common functions */
-require_once dirname(__FILE__) . '/../lib-common.php';
+require_once __DIR__ . '/../lib-common.php';
 
 $content = '';
 

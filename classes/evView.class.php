@@ -198,7 +198,7 @@ class evView
             'urlfilt_cal' => (int)$this->cal,
             'urlfilt_cat' => (int)$this->cat,
             'use_json' => 'true',
-            'is_uikit' => $_EV_CONF['_is_uikit'] ? 'true' : '',
+            'is_uikit' => $_EV_CONF['_is_uikit'],
             'view'  => $this->type,
             'iconset'   => $_EV_CONF['_iconset'],
         ) );
@@ -547,7 +547,6 @@ class evView_day extends evView
 
         for ($i = 0; $i < 24; $i++) {
             $link = date($_CONF['timeonly'], mktime($i, 0));
-            //if ($_EV_CONF['_can_add']) {
             if (EVLIST_canSubmit()) {
                 $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
                         $month . '&amp;day=' . $day . '&amp;year=' . $year .
@@ -886,7 +885,6 @@ class evView_week extends evView
                     "&amp;month=$curmonth&amp;year=$curyear")
             );
 
-            //if ($_EV_CONF['_can_add']) {
             if (EVLIST_canSubmit()) {
                 $T->set_var(array(
                     'can_add'       => 'true',
@@ -1185,7 +1183,6 @@ class evView_month extends evView
                     'cal_day_entries' => $dayentries,
                 ) );
 
-                //if ($_EV_CONF['_can_add']) {
                 if (EVLIST_canSubmit()) {
                     // Add the "Add Event" link for the day
                     $T->set_var('can_add', 'true');

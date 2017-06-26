@@ -11,6 +11,7 @@ Release TBD
 - Fix recurring multi-day events
 - Add key fields to repeats to help searching by date/time
 - Change AJAX functions to use Jquery
+- Make the ticket number format configurable
 
 ## v1.4.2
 Released 2017-01-21

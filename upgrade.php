@@ -64,7 +64,7 @@ $c = config::get_instance();
 function evlist_upgrade()
 {
     global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c,
-        $_CONF_EVLIST_DEFAULTS;
+        $_CONF_EVLIST_DEFAULT;
 
     $currentVersion = DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'");
 
@@ -251,6 +251,8 @@ function evlist_upgrade()
         case '1.4.2':
             $currentVersion = '1.4.3';
             $c->del('cal_tmpl', 'evlist');
+            $c->add('ticket_format',$CONF_EVLIST_DEFAULT['ticket_format'],
+                'text', 20, 10, 0, 30, true, 'evlist');
             if (!empty($_EV_CONF['meetup_gid'])) {
                 // Changing meetup_gid type to array, first get the current
                 // value and convert it.

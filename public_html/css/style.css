@@ -700,3 +700,18 @@ div.evPrtDataItem div.evdata {
     max-width: 25%;
     word-break: keep-all;
 }
+.ev-icon-ok {
+    color: green;
+}
+.ev-icon-danger {
+    color: red;
+}
+.ev-icon-warning {
+    color: #FFD300;
+}
+.ev-icon-info {
+    color: #0077dd;
+}
+.ev-icon-unknown {
+    color: #530E53;
+}

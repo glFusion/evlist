@@ -543,6 +543,8 @@ class evRepeat
             'show_tz'   => $this->tzid == 'local' ? '' : 'true',
             'timezone'  => $this->tzid,
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
+            'iconset'   => $_EV_CONF['_iconset'],
+            'is_uikit'  => $_EV_CONF['_is_uikit'],
         ) );
 
         // Show the user comments. Moderators and event owners can delete comments
@@ -558,12 +560,10 @@ class evRepeat
 
         if ($_EV_CONF['enable_rsvp'] == 1 &&
                 $this->Event->options['use_rsvp'] > 0) {
-            if ($this->Event->options['rsvp_cutoff'] > 0) {
-                if (time() > $this->dtStart1->toUnix() - ($this->Event->options['rsvp_cutoff'] * 86400)) {
-                    $past_cutoff = false;
-                } else {
-                    $past_cutoff = true;
-                }
+            if (time() > $this->dtStart1->toUnix() - ((int)$this->Event->options['rsvp_cutoff'] * 86400)) {
+                $past_cutoff = true;
+            } else {
+                $past_cutoff = false;
             }
             if (COM_isAnonUser()) {
                 // Just show a must-log-in message
@@ -581,41 +581,30 @@ class evRepeat
                }
 
                 // Show the registration link
-               if (    ($this->Event->options['max_rsvp'] == 0 ||
+               if (     ($this->Event->options['max_rsvp'] == 0 ||
                         $this->Event->options['rsvp_waitlist'] == 1 ||
                         $this->Event->options['max_rsvp'] >
-                        $this->TotalRegistrations() )
+                            $this->TotalRegistrations() )
                         &&
-                        ( $this->Event->options['max_user_rsvp'] == 0 ||
-                          $total_tickets < $this->Event->options['max_user_rsvp']  )
+                        ($this->Event->options['max_user_rsvp'] == 0 ||
+                          $total_tickets < $this->Event->options['max_user_rsvp'] )
                 ) {
                     USES_evlist_class_tickettype();
                     $Ticks = evTicketType::GetTicketTypes();
                     if ($this->Event->options['max_user_rsvp'] > 0) {
                         $T->set_block('event', 'tickCntBlk', 'tcBlk');
                         $T->set_var('register_multi', true);
-                        //$rsvp_user_count = '';
                         $avail_tickets = $this->Event->options['max_user_rsvp'] -
                                     $total_tickets;
                         for ($i = 1; $i <= $avail_tickets; $i++) {
                             $T->set_var('tick_cnt', $i);
                             $T->parse('tcBlk', 'tickCntBlk', true);
-                            //$rsvp_user_count .= '<option value="'.$i.'">'.$i.
-                            //        '</option>'.LB;
                         }
-                        //$T->set_var('register_multi', $rsvp_user_count);
                     } else {
-                        // max_rsvp == 0 indicates openended registration
                         $T->set_var('register_unltd', 'true');
                     }
                     $T->set_block('event', 'tickTypeBlk', 'tBlk');
                     foreach ($this->Event->options['tickets'] as $tick_id=>$data) {
-                        /*$options .= '<option value="' . $tick_id . '">' .
-                            $Ticks[$tick_id]->description;
-                        if ($data['fee'] > 0) {
-                            $options .= ' - ' . COM_numberFormat($data['fee'], 2);
-                        }
-                        $options .= '</option>' . LB;*/
                         $status = LGLIB_invokeService('paypal', 'formatAmount',
                                 array('amount' => $data['fee']), $pp_fmt_amt, $svc_msg);
                         $fmt_amt = $status == PLG_RET_OK ?
@@ -634,7 +623,6 @@ class evRepeat
                     ) );
 
                 }
-
             }
 
             // If ticket printing is enabled for this event, see if the

@@ -69,7 +69,7 @@
       {!else}           
       <a href="{pi_url}/event.php?eid={ev_id}&amp;delevent=x" onclick="return confirm('{$LANG_EVLIST['conf_del_all']}')"
           id="delete_event">
-        <i title="{$LANG_ADMIN['delete']}" class="{iconset}-trash-o ev-icon-danger tooltip"><i>
+        <i title="{$LANG_ADMIN['delete']}" class="{iconset}-trash-o ev-icon-danger tooltip"></i>
       </a>
       {!endif}           
       <a href="{pi_url}/event.php?clone=x&eid={ev_id}">

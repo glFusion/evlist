@@ -548,7 +548,6 @@ class evRepeat
         ) );
 
         // Show the user comments. Moderators and event owners can delete comments
-        $this->Event->enable_comments = 0;
         if (plugin_commentsupport_evlist() && $this->Event->enable_comments < 2) {
             $T->set_var('usercomments',
                 CMT_userComments($this->rp_id, $this->Detail->title, 'evlist',

@@ -504,7 +504,6 @@ class evEvent
 
         if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
             $this->isNew = false;
-            $oldid = COM_sanitizeID($A['eid']);
         }
 
         // Authorized to bypass the queue
@@ -692,6 +691,7 @@ class evEvent
         }
 
         if (empty($this->Errors)) {
+            PLG_itemSaved($this->id, 'evlist');
             return '';
         } else {
             return $this->PrintErrors();
@@ -724,6 +724,7 @@ class evEvent
         DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
         DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
         DB_delete($_TABLES['evlist_tickets'], 'ev_id', $eid);
+        PLG_itemDeleted($eid, 'evlist');
         return true;
     }
 

@@ -56,7 +56,7 @@ require_once $_CONF['path_system'] . 'classes/config.class.php';
 $ev_config = config::get_instance();
 $_EV_CONF = $ev_config->get_config('evlist');
 
-require_once dirname(__FILE__) . '/evlist.php';
+require_once __DIR__ . '/evlist.php';
 
 // Some variables are used all over, so get them once to avoid a lot of
 // function calls
@@ -105,6 +105,27 @@ if (is_file("$langpath/custom/$langfile")) {
     include_once "$langpath/custom/$langfile";
 }
 
+// Define values for whether RSVP can be per repeat or only for a whole event
+// This is basically ignored for one-time events.
+define('EV_RSVP_EVENT', 1);
+define('EV_RSVP_REPEAT', 2);
+
+// macros to make the code easier to read
+define('EVCHECKED', 'checked="checked"');
+define('EVSELECTED', 'selected="selected"');
+
+// define date format for Pear Date_Calc as common SQL format.
+// also defined in lglib/functions.inc starting with version 0.0.7
+if (!defined('DATE_CALC_FORMAT')) {
+    define('DATE_CALC_FORMAT', '%Y-%m-%d');
+}
+
+// The services file only has functions for event signups and payments.
+// No need to include if RSVP is disabled.
+if ($_EV_CONF['enable_rsvp']) {
+    include_once __DIR__ . '/services.inc.php';
+}
+
 function USES_evlist_functions()
 {    require_once EVLIST_PI_PATH . '/evlist_functions.inc.php'; }
 
@@ -141,20 +162,6 @@ function USES_evlist_class_view()
 function USES_evlist_class_meetup()
 {   require_once 'classes/evMeetup.class.php';  }
 
-// Define values for whether RSVP can be per repeat or only for a whole event
-// This is basically ignored for one-time events.
-define('EV_RSVP_EVENT', 1);
-define('EV_RSVP_REPEAT', 2);
-
-// macros to make the code easier to read
-define('EVCHECKED', 'checked="checked"');
-define('EVSELECTED', 'selected="selected"');
-
-// define date format for Pear Date_Calc as common SQL format.
-// also defined in lglib/functions.inc starting with version 0.0.7
-if (!defined('DATE_CALC_FORMAT')) {
-    define('DATE_CALC_FORMAT', '%Y-%m-%d');
-}
 
 /**
 *   Return the current code (not necessarily installed) version
@@ -1747,7 +1754,7 @@ function plugin_configmanager_select_topic_centerblock_evlist()
 *   @param  array   $options    (reserved for future extensions)
 *   @return mixed         string or array of strings with the information
 */
-function plugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
+function Xplugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 {
     global $_CONF, $_TABLES, $LANG_EVLIST;
 
@@ -2131,6 +2138,155 @@ function plugin_loadlanguage_evlist($requested='')
 
 
 /**
+*   Provides the getItemInfo function for this plugin
+*
+*   @param  string  $id         Product ID
+*   @param  string  $fields     Comma-separated list of fields to return
+*   @param  integer $uid        User ID
+*   @param  array   $options    Not used
+*   @return array           Array of product information
+*/
+function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
+{
+    global $_TABLES, $_CONF, $LANG_PP;
+
+    $properties = explode(',', $what);
+    $fields = array();
+    $retval = array();
+    $buildingIndex = false;
+    foreach ($properties as $p) {
+        switch ($p) {
+        case 'id':
+            $fields[] = 'e.id';
+            break;
+        case 'title':
+            $fields[] = 'd.title';
+            break;
+        case 'excerpt':
+        case 'introtext':
+            $fields[] = 'd.summary';
+        case 'description':
+        case 'bodytext':
+            $fields[] = 'd.full_description';
+            break;
+        case 'searchidx':
+        case 'content':
+            $fields[] = 'd.title';
+            $fields[] = 'd.summary';
+            $fields[] = 'd.full_description';
+            break;
+        case 'date':
+            $fields[] = 'UNIX_TIMESTAMP(r.rp_start) AS unixtime';
+            break;
+        case 'search_index':
+            $buildingIndex = true;
+            break;
+        case 'perms':
+            $fields[] = 'e.owner_id';
+            $fields[] = 'e.group_id';
+            $fields[] = 'e.perm_owner';
+            $fields[] = 'e.perm_group';
+            $fields[] = 'e.perm_members';
+            $fields[] = 'e.perm_anon';
+            break;
+        }
+    }
+    if (count($fields) == 0) {
+        return $retval;
+    }
+    $fields = array_unique($fields);
+    $fields = implode(',', $fields);
+    $retval = array();
+    $sql = "SELECT $fields
+            FROM {$_TABLES['evlist_events']} e
+            LEFT JOIN {$_TABLES['evlist_detail']} d
+                ON d.ev_id = e.id
+            LEFT JOIN {$_TABLES['evlist_repeat']} r
+                ON r.rp_ev_id = e.id";
+    if ($id == '*') {
+        if ( $buildingSearchIndex ) {
+            $today = date('Y-m-d');
+            $where = ' WHERE status = 1 ';
+        } else {
+            $where = ' WHERE 1=1 ';
+        }
+    } else {
+        $where = " WHERE (e.id = '" . DB_escapeString($id) . "')";
+    }
+    if ($uid > 0) {
+        $where .= COM_getPermSQL('AND');
+    }
+    $sql .= $where . ' GROUP BY e.id';
+    $res = DB_query($sql);
+
+    $props = array();
+    while ($A = DB_fetchArray($res, false)) {
+        foreach ($properties as $p) {
+            switch ($p) {
+            case 'title':
+                $props[$p] = $A['title'];
+                break;
+            case 'introtext':
+                $props[$p] = $A['summary'];
+                break;
+            case 'bodytext':
+                $props[$p] = $A['full_description'];
+                break;
+            case 'searchidx':
+            case 'content':
+                $props[$p] = $A['title'] . ' ' .
+                    $A['summary'] . ' ' . $A['full_description'];
+                break;
+            case 'date':
+                $props[$p] = $A['unixtime'];
+                break;
+            case 'perms':
+                $props['perms'] = array(
+                    'owner_id' => $A['owner_id'],
+                    'group_id' => $A['group_id'],
+                    'perm_owner' => $A['perm_owner'],
+                    'perm_group' => $A['perm_group'],
+                    'perm_members' => $A['perm_members'],
+                    'perm_anon' => $A['perm_anon'],
+                );
+                break;
+            default:
+                $props[$p] = isset($A[$p]) ? $A[$p] : NULL;
+                break;
+            }
+        }
+        //$props['url'] = COM_buildUrl(EVLIST_URL . '/event.php?eid=' . $A['id'], 0);
+        $props['url'] = EVLIST_URL . '/event.php?view=event&eid=' . $A['id'];
+        $mapped = array();
+        foreach ($props as $key => $value) {
+            if ($id == '*') {
+                if ($value != '') {
+                    $mapped[$key] = $value;
+                }
+            } else {
+                $mapped[$key] = $value;
+            }
+        }
+
+        if ($id == '*') {
+            $retval[] = $mapped;
+        } else {
+            $retval = $mapped;
+            break;
+        }
+    }
+
+    if (($id != '*') && (count($retval) == 1)) {
+        $tRet = array_values($retval);
+        $retval = $tRet[0];
+    }
+    if ( $retval === '' || (is_array($retval) && count($retval) == 0 ) ) return NULL;
+    return $retval;
+}
+
+
+
+/**
 *   Check that the currently installed version matches the code version.
 *   This is to disable functions that might not work due to a mismatch.
 *   Just check the major.minor.revision values.  Any fourth element is ignored.
@@ -2248,17 +2404,17 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                     $dt_sql = "rep.rp_start >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 2:     // include if start date has not passed
-                    $dt_sql = "rep.rp_start >= '$start 00:00:00'";
+                    $dt_sql = "rep.rp_start >= '$start'";
                     break;
                 case 3:     // include if end time has not passed
                     $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 4:     // include if end date has not passed
-                    $dt_sql = "rep.rp_end >= '$end 23:59:59'";
+                    $dt_sql = "rep.rp_end >= '$end'";
                     break;
                 }
                 // Always limit to events starting before the specified end date
-                $dt_sql .= " AND rep.rp_start <= '$end 23:59:59'";
+                $dt_sql .= " AND rep.rp_start <= '$end'";
                 break;
             case 'select':
                 $selection = $value;
@@ -2298,8 +2454,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             COM_getPermSQL('AND', 0, 2, 'cal') .
             " $opt_where
             GROUP BY $grp_by ASC
-            ORDER BY rep.rp_date_start $opt_order,
-                    rep.rp_time_start1 $opt_order";
+            ORDER BY rep.rp_start $opt_order";
+            //ORDER BY rep.rp_date_start $opt_order,
+            //        rep.rp_time_start1 $opt_order";
     if ($limit > 0) {
         if ($page > 1) {
             $sql .= ' LIMIT ' . (($page - 1) * $limit) . ',' . $limit;
@@ -2346,7 +2503,6 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     USES_lglib_class_datecalc();
 
     while ($A = DB_fetchArray($result, false)) {
-
         // Set a valid foreground and background color
         if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
         if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
@@ -2360,14 +2516,15 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
             $end_date = min($A['rp_date_end'], $end);
             $newdate = max($A['rp_date_start'], $start);
             while ($newdate <= $end_date) {
-                if (!isset($events[$newdate])) $events[$newdate] = array();
+                if (!isset($events[$newdate]))
+                    $events[$newdate] = array();
                 $events[$newdate][] = $A;
                 list($y, $m, $d) = explode('-', $newdate);
                 $newdate = Date_Calc::nextDay($d, $m, $y, '%Y-%m-%d');
             }
         }
-
     }   // while
+
     // Now, get Meetup events
     if ($_EV_CONF['meetup_enabled']) {
         EVLIST_getMeetupEvents($start, $end, $opts, $events);
@@ -2476,22 +2633,15 @@ function EVLIST_noquotes($str)
     return str_replace(array('"'), array('&quot;'), $str);
 }
 
-if ($_EV_CONF['enable_rsvp']) {
-    include_once dirname(__FILE__) . '/services.inc.php';
-}
-
 
 /**
 *   Determine if the current user can submit an event.
 *   Checks config and logged-in status.
-*   Also sets a global $_EV_CONF['_can_add'] for legacy use
 *
 *   @return boolean     True if subbmission is allowed, False if not
 */
 function EVLIST_canSubmit()
 {
-    global $_EV_CONF;
-
     static $canSubmit = NULL;
 
     if ($canSubmit === NULL) {
@@ -2501,10 +2651,8 @@ function EVLIST_canSubmit()
             (!COM_isAnonUser() &&
             ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) ||
             plugin_ismoderator_evlist()) {
-            $_EV_CONF['_can_add'] = 1;
             $canSubmit = true;
         } else {
-            $_EV_CONF['_can_add'] = 0;
             $canSubmit = false;
         }
     }

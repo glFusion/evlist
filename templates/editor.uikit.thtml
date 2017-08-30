@@ -3,13 +3,6 @@
 {wysiwyg}
 {!endif}
 <script type="text/javascript">
-$(document).ready(function() {
-    toggleRSVPdetail({use_rsvp});
-    showhiderecurringoptions();
-    showhideformatoptions({format_opt});
-    showhide_tzselect(document.getElementById("tz_local"));
-});
-
 // Global variables to track date/time field contents
 var ts1 = {ts_start} * 1000;
 var ts2 = {ts_end} * 1000;
@@ -463,7 +456,7 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_startdate1">
           {$LANG_EVLIST['start_date']}:
-          <span id="date_start" class="tooltip_cfg tooltipstered"></span> 
+          <span id="date_start" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="startdt1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
@@ -489,7 +482,7 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_enddate1">
           {$LANG_EVLIST['end_date']}:
-          <span id="date_end" class="tooltip_cfg tooltipstered"></span> 
+          <span id="date_end" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
@@ -513,7 +506,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row" id="timezone">
         <label for="tzid" class="uk-form-label">{$LANG_EVLIST['timezone']}:
-          <span id="tz" class="tooltip_cfg tooltipstered"></span> 
+          <span id="tz" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" id="tz_local" name="tz_local" onclick="showhide_tzselect(this)" {tz_islocal}>&nbsp;{$LANG_EVLIST['tz_local']}<br />
@@ -523,7 +516,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_split', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <span id="split_doc" class="tooltip_cfg tooltipstered"></span>
           <input type="checkbox" name="split" value="1"
                 id="split" {split_checked} onclick="showhideallday()" />
           &nbsp;&nbsp;
@@ -531,7 +524,7 @@ function toggleRSVPdetail(val)
 
         <span {allday_show} id="div1">
           {$LANG_EVLIST['allday']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_allday', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <span id="allday_doc" class="tooltip_cfg tooltipstered"></span>
           <input type="checkbox" name="allday" value="1"
             id="allday" {allday_checked} onclick="chk_allday()" />
         </span>
@@ -777,7 +770,7 @@ function toggleRSVPdetail(val)
       </div>
       <div class="uk-form-row">
         <label class="uk-form-label">{$LANG_EVLIST['ticket_types']}:</label>
-        <div class="uk-form-controls evdata">
+        <div class="uk-form-controls">
         <table>
         <th>{$LANG_EVLIST['enabled']}</th>
         <th>{$LANG_EVLIST['type']}</th>
@@ -1153,6 +1146,16 @@ $(document).ready(function() {
             });
         }
     });
+});
+
+$(document).ready(function() {
+    toggleRSVPdetail({use_rsvp});
+{!if recur_section}
+    showhiderecurringoptions();
+    showhideformatoptions({format_opt});
+{!endif}
+    showhide_tzselect(document.getElementById("tz_local"));
+    chk_allday();
 });
 
 </script>

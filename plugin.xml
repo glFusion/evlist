@@ -7,6 +7,5 @@
     <phpversion>5.6.0</phpversion>
     <url>http://www.glfusion.org</url>
     <maintainer>Mark R. Evans</maintainer>
-    <dataproxydriver>evlist.class.php</dataproxydriver>
     <requires>lglib</requires>
 </plugin>

@@ -2,6 +2,7 @@
 
 ## v1.4.3
 Release TBD
+- Added a Reminder class to handle reminder tasks
 - Require glFusion 1.6+
 - Add css to format long tooltips
 - Remove HTML calendar template, use AJAX only

@@ -56,41 +56,17 @@ case 'getloc':
 case 'addreminder':
     $rp_id = (int)$_POST['rp_id'];
     $status = array();
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
-    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess(2)) {
-        $username = COM_getDisplayName($_USER['uid']);
-        $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
-            (eid, rp_id, uid, name, email, days_notice)
-        VALUES (
-            '{$Ev->Event->id}',
-            '{$Ev->rp_id}',
-            '" . (int)$_USER['uid']. "',
-            '" . DB_escapeString($username) . "',
-            '" . DB_escapeString($_POST['rem_email']) . "',
-            '" . (int)$_POST['notice']. "')";
-        //COM_errorLog($sql);
-        DB_query($sql, 1);
-        if (!DB_error()) {
-            $status['reminder_set'] = true;
-        } else {
-            $status['reminder_set'] = false;
-        }
-    }
+    USES_evlist_class_reminder();
+    $R = new Reminder($_POST['rp_id']);
+    $status['reminder_set'] = $R->Add($_POST['notice'], $_POST['rem_email']);
     echo json_encode($status);
     exit;
     break;
 
 case 'delreminder':
-    $rp_id = (int)$_POST['rp_id'];
-    $uid = (int)$_USER['uid'];
-    if (!COM_isAnonUser() && $rp_id > 0) {
-        USES_evlist_class_repeat();
-        $Ev = new evRepeat($rp_id);
-        DB_delete($_TABLES['evlist_remlookup'],
-            array('eid', 'uid', 'rp_id'),
-            array($Ev->Event->id, $uid, $rp_id) );
-    }
+    USES_evlist_class_reminder();
+    $R = new Reminder($_POST['rp_id']);
+    $R->Delete();
     echo json_encode(array('reminder_set' => false));
     exit;
     break;

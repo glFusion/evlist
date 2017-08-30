@@ -230,43 +230,6 @@ case 'delfuture':
     $R->DeleteFuture();
     break;
 
-// DEPRECATED
-case 'savereminder':
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
-    if (!COM_isAnonUser() && $Ev->rp_id > 0 && $Ev->Event->hasAccess(2)) {
-        // eid is normally main event id.  This keeps us from being redirected
-        // to index.php after saving the reminder.
-        $eid = (int)$rp_id;
-        $sql = "INSERT INTO {$_TABLES['evlist_remlookup']}
-            (eid, rp_id, uid, email, days_notice)
-        VALUES (
-            '{$Ev->Event->id}',
-            '{$Ev->rp_id}',
-            '" . (int)$_USER['uid']. "',
-            '" . DB_escapeString($_POST['rem_email']) . "',
-            '" . (int)$_POST['notice']. "')";
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (DB_error()) {
-            // In case of a duplicate submission or something
-            LGLIB_storeMessage($LANG_EVLIST['messages'][23]);
-        }
-    }
-    break;
-
-case 'delreminder':
-// DEPRECATED
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
-    if (!COM_isAnonUser() && $Ev->rp_id > 0) {
-        DB_delete($_TABLES['evlist_remlookup'],
-            array('eid', 'uid', 'rp_id'),
-            array($_POST['eid'], $_USER['uid'], $rp_id) );
-    }
-    $eid = (int)$rp_id;
-    break;
-
 case 'register':
     if ($rp_id < 1) {
         break;

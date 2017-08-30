@@ -159,6 +159,9 @@ function USES_evlist_class_ticket()
 function USES_evlist_class_view()
 {   require_once EVLIST_PI_PATH . '/classes/evView.class.php'; }
 
+function USES_evlist_class_reminder()
+{   require_once EVLIST_PI_PATH . '/classes/evReminder.class.php'; }
+
 function USES_evlist_class_meetup()
 {   require_once 'classes/evMeetup.class.php';  }
 
@@ -1012,101 +1015,14 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 */
 function plugin_runScheduledTask_evlist()
 {
-    global $_CONF, $_TABLES, $LANG_EVLIST;
-
     if (!EVLIST_isCurrentVersion()) return;
 
-    //check if reminders exist
-    $sql = "SELECT rem.email, rem.eid, rem.uid, rem.name, rem.rp_id,
-            u.language
-        FROM {$_TABLES['evlist_remlookup']} rem
-        LEFT JOIN {$_TABLES['users']} u
-            ON u.uid = rem.uid
-        LEFT JOIN {$_TABLES['evlist_repeat']} rep
-            ON rep.rp_id = rem.rp_id
-        WHERE rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)";
-        // TODO: Figure out sql for recurring event reminders
-        /*AND (
-            rem.rp_id = 0 AND
-            rep.rp_date_start < date_add(NOW(), INTERVAL rem.days_notice DAY)            )
-    )";*/
-    //COM_errorLog($sql);
-    $result = DB_query($sql, 1);
-    if (DB_numRows($result) < 1) {
-        return true;
+    USES_evlist_class_reminder();
+    $Rems = Reminder::getCurrent();
+    foreach ($Rems as $R) {
+        $R->Send();
+        $R->Delete();
     }
-
-    $now = time();
-    $events = array();
-    USES_evlist_class_repeat();
-
-    $T = new Template(EVLIST_PI_PATH . '/templates/');
-    $T->set_file(array(
-        'msg' => 'reminder_mail.thtml',
-        'addr' => 'address.thtml',
-    ) );
-
-    //common variables
-    //begin loop
-    while ($A = DB_fetchArray($result, false)) {
-
-        // Load the user's language
-        $LANG = plugin_loadlanguage_evlist($A['language']);
-
-        // Load the event instance. May be multiple notifications for
-        // upcoming events, but shouldn't be too many events.
-        if (!isset($events[$A['rp_id']])) {
-            $events[$A['rp_id']] = new evRepeat($A['rp_id']);
-        }
-        $Rp = $events[$A['rp_id']];
-        $subject = $LANG['rem_subject'];
-
-        $title = COM_stripslashes($A['title']);
-        $summary = COM_stripslashes($A['summary']);
-        $date_start = EVLIST_formattedDate($Rp->date_start1);
-        $event_url = EVLIST_URL . '/event.php?eid=' . $A['rp_id'];
-        if ($A['allday'] == 1) {
-            $times = $LANG['allday'];
-        } else {
-            $times = EVLIST_formattedTime($Rp->time_start1) . ' - ' .
-                    EVLIST_formattedTime($Rp->time_end1);
-            if ($A['split'] == 1) {
-                $times .= ', ' . EVLIST_formattedTime($A['rp_time_start2']) .
-                    ' - ' . EVLIST_formattedTime($A['rp_time_end2']);
-            }
-        }
-
-        $T->set_var(array(
-            'lang_what' => $LANG['what'],
-            'lang_when' => $LANG['when'],
-            'lang_where'    => $LANG['where'],
-            'what'      => $Rp->Event->Detail->title,
-            'when'      => $Rp->date_start . ' ' . $times,
-            'location'  => $Rp->Event->Detail->location,
-            'street'    => $Rp->Event->Detail->street,
-            'city'      => $Rp->Event->Detail->city,
-            'province'  => $Rp->Event->Detail->province,
-            'postal'    => $Rp->Event->Detail->postal,
-            'country'   => $Rp->Event->Detail->country,
-            'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
-            'summary'   => COM_stripSlashes($Rp->Event->Detail->summary),
-            'msg1'      => $LANG['rem_msg1'],
-            'msg2'      => $LANG['rem_msg2'],
-        ) );
-        $T->parse('address_info', 'addr', true);
-        $T->parse('output', 'msg');
-        $message = $T->finish($T->get_var('output'));
-
-        $mailto = COM_formatEmailAddress($A['name'], $A['email']);
-        //mail reminder
-        COM_mail($mailto, $subject, $message, '', true);
-
-        //delete reminder
-        DB_delete($_TABLES['evlist_remlookup'],
-                    array('eid', 'rp_id', 'uid'),
-                    array($A['eid'], $A['rp_id'], $A['uid']));
-    }
-
     return true;
 }
 
@@ -2071,7 +1987,6 @@ function EVLIST_siteFooter()
 */
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
-//    if (!EVLIST_isCurrentVersion()) return;
     USES_evlist_functions();
 
     if ($cal > 0) {
@@ -2300,14 +2215,9 @@ function EVLIST_isCurrentVersion()
     static $isCurrent = -1;     // static var to minimize DB calls
 
     if ($isCurrent === -1) {
-        $isCurrent = true;
-        $evListVersion = DB_getItem($_TABLES['plugins'], 'pi_version',
+        $installed = DB_getItem($_TABLES['plugins'], 'pi_version',
                 "pi_name = 'evlist'");
-        $installed = explode('.', $evListVersion);
-        $code = explode('.', $_EV_CONF['pi_version']);
-        for ($i = 0; $i < 3; $i++) {
-            if ($installed[$i] != $code[$i]) $isCurrent = false;
-        }
+        $isCurrent = COM_checkVersion($installed, $_EV_CONF['pi_version']);
     }
     return $isCurrent;
 }

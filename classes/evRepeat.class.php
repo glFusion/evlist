@@ -241,6 +241,8 @@ class evRepeat
             $this->time_end1    = $A['rp_time_end1'];
             $this->time_start2  = $A['rp_time_start2'];
             $this->time_end2    = $A['rp_time_end2'];
+            // This is used by Reminders so make sure it's set:
+            $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
 
             $this->Event = new evEvent($this->ev_id, $this->det_id);
             $this->tzid = $this->Event->tzid;
@@ -771,9 +773,8 @@ class evRepeat
 
             // Let's see if we have already asked for a reminder...
             if ($_USER['uid'] > 1) {
-                $hasReminder = DB_count($_TABLES['evlist_remlookup'],
-                        array('eid', 'uid', 'rp_id'),
-                        array($this->ev_id, $_USER['uid'], $this->rp_id) );
+                USES_evlist_class_reminder();
+                $hasReminder = Reminder::countReminders($this->ev_id, $this->rp_id);
             }
         } else {
             $show_reminders = false;

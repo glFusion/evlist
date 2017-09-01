@@ -11,7 +11,7 @@
   <a href="{pi_url}/index.php?{range_url}&amp;view=list&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" class='tooltip evlist_nav_img' title="{$LANG_EVLIST['list_view']}"><img src="{pi_url}/images/{list_img}" alt="{$LANG_EVLIST['list_view']}" width="27" height="20" /></a>
 </div>
   {!if add_event_link}
-    <form method="post" action="{add_event_link}">
+    <form method="get" action="{add_event_link}">
     {!if feed_icons}
       {feed_icons}&nbsp;
     {!endif}

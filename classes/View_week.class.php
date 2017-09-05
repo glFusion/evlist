@@ -43,7 +43,7 @@ class View_week extends View
     */
     public function Content()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST;
+        global $_CONF, $_EV_CONF, $LANG_MONTH, $LANG_EVLIST, $_USER;
 
         $retval = '';
 
@@ -65,7 +65,6 @@ class View_week extends View
         $tpl = $this->getTemplate();
         $T->set_file(array(
             'week'      => $tpl . '.thtml',
-            //'events'    => 'weekview/events.thtml',
         ) );
 
         $daynames = self::DayNames();
@@ -124,34 +123,33 @@ class View_week extends View
 
             $T->set_block('week', 'eventBlock', 'eBlk');
             foreach ($events[$weekData] as $A) {
-                //$fgstyle = 'color:' . $A['fgcolor'].';';
+                $tz = $A['tzid'] == 'local' ? $_USER['tzid'] : $A['tzid'];
                 if ($A['allday'] == 1 ||
                         ($A['rp_date_start'] < $weekData &&
                         $A['rp_date_end'] > $weekData)) {
                     $event_time = $LANG_EVLIST['allday'];
-                    /*$event_div = '<div class="monthview_allday"
-                        style="background-color:'. $event['bgcolor'].';">';*/
                 } else {
                     if ($A['rp_date_start'] == $weekData) {
-                        $startstamp = strtotime($weekData . ' ' . $A['rp_time_start1']);
-                        $starttime = date('g:i a', $startstamp);
+                        $s_dt = new \Date($weekData  . ' ' . $A['rp_time_start1'], $tz);
+                        $starttime = $s_dt->format($_CONF['timeonly'],true);
                     } else {
                         $starttime = ' ... ';
                     }
 
                     if ($A['rp_date_end'] == $weekData) {
-                        $endstamp = strtotime($weekData . ' ' . $A['rp_time_end1']);
-                        $endtime = date('g:i a', $endstamp);
+                        $e_dt = new \Date($weekData . ' ' . $A['rp_time_end1'], $tz);
+                        $endtime = $e_dt->format($_CONF['timeonly'], true);
                     } else {
                         $endtime = ' ... ';
                     }
                     $event_time = $starttime . ' - ' . $endtime;
+                    if ($A['tzid'] != 'local') $event_time .= ' ( ' . $s_dt->format('T',true) . ')';
 
                     if ($A['split'] == 1 && !empty($A['rp_time_start2'])) {
-                        $startstamp2 = strtotime($weekData . ' ' . $A['rp_time_start2']);
-                        $starttime2 = date('g:i a', $startstamp2);
-                        $endstamp2 = strtotime($weekData . ' ' . $A['rp_time_end2']);
-                        $endtime2 = date('g:i a', $endstamp2);
+                        $s_dt2 = new \Date($weekData . ' ' . $A['rp_time_start2'], $tz);
+                        $e_dt2 = new \Date($weekData . ' ' . $A['rp_time_end2'], $tz);
+                        $starttime2 = $s_dt2->format($_CONF['timeonly'], true);
+                        $endtime2 = $e_dt2->format($_CONF['timeonly'], true);
                         $event_time .= ' & ' . $starttime2 . ' - ' . $endtime2;
                     }
                 }
@@ -186,7 +184,6 @@ class View_week extends View
                 }
                 $T->parse('eBlk', 'eventBlock', true);
             }
-
             $T->parse('dBlk', 'dayBlock', true);
         }
 

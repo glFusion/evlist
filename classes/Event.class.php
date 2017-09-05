@@ -353,7 +353,7 @@ class Event
                     $tmp, $row['startminute2']);
                 $tmp = EVLIST_12to24($row['endhour2'], $row['end2_ampm']);
                 $this->time_end2 = sprintf('%02d:%02d:00',
-                    $tmp, $row['endminute1']);
+                    $tmp, $row['endminute2']);
             } else {
                 $this->time_start2 = NULL;
                 $this->time_end2 = NULL;

@@ -50,7 +50,7 @@
 }
 
 #calendar .day {
-    overflow:scroll;
+    overflow-y: auto;
 }
 
 #calendar .date {

@@ -7,6 +7,6 @@
 {!else}
   <a href="{pi_url}/event.php?eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}" 
 {!endif}
-    class="tooltip" title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
+    data-uk-tooltip={cls:'evTooltip'} title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
 </div>
 {# end {templatelocation} #}

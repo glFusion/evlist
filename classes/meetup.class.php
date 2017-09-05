@@ -1,8 +1,10 @@
 <?php
+namespace Evlist;
 /**
  * @package    Meetup
  * @license    http://www.gnu.org/licenses/gpl.html GNU/GPL
  */
+
 class Meetup 
 {
   /**

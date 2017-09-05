@@ -11,6 +11,7 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Evlist;
 
 /**
 *   Class for Meetup events
@@ -66,13 +67,13 @@ class evMeetup
     /**
     *   Retrieve Meetup events.
     *   Checks the cache table first for a recent entry.  If not found,
-    *   get weather info from Google and update the cache.
+    *   get information from meetup.com
     *
     *   @return array   Array of event information
     */
     public function getEvents($start='', $end='', $key='')
     {
-        global $_TABLES, $_EV_CONF;
+        global $_TABLES, $_EV_CONF, $_CONF;
 
         $events = array();
 
@@ -102,11 +103,13 @@ class evMeetup
 
         $time_param = '';
         if (!empty($start)) {
-            $time_param .= strtotime($start) * 1000;
+            $d = new \Date($start, $_CONF['timezone']);
+            $time_param .= $d->toUnix() * 1000;
         }
         if (!empty($end)) {
             if (!empty($start)) $time_param .= ',';
-            $time_param .= strtotime($end . ' 23:59:59') * 1000;
+            $d = new \Date($end . ' 23:59:59', $_CONF['timezone']);
+            $time_param .= $d->toUnix() * 1000;
         }
         if (!empty($time_param)) {
             $this->setParam('time', $time_param);
@@ -121,13 +124,13 @@ class evMeetup
             $events = array();
             foreach ($response->results as $event) {
                 $tz = $event->timezone;
-                $d = new Date($event->time / 1000, $tz);
+                $d = new \Date($event->time / 1000, $tz);
                 $dt = $d->format('Y-m-d', true);
                 $tm = $d->format('H:i:s', true);
                 if (!isset($events[$dt])) $events[$dt] = array();
                 $events[$dt][] = $event;
             }
-            $this->updateCache($events);
+//            $this->updateCache($events);
         }
         catch(Exception $e) {
             COM_errorLog('EVLIST:' . $e->getMessage());

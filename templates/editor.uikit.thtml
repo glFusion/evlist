@@ -334,7 +334,7 @@ function toggleRSVPdetail(val)
         <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
         </label>
         <div class="uk-form-controls">
-          <input required type="text" name="title"
+          <input required type="text" name="title" class="required"
             id="title" style="width:50%;" maxlength="255"
             value="{title}" />
           <span class="evFieldNote">{title_note}</span>

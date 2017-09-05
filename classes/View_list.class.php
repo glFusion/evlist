@@ -47,7 +47,7 @@ class View_list extends View
     */
     public function Content()
     {
-        global $_CONF, $_EV_CONF, $_USER, $_TABLES, $LANG_EVLIST;
+        global $_CONF, $_EV_CONF, $_USER, $_TABLES, $LANG_EVLIST, $_USER;
 
         $retval = '';
         $T = new \Template(EVLIST_PI_PATH . '/templates/');
@@ -99,14 +99,10 @@ class View_list extends View
             break;
         }
 
-        //$_EV_CONF['meetup_enabled'] = false;
         $events = EVLIST_getEvents($start, $end, $opts);
-        //$andrange = '&amp;range=' . $this->range;
-        //$T->set_var('range', $this->range);
 
         if (!empty($this->cat)) {
             $andcat = '&amp;cat=' . $this->cat;
-            //$T->set_var('category', $this->cat);
         } else {
             $andcat = '';
         }
@@ -120,7 +116,6 @@ class View_list extends View
             ) );
         } else {
             //populate list
-
             $T->set_file(array(
                 'item' => 'list_item.thtml',
                 'editlinks' => 'edit_links.thtml',
@@ -156,8 +151,10 @@ class View_list extends View
                     }
 
                     $summary = PLG_replaceTags(COM_stripslashes($A['summary']));
+                    $tz = $A['tzid'] == 'local' ? $_USER['tzid'] : $A['tzid'];
+                    $d = new \Date($A['rp_date_start'] . ' ' . $A['rp_time_start1'], $tz);
                     $datesummary = sprintf($LANG_EVLIST['event_begins'],
-                        EVLIST_formattedDate(strtotime($A['rp_date_start'])));
+                        $d->format($_CONF['date'], true));
                     $morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                         $A['rp_id'] . $andrange . $andcat);
                     $morelink = '<a href="' . $morelink . '">' .

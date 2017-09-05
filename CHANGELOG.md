@@ -2,6 +2,9 @@
 
 ## v1.4.3
 Release TBD
+- Show timezone in tooltips if not local
+- Implement Evlist namespace and class autoloader
+- Add overflow:auto to day blocks in monthly view
 - Added a Reminder class to handle reminder tasks
 - Require glFusion 1.6+
 - Add css to format long tooltips

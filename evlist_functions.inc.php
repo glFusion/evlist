@@ -125,11 +125,12 @@ function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
 *   Display a small monthly calendar for the current month.
 *   Dates that have events scheduled are highlighted.
 *
+*   @deprecated
 *   @param  integer $year   Year to display, default is current year
 *   @param  integer $month  Starting month
 *   @return string          HTML for calendar page
 */
-function EVLIST_smallmonth($year=0, $month=0, $opts=array())
+function X_EVLIST_smallmonth($year=0, $month=0, $opts=array())
 {
     global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
 
@@ -226,9 +227,7 @@ function EVLIST_smallmonth($year=0, $month=0, $opts=array())
         $T->parse('wBlock', 'week', true);
         $T->clear_var('dBlock');
     }
-
     $T->parse('output', 'smallmonth');
-
     return $T->finish($T->get_var('output'));
 }
 
@@ -326,7 +325,7 @@ function EVLIST_getDayViewData($events, $today = '')
     );
     $alldaydata = array();
 
-    USES_class_date();
+    //USES_class_date();
 
     // Events are keyed by hour, so read through each hour
     foreach ($events as $date=>$E) {
@@ -520,27 +519,6 @@ function EVLIST_GetOptions($options, $selected = '', $bias=0)
 
 
 /**
-*   Get the ISO language.
-*   This is to load the correct language for the calendar popup, so make
-*   sure a corresponding language file exists.
-*   Default to English if not found.
-*
-*   @return string      ISO language string, 'en' by default
-*/
-function EVLIST_getIsoLang()
-{
-    global $_CONF, $_EV_CONF;
-
-    $iso_lang = $_CONF['iso_lang'];
-    if (!is_file($_CONF['path_html'] . $_EV_CONF['pi_name'] .
-            '/js/calendar/lang/calendar-' . $iso_lang . '.js')) {
-        $iso_lang = 'en';
-    }
-    return $iso_lang;
-}
-
-
-/**
 *   Get the RSS feed links only
 *
 *   @return array   Array of links & titles
@@ -631,8 +609,7 @@ function EVLIST_adminRSVP($rp_id)
 1 row in set (0.00 sec)
 */
     USES_lib_admin();
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
+    $Ev = new Evlist\Repeat($rp_id);
     if ($Ev->rp_id == 0) return '';
 
     DB_query("SET @tk_count = 0;");
@@ -745,7 +722,7 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
 
-    USES_class_date();
+    //USES_class_date();
 
     $retval = '';
 

@@ -1146,7 +1146,6 @@ class Event
             'saveaction'    => $saveaction,
             'delaction'     => $delaction,
             'owner_id'      => $this->owner_id,
-            'iso_lang'      => EVLIST_getIsoLang(),
             'hour_mode'     => $_CONF['hour_mode'],
             'days_interval' => $days_interval,
             'display_format' => $_CONF['shortdate'],

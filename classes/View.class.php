@@ -198,7 +198,6 @@ class View
             'event_type_select' => $type_options,
             'range_options' => $range_options,
             'action_url'    => EVLIST_URL . '/index.php',
-            'iso_lang'  => EVLIST_getIsoLang(),
             'view'      => $this->view,
             'curdate'   => sprintf("%d-%02d-%02d", $year, $month, $day),
             'urlfilt_cal' => (int)$this->cal,

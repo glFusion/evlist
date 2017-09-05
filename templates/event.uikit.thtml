@@ -233,17 +233,6 @@
 </div>
 {!endif}
 
-{!if unregister_link}
-<div class="evEventRegInfo">
-  {$LANG_EVLIST['cancel_free']}<br />
-  <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
-    <input type="hidden" name="rp_id" value="{rp_id}" />
-    <input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
-    <input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
-  </form>
-</div>
-{!endif}
-
 {!if show_reminderform}
 <div class="evEventItem">
   <div id="reminder_no" class="evdata uk-alert" style="display:none;">
@@ -269,6 +258,17 @@
       <input type="hidden" name="notice" value="0" />
     </form>
   </div>
+</div>
+{!endif}
+
+{!if unregister_link}
+<div class="evEventRegInfo">
+  {$LANG_EVLIST['cancel_free']}<br />
+  <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
+    <input type="hidden" name="rp_id" value="{rp_id}" />
+    <input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
+    <input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
+  </form>
 </div>
 {!endif}
 

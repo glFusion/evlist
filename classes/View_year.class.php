@@ -119,7 +119,7 @@ class View_year extends View
                         $daylinkclass = $dayclass == 'off' ?
                             'nolink-events' : 'day-events';
                         foreach ($events[$daydata] as $event) {
-                            $tz = $event['tzid'] == 'local' ? $_USER['tzid'] : $_CONF['timezone'];
+                            $tz = $event['tzid'] == 'local' ? $_USER['tzid'] : $event['tzid'];
                             // Separate events by a newline if more than one
                             if (!empty($popup)) {
                                 $popup .= self::tooltip_newline();

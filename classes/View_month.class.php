@@ -58,7 +58,7 @@ class View_month extends View
         $ending_date = $calendarView[$x][$y];
         $daynames = self::DayNames();
         $events = EVLIST_getEvents($starting_date, $ending_date,
-                array('cat'=>$cat, 'cal'=>$cal));
+                array('cat'=>$this->cat, 'cal'=>$this->cal));
         $nextmonth = $this->month + 1;
         $nextyear = $this->year;
         if ($nextmonth > 12) {

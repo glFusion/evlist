@@ -5,19 +5,9 @@
   <a id="next_href" onclick="javascript:ChangeDate({nextyear}, 1, 1, 'year');" href="#!">&gt;&gt;</a>
 </h2>
 
-<div class="calcontainer">
-  <table id="evlist_yearview">
+<div class="calcontainer" style="margin:auto;">
     <!-- BEGIN month -->
-    {!if st_row}
-      <tr>
-    {!endif}
-    <td class="evlist_yearview_panel">
-      {month}
-    </td>
-    {!if end_row}
-      </tr>
-    {!endif}
+  <div class="year_smallmonth">{month}</div>
     <!-- END month -->
-  </table>
 </div>
 {# end {templatelocation} #}

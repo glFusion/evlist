@@ -131,6 +131,10 @@ case 'pyear':
 
 case 'today':
     list($year, $month, $day) = explode('-', $_EV_CONF['_today']);
+    $V = Evlist\View::getView('', $year, $month, $day, $category, $calendar);
+    $content .= $V->Render();
+    break;
+
 case 'day':
 case 'week':
 case 'month':

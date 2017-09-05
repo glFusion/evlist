@@ -20,7 +20,7 @@
      <!-- BEGIN day -->
     <td class="month{dayclass}">
 {!if popup}
-      <span class="tooltip gl_mootip" title="{popup}">
+      <span data-uk-tooltip="{cls:'evTooltip'}"class="gl_mootip" title="{popup}">
 {!else}
       <span>
 {!endif}

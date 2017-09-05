@@ -28,13 +28,12 @@ class View_smallmonth extends View
     */
     public function Render()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
+        global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM, $_USER;
 
         $retval = '';
 
         // Default to the current year
         $monthnum_str = sprintf('%02d', (int)$this->month);
-        $dt = $_EV_CONF['_now'];
 
         // Get all the dates in the period
         $starting_date = date('Y-m-d', mktime(0, 0, 0, $this->month, 1, $this->year));
@@ -90,16 +89,18 @@ class View_smallmonth extends View
                                 'nolink-events' : 'day-events';
                     $dayspanclass='tooltip gl_mootip';
                     foreach ($events[$daydata] as $event) {
+                        $tz = $event['tzid'] == 'local' ? $_USER['tzid'] : $event['tzid'];
                         // Show event titles on different lines if more than one
                         if (!empty($popup)) $popup .= self::tooltip_newline();
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0 &&
                             $event['rp_date_start'] == $event['rp_date_end']) {
-                            $dt->setTimestamp(strtotime($event['rp_date_start'] .
-                                ' ' . $event['rp_time_start1']));
+                            $dt = new \Date($event['rp_date_start'] . ' ' . $event['rp_time_start1'], $tz);
                             // Time is a localized string, not a timestamp, so
                             // don't adjust for the timezone
-                            $popup .= $dt->format($_CONF['timeonly'], false) . ': ';
+                            $popup .= $dt->format($_CONF['timeonly'], true);
+                            if ($event['tzid'] != 'local') $popup .= ' ' . $dt->format('T');
+                            $popup .= ': ';
                         }
                         $popup .= htmlentities($event['title']);
                     }

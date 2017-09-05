@@ -40,21 +40,12 @@ class View_year extends View
     /**
     *   Get the actual calendar view content
     *
+    *   @uses   View_smallmonth
     *   @return string      HTML for calendar content
     */
     public function Content()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH, $_USER;
-
-        $retval = '';
-
-        // Get all the dates in the year
-        $starting_date = sprintf('%d-01-01', $this->year);
-        $ending_date = sprintf('%d-12-31', $this->year);
-        $calendarView = \Date_Calc::getCalendarYear($this->year, '%Y-%m-%d');
-        $daynames = self::DayNames(1);
-        $events = EVLIST_getEvents($starting_date, $ending_date,
-            array('cat'=>$this->cat, 'cal'=>$this->cal));
+        global $_EV_CONF;
 
         $T = new \Template(EVLIST_PI_PATH . '/templates/yearview');
         $tpl = $this->getTemplate();
@@ -62,11 +53,10 @@ class View_year extends View
             'yearview'  => $tpl . '.thtml',
         ) );
 
-        $out = array();
-        list($y, $m, $d) = explode('-', $_EV_CONF['_today']);
         $T->set_block('yearview', 'month', 'mBlock');
         for ($i = 1; $i < 13; $i++) {
-            $cal = View::getView('smallmonth', $y, $i, 1, $this->cat, $this->cal, $this->opts);
+            $cal = View::getView('smallmonth', $this->year, $i, 1,
+                    $this->cat, $this->cal, $this->opts);
             $T->set_var('month', $cal->Render());
             $T->parse('mBlock', 'month', true);
         }

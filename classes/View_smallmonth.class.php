@@ -76,17 +76,17 @@ class View_smallmonth extends View
                 list($y, $m, $d) = explode('-', $daydata);
                 $T->clear_var('no_day_link');
                 if ($daydata == $_EV_CONF['_today']) {
-                    $dayclass = 'monthtoday';
+                    $dayclass = 'today';
                 } elseif ($m == $monthnum_str) {
-                    $dayclass = 'monthon';
+                    $dayclass = 'on';
                 } else {
                     $T->set_var('no_day_link', 'true');
-                    $dayclass = 'monthoff';
+                    $dayclass = 'off';
                 }
                 $popup = '';
                 if (isset($events[$daydata])) {
                     // Create the tooltip hover text
-                    $daylinkclass = $dayclass == 'monthoff' ?
+                    $daylinkclass = $dayclass == 'off' ?
                                 'nolink-events' : 'day-events';
                     $dayspanclass='tooltip gl_mootip';
                     foreach ($events[$daydata] as $event) {
@@ -124,6 +124,15 @@ class View_smallmonth extends View
         $T->parse('output', 'smallmonth');
         return $T->finish($T->get_var('output'));
     }
+
+
+    /**
+    *   Fake setSession() function to avoid altering session vars.
+    *   Small calendar on homepage is always the current month and should not
+    *   affect other calendar views
+    */
+    protected function setSession() {}
+
 }
 
 ?>

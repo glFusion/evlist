@@ -421,10 +421,6 @@ class View
         $T->set_file(array(
             'view'  => 'json_cal_wrapper.thtml',
         ) );
-        /*$function = "EVLIST_{$type}view";
-        if (!function_exists($function)) {
-            return '<span class="alert">Failure loading calendar</span>';
-        }*/
 
         $T->set_var(array(
             'cal_header'    => $this->Header(),

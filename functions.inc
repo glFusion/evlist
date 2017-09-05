@@ -1955,7 +1955,11 @@ function EVLIST_siteFooter()
 */
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
-    $Cal = new Evlist\View_smallmonth(0, 0, 0, 0, $cal);
+    global $_EV_CONF;
+
+    // PHP block calendar is always current, regardless of session vars
+    list($y, $m, $d) = explode('-', $_EV_CONF['_today']);
+    $Cal = new Evlist\View_smallmonth($y, $m, $d, 0, $cal);
     return $Cal->Render();
 }
 

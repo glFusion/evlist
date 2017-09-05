@@ -18,7 +18,7 @@
       <a href="{pi_url}/index.php?view=week&amp;cat={urlfilt_cat}&amp;cal={urlfilt_cal}&amp;year={weekyear}&amp;month={weekmonth}&amp;day={weekday}">&gt;&gt;</a>
     </td>
      <!-- BEGIN day -->
-    <td class="{dayclass}">
+    <td class="month{dayclass}">
 {!if popup}
       <span class="tooltip gl_mootip" title="{popup}">
 {!else}

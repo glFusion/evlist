@@ -126,7 +126,7 @@ case 'pyear':
     $v = substr($view, 1);
     $V = Evlist\View::getView($v, $year, $month, $day, $category, $calendar);
     $V->setPrint();
-    echo $V->Render();
+    echo $V->Content();
     exit;
 
 case 'today':

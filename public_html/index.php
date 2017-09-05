@@ -59,7 +59,6 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
 }
 
 USES_evlist_functions();
-USES_evlist_class_view();
 
 /*
 *   MAIN
@@ -73,13 +72,13 @@ if (isset($_GET['view'])) {
     $view = COM_applyFilter(COM_getArgument('view'));
 }
 
-if (isset($_GET['range'])) {
+/*if (isset($_GET['range'])) {
     $range = COM_applyFilter($_GET['range'], true);
 } elseif (isset($_POST['range'])) {
     $range = COM_applyFilter($_POST['range'], true);
 } else {
     $range = COM_applyFilter(COM_getArgument('range'),true);
-}
+}*/
 
 if (isset($_GET['cat'])) {
     $category = COM_applyFilter($_GET['cat'], true);
@@ -119,90 +118,33 @@ if (empty($day))
 EVLIST_setReturn($view);
 
 switch ($view) {
+case 'pday':
+case 'pweek':
+case 'pmonth':
+case 'pyear':
+    // Strip the leading "p" for "print"
+    $v = substr($view, 1);
+    $V = Evlist\View::getView($v, $year, $month, $day, $category, $calendar);
+    $V->setPrint();
+    echo $V->Render();
+    exit;
+
 case 'today':
     list($year, $month, $day) = explode('-', $_EV_CONF['_today']);
-    $content = evView::GetView('', $year, $month, $day);
-    break;
-
-case 'pday':
-    $V = new evView_day($year, $month, $day, $category, $calendar);
-    $V->setPrint();
-    $content .= $V->Render();
-    echo $content;
-    exit;
-
 case 'day':
-    $V = new evView_day($year, $month, $day, $category, $calendar);
-    $content .= $V->Render();
-    break;
-
-case 'pweek':
-    $V = new evView_week($year, $month, $day, $category, $calendar);
-    $V->setPrint();
-    $content .= $V->Render();
-    echo $content;
-    exit;
-
 case 'week':
-    $V = new evView_week($year, $month, $day, $category, $calendar);
-    $content .= $V->Render();
-    break;
-
-case 'pmonth':
-    $V = new evView_month($year, $month, $day, $category, $calendar);
-    $V->setPrint();
-    $content .= $V->Render();
-    echo $content;
-    exit;
-
 case 'month':
-    $V = new evView_month($year, $month, $day, $category, $calendar);
-    $content .= $V->Render();
-    break;
-
-case 'pyear':
-    $tpl = 'yearview_print';
-    break;
-
 case 'year':
-    $V = new evView_year($year, 1, 1, $category, $calendar);
-    $content .= $V->Render();
-    break;
-
-//case 'mylist':
-//    $content .= EVLIST
 case 'list':
-    switch ($range) {
-    case 1:         // Past events
-        $block_title = $LANG_EVLIST['past_events'];
-        break;
-    case 3:         // Next 7 days
-        $block_title = $LANG_EVLIST['this_week_events'];
-        break;
-    case 4:         // Next 1 month
-        $block_title = $LANG_EVLIST['this_month_events'];
-        break;
-    default:        // Upcoming events
-        $range = 2;
-    case 2:
-        $block_title = $LANG_EVLIST['upcoming_events'];
-        break;
-    }
-    if (!empty($category)) {
-        $block_title .= '&nbsp;/&nbsp;' . $LANG_EVLIST['category'] .
-            ':&nbsp;' . $catname;
-    }
-    $V = new evView_list($year, $month, $day, $category,
-                    $calendar, $range);
+    $V = Evlist\View::getView($view, $year, $month, $day, $category, $calendar);
     $content .= $V->Render();
     break;
 
 case 'printtickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::PrintTickets($eid);
+        $doc = Evlist\Ticket::PrintTickets($eid);
         echo $doc;
         exit;
     } else {
@@ -213,9 +155,8 @@ case 'printtickets':
 case 'exporttickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::ExportTickets($eid);
+        $doc = Evlist\Ticket::ExportTickets($eid);
         header('Content-type: text/csv');
         header('Content-Disposition: attachment; filename="event-'.$eid.'.csv');
         echo $doc;
@@ -235,7 +176,8 @@ case 'myevents':
     break;
 
 default:
-    $content = evView::GetView('', 0, 0, 0);
+    $V = Evlist\View::getView('', 0, 0, 0);
+    $content = $V->Render();
     break;
 }
 
@@ -414,6 +356,5 @@ function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
     }
     return $retval;
 }
-
 
 ?>

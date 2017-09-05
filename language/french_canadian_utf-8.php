@@ -158,7 +158,9 @@ $LANG_EVLIST = array(
 'day'              => 'Jour',
 'week'           => 'Semaine',
 'month'              => 'Mois',
-'year'             => 'Année', ),
+'year'             => 'Année',
+    'list'  => 'List',
+),
 
 
 'filter'            => 'Filtre',

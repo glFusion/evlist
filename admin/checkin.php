@@ -26,8 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 $tic_id = isset($_GET['tic']) ? $_GET['tic'] : '';
 $rp_id = isset($_GET['rp']) ? $_GET['rp'] : '';
 if (!empty($tic_id) && !empty($rp_id)) {
-    USES_evlist_class_ticket();
-    $Ticket = new evTicket($tic_id);
+    $Ticket = new Evlist\Ticket($tic_id);
     if ($Ticket->tic_id != $tic_id) {
         $color = "red";
         $text = "Invalid Ticket";

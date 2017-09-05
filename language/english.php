@@ -167,6 +167,7 @@ You may either move existing events to a new calendar, or delete those events.',
     'week'  => 'Week',
     'month' => 'Month',
     'year'  => 'Year',
+    'list'  => 'List',
     ),
 
 'filter'            => 'Filter',

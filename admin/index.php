@@ -290,7 +290,6 @@ function EVLIST_admin_list_events()
     global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
-    USES_evlist_class_repeat(); // to get link to event
     EVLIST_setReturn('adminevents');
 
     $retval = '';
@@ -443,7 +442,7 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
                 "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
             break;
         case 'delete':
-            if (!evTicketType::isUsed($A['id'])) {
+            if (!Evlist\TicketType::isUsed($A['id'])) {
                 $retval = COM_createLink(
                     $icon_arr['delete'],
                     EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
@@ -541,7 +540,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= '</a>';
             break;
         case 'title':
-            $rp_id = evRepeat::getNearest($A['id']);
+            $rp_id = Evlist\Repeat::getNearest($A['id']);
             if ($rp_id !== false) {
                 $retval = COM_createLink($fieldvalue, EVLIST_URL .
                         '/event.php?eid=' . $rp_id);
@@ -758,7 +757,6 @@ function EVLIST_importEvents()
         $retval = $LANG_EVLIST['err_invalid_import'];
         return $retval;
     }
-    USES_evlist_class_event();
     $success = 0;
     $failures = 0;
 
@@ -770,7 +768,7 @@ function EVLIST_importEvents()
     if ($group_id < 2) $group_id = 2;  // last resort, use Root
 
     while (($event = fgetcsv($fp)) !== false) {
-        $Ev = new evEvent();
+        $Ev = new Evlist\Event();
         $Ev->isNew = true;
         $i = 0;
         $A = array(
@@ -892,16 +890,14 @@ case 'edit':
  
 case 'tickdelete_x':
     if (is_array($_POST['delrsvp'])) {
-        USES_evlist_class_ticket();
-        evTicket::Delete($_POST['delrsvp']);
+        Evlist\Ticket::Delete($_POST['delrsvp']);
     }
     COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
     exit;
 
 case 'tickreset_x':
     if (is_array($_POST['delrsvp'])) {
-        USES_evlist_class_ticket();
-        evTicket::Reset($_POST['delrsvp']);
+        Evlist\Ticket::Reset($_POST['delrsvp']);
     }
     COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
     exit;
@@ -914,16 +910,14 @@ case 'delcalconfirm':
     $cal_id = isset($_POST['cal_id']) ? (int)$_POST['cal_id'] : 0;
     if ($cal_id < 1) break;
     $newcal = isset($_POST['newcal']) ? (int)$_POST['newcal'] : 0;
-    USES_evlist_class_calendar();
-    $Cal = new evCalendar($cal_id);
+    $Cal = new Evlist\Calendar($cal_id);
     $Cal->Delete($newcal);
     break;
 
 case 'saveevent':
-    USES_evlist_class_event();
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
-    $Ev = new evEvent($eid);
+    $Ev = new Evlist\Event($eid);
     $errors = $Ev->Save($_POST, $table);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
@@ -941,10 +935,8 @@ case 'saveevent':
     break;
 
 case 'saverepeat':
-    USES_evlist_class_repeat();
-    //$eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? $_POST['rp_id'] : '';
-    $Rp = new evRepeat($rp_id);
+    $Rp = new Evlist\Repeat($rp_id);
     $errors = $Rp->Save($_POST);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
@@ -957,24 +949,21 @@ case 'saverepeat':
     break;
 
 case 'savecal':
-    USES_evlist_class_calendar();
     $cal_id = isset($_POST['cal_id']) ? $_POST['cal_id'] : 0;
-    $Cal = new evCalendar($cal_id);
+    $Cal = new Evlist\Calendar($cal_id);
     $status = $Cal->Save($_POST);
     $view = 'calendars';
     break;
 
 case 'savecat':
-    USES_evlist_class_category();
-    $C = new evCategory($_POST['id']);
+    $C = new Evlist\Category($_POST['id']);
     $status = $C->Save($_POST);
     $view = 'categories';
     break;
 
 case 'saveticket':
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_tickettype();
-        $C = new evTicketType($_POST['id']);
+        $C = new Evlist\TicketType($_POST['id']);
         $status = $C->Save($_POST);
         $view = 'tickettypes';
     } else {
@@ -985,18 +974,16 @@ case 'saveticket':
 case 'delcat':
     $cat_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
     if ($cat_id > 0) {
-        USES_evlist_class_category();
-        evCategory::Delete($cat_id);
+        Evlist\Category::Delete($cat_id);
     }
     $view = 'categories';
     break;
 
 case 'delevent':
-    USES_evlist_class_event();
     $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ? 
             $_REQUEST['eid'] : '';
     if ($eid != '') {
-        evEvent::Delete($eid);
+        Evlist\Event::Delete($eid);
     }
     $view = 'events';
     break;
@@ -1063,9 +1050,8 @@ case 'importexec':
 case 'printtickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::PrintTickets($eid);
+        $doc = Evlist\Ticket::PrintTickets($eid);
         echo $doc;
         exit;
     } else {
@@ -1076,9 +1062,8 @@ case 'printtickets':
 case 'exporttickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::ExportTickets($eid);
+        $doc = Evlist\Ticket::ExportTickets($eid);
         header('Content-type: text/csv');
         header('Content-Disposition: attachment; filename="event-'.$eid.'.csv');
         echo $doc;
@@ -1096,16 +1081,14 @@ default:
 $page = $view;      // Default for menu creation
 switch ($view) {
 case 'deletecal':
-    USES_evlist_class_calendar();
     $cal_id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
     if ($cal_id < 1) break;
-    $Cal = new evCalendar($cal_id);
+    $Cal = new Evlist\Calendar($cal_id);
     $content .= $Cal->DeleteForm();
     break;
 
 case 'editcal':
-    USES_evlist_class_calendar();
-    $Cal = new evCalendar($actionval);
+    $Cal = new Evlist\Calendar($actionval);
     $content .= $Cal->Edit();
     break;
 
@@ -1114,8 +1097,7 @@ case 'calendars':
     break;
 
 case 'moderate':
-    USES_evlist_class_event();
-    $Ev = new evEvent();
+    $Ev = new Evlist\Event();
     $Ev->Read($_REQUEST['id'], 'evlist_submissions');
     $content .= $Ev->Edit('', 0, 'moderate');
     break;
@@ -1126,7 +1108,6 @@ case 'categories':
 
 case 'tickettypes':
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_tickettype();
         $content .= EVLIST_adminlist_tickettypes();
     }
     break;
@@ -1137,15 +1118,13 @@ case 'tickets':
     break;
 
 case 'editcat':
-    USES_evlist_class_category();
-    $C = new evCategory($_GET['id']);
+    $C = new Evlist\Category($_GET['id']);
     $content .= $C->Edit();
     break;
 
 case 'editticket':
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_tickettype();
-        $Tic = new evTicketType($actionval);
+        $Tic = new Evlist\TicketType($actionval);
         $content .= $Tic->Edit();
     }
     break;
@@ -1169,8 +1148,7 @@ case 'import':
     break;
 
 case 'edit':
-    USES_evlist_class_event();
-    $Ev = new evEvent($_REQUEST['eid']);
+    $Ev = new Evlist\Event($_REQUEST['eid']);
     $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
     break;
 

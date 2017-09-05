@@ -10,7 +10,7 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
+namespace Evlist;
 
 /**
  *  Class for reminders
@@ -42,8 +42,7 @@ class Reminder
     */
     public function __construct($rp_id='', $uid='')
     {
-        USES_evlist_class_repeat();
-        $this->Repeat = new evRepeat($rp_id);
+        $this->Repeat = new Repeat($rp_id);
         if ($this->Repeat->rp_id != '') {
             $this->eid = $this->Repeat->ev_id;
             $this->rp_id = $rp_id;
@@ -141,11 +140,6 @@ class Reminder
         } else {
             $A = DB_fetchArray($res, false);
             $this->setVars($A);
-            /*$this->date_start = $A['date_start'];
-            $this->timestamp = $A['timestamp'];
-            $this->name = $A['name'];
-            $this->email = $A['email'];
-            $this->days_notice = $A['days_notice'];*/
             $this->isNew = false;
             return true;
         }
@@ -243,11 +237,14 @@ class Reminder
         global $_TABLES;
 
         $Rems = array();
-        $sql = "SELECT eid, rp_id, uid FROM {$_TABLES['evlist_remlookup']}
+        $sql = "SELECT * FROM {$_TABLES['evlist_remlookup']}
                 WHERE date_start <= (UNIX_TIMESTAMP() + (days_notice * 86400))";
         $res = DB_query($sql);
+        $i = 0;
         while ($A = DB_fetchArray($res, false)) {
-            $Rems[] = new Reminder($A['rp_id'], $A['uid']);
+            $Rems[$i] = new Reminder();
+            $Rems[$i]->setVars($A);
+            $i++;
         }
         return $Rems;
     }
@@ -305,7 +302,7 @@ class Reminder
             }
         }
 
-        $T = new Template(EVLIST_PI_PATH . '/templates/');
+        $T = new \Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
             'msg' => 'reminder_mail.thtml',
             'addr' => 'address.thtml',

@@ -14,12 +14,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Evlist;
 
 /**
 *   Class for ticket types
 *   @package evlist
 */
-class evTicketType
+class TicketType
 {
     var $properties = array();
     var $isNew;
@@ -138,7 +139,7 @@ class evTicketType
     {
         global $_EV_CONF;
 
-        $T = new Template(EVLIST_PI_PATH . '/templates');
+        $T = new \Template(EVLIST_PI_PATH . '/templates');
         if ($_EV_CONF['_is_uikit']) {
             $T->set_file('modify', 'ticketForm.uikit.thtml');
         } else {
@@ -196,7 +197,7 @@ class evTicketType
             if ($this->isNew) $this->id = DB_insertId();
             return true;
         } else {
-            COM_errorLog("evTicketType::Save SQL Error: $sql");
+            COM_errorLog("Evist\\TicketType::Save SQL Error: $sql");
             return false;
         }
     }   // function Save()
@@ -276,7 +277,7 @@ class evTicketType
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("evTicketType::Toggle SQL Error: $sql");
+            COM_errorLog("Evlist\\TicketType::Toggle SQL Error: $sql");
             return $oldvalue;
         } else {
             return $newvalue;
@@ -288,7 +289,7 @@ class evTicketType
     *   Get all the ticket types into objects
     *
     *   @param  boolean $enabled    True to get only enabled, false for all
-    *   @return array       Array of evTicketType objects, indexed by ID
+    *   @return array       Array of TicketType objects, indexed by ID
     */
     public static function GetTicketTypes($enabled = true)
     {
@@ -303,13 +304,13 @@ class evTicketType
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 // create empty objects and use SetVars to save DB lookups
-                $types[$key][$A['id']] = new evTicketType();
+                $types[$key][$A['id']] = new TicketType();
                 $types[$key][$A['id']]->SetVars($A);
             }
         }
         return $types[$key];
     }
 
-}   // class evTicketType
+}   // class TicketType
 
 ?>

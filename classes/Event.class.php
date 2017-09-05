@@ -5,22 +5,21 @@
 *   @author     Lee Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.1
+*   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Evlist;
 
 USES_lglib_class_datecalc();
-USES_evlist_class_detail();
-USES_evlist_class_calendar();
 USES_evlist_functions();
 
 /**
  *  Class for event
  *  @package evlist
  */
-class evEvent
+class Event
 {
     /** Property fields.  Accessed via Set() and Get()
     *   @var array */
@@ -43,8 +42,8 @@ class evEvent
 
     var $old_schedule;      // Keeper of old schedul info before updating
 
-    var $Detail;            // evDetail object
-    var $Calendar;          // evCalendar object
+    var $Detail;            // Detail object
+    var $Calendar;          // Calendar object
     var $table;             // DB table being used
 
     /** Array of error messages
@@ -142,7 +141,7 @@ class evEvent
                 $this->options['rsvp_print'] = $_EV_CONF['rsvp_print'] - 1;
             }
 
-            $this->Detail = new evDetail();
+            $this->Detail = new Detail();
 
         } else {
             $this->id = $ev_id;
@@ -152,10 +151,10 @@ class evEvent
                 // Load the Detail object.  May need to load a special one
                 // if we're editing a repeat instance.
                 if ($detail > 0 && $detail != $this->det_id) {
-                    $this->Detail = new evDetail($detail);
+                    $this->Detail = new Detail($detail);
                 } else {
                     // Normal, load our own detail object
-                    $this->Detail = new evDetail($this->det_id);
+                    $this->Detail = new Detail($this->det_id);
                 }
             }
         }
@@ -449,8 +448,8 @@ class evEvent
             $this->SetVars($row, true);
             $this->isNew = false;
 
-            $this->Detail = new evDetail($this->det_id);
-            $this->Calendar = new evCalendar($this->cal_id);
+            $this->Detail = new Detail($this->det_id);
+            $this->Calendar = new Calendar($this->cal_id);
 
             return true;
         }
@@ -592,7 +591,7 @@ class evEvent
             }
 
             // Create a detail record
-            $this->Detail = new evDetail();
+            $this->Detail = new Detail();
             $this->Detail->SetVars($A);
             $this->Detail->ev_id = $this->id;
             if (!$this->isValidRecord()) {
@@ -672,7 +671,7 @@ class evEvent
         } elseif ($this->table == 'evlist_submissions' &&
                 isset($_CONF['notification']) &&
                 in_array ('evlist', $_CONF['notification'])) {
-            $N = new Template(EVLIST_PI_PATH . '/templates/');
+            $N = new \Template(EVLIST_PI_PATH . '/templates/');
             $N->set_file('mail', 'notify_submission.thtml');
             $N->set_var(array(
                 'title'     => $this->Detail->title,
@@ -801,7 +800,7 @@ class evEvent
             COM_404();
         }
 
-        $T = new Template($_CONF['path'] . 'plugins/evlist/templates/');
+        $T = new \Template($_CONF['path'] . 'plugins/evlist/templates/');
         if ($_EV_CONF['_is_uikit']) {
             $T->set_file('editor', 'editor.uikit.thtml');
         } else {
@@ -859,7 +858,7 @@ class evEvent
             ) );
 
             // Override our dates & times with those from the repeat.
-            // $rp_id is passed when this is called from class evRepeat.
+            // $rp_id is passed when this is called from class Repeat.
             // Maybe that should pass in the repeat's data instead to avoid
             // another DB lookup.  An array of values could be used.
             $Rep = DB_fetchArray(DB_query("SELECT *
@@ -896,7 +895,7 @@ class evEvent
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
                         EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->rec_data['type']),
-                'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
+                'recurring_weekday_options' => EVLIST_GetOptions(\Date_Calc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
                 'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
@@ -987,7 +986,7 @@ class evEvent
             list($endmonth1, $endday1, $endyear1,
                     $endhour1, $endminute1) =
                     $this->DateParts($this->date_end1, $this->time_end1);
-            $days_interval = Date_Calc::dateDiff(
+            $days_interval = \Date_Calc::dateDiff(
                     $endday1, $endmonth1, $endyear1,
                     $startday1, $startmonth1, $startyear1);
         } else {
@@ -1096,7 +1095,7 @@ class evEvent
             'cal_id,cal_name', $this->cal_id, 1, $cal_where);
 
         USES_class_navbar();
-        $navbar = new navbar;
+        $navbar = new \navbar;
         $cnt = 0;
         foreach ($tabs as $id) {
             $navbar->add_menuitem($LANG_EVLIST[$id],'showhideEventDiv("'.$id.'",'.$cnt.');return false;',true);
@@ -1165,15 +1164,14 @@ class evEvent
             // If the event timezone is "local", just use some valid timezone
             // for the selection. The checkbox will be checked which will
             // hide the timezone selection anyway.
-            'tz_select'     => Date::getTimeZoneDropDown(
+            'tz_select'     => \Date::getTimeZoneDropDown(
                         $this->tzid == 'local' ? $_CONF['timezone'] : $this->tzid,
                         array('id' => 'tzid', 'name' => 'tzid')),
             'tz_islocal'    => $this->tzid == 'local' ? EVCHECKED : '',
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
-            USES_evlist_class_tickettype();
-            $TickTypes = evTicketType::GetTicketTypes();
+            $TickTypes = TicketType::GetTicketTypes();
             //$T->set_block('editor', 'Tickets', 'tTypes');
             $tick_opts = '';
             foreach ($TickTypes as $tick_id=>$tick_obj) {
@@ -1372,7 +1370,7 @@ class evEvent
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("evEvent::_toggle SQL Error: $sql");
+            COM_errorLog("Event::_toggle SQL Error: $sql");
             return $oldvalue;
         } else {
             return $newvalue;
@@ -1401,8 +1399,6 @@ class evEvent
     */
     public function MakeRecurrences()
     {
-        USES_evlist_class_recur();
-
         $events = array();
 
         switch ($this->rec_data['type']) {
@@ -1420,29 +1416,29 @@ class evEvent
             break;
         case EV_RECUR_DATES:
             // Specific dates.  Simple handling.
-            $Rec = new evRecurDates($this);
+            $Rec = new RecurDates($this);
             break;
         case EV_RECUR_DOM:
             // Recurs on one or more days each month-
             // e.g. first and third Tuesday
-            $Rec = new evRecurDOM($this);
+            $Rec = new RecurDOM($this);
             break;
         case EV_RECUR_DAILY:
             // Recurs daily for a number of days
-            $Rec = new evRecurDaily($this);
+            $Rec = new RecurDaily($this);
             break;
         case EV_RECUR_WEEKLY:
             // Recurs on one or more days each week-
             // e.g. Tuesday and Thursday
-            $Rec = new evRecurWeekly($this);
+            $Rec = new RecurWeekly($this);
             break;
         case EV_RECUR_MONTHLY:
             // Recurs on the same date(s) each month
-            $Rec = new evRecurMonthly($this);
+            $Rec = new RecurMonthly($this);
             break;
         case EV_RECUR_YEARLY:
             // Recurs once each year
-            $Rec = new evRecurYearly($this);
+            $Rec = new RecurYearly($this);
             break;
         }
 
@@ -1725,7 +1721,7 @@ class evEvent
         // Validate the user-supplied stopdate
         if (!empty($A['stopdate'])) {
             list($stop_y, $stop_m, $stop_d) = explode('-', $A['stopdate']);
-            if (Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
+            if (\Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
                 $this->rec_data['stop'] = $A['stopdate'];
             }
         }
@@ -1869,6 +1865,6 @@ class evEvent
         return $this->cal_id == -1;
     }
 
-}   // class evEvent
+}   // class Event
 
 ?>

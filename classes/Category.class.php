@@ -10,12 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Evlist;
 
 /**
  *  Class for categories
  *  @package evlist
  */
-class evCategory
+class Category
 {
     var $properties = array();
     var $isNew;
@@ -127,7 +128,7 @@ class evCategory
     {
         global $_SYSTEM;
 
-        $T = new Template(EVLIST_PI_PATH . '/templates');
+        $T = new \Template(EVLIST_PI_PATH . '/templates');
         if ($_SYSTEM['disable_jquery_slimbox']) {
             $T->set_file('modify', 'catEditForm.uikit.thtml');
         } else {

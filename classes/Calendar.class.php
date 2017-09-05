@@ -10,13 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
+namespace Evlist;
 
 /**
- *  Class for calendar
- *  @package evlist
- */
-class evCalendar
+*   Class for calendar
+*   @package evlist
+*/
+class Calendar
 {
     var $properties = array();
     var $isNew;
@@ -182,7 +182,7 @@ class evCalendar
     {
         global $_EV_CONF, $_SYSTEM;
 
-        $T = new Template(EVLIST_PI_PATH . '/templates');
+        $T = new \Template(EVLIST_PI_PATH . '/templates');
         if ($_EV_CONF['_is_uikit']) {
             $T->set_file('modify', 'calEditForm.uikit.thtml');
         } else {
@@ -322,7 +322,7 @@ class evCalendar
     {
         global $_TABLES, $LANG_EVLIST;
 
-        $T = new Template(EVLIST_PI_PATH . '/templates/');
+        $T = new \Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file('delcalfrm', 'delcalform.thtml');
 
         $T->set_var(array(

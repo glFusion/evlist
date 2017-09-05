@@ -16,8 +16,12 @@ require_once __DIR__ . '/../lib-common.php';
 
 $content = '';
 
-switch ($_REQUEST['action']) {
+switch ($_POST['action']) {
 case 'getloc':
+    if (!$_EV_CONF['use_locator']) {
+        break;
+    }
+
     // Create an array to return so the javascript won't choke.
     $B = array(
         'id'        => '',
@@ -31,9 +35,6 @@ case 'getloc':
         'lng'       => '',
     );
 
-    if (!$_EV_CONF['use_locator']) {
-        break;
-    }
     $id = isset($_POST['id']) && !empty($_POST['id']) ?
                     COM_sanitizeID($_POST['id']) : '';
     $status = LGLIB_invokeService('locator', 'getInfo',
@@ -56,66 +57,30 @@ case 'getloc':
 case 'addreminder':
     $rp_id = (int)$_POST['rp_id'];
     $status = array();
-    USES_evlist_class_reminder();
-    $R = new Reminder($_POST['rp_id']);
+    $R = new Evlist\Reminder($_POST['rp_id']);
     $status['reminder_set'] = $R->Add($_POST['notice'], $_POST['rem_email']);
     echo json_encode($status);
     exit;
     break;
 
 case 'delreminder':
-    USES_evlist_class_reminder();
-    $R = new Reminder($_POST['rp_id']);
+    $R = new Evlist\Reminder($_POST['rp_id']);
     $R->Delete();
     echo json_encode(array('reminder_set' => false));
     exit;
     break;
 
-case 'getCalDay':
-    $month = (int)$_REQUEST['month'];
-    $day = (int)$_REQUEST['day'];
-    $year = (int)$_REQUEST['year'];
-    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
-    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
-    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
-    USES_evlist_class_view();
-    $V = new evView_day($year, $month, $day, $cat, $cal, $opt);
-    echo $V->Content();
-    exit;
-    break;
-
-case 'getCalWeek':
-    $month = (int)$_REQUEST['month'];
-    $day = (int)$_REQUEST['day'];
-    $year = (int)$_REQUEST['year'];
-    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
-    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
-    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
-    USES_evlist_class_view();
-    $V = new evView_week($year, $month, $day, $cat, $cal, $opt);
-    echo $V->Content();
-    exit;
-    break;
-
-case 'getCalMonth':
-    $month = (int)$_REQUEST['month'];
-    $year = (int)$_REQUEST['year'];
-    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
-    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
-    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
-    USES_evlist_class_view();
-    $V = new evView_month($year, $month, 1, $cat, $cal, $opt);
-    echo $V->Content();
-    exit;
-    break;
-
-case 'getCalYear':
-    $year = (int)$_REQUEST['year'];
-    $cat = isset($_REQUEST['cat']) ? (int)$_REQUEST['cat'] : 0;
-    $cal = isset($_REQUEST['cal']) ? (int)$_REQUEST['cal'] : 0;
-    $opt = isset($_REQUEST['opt']) ? $_REQUEST['opt'] : '';
-    USES_evlist_class_view();
-    $V = new evView_year($year, 1, 1, $cat, $cal, $opt);
+case 'day':
+case 'week':
+case 'month':
+case 'year':
+    $day = isset($_POST['day']) ? (int)$_POST['day'] : 0;
+    $month = isset($_POST['month']) ? (int)$_POST['month'] : 0;
+    $year = isset($_POST['year']) ? (int)$_POST['year'] : 0;
+    $cat = isset($_POST['cat']) ? (int)$_POST['cat'] : 0;
+    $cal = isset($_POST['cal']) ? (int)$_POST['cal'] : 0;
+    $opt = isset($_POST['opt']) ? $_POST['opt'] : '';
+    $V = Evlist\View::getView($_POST['action'], $year, $month, $day, $cat, $cal, $opt);
     echo $V->Content();
     exit;
     break;
@@ -125,18 +90,17 @@ case 'toggle':
     // This is the same as the admin ajax function and takes the same $_REQUEST
     // parameters, but checks that the user is the event owner or other
     // authorized user before acting.
-    $oldval = $_POST['oldval'] == 1 ? 1 : 0;
+    $oldval = isset($_POST['oldval']) && $_POST['oldval'] == 1 ? 1 : 0;
     switch($_POST['component']) {
     case 'event':
-        USES_evlist_class_event();
-        $Ev = new evEvent($_POST['id']);
+        $Ev = new Event($_POST['id']);
         if (!plugin_ismoderator_evlist() || !$Ev->isOwner() || $Ev->isNew) {
             $newval = $oldval;
             break;
         }
         switch ($_POST['type']) {
         case 'enabled':
-            $newval = evEvent::toggleEnabled($oldval, $_POST['id']);
+            $newval = Event::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
@@ -149,7 +113,9 @@ case 'toggle':
         'type'  => $_POST['type'],
         'component' => $_POST['component'],
         'baseurl'   => EVLIST_URL,
-        'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
+        'statusMessage' => $newval != $oldval ?
+                    $LANG_EVLIST['msg_item_updated'] :
+                    $LANG_EVLIST['msg_item_nochange'],
     );
     echo json_encode($response);
     break;

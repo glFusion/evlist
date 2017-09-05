@@ -17,10 +17,10 @@ function ChangeDate(year, month, day, type)
 {
  var action;
   switch (type) {
-    case 'year': action = "getCalYear"; break;
-    case 'month': action = "getCalMonth"; break;
-    case 'week': action = "getCalWeek"; break;
-    case 'day': action = "getCalDay"; break;
+    case 'year': action = "year"; break;
+    case 'month': action = "month"; break;
+    case 'week': action = "week"; break;
+    case 'day': action = "day"; break;
     default: return;
   }
   newyear = year;

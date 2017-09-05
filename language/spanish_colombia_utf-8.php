@@ -166,6 +166,7 @@ You may either move existing events to a new calendar, or delete those events.',
     'week'  => 'Semana',
     'month' => 'Mes',
     'year'  => 'Año',
+    'list'  => 'List',
     ),
 
 'filter'            => 'Filtro',

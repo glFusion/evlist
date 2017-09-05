@@ -7,7 +7,7 @@
 *   @copyright  Copyright (c) 2015 Lee Garner <lee@leegarner.com>
 *   @package    evlist
 *   @version    1.4.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -33,13 +33,13 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
 
     // Create a return array with values to be populated later.
     // The actual paypal product ID is evlist:type:id
+    if (!is_array($args) || !isset($args[2])) return $output;
     $output = array('product_id' => implode(':', $args),
             'name' => 'Unknown',
             'short_description' => 'Unknown Evlist Item',
             'price' => '0.00',
     );
 
-    if (!is_array($args) || !isset($args[2])) return $output;
     $product_id = $args[1];
     $item_id = $args[2];
 
@@ -52,10 +52,8 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
         if ($tick_type == 0) {
             return PLG_RET_ERROR;
         }
-        USES_evlist_class_tickettype();
-        USES_evlist_class_event();
-        $Tick = new evTicketType($tick_type);
-        $Ev = new evEvent($ev_id);
+        $Tick = new Evlist\TicketType($tick_type);
+        $Ev = new Evlist\Event($ev_id);
         if (isset($Ev->ptions['tickets'][$tick_type])) {
             $fee = (float)$Ev->options['tickets'][$tick_type];
         } else {
@@ -64,10 +62,9 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
 
         $short_desc = $Tick->description. ': ' . $Ev->Detail->title;
         if ($rp_id > 0) {
-            USES_evlist_class_repeat();
-            $Ev = new evRepeat($rp_id);
+            $Ev = new Evlist\Repeat($rp_id);
             if ($Ev->rp_id == $rp_id) { // valid repeat ID
-                $short_desc .=  
+                $short_desc .=
                     ', ' . $Ev->start_date1 . ' ' . $Ev->start_time1;
             } else {
                 return PLG_RET_ERROR;
@@ -138,20 +135,18 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
         $tick_type = $item_parts[1];
         $rp_id = $item_parts[2];
 
-        USES_evlist_class_tickettype();
-        USES_evlist_class_repeat(); // includes event class
-        $TickType = new evTicketType($tick_type);
+        $TickType = new Evlist\TicketType($tick_type);
         $repeats = array();
         if ($rp_id > 0) {
             $repeats[] = $rp_id;
             // Ticket to a single occurrence
-            $Rp = new evRepeat($rp_id);
+            $Rp = new Evlist\Repeat($rp_id);
             $Ev = $Rp->Event;
             $dt_info = $Rp->start_date1 . ' ' . $Rp->start_time1;
         } else {
             // rp_id = 0, make sure it's an event pass
             if ($TickType->event_pass) {
-                $Ev = new evEvent($ev_id);
+                $Ev = new Evlist\Event($ev_id);
                 $dt_info = $Ev->date_start1 . ' ' . $Ev->time_start1;
             } else {
                 return PLG_RET_ERROR;
@@ -165,8 +160,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
         $output['short_description'] = $output['name'];
 
         // TODO: fix to handle qty > 1, need loop and calc per-item pmt amt.
-        USES_evlist_class_ticket();
-        $unpaid = evTicket::MarkPaid($quantity, $ev_id, $rp_id, $uid);
+        $unpaid = Evlist\Ticket::MarkPaid($quantity, $ev_id, $rp_id, $uid);
         if ($unpaid < 0) {
             EVLIST_Log("ALERT: $quantity tickets paid for user $uid for event $ev_id, exceeds unpaid count by $unpaid");
         } else {
@@ -241,6 +235,5 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
     }
     return PLG_RET_OK;
 }
-
 
 ?>

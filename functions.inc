@@ -126,45 +126,21 @@ if ($_EV_CONF['enable_rsvp']) {
     include_once __DIR__ . '/services.inc.php';
 }
 
+spl_autoload_register('EVLIST_autoloader');
+function EVLIST_autoloader($class)
+{
+    global $_CONF;
+    if (strpos($class, 'Evlist\\') === 0) {
+        $class = str_replace('Evlist\\', '', $class);
+    }
+    $path = __DIR__ . '/classes/' . $class . '.class.php';
+    if (file_exists($path)) {
+        include $path;
+    }
+}
+
 function USES_evlist_functions()
 {    require_once EVLIST_PI_PATH . '/evlist_functions.inc.php'; }
-
-function USES_evlist_views()
-{    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
-
-function USES_evlist_class_event()
-{   require_once EVLIST_PI_PATH . '/classes/evEvent.class.php'; }
-
-function USES_evlist_class_detail()
-{   require_once EVLIST_PI_PATH . '/classes/evDetail.class.php'; }
-
-function USES_evlist_class_repeat()
-{   require_once EVLIST_PI_PATH . '/classes/evRepeat.class.php'; }
-
-function USES_evlist_class_calendar()
-{   require_once EVLIST_PI_PATH . '/classes/evCalendar.class.php'; }
-
-function USES_evlist_class_category()
-{   require_once EVLIST_PI_PATH . '/classes/evCategory.class.php'; }
-
-function USES_evlist_class_recur()
-{   require_once EVLIST_PI_PATH . '/classes/evRecur.class.php'; }
-
-function USES_evlist_class_tickettype()
-{   require_once EVLIST_PI_PATH . '/classes/evTicketType.class.php'; }
-
-function USES_evlist_class_ticket()
-{   require_once EVLIST_PI_PATH . '/classes/evTicket.class.php'; }
-
-function USES_evlist_class_view()
-{   require_once EVLIST_PI_PATH . '/classes/evView.class.php'; }
-
-function USES_evlist_class_reminder()
-{   require_once EVLIST_PI_PATH . '/classes/evReminder.class.php'; }
-
-function USES_evlist_class_meetup()
-{   require_once 'classes/evMeetup.class.php';  }
-
 
 /**
 *   Return the current code (not necessarily installed) version
@@ -611,10 +587,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
         break;
     case 3:     // calendar format
-        USES_evlist_class_view();
-        $content = evView::GetView();
-        //USES_evlist_views();
-        //$display = EVLIST_view('', 0, 0, 0);
+        $content = View::getView();
         break;
     case 0:     // disabled
     default:
@@ -1017,8 +990,7 @@ function plugin_runScheduledTask_evlist()
 {
     if (!EVLIST_isCurrentVersion()) return;
 
-    USES_evlist_class_reminder();
-    $Rems = Reminder::getCurrent();
+    $Rems = Evlist\Reminder::getCurrent();
     foreach ($Rems as $R) {
         $R->Send();
         $R->Delete();
@@ -1057,10 +1029,9 @@ function plugin_moderationapprove_evlist($eid)
 
     // The glFusion core already copies the event information to the event
     // table, and the Detail table was already in place.  This is wasteful,
-    // but now we're going to read that data back and let the evEvent class
+    // but now we're going to read that data back and let the Event class
     // create the recurrences.
-    USES_evlist_class_event();
-    $Ev = new evEvent($eid);
+    $Ev = new Evlist\Event($eid);
     $Ev->UpdateRepeats();
 
     return true;
@@ -1677,8 +1648,7 @@ function Xplugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
     // Getting all events not yet supported
     if ($id == '*') return array();
 
-    USES_evlist_class_repeat();
-    $Rp = new evRepeat($id);
+    $Rp = new Evlist\Repeat($id);
     if ($Rp->isNew) {
         return array();
     }
@@ -1794,8 +1764,8 @@ function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
 */
 function plugin_deletecomment_evlist($cid,$id)
 {
-    USES_class_evlist_repeat();
-    $Rp = new evRepeat($id);
+    //USES_class_evlist_repeat();
+    $Rp = new Evlist\Repeat($id);
     if ($Rp->isNew) return false;   // invalid item
 
     if (plugin_ismoderator_evlist() || $Rp->Event->isOwner()) {
@@ -1844,9 +1814,7 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
     if (!plugin_commentsupport_evlist())
         return '';
 
-    USES_evlist_class_repeat();
-    $Rp = new evRepeat($id);
-
+    $Rp = new Evlist\Repeat($id);
     if (!$Rp->isNew) {
         $delete_option = (plugin_ismoderator_evlist() ||
                 $Rp->Event->owner_id = $_USER['uid']);
@@ -1980,21 +1948,15 @@ function EVLIST_siteFooter()
 *   Optional parameters allow for custom blocks to be created that display
 *   only one or a subset of calendar data
 *
-*   @see    function EVLIST_smallmonth()
+*   @uses   Evlist\View_smallmonth
 *   @param  array   $blk    Optional block data
 *   @param  string  $cal    Optional calendar ID
 *   @return string      HTML for the block contents
 */
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
-    USES_evlist_functions();
-
-    if ($cal > 0) {
-        $opts = array('cal' => (int)$cal);
-    } else {
-        $opts = array();
-    }
-    return EVLIST_smallmonth(0, 0, $opts);
+    $Cal = new Evlist\View_smallmonth(0, 0, 0, 0, $cal);
+    return $Cal->Render();
 }
 
 
@@ -2079,8 +2041,8 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             break;
         case 'excerpt':
         case 'introtext':
-            $fields[] = 'd.summary';
         case 'description':
+            $fields[] = 'd.summary';
         case 'bodytext':
             $fields[] = 'd.full_description';
             break;
@@ -2151,6 +2113,9 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             case 'content':
                 $props[$p] = $A['title'] . ' ' .
                     $A['summary'] . ' ' . $A['full_description'];
+                break;
+            case 'description':
+                $props[$p] = $A['summary'] . ' ' . $A['full_description'];
                 break;
             case 'date':
                 $props[$p] = $A['unixtime'];
@@ -2400,7 +2365,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 */
 function EVLIST_getEvents($start='', $end='', $opts=array())
 {
-    global $_EV_CONF;
+    global $_EV_CONF, $_USER;
 
     $events = array();
     $sql = EVLIST_getEvents_sql($start, $end, $opts);
@@ -2409,14 +2374,13 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     if (!$result || DB_error())
         return $events;
 
-    USES_evlist_class_repeat();
     USES_lglib_class_datecalc();
 
     while ($A = DB_fetchArray($result, false)) {
         // Set a valid foreground and background color
         if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
         if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
-
+        //if ($A['tzid'] == 'local') $A['tzid'] = $_USER['tzid'];
         if ($A['rp_date_start'] == $A['rp_date_end']) {
             // Single-day event just gets added to the array
             $events[$A['rp_date_start']][] = $A;
@@ -2462,16 +2426,15 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
     // a specific category.
     if (isset($opts['cat']) && $opts['cat'] > 0) return array();
 
-    USES_evlist_class_meetup();
     // Create a unique key for the query for cache identification
     $key = $start . '-' . $end . @serialize($opts);
     $key = md5($key);
-    $M = new evMeetup($key);
+    $M = new Evlist\evMeetup($key);
     $Mevents = $M->getEvents($start, $end);
     foreach ($Mevents as $ev_date=>$ev_events) {
         foreach ($ev_events as $event) {
             // Format the meetup.com date information into the expected layout
-            $dt = new Date($event->time / 1000);
+            $dt = new Date($event->time / 1000, $event->timezone);
             $ev_start = $dt->format($_CONF['timeonly'], true);
             if (!isset($event->duration)) {
                 $duration = 3600000;     // duration required, default one hour
@@ -2479,7 +2442,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
                 $duration = $event->duration;
             }
             $end = $event->time + $duration;
-            $dt->setTimeStamp(($event->time + $duration) / 1000);
+            $dt->setTimeStamp(($event->time + $duration) / 1000, $event->timezone);
             $ev_end = $dt->format($_CONF['timeonly'], true);
             $events[$ev_date][] = array(
                 'cal_name' => 'meetup',
@@ -2498,6 +2461,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
                 'show_upcoming' => 1,   // force to be shown in upcoming block
                 'fgcolor' => 'inherit',
                 'bgcolor' => 'inherit',
+                'tzid' => $event->timezone,
             );
         }
     }

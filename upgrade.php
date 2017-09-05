@@ -265,6 +265,17 @@ function evlist_upgrade()
                     return false;
                 }
             }
+
+            // Remove renamed class files
+            $files = array(
+                'evTicketType.class.php', 'evTicket.class.php',
+                'evCategory.class.php', 'evCalendar.class.php',
+                'evView.class.php', 'evEvent.class.php', 'evRepeat.class.php',
+                'evRecur.class.php', 'evDetail.class.php',
+            );
+            foreach ($files as $file) {
+                @unlink(__DIR__ . '/classes/' . $file);
+            }
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
     }

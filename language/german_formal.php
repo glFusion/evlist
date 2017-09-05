@@ -286,6 +286,7 @@ $LANG_EVLIST = array(
                 'week'  => 'Wochen-Ansicht',
                 'month' => 'Monats-Ansicht',
                 'year'  => 'Jahres-Ansicht',
+    'list'  => 'List',
     ),
 'on_days'                => 'am %s',
 'on_the_days'            => 'an dem %s',

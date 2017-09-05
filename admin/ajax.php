@@ -26,11 +26,9 @@ case 'toggle':
     $oldval = $_POST['oldval'] == 1 ? 1 : 0;
     switch ($_POST['component']) {
     case 'category':
-        USES_evlist_class_category();
-
         switch ($_POST['type']) {
         case 'enabled':
-            $newval = evCategory::toggleEnabled($oldval, $_POST['id']);
+            $newval = Evlist\Category::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
@@ -39,11 +37,9 @@ case 'toggle':
         break;
 
     case 'calendar':
-        USES_evlist_class_calendar();
-
         switch ($_POST['type']) {
         case 'enabled':
-            $newval = evCalendar::toggleEnabled($oldval, $_POST['id']);
+            $newval = Evlist\Calendar::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
@@ -52,11 +48,9 @@ case 'toggle':
         break;
 
     case 'event':
-        USES_evlist_class_event();
-
         switch ($_POST['type']) {
         case 'enabled':
-            $newval = evEvent::toggleEnabled($oldval, $_POST['id']);
+            $newval = Evlist\Event::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:
@@ -65,11 +59,10 @@ case 'toggle':
         break;
 
     case 'tickettype':
-        USES_evlist_class_tickettype();
         switch ($_POST['type']) {
         case 'enabled':
         case 'event_pass':
-            $newval = evTicketType::Toggle($_POST['type'], $oldval, $_POST['id']);
+            $newval = Evlist\TicketType::Toggle($_POST['type'], $oldval, $_POST['id']);
             break;
 
          default:

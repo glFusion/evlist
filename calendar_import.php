@@ -43,9 +43,6 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-/** Import the event class */
-USES_evlist_class_event();
-
 /**
 *   Import events from the Calendar plugin to evList.
 *   This function checks that the event ID isn't already in use to avoid
@@ -109,7 +106,7 @@ function evlist_import_calendar_events()
         // event and detail records.
 
         // Create the event object, while checking if the eid exists
-        $Ev = new evEvent($A['eid']);
+        $Ev = new Event($A['eid']);
         if ($Ev->id != '')      // Oops, dup ID, must already be done.
             continue;           // Skip possible duplicates
 

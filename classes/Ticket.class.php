@@ -10,12 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Evlist;
 
 /**
 *   Class for event tickets
 *   @package evlist
 */
-class evTicket
+class Ticket
 {
     var $properties = array();
 
@@ -299,7 +300,7 @@ class evTicket
     *   @param  integer $rp_id      Repeat ID, 0 for all occurrences
     *   @param  integer $uid        User ID, 0 for all users
     *   @param  string  $paid       'paid', 'unpaid', or empty for all
-    *   @return array       Array of evTicket objects, indexed by ID
+    *   @return array       Array of Ticket objects, indexed by ID
     */
     public static function GetTickets($ev_id, $rp_id = 0, $uid = 0, $paid='')
     {
@@ -334,7 +335,7 @@ class evTicket
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 // create empty objects and use SetVars to save DB lookups
-                $tickets[$A['tic_id']] = new evTicket();
+                $tickets[$A['tic_id']] = new Ticket();
                 $tickets[$A['tic_id']]->SetVars($A);
             }
         }
@@ -356,8 +357,7 @@ class evTicket
     {
         global $_CONF, $_USER, $LANG_EVLIST;
 
-        USES_evlist_class_event();
-        $Event = new evEvent($ev_id);
+        $Event = new Event($ev_id);
 
         // Verify that the current user is an admin or event owner to print
         // all tickets, otherwise only print the user's tickets.
@@ -378,8 +378,6 @@ class evTicket
         }
 
         USES_lglib_class_fpdf();
-        USES_evlist_class_repeat();
-        USES_evlist_class_tickettype();
 
         $ev_id = NULL;
 
@@ -394,13 +392,13 @@ class evTicket
         $counter = 0;
         foreach ($tickets as $tic_id=>$ticket) {
             if (!isset($tick_types[$ticket->tic_type])) {
-                $tick_types[$ticket->tic_type] = new evTicketType($ticket->tic_type);
+                $tick_types[$ticket->tic_type] = new TicketType($ticket->tic_type);
             }
 
             // If we don't already have the event info, get it and construct
             // the address string
             if ($ev_id != $ticket->ev_id) {
-                $Ev = new evEvent($ticket->ev_id);
+                $Ev = new Event($ticket->ev_id);
                 $ev_id = $Ev->id;
                 $addr = array();
                 if ($Ev->Detail->street != '') $addr[] = $Ev->Detail->street;
@@ -413,7 +411,7 @@ class evTicket
 
             // Get the repeat(s) for the ticket(s) to print a ticket for each
             // occurrence.
-            $repeats = evRepeat::GetRepeats($ticket->ev_id, $ticket->rp_id);
+            $repeats = Repeat::GetRepeats($ticket->ev_id, $ticket->rp_id);
             if (empty($repeats)) return;
 
             foreach ($repeats as $rp_id => $event) {
@@ -519,10 +517,7 @@ class evTicket
 
         $retval = '';
 
-        USES_evlist_class_repeat();
-        USES_evlist_class_tickettype();
-
-        $Rp = new evRepeat($rp_id);
+        $Rp = new Repeat($rp_id);
         // Verify that the current is an admin or event owner
         if (!$Rp->Event->hasAccess(3)) {
             return $retval;
@@ -544,8 +539,8 @@ class evTicket
 
         $counter = 0;
         // For display, use the site timezone
-        $dt_tick = new Date('now', $_CONF['timezone']);
-        $dt_used = new Date('now', $_CONF['timezone']);
+        $dt_tick = new \Date('now', $_CONF['timezone']);
+        $dt_used = new \Date('now', $_CONF['timezone']);
         foreach ($tickets as $tic_id=>$ticket) {
             $counter++;
             $dt_tick->setTimestamp($ticket->dt);
@@ -680,7 +675,7 @@ class evTicket
     /**
     *   Mark a number of tickets paid for a user/event
     *
-    *   @uses   evTicket::CountUnpaid()
+    *   @uses   Ticket::CountUnpaid()
     *   @param  integer $count      Number of tickets paid
     *   @param  string  $ev_id      Event ID
     *   @param  integer $rp_id      Instance ID, default 0 (event)
@@ -706,6 +701,6 @@ class evTicket
         return self::CountUnpaid($ev_id, $rp_id, $uid);
     }
 
-}   // class evTicket
+}   // class Ticket
 
 ?>

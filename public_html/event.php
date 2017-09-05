@@ -65,7 +65,6 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
 // Import plugin-specific function library
 USES_evlist_functions();
 //USES_evlist_views();
-USES_evlist_class_view();
 
 /*
  * Main function
@@ -157,8 +156,7 @@ case 'search':
 case 'saverepeat':
 case 'savefuturerepeat':
     if ($rp_id > 0) {
-        USES_evlist_class_repeat();
-        $R = new evRepeat($rp_id);
+        $R = new Evlist\Repeat($rp_id);
         $errors = $R->Save($_POST); // save detail info
         if (!empty($errors)) {
             $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
@@ -181,10 +179,9 @@ case 'savefuturerepeat':
     break;
 
 case 'saveevent':
-    USES_evlist_class_event();
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
-    $Ev = new evEvent($eid);
+    $Ev = new Evlist\Event($eid);
     $errors = $Ev->Save($_POST, $table);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
@@ -201,21 +198,19 @@ case 'saveevent':
     break;
 
 case 'delevent':
-    USES_evlist_class_event();
     $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ?
             $_REQUEST['eid'] : '';
     if ($eid != '') {
-        evEvent::Delete($eid);
+        Evlist\Event::Delete($eid);
     }
     $view = 'home';
     break;
 
 case 'delrepeat':
-    USES_evlist_class_repeat();
     $rp_id = isset($_REQUEST['rp_id']) && !empty($_REQUEST['rp_id']) ?
             (int)$_REQUEST['rp_id'] : 0;
     if ($rp_id > 0) {
-        $R = new evRepeat($rp_id);
+        $R = new Evlist\Repeat($rp_id);
         if ($R->Event->canEdit()) {
             $R->Delete();
         }
@@ -225,8 +220,7 @@ case 'delrepeat':
 
 case 'delfuture':
     // Delete the selected and all future occurances.
-    USES_evlist_class_repeat();
-    $R = new evRepeat($_REQUEST['rp_id']);
+    $R = new Evlist\Repeat($_REQUEST['rp_id']);
     $R->DeleteFuture();
     break;
 
@@ -240,8 +234,7 @@ case 'register':
         echo $display;
         exit;
     }
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
+    $Ev = new Evlist\Repeat($rp_id);
     $msg = $Ev->Register($_POST['tick_count'], $_POST['tick_type']);
     //if ($msg == 0) $msg = 24;   // Set "success" message.
     //LGLIB_storeMessage($LANG_EVLIST['messages'][$msg]);
@@ -253,8 +246,7 @@ case 'cancelreg':
         // Anonymous users can't register
         break;
     }
-    USES_evlist_class_repeat();
-    $Ev = new evRepeat($rp_id);
+    $Ev = new Evlist\Repeat($rp_id);
     $status = $Ev->CancelRegistration(0, $_POST['num_cancel']);
     if ($status) {
         // success
@@ -276,12 +268,10 @@ case 'cancel':
 
 case 'tickdelete_x':
     // Delete one or more tickets, if admin or owner
-    USES_evlist_class_repeat();
-    $rp = new evRepeat($_GET['rp_id']);
+    $rp = new Evlist\Repeat($_GET['rp_id']);
     if ($rp->isAdmin) {
         if (is_array($_POST['delrsvp'])) {
-            USES_evlist_class_ticket();
-            evTicket::Delete($_POST['delrsvp']);
+            Evlist\Ticket::Delete($_POST['delrsvp']);
         }
     }
     COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
@@ -289,27 +279,25 @@ case 'tickdelete_x':
 
 case 'tickreset_x':
     // Reset the usage flag for one or more tickets if admin or owner
-    USES_evlist_class_repeat();
-    $rp = new evRepeat($_GET['rp_id']);
+    $rp = new Evlist\Repeat($_GET['rp_id']);
     if ($rp->isAdmin) {
         if (is_array($_POST['delrsvp'])) {
-            USES_evlist_class_ticket();
-            evTicket::Reset($_POST['delrsvp']);
+            Evlist\Ticket::Reset($_POST['delrsvp']);
         }
     }
     COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
     exit;
 }
 
+$add_link = true;
 switch ($view) {
 case 'edit':
     switch ($actionval) {
     case 'repeat':
     case 'futurerepeat':
         if (isset($_REQUEST['rp_id'])) {
-            USES_evlist_class_repeat();
             $rp_id = (int)$_GET['rp_id'];
-            $Ev = new evRepeat($rp_id);
+            $Ev = new Evlist\Repeat($rp_id);
             if ($Ev->Event->canEdit()) {
                 $content .= $Ev->Edit(0, $actionval);
             } else {
@@ -319,20 +307,21 @@ case 'edit':
         break;
     case 'event':
     default:
-        USES_evlist_class_event();
         if (isset($_REQUEST['eid'])) {
-            $Ev = new evEvent($_REQUEST['eid']);
+            $Ev = new Evlist\Event($_REQUEST['eid']);
             if ($Ev->canEdit()) {
                 // allowed to edit an existing event
                 $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+                $add_link = false;
             } else {
                 COM_404();
             }
         } else {
             // Submitting a new event
             if (EVLIST_canSubmit()) {
-                $Ev = new evEvent();
+                $Ev = new Evlist\Event();
                 $content .= $Ev->Edit();
+                $add_link = false;
             }
         }
         break;
@@ -341,13 +330,13 @@ case 'edit':
 
 case 'clone':
     if (isset($_GET['eid'])) {
-        USES_evlist_class_event();
-        $Ev = new evEvent($_GET['eid']);
+        $Ev = new Evlist\Event($_GET['eid']);
         if ($Ev->id == '' || !$Ev->canEdit())      // Event not found
             break;
         // Now prep it to be saved as a new record
         $Ev->id = '';
         $Ev->isNew = true;
+        $add_link = false;
         $content .= $Ev->Edit();
     }
     break;
@@ -366,8 +355,7 @@ case 'home':
 case 'print':
     $rp_id = isset($_GET['rp_id']) ? $_GET['rp_id'] : '';
     if (!empty($rp_id)) {
-        USES_evlist_class_repeat();
-        $Rep = new evRepeat($rp_id);
+        $Rep = new Evlist\Repeat($rp_id);
         $pagetitle = COM_stripslashes($Rep->Event->title);
         echo $Rep->Render('', '', 'print');
         exit;
@@ -381,8 +369,7 @@ case 'print':
 case 'printtickets':
     // Print the current user's own tickets to the event
     if ($_EV_CONF['enable_rsvp'] && !COM_isAnonUser()) {
-        USES_evlist_class_ticket();
-        $doc = evTicket::PrintTickets($eid, $rp_id, $_USER['uid']);
+        $doc = Evlist\Ticket::PrintTickets($eid, $rp_id, $_USER['uid']);
         echo $doc;
         exit;
     } else {
@@ -399,10 +386,9 @@ default:
         $actionval = COM_getArgument('view');
         $eid = COM_sanitizeID(COM_getArgument('eid'),false);
     }
-    USES_evlist_class_repeat();
     if ($actionval == 'event' && !empty($eid)) {
         // Given an event ID, get the nearest instance to display
-        $rp_id = evRepeat::getNearest($eid);
+        $rp_id = Evlist\Repeat::getNearest($eid);
         if ($rp_id === false) {
             COM_refresh($EVLIST_URL . '/index.php');
         }
@@ -411,7 +397,7 @@ default:
         $rp_id = $eid;
     }
     if (!empty($rp_id)) {
-        $Rep = new evRepeat($rp_id);
+        $Rep = new Evlist\Repeat($rp_id);
         $pagetitle = COM_stripslashes($Rep->Event->title);
         if ($view == 'print') {
             $template = 'print';
@@ -428,10 +414,8 @@ default:
 }
 
 $display = EVLIST_siteHeader($pagetitle);
-$V = new evView_detail();
-$display .= $V->Header('detail', 0, 0, 0, $cat_id, $cal_id);
-//$display .= EVLIST_calHeader(date('Y'), date('m'), date('d'), 'detail',
-//                $cat_id, $cal_id);
+$V = new Evlist\View_detail();
+$display .= $V->Header($add_link);
 
 if (!empty($msg)) {
     $display .= COM_startBlock($LANG_EVLIST['alert'],'','blockheader-message.thtml');

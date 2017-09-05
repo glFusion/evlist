@@ -185,30 +185,6 @@ function plugin_install_evlist()
 }
 
 
-// These are required for the evEvent class.  They're included here
-// since functions.inc isn't available until the plugin is installed
-/*
-define(EVLIST_PI_PATH, __DIR__);
-
-function USES_evlist_functions()
-{    require_once EVLIST_PI_PATH . '/evlist_functions.inc.php'; }
-
-function USES_evlist_views()
-{    require_once EVLIST_PI_PATH . '/evlist_views.inc.php'; }
-
-function USES_evlist_class_event()
-{   require_once EVLIST_PI_PATH . '/classes/evEvent.class.php'; }
-
-function USES_evlist_class_detail()
-{   require_once EVLIST_PI_PATH . '/classes/evDetail.class.php'; }
-
-function USES_evlist_class_repeat()
-{   require_once EVLIST_PI_PATH . '/classes/evRepeat.class.php'; }
-
-function USES_evlist_class_calendar()
-{   require_once EVLIST_PI_PATH . '/classes/evCalendar.class.php'; }
-*/
-
 /**
 * Loads the configuration records for the Online Config Manager
 *

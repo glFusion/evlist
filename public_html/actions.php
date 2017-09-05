@@ -40,25 +40,22 @@ foreach($expected as $provided) {
 switch ($action) {
 case 'tickdelete_x':
     if (is_array($_POST['delrsvp'])) {
-        USES_evlist_class_ticket();
-        evTicket::Delete($_POST['delrsvp']);
+        Evlist\Ticket::Delete($_POST['delrsvp']);
     }
     COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
     exit;
 
 case 'tickreset_x':
     if (is_array($_POST['delrsvp'])) {
-        USES_evlist_class_ticket();
-        evTicket::Reset($_POST['delrsvp']);
+        Evlist\Ticket::Reset($_POST['delrsvp']);
     }
     COM_refresh($_CONF['site_url'] . '/evlist/event.php?eid=' . $_POST['ev_id']);
     exit;
 
 case 'saveevent':
-    USES_evlist_class_event();
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
-    $Ev = new evEvent($eid);
+    $Ev = new Evlist\Event($eid);
     $errors = $Ev->Save($_POST, $table);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
@@ -76,11 +73,10 @@ case 'saveevent':
     break;
 
 case 'delevent':
-    USES_evlist_class_event();
     $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ? 
             $_REQUEST['eid'] : '';
     if ($eid != '') {
-        evEvent::Delete($eid);
+        Evlist\Event::Delete($eid);
     }
     $view = 'events';
     break;
@@ -92,9 +88,8 @@ case 'view':
 case 'printtickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::PrintTickets($eid);
+        $doc = Evlist\Ticket::PrintTickets($eid);
         echo $doc;
         exit;
     } else {
@@ -105,9 +100,8 @@ case 'printtickets':
 case 'exporttickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_ticket();
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = evTicket::ExportTickets($eid);
+        $doc = Evlist\Ticket::ExportTickets($eid);
         header('Content-type: text/csv');
         header('Content-Disposition: attachment; filename="event-'.$ev_id.'.csv');
         echo $doc;
@@ -131,15 +125,13 @@ case 'tickets':
 
 case 'editticket':
     if ($_EV_CONF['enable_rsvp']) {
-        USES_evlist_class_tickettype();
-        $Tic = new evTicketType($actionval);
+        $Tic = new Evlist\TicketType($actionval);
         $content .= $Tic->Edit();
     }
     break;
 
 case 'editevent':
-    USES_evlist_class_event();
-    $Ev = new evEvent($_REQUEST['eid']);
+    $Ev = new Event($_REQUEST['eid']);
     $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
     break;
 }

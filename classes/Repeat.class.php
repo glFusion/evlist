@@ -10,15 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
-USES_evlist_class_event();
-USES_evlist_class_detail();
+namespace Evlist;
 
 /**
 *   Class for event
 *   @package evlist
 */
-class evRepeat
+class Repeat
 {
     /** Property fields.  Accessed via Set() and Get()
     *   @var array */
@@ -115,7 +113,7 @@ class evRepeat
         case 'dtEnd2':
             // Date objects to track starting and ending timestamps
             //$this->properties[$var] = new Date($value, $this->tzid);
-            $this->properties[$var] = new Date($value, $_CONF['timezone']);
+            $this->properties[$var] = new \Date($value, $_CONF['timezone']);
             break;
 
         default:
@@ -244,7 +242,7 @@ class evRepeat
             // This is used by Reminders so make sure it's set:
             $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
 
-            $this->Event = new evEvent($this->ev_id, $this->det_id);
+            $this->Event = new Event($this->ev_id, $this->det_id);
             $this->tzid = $this->Event->tzid;
             return true;
         }
@@ -254,7 +252,7 @@ class evRepeat
     /**
     *   Edit a single repeat.
     *
-    *   @see    evEvent::Edit()
+    *   @see    Event::Edit()
     *   @param  integer $rp_id      ID of instance to edit
     *   @param  string  $edit_type  Type of repeat (repeat or futurerepeat)
     *   @return string      Editing form
@@ -271,7 +269,7 @@ class evRepeat
     /**
     *   Save this occurance info to the database.
     *   Only updates can be performed since the original record must have
-    *   been created by the evEvent class.
+    *   been created by the Event class.
     *
     *   The incoming $A parameter will contain all the event info, so it can
     *   be used to populate both the Detail and Repeat records.
@@ -291,9 +289,9 @@ class evRepeat
             // Update this repeat's detail record if there is one.  Otherwise
             // create a new one.
             if ($this->det_id != $this->Event->det_id) {
-                $D = new evDetail($this->det_id);
+                $D = new Detail($this->det_id);
             } else {
-                $D = new evDetail();
+                $D = new Detail();
             }
             $D->SetVars($A);
             $D->ev_id = $this->ev_id;
@@ -389,7 +387,7 @@ class evRepeat
         } else {
             $template .= $_EV_CONF['_is_uikit'] ? '.uikit' : '';
         }
-        $T = new Template(EVLIST_PI_PATH . '/templates/');
+        $T = new \Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
                 'event' => $template . '.thtml',
                 //'editlinks' => 'edit_links.thtml',
@@ -506,7 +504,7 @@ class evRepeat
             }
             if ($this->Event->rec_data['stop'] != '' &&
                 $this->Event->rec_data['stop'] < EV_MAX_DATE) {
-                $stop_date = new Date($this->Event->rec_data['stop'], $this->tzid);
+                $stop_date = new \Date($this->Event->rec_data['stop'], $this->tzid);
                 $rec_string .= ' ' . sprintf($LANG_EVLIST['recur_stop_desc'],
                     $stop_date->format($_CONF['dateonly'], $this->use_tz));
             }
@@ -590,8 +588,7 @@ class evRepeat
                         ($this->Event->options['max_user_rsvp'] == 0 ||
                           $total_tickets < $this->Event->options['max_user_rsvp'] )
                 ) {
-                    USES_evlist_class_tickettype();
-                    $Ticks = evTicketType::GetTicketTypes();
+                    $Ticks = TicketType::GetTicketTypes();
                     if ($this->Event->options['max_user_rsvp'] > 0) {
                         $T->set_block('event', 'tickCntBlk', 'tcBlk');
                         $T->set_var('register_multi', true);
@@ -630,8 +627,7 @@ class evRepeat
             // current user has any tickets to print.
             if ($this->Event->options['rsvp_print'] > 0) {
                 $paid = $this->Event->options['rsvp_print'] == 1 ? 'paid' : '';
-                USES_evlist_class_ticket();
-                $tickets = evTicket::GetTickets($this->ev_id, $this->rp_id, $this->uid, $paid);
+                $tickets = Ticket::GetTickets($this->ev_id, $this->rp_id, $this->uid, $paid);
                 if (count($tickets) > 0) {
                     $T->set_var(array(
                         'have_tickets'  => 'true',
@@ -773,7 +769,6 @@ class evRepeat
 
             // Let's see if we have already asked for a reminder...
             if ($_USER['uid'] > 1) {
-                USES_evlist_class_reminder();
                 $hasReminder = Reminder::countReminders($this->ev_id, $this->rp_id);
             }
         } else {
@@ -797,8 +792,7 @@ class evRepeat
             'show_reminderform' => $show_reminders ? 'true' : '',
         ) );
 
-        USES_evlist_class_tickettype();
-        $tick_types = evTicketType::GetTicketTypes();
+        $tick_types = TicketType::GetTicketTypes();
         $T->set_block('event', 'registerBlock', 'rBlock');
         if (is_array($this->Event->options['tickets'])) {
             foreach ($this->Event->options['tickets'] as $tic_type=>$info) {
@@ -911,16 +905,14 @@ class evRepeat
         }
 
         // for free tickets, just create the ticket records
-        USES_evlist_class_tickettype();
-        USES_evlist_class_ticket();
-        $TickType = new evTicketType($tick_type);
+        $TickType = new TicketType($tick_type);
         if ($TickType->event_pass) {
             $t_rp_id = 0;
         } else {
             $t_rp_id = $this->rp_id;
         }
         for ($i = 0; $i < $num_attendees; $i++) {
-            evTicket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid);
+            Ticket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid);
         }
         return 0;
     }
@@ -1135,7 +1127,7 @@ class evRepeat
             $sql = "SELECT * FROM {$_TABLES['evlist_repeat']} WHERE $where";
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
-                $repeats[$A['rp_id']] = new evRepeat();
+                $repeats[$A['rp_id']] = new Repeat();
                 $repeats[$A['rp_id']]->SetVars($A, true);
             }
         }
@@ -1155,8 +1147,7 @@ class evRepeat
     {
         global $LANG_EVLIST, $_CONF;
 
-        USES_evlist_class_tickettype();
-        $TickType = new evTicketType($tick_type);
+        $TickType = new TicketType($tick_type);
         $fee = $this->Event->options['tickets'][$tick_type]['fee'];
         $rp_id = $TickType->event_pass ? 0 : $this->rp_id;
 
@@ -1191,7 +1182,7 @@ class evRepeat
         global $_EV_CONF, $_TABLES, $_CONF;
 
         if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new Date($ts, $_CONF['timezone']);
+        $D = new \Date($ts, $_CONF['timezone']);
         $sql_date = $D->toMySQL(true);
         $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
                 WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
@@ -1273,8 +1264,8 @@ class evRepeat
     *   Try first to get the closest upcoming instance, then try for the
     *   most recent past instance.
     *
-    *   @uses   evRepeat::getLast()
-    *   @uses   evRepeat::getUpcoming()
+    *   @uses   Repeat::getLast()
+    *   @uses   Repeat::getUpcoming()
     *   @param  string  $ev_id  Event ID
     *   @return mixed       Instance ID, or False on an or not found
     */
@@ -1287,6 +1278,6 @@ class evRepeat
         return $rp_id;
     }
 
-}   // class evRepeat
+}   // class Repeat
 
 ?>

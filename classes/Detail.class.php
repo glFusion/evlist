@@ -1,22 +1,22 @@
 <?php
 /**
- *  Class to manage event detail records for the EvList plugin
- *
- *  @author     Lee Garner <lee@leegarner.com>
- *  @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
- *  @package    evlist
- *  @version    1.4.3
- *  @license    http://opensource.org/licenses/gpl-2.0.php 
- *              GNU Public License v2 or later
- *  @filesource
- */
-
+*   Class to manage event detail records for the EvList plugin
+*
+*   @author     Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+*   @package    evlist
+*   @version    1.4.3
+*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*               GNU Public License v2 or later
+*   @filesource
+*/
+namespace Evlist;
 
 /**
- *  Class for event detail
- *  @package evlist
- */
-class evDetail
+*   Class for event detail
+*   @package evlist
+*/
+class Detail
 {
     /** Property fields.  Accessed via __set() and __get()
     *   @var array */
@@ -275,7 +275,7 @@ class evDetail
         return true;
     }
         
-}   // class evDetail
+}   // class Detail
 
 
 ?>

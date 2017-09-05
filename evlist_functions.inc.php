@@ -58,7 +58,6 @@ USES_lglib_class_datecalc();
 *   @param  integer $range  Range being displayed (upcoming, past, etc)
 *   @return string          HTML for page navigation
 */
-//function EVLIST_pagenav($start, $end, $cat=0, $page = 0, $range = 0, $cal = 0)
 function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
 {
     global $_TABLES, $_EV_CONF;
@@ -71,164 +70,11 @@ function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
 
     $base_url = EVLIST_URL.
         "/index.php?cat=$cat&amp;cal=$cal&amp;range=$range&amp;view=list";
-/*
-    if (!empty($cat)) {
-        $cat_join = " LEFT JOIN {$_TABLES['evlist_lookup']} l
-                    ON l.eid = ev.id ";
-        $cat_where = " AND l.cid = '$cat' ";
-    } else {
-        $cat_join = '';
-        $cat_where = '';
-    }
-
-    if ($cal> 0) {
-        $cal_where = ' AND cal.cal_id = ' . $cal;
-    } else {
-        $cal_where = '';
-    }
-
-    $sql = "SELECT count(rep.rp_id) as cnt
-            FROM {$_TABLES['evlist_repeat']} rep
-            LEFT JOIN {$_TABLES['evlist_events']} ev
-                ON ev.id = rep.rp_ev_id
-            LEFT JOIN {$_TABLES['evlist_calendars']} cal
-                ON cal.cal_id = ev.cal_id
-            $cat_join
-            WHERE ev.status = 1
-            AND (
-                (rep.rp_date_start <= '$end' AND rep.rp_date_end >= '$start')
-                OR
-                (rep.rp_date_end >= '$start' AND rep.rp_date_start <= '$start')
-                OR
-                (rep.rp_date_end <= '$end' AND rep.rp_date_start >= '$start')
-            ) " .
-            COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
-            COM_getPermSQL('AND', 0, 2, 'cal') .
-            " $cat_where $cal_where
-            ORDER BY rep.rp_date_start ASC";
-    //echo $sql;die;
-    $res = DB_query($sql);
-    list($numrows) = DB_fetchArray($res);
-    */
-
     if ($numrows > $limit) {
         $numpages = ceil($numrows / $limit);
-        //$baseurl = EVLIST_URL . '/index.php?' . $range . $andcat;
-
         $retval = COM_printPageNavigation($base_url, $page, $numpages);
     }
     return $retval;
-}
-
-
-/**
-*   Display a small monthly calendar for the current month.
-*   Dates that have events scheduled are highlighted.
-*
-*   @deprecated
-*   @param  integer $year   Year to display, default is current year
-*   @param  integer $month  Starting month
-*   @return string          HTML for calendar page
-*/
-function X_EVLIST_smallmonth($year=0, $month=0, $opts=array())
-{
-    global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM;
-
-    $retval = '';
-
-    // Default to the current year
-    if ($year == 0) $year = date('Y');
-    if ($month == 0) $month = date('m');
-    $monthnum_str = sprintf("%02d", (int)$month);
-
-    // Get all the dates in the period
-    $starting_date = date('Y-m-d', mktime(0, 0, 0, $month, 1, $year));
-    $ending_date = date('Y-m-d', mktime(23, 59, 59, $month, 31, $year));
-    $calendarView = Date_Calc::getCalendarMonth($month, $year, '%Y-%m-%d');
-    $events = EVLIST_getEvents($starting_date, $ending_date, $opts);
-
-    $T = new Template(EVLIST_PI_PATH . '/templates');
-    $T->set_file(array(
-        'smallmonth'  => 'phpblock_month.thtml',
-    ) );
-
-    $T->set_var(array(
-        'thisyear' => $year,
-        'month' => $month,
-        'monthname' => $LANG_MONTH[(int)$month],
-    ));
-
-    // Set each day column header to the first letter of the day name
-    $T->set_block('smallmonth', 'daynames', 'nBlock');
-    $daynames = EVLIST_getDayNames(1);
-    foreach ($daynames as $key=>$dayname) {
-        $T->set_var('dayname', $dayname);
-        $T->parse('nBlock', 'daynames', true);
-    }
-
-    $T->set_block('smallmonth', 'week', 'wBlock');
-
-    $dt = new Date('now');
-
-    foreach ($calendarView as $weeknum => $weekdata) {
-        list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);
-        $T->set_var(array(
-                    'weekyear'  => $weekYear,
-                    'weekmonth' => $weekMonth,
-                    'weekday'   => $weekDay,
-        ) );
-        $T->set_block('smallmonth', 'day', 'dBlock');
-        foreach ($weekdata as $daynum => $daydata) {
-            list($y, $m, $d) = explode('-', $daydata);
-            $T->clear_var('no_day_link');
-            if ($daydata == $_EV_CONF['_today']) {
-                $dayclass = 'monthtoday';
-            } elseif ($m == $monthnum_str) {
-                $dayclass = 'monthon';
-            } else {
-                $T->set_var('no_day_link', 'true');
-                $dayclass = 'monthoff';
-            }
-            $popup = '';
-            if (isset($events[$daydata])) {
-                // Create the tooltip hover text
-                $daylinkclass = $dayclass == 'monthoff' ?
-                                'nolink-events' : 'day-events';
-                $dayspanclass='tooltip gl_mootip';
-                foreach ($events[$daydata] as $event) {
-                    // Show event titles on different lines if more than one
-                    if (!empty($popup)) $popup .= EVLIST_tooltip_newline();
-                    // Don't show a time for all-day events
-                    if ($event['allday'] == 0 &&
-                            $event['rp_date_start'] == $event['rp_date_end']) {
-                        $dt->setTimestamp(strtotime($event['rp_date_start'] .
-                                ' ' . $event['rp_time_start1']));
-                        // Time is a localized string, not a timestamp, so
-                        // don't adjust for the timezone
-                        $popup .= $dt->format($_CONF['timeonly'], false) . ': ';
-                    }
-                    $popup .= htmlentities($event['title']);
-                }
-                $T->set_var('popup', $popup);
-            } else {
-                $dayspanclass='';
-                $daylinkclass = 'day-noevents';
-                $T->clear_var('popup');
-            }
-            $T->set_var(array(
-                'daylinkclass'      => $daylinkclass,
-                'dayclass'          => $dayclass,
-                'dayspanclass'      => $dayspanclass,
-                'day'               => substr($daydata, 8, 2),
-                'pi_url'            => EVLIST_URL,
-            ) );
-            $T->parse('dBlock', 'day', true);
-        }
-        $T->parse('wBlock', 'week', true);
-        $T->clear_var('dBlock');
-    }
-    $T->parse('output', 'smallmonth');
-    return $T->finish($T->get_var('output'));
 }
 
 
@@ -460,32 +306,6 @@ function EVLIST_alertMessage($msg = '', $type = '', $header = '')
     if ($msg == '')
         return '';
     return COM_showMessageText($msg, $header, true, $type);
-}
-
-
-/**
-*   Create the calendar selection checkboxes to be shown in the javascript
-*   dropdown.
-*
-*   @param  array       key=>name array of calendars
-*   @return string      Input elements for each available calendar
-*/
-function EVLIST_cal_checkboxes($cals)
-{
-    $boxes = '';
-    if (!is_array($cals)) return $boxes;
-
-    asort($cals);
-    if (!empty($cals)) {
-        foreach ($cals as $key=>$cal) {
-            $boxes .= '<div style="float:left;width:100%;' .
-                'color:' . $cal['fgcolor'] . '">
-                <input checked="checked" type="checkbox" id="cal' . $key .
-                '" onclick="SelectCal(this)">&nbsp;' .
-                $cal['cal_name'] . '</div><br >' . LB;
-        }
-    }
-    return $boxes;
 }
 
 

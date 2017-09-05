@@ -2534,25 +2534,7 @@ function EVLIST_canSubmit()
 }
 
 
-/**
-*   Return the newline characters to use for the tooltips.
-*   UIkit themes need <br />, Vintage only uses LB
-*
-*   @return string      Newline characters
-*/
-function EVLIST_tooltip_newline()
-{
-    global $_EV_CONF;
-
-    if ($_EV_CONF['_is_uikit']) {
-        return '<br />' . LB;
-    } else {
-        return LB;
-    }
-}
-
-
-// EVLIST_xxxReuturn() functions simply set and read a session variable
+// EVLIST_xxxReturn() functions simply set and read a session variable
 // so the calling routines don't have to know what the designated variable
 // name is.
 

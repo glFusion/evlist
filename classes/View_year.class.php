@@ -44,7 +44,7 @@ class View_year extends View
     */
     public function Content()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH;
+        global $_CONF, $_EV_CONF, $LANG_MONTH, $_USER;
 
         $retval = '';
 
@@ -119,18 +119,17 @@ class View_year extends View
                         $daylinkclass = $dayclass == 'off' ?
                             'nolink-events' : 'day-events';
                         foreach ($events[$daydata] as $event) {
+                            $tz = $event['tzid'] == 'local' ? $_USER['tzid'] : $_CONF['timezone'];
                             // Separate events by a newline if more than one
                             if (!empty($popup)) {
-                                $popup .= EVLIST_tooltip_newline();
+                                $popup .= self::tooltip_newline();
                             }
                             // Don't show a time for all-day events
                             if ($event['allday'] == 0) {
-                                $dt = new \Date('now', $_CONF['timezone']);
-                                $dt->setTimestamp(strtotime($event['rp_date_start'] .
-                                    ' ' . $event['rp_time_start1']));
-                                // Time is a localized string, not a timestamp, so
-                                // don't adjust for the timezone
-                                $popup .= $dt->format($_CONF['timeonly'], false) . ': ';
+                                $dt = new \Date($event['rp_date_start'] . ' ' . $event['rp_time_start1'], $tz);
+                                $popup .= $dt->format($_CONF['timeonly'], true);
+                                if ($event['tzid'] != 'local') $popup .= ' (' . $dt->format('T') . ')';
+                                $popup .=  ': ';
                             }
                             $popup .= htmlentities($event['title']);
                         }

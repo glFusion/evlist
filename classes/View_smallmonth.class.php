@@ -91,7 +91,7 @@ class View_smallmonth extends View
                     $dayspanclass='tooltip gl_mootip';
                     foreach ($events[$daydata] as $event) {
                         // Show event titles on different lines if more than one
-                        if (!empty($popup)) $popup .= EVLIST_tooltip_newline();
+                        if (!empty($popup)) $popup .= self::tooltip_newline();
                         // Don't show a time for all-day events
                         if ($event['allday'] == 0 &&
                             $event['rp_date_start'] == $event['rp_date_end']) {

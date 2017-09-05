@@ -467,6 +467,24 @@ class View
         return $T->parse('output', 'boxes');
     }
 
+
+    /**
+    *   Return the newline characters to use for the tooltips.
+    *   UIkit themes need <br />, Vintage only uses LB
+    *
+    *   @return string      Newline characters
+    */
+    protected static function tooltip_newline()
+    {
+        global $_EV_CONF;
+
+        if ($_EV_CONF['_is_uikit']) {
+            return '<br />' . LB;
+        } else {
+            return LB;
+        }
+    }
+
 }
 
 ?>

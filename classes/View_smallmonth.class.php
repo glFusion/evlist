@@ -32,15 +32,18 @@ class View_smallmonth extends View
 
         $retval = '';
 
-        // Default to the current year
+        // 2-digit month to compare to current date for highlighting
         $monthnum_str = sprintf('%02d', (int)$this->month);
 
-        // Get all the dates in the period
-        $starting_date = date('Y-m-d', mktime(0, 0, 0, $this->month, 1, $this->year));
-        $ending_date = date('Y-m-d', mktime(23, 59, 59, $this->month,
-            \Date_Calc::daysInMonth($this->year, $this->month), $this->year));
+        // Get all the dates in the month
         $calendarView = \Date_Calc::getCalendarMonth($this->month, $this->year, '%Y-%m-%d');
-        $events = EVLIST_getEvents($starting_date, $ending_date, $opts);
+        $x = count($calendarView) - 1;
+        $y = count($calendarView[$x]) - 1;
+        $starting_date = $calendarView[0][0];
+        $ending_date = $calendarView[$x][$y];
+
+        $events = EVLIST_getEvents($starting_date, $ending_date,
+                array('cat'=>$this->cat, 'cal'=>$this->cal));
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
         $T->set_file(array(

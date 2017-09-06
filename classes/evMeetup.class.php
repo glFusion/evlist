@@ -131,10 +131,10 @@ class evMeetup
                     if (!isset($events[$dt])) $events[$dt] = array();
                     $events[$dt][] = $event;
                 }
+                $this->updateCache($events);
             }
-            $this->updateCache($events);
         }
-        catch(Exception $e) {
+        catch(\Exception $e) {
             COM_errorLog('EVLIST:' . $e->getMessage());
             if (!empty($A)) {
             // Got old data from cache, better than nothing

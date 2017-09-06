@@ -1,6 +1,5 @@
 {# begin {templatelocation} #}
 <div class="monthview_allday show_cal{cal_id} event" 
-    title="{ev_hover}"
     style="background-color:{bgcolor};">
 {!if is_meetup}
   <a href="{ev_url}" target="_blank"

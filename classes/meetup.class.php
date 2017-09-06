@@ -280,7 +280,7 @@ class Meetup
                 } 
                 else 
                 {
-                    throw new Exception("Missing parameter '" . $matches[1][$i] . "' for path '" . $path . "'.");
+                    throw new \Exception("Missing parameter '" . $matches[1][$i] . "' for path '" . $path . "'.");
                 }
             }
         }
@@ -347,7 +347,7 @@ class Meetup
             //api request (any) - include sign parameters
             $params = array_merge( array('sign', 'true'), $params );
         }
-    
+
         //init curl
         $ch = curl_init();
         
@@ -410,9 +410,9 @@ class Meetup
             $error = curl_error($ch);
             curl_close($ch);
              
-            throw new Exception("Failed retrieving  '" . $url . "' because of connection issue: ' " . $error . "'.");
+            throw new \Exception("Failed retrieving  '" . $url . "' because of connection issue: ' " . $error . "'.");
         }
-        
+
         //retrieve json and store it internally
         $this->_response = json_decode($content);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -437,7 +437,7 @@ class Meetup
                 $error = 'Status ' . $status;
             }
              
-            throw new Exception("Failed retrieving  '" . $url . "' because of ' " . $error . "'.");
+            throw new \Exception("Failed retrieving  '" . $url . "' because of ' " . $error . "'.");
         }   
         else if (is_null($this->_response)) 
         {
@@ -466,8 +466,8 @@ class Meetup
                     $error = 'Unknown error';
                     break;
             }
-        
-            throw new Exception("Cannot read response by  '" . $url . "' because of: '" . $error . "'.");
+            $this->_response = array(); 
+            //throw new \Exception("Cannot read response by  '" . $url . "' because of: '" . $error . "'.");
         }
     
         return $this->_response;

@@ -121,16 +121,18 @@ class evMeetup
         try {
             $M = new Meetup(array('key' => $_EV_CONF['meetup_key']));
             $response = $M->getEvents($this->params);
-            $events = array();
-            foreach ($response->results as $event) {
-                $tz = $event->timezone;
-                $d = new \Date($event->time / 1000, $tz);
-                $dt = $d->format('Y-m-d', true);
-                $tm = $d->format('H:i:s', true);
-                if (!isset($events[$dt])) $events[$dt] = array();
-                $events[$dt][] = $event;
+            if (!empty($response)) {
+                $events = array();
+                foreach ($response->results as $event) {
+                    $tz = $event->timezone;
+                    $d = new \Date($event->time / 1000, $tz);
+                    $dt = $d->format('Y-m-d', true);
+                    $tm = $d->format('H:i:s', true);
+                    if (!isset($events[$dt])) $events[$dt] = array();
+                    $events[$dt][] = $event;
+                }
             }
-//            $this->updateCache($events);
+            $this->updateCache($events);
         }
         catch(Exception $e) {
             COM_errorLog('EVLIST:' . $e->getMessage());

@@ -413,7 +413,7 @@ function toggleRSVPdetail(val)
         <div class="uk-form-controls">
           <select name="enable_comments">
             <option value="0" {ena_cmt_0}>{$LANG_EVLIST['yes']}</option>
-            <option value="2" {ena_cmt_2}>{$LANG_EVLIST['no']}</option>
+            <option value="-1" {ena_cmt_-1}>{$LANG_EVLIST['no']}</option>
             <option value="1" {ena_cmt_1}>{$LANG_EVLIST['closed']}</option>
           </select>
         </div>

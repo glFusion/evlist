@@ -550,7 +550,7 @@ class Repeat
         // Show the user comments. Moderators and event owners can delete comments
         if (plugin_commentsupport_evlist() && $this->Event->enable_comments < 2) {
             $T->set_var('usercomments',
-                CMT_userComments($this->rp_id, $this->Detail->title, 'evlist',
+                CMT_userComments($this->rp_id, $this->Event->Detail->title, 'evlist',
                     $cmtorder, $cmtmode, 0, 1, false,
                     (plugin_ismoderator_evlist() || $this->Event->owner_id == $_USER['uid']),
                     $this->Event->enable_comments)

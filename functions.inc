@@ -126,18 +126,16 @@ if ($_EV_CONF['enable_rsvp']) {
     include_once __DIR__ . '/services.inc.php';
 }
 
-spl_autoload_register('EVLIST_autoloader');
-function EVLIST_autoloader($class)
+spl_autoload_register(function($class)
 {
-    global $_CONF;
     if (strpos($class, 'Evlist\\') === 0) {
         $class = str_replace('Evlist\\', '', $class);
+        $path = __DIR__ . '/classes/' . $class . '.class.php';
+        if (file_exists($path)) {
+            include $path;
+        }
     }
-    $path = __DIR__ . '/classes/' . $class . '.class.php';
-    if (file_exists($path)) {
-        include $path;
-    }
-}
+});
 
 function USES_evlist_functions()
 {    require_once EVLIST_PI_PATH . '/evlist_functions.inc.php'; }

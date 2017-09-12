@@ -1159,14 +1159,21 @@ function plugin_itemlist_evlist()
 */
 function plugin_enablestatechange_evlist($enable)
 {
-    global $_TABLES;
+    global $_TABLES, $_PLUGINS;
 
     $is_enabled = $enable ? 1 : 0;
 
+    // If trying to enable the plugin but lgLib is not available,
+    // take no action and return
+    if ($is_enabled && !in_array('lglib', $_PLUGINS)) {
+        // Re-disable the plugin
+        DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
+        $enable = false;
+        $is_enabled = 0;
+    }
+
     // toggle evlist feeds
-    DB_query ("UPDATE {$_TABLES['syndication']}
-                SET is_enabled = $is_enabled
-                WHERE type = 'evlist'");
+    DB_change($_TABLES['syndication'], 'is_enabled', $is_enabled, 'type', 'evlist');
 
     // turns block off if on, but will not turn it on if off.
     if ($is_enabled != 1) {
@@ -1175,101 +1182,25 @@ function plugin_enablestatechange_evlist($enable)
                     WHERE (type = 'phpblock')
                     AND (phpblockfn LIKE 'phpblock_evlist_%')");
     }
+    return $enable;
 }
 
 
-function evlist_sendNotification($A)
+/**
+*   Receives notification of anothe plugin's deletion
+*
+*   @param  mixed   $id     Item ID
+*   @param  string  $type   Plugin Name
+*/
+function plugin_itemdeleted_evlist($id, $type)
 {
-    global $LANG_DIRECTION, $LANG_CHARSET, $_CONF, $_TABLES, $LANG_EVLIST;
+    global $_TABLES;
 
-    require_once $_CONF['path'].'lib/phpmailer/class.phpmailer.php';
-
-    if( empty( $LANG_DIRECTION )) {
-        // default to left-to-right
-        $direction = 'ltr';
-    } else {
-        $direction = $LANG_DIRECTION;
+    // If the lgLib plugin is disabled or removed, disable thie plugin
+    if ($type == 'lglib' && $id == '*') {
+        plugin_enablestatechange_evlist(false);
+        DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
     }
-    if( empty( $LANG_CHARSET )) {
-        $charset = $_CONF['default_charset'];
-        if( empty( $charset )) {
-            $charset = 'iso-8859-1';
-        }
-    } else {
-        $charset = $LANG_CHARSET;
-    }
-
-    COM_clearSpeedlimit(300,'evnotify');
-    $last = COM_checkSpeedlimit ('evnotify');
-    if ( $last == 0 ) {
-        $mail = new PHPMailer();
-        $mail->CharSet = $charset;
-        if ($_CONF['mail_backend'] == 'smtp' ) {
-            $mail->Host     = $_CONF['mail_smtp_host'] . ':' . $_CONF['mail_smtp_port'];
-            $mail->SMTPAuth = $_CONF['mail_smtp_auth'];
-            $mail->Username = $_CONF['mail_smtp_username'];
-            $mail->Password = $_CONF['mail_smtp_password'];
-            $mail->Mailer = "smtp";
-        } elseif ($_CONF['mail_backend'] == 'sendmail') {
-            $mail->Mailer = "sendmail";
-            $mail->Sendmail = $_CONF['mail_sendmail_path'];
-        } else {
-            $mail->Mailer = "mail";
-        }
-        $mail->WordWrap = 76;
-        $mail->IsHTML(false);
-
-        $title = stripslashes ($A['title']);
-        $summary = stripslashes ($A['summary']);
-
-        $mail->Subject = $_CONF['site_name'] . ' ' . $LANG_EVLIST['moderation_title'];
-
-        $mailbody = "{$LANG_EVLIST['title']}: $title\n"
-                  . "{$LANG_EVLIST['date']}: " . strftime ($_CONF['date'],
-                    strtotime ($A['date_start1']));
-        $mailbody .= "\n" . $summary . "\n\n";
-        $mailbody .= "{$LANG_EVLIST['moderation_title']} <{$_CONF['site_admin_url']}/moderation.php>\n\n";
-        $mailbody .= "\n------------------------------\n";
-        $mailbody .= "\n{$LANG_EVLIST['end_message']}\n";
-        $mailbody .= "\n------------------------------\n";
-
-        $mail->Body = $mailbody;
-
-        $mail->From     = $_CONF['site_mail'];
-        $mail->FromName = $_CONF['site_name'];
-
-        $group_id = DB_getItem($_TABLES['groups'],'grp_id','grp_name="evList Admin"');
-
-        $groups = EV_getGroupList($group_id);
-        $groupList = implode(',',$groups);
-
-        $sql = "SELECT DISTINCT {$_TABLES['users']}.uid,username,fullname,email "
-              ."FROM {$_TABLES['group_assignments']},{$_TABLES['users']} "
-              ."WHERE {$_TABLES['users']}.uid > 1 "
-              ."AND {$_TABLES['users']}.uid = {$_TABLES['group_assignments']}.ug_uid "
-              ."AND ({$_TABLES['group_assignments']}.ug_main_grp_id IN ({$groupList}))";
-
-        $result = DB_query($sql);
-        $nRows = DB_numRows($result);
-        $toCount = 0;
-        for ($i=0;$i < $nRows; $i++ ) {
-            $row = DB_fetchArray($result);
-            if ( $row['email'] != '' ) {
-                COM_errorLog("evList Submit: Sending notification email to: " . $row['email'] . " - " . $row['username']);
-                $toCount++;
-                $mail->AddAddress($row['email'], $row['username']);
-            }
-        }
-        if ( $toCount > 0 ) {
-            if(!$mail->Send()) {
-                COM_errorLog("evList Submit: Unable to send moderation email - error:" . $mail->ErrorInfo);
-            }
-        } else {
-            COM_errorLog("evList Submit: Error - Did not find any administrators to email");
-        }
-        COM_updateSpeedlimit ('evnotify');
-    }
-    return true;
 }
 
 
@@ -1954,6 +1885,7 @@ function EVLIST_siteFooter()
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
     global $_EV_CONF;
+COM_errorLog("In smallmonth");
 
     // PHP block calendar is always current, regardless of session vars
     list($y, $m, $d) = explode('-', $_EV_CONF['_today']);

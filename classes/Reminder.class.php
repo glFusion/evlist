@@ -42,8 +42,10 @@ class Reminder
     */
     public function __construct($rp_id='', $uid='')
     {
-        $this->Repeat = new Repeat($rp_id);
-        if ($this->Repeat->rp_id != '') {
+        if ($rp_id !== '') {
+            $this->Repeat = new Repeat($rp_id);
+        }
+        if ($this->Repeat->rp_id > 0) {
             $this->eid = $this->Repeat->ev_id;
             $this->rp_id = $rp_id;
             $this->uid = $uid;
@@ -240,11 +242,8 @@ class Reminder
         $sql = "SELECT * FROM {$_TABLES['evlist_remlookup']}
                 WHERE date_start <= (UNIX_TIMESTAMP() + (days_notice * 86400))";
         $res = DB_query($sql);
-        $i = 0;
         while ($A = DB_fetchArray($res, false)) {
-            $Rems[$i] = new Reminder();
-            $Rems[$i]->setVars($A);
-            $i++;
+            $Rems[] = new Reminder($A['rp_id']);
         }
         return $Rems;
     }

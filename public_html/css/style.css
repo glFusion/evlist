@@ -722,3 +722,13 @@ div.evPrtDataItem div.evdata {
     margin: 5px;
     height: 14rem;
 }
+@media screen and (max-width: 767px) {
+  .calcontainer .year_smallmonth {
+    height: 16rem;
+  }
+}
+@media screen and (max-width: 400px) {
+  .calcontainer .year_smallmonth {
+    height: inherit;
+  }
+}

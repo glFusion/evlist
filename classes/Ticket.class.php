@@ -373,7 +373,7 @@ class Ticket
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
         // the lglib version during installation
-        if (empty($tickets) || !in_array('lglib', $_PLUGINS) {
+        if (empty($tickets) || !in_array('lglib', $_PLUGINS)) {
             return "There are no tickets available to print";
         }
         USES_lglib_class_fpdf();

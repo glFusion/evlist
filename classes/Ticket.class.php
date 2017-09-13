@@ -355,7 +355,7 @@ class Ticket
     */
     public static function PrintTickets($ev_id='', $rp_id=0, $uid=0)
     {
-        global $_CONF, $_USER, $LANG_EVLIST;
+        global $_CONF, $_USER, $LANG_EVLIST, $_PLUGINS;
 
         $Event = new Event($ev_id);
 
@@ -373,10 +373,9 @@ class Ticket
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
         // the lglib version during installation
-        if (empty($tickets) || !function_exists('USES_lglib_class_fpdf')) {
+        if (empty($tickets) || !in_array('lglib', $_PLUGINS) {
             return "There are no tickets available to print";
         }
-
         USES_lglib_class_fpdf();
 
         $ev_id = NULL;
@@ -384,7 +383,7 @@ class Ticket
         // create params array for qrcode, if used
         $params = array('module_size'=>5);
 
-        $pdf = new FPDF();
+        $pdf = new \FPDF();
         $pdf->SetLeftMargin(20);
         $pdf->AddPage();
 

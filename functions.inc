@@ -2450,6 +2450,7 @@ function EVLIST_noquotes($str)
 */
 function EVLIST_canSubmit()
 {
+    global $_EV_CONF;
     static $canSubmit = NULL;
 
     if ($canSubmit === NULL) {

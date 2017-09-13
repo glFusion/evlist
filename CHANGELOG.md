@@ -2,6 +2,7 @@
 
 ## v1.4.3
 Release TBD
+- Move ticket format to a configuration item under RSVP
 - Show timezone in tooltips if not local
 - Implement Evlist namespace and class autoloader
 - Add overflow:auto to day blocks in monthly view

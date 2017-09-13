@@ -142,6 +142,11 @@ class Ticket
     {
         global $_EV_CONF;
 
+        // Make sure a default format is defined if not in the config
+        if (strstr($_EV_CONF['ticket_format'], '%s') === false) {
+            $_EV_CONF['ticket_format'] = 'EV%s';
+        }
+
         // md5 makes a long value to put in a qrcode url.
         // makeSid() should be sufficient since it includes some
         // random characters.
@@ -644,7 +649,7 @@ class Ticket
 
 
     /**
-    *   Get a cound of the unpaid tickets for a user/event.
+    *   Get a count of the unpaid tickets for a user/event.
     *
     *   @param  string  $ev_id      Event ID
     *   @param  integer $rp_id      Instance ID, default 0 (event)

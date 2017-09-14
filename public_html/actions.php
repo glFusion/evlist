@@ -131,10 +131,10 @@ case 'editticket':
     break;
 
 case 'editevent':
-    $Ev = new Event($_REQUEST['eid']);
+    $Ev = new Evlist\Event($_REQUEST['eid']);
     $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
     break;
 }
 
-echo COM_refresh(EVLIST_return());
+echo COM_refresh(EVLIST_getReturn());
 ?>

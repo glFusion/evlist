@@ -93,14 +93,14 @@ case 'toggle':
     $oldval = isset($_POST['oldval']) && $_POST['oldval'] == 1 ? 1 : 0;
     switch($_POST['component']) {
     case 'event':
-        $Ev = new Event($_POST['id']);
-        if (!plugin_ismoderator_evlist() || !$Ev->isOwner() || $Ev->isNew) {
+        $Ev = new Evlist\Event($_POST['id']);
+        if ( (!plugin_ismoderator_evlist() && !$Ev->isOwner() ) || $Ev->isNew ) {
             $newval = $oldval;
             break;
         }
         switch ($_POST['type']) {
         case 'enabled':
-            $newval = Event::toggleEnabled($oldval, $_POST['id']);
+            $newval = Evlist\Event::toggleEnabled($oldval, $_POST['id']);
             break;
 
          default:

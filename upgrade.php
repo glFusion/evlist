@@ -51,7 +51,7 @@ if (!defined ('GVERSION')) {
 }
 
 global $_DB_dbms, $c, $_CONF, $CONF_EVLIST_DEFAULT;
-require_once EVLIST_PI_PATH . "/sql/{$_DB_dbms}_install.php";
+require_once __DIR__ . "/sql/{$_DB_dbms}_install.php";
 require_once $_CONF['path'] . 'system/classes/config.class.php';
 require_once $_CONF['path'] . 'plugins/evlist/install_defaults.php';
 $c = config::get_instance();
@@ -64,9 +64,20 @@ $c = config::get_instance();
 function evlist_upgrade()
 {
     global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c,
-        $_CONF_EVLIST_DEFAULT;
+        $_CONF_EVLIST_DEFAULT, $_PLUGIN_INFO;
 
-    $currentVersion = DB_getItem($_TABLES['plugins'],'pi_version',"pi_name='evlist'");
+    if (isset($_PLUGIN_INFO[$_EV_CONF['pi_name']])) {
+        if (is_array($_PLUGIN_INFO[$_EV_CONF['pi_name']])) {
+            // glFusion >= 1.6.6
+            $currentVersion = $_PLUGIN_INFO[$_EV_CONF['pi_name']]['pi_version'];
+        } else {
+            // legacy
+            $currentVersion = $_PLUGIN_INFO[$_EV_CONF['pi_name']];
+        }
+    } else {
+        return false;
+    }
+    $installed_ver = plugin_chkVersion_paypal();
 
     $_TABLES['evlist_settings'] = $_DB_table_prefix . 'evlist_settings';
 
@@ -278,6 +289,10 @@ function evlist_upgrade()
             }
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, $installed_ver)) {
+        if (!PAYPAL_do_set_version($installed_ver)) return false;
     }
 
     CTL_clearCache();

@@ -276,6 +276,12 @@ function evlist_upgrade()
                     return false;
                 }
             }
+   
+            // This column should have been there from the beginning, but on
+            // at least one site it was missing. Add it here, but ignore any
+            // SQL error since it's probably already there. 
+            DB_query("ALTER TABLE {$_TABLES['evlist_remlookup']}
+                ADD date_start int(10) unsigned AFTER rp_id", 1);
 
             // Remove renamed class files
             $files = array(

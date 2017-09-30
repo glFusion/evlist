@@ -327,7 +327,7 @@ function EVLIST_GetOptions($options, $selected = '', $bias=0)
     $bias = (int)$bias;
 
     foreach ($options as $value=>$name) {
-        $value += $bias;
+        if (is_numeric($value)) $value += $bias;
         $retval .= '<option value="' . $value . '"';
         if ($value == $selected) {
                 $retval .= ' selected="selected"';

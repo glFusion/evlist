@@ -106,9 +106,11 @@ function evlist_import_calendar_events()
         // event and detail records.
 
         // Create the event object, while checking if the eid exists
-        $Ev = new Event($A['eid']);
-        if ($Ev->id != '')      // Oops, dup ID, must already be done.
+        $Ev = new Evlist\Event($A['eid']);
+        if ($Ev->id != '') {    // Oops, dup ID, must already be done.
+            COM_errorLog("{$A['eid']} - already exists");
             continue;           // Skip possible duplicates
+        }
 
         // Force it to be a new event even though we have an event ID
         $Ev->isNew = true;
@@ -130,11 +132,11 @@ function evlist_import_calendar_events()
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
-            $error = 1;
+            COM_errorLog("{$A['eid']} - Unknow DB error: $sql");
+            $errors++;
             continue;
         }
     }
-
     return $errors;
 }
 

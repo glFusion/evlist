@@ -93,11 +93,14 @@ function EVLIST_adminHeader($page)
                 'text' => $LANG_EVLIST['ticket_types']);
         }
     }
-
-    $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?importcalendar=x',
+    $menu_arr[] = array(
+            'url' => EVLIST_ADMIN_URL . '/index.php?import=x',
+            'text' => $LANG_EVLIST['import'],
+    );
+    /*$menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?importcalendar=x',
             'text' => $LANG_EVLIST['import_calendar']);
     $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?import=x',
-            'text' => $LANG_EVLIST['import_from_csv']);
+            'text' => $LANG_EVLIST['import_from_csv']);*/
 
     $menu_arr[] = array('url' => $_CONF['site_admin_url'],
                 'text' => $LANG_ADMIN['admin_home']);
@@ -718,7 +721,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
 *
 *   @return string      Completion message
 */
-function EVLIST_importEvents()
+function EVLIST_importCSV()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $_USER;
 
@@ -857,9 +860,10 @@ $expected = array(
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
     'tickreset_x', 'tickdelete_x', 'exporttickets',
+    'import_csv', 'import_cal', 'import_csv',
     // Views to display
     'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
-    'import', 'importexec', 'edit', 'editcat', 'editticket', 'tickettypes',
+    'import', 'edit', 'editcat', 'editticket', 'tickettypes',
     'tickets',
 );
 $action = 'view';
@@ -1019,7 +1023,16 @@ case 'view':
     $view = $actionval;
     break;
 
-case 'importcalendar':
+case 'delrsvp':
+    if (is_array($_POST['delrsvp'])) {
+        foreach ($_POST['delrsvp'] as $rsvp_id) {
+            DB_delete($_TABLES['evlist_rsvp'], 'rsvp_id', $rsvp_id);
+        }
+    }
+    $view = 'rsvp';
+    break;
+
+case 'import_cal':
     require_once EVLIST_PI_PATH . '/calendar_import.php';
     $errors = evlist_import_calendar_events();
     if ($errors == -1) {
@@ -1031,19 +1044,10 @@ case 'importcalendar':
     }
     break;
 
-case 'delrsvp':
-    if (is_array($_POST['delrsvp'])) {
-        foreach ($_POST['delrsvp'] as $rsvp_id) {
-            DB_delete($_TABLES['evlist_rsvp'], 'rsvp_id', $rsvp_id);
-        }
-    }
-    $view = 'rsvp';
-    break;
-
-case 'importexec':
+case 'import_csv':
     // Import events from CSV file
-    $status = EVLIST_importEvents();
-    $content .= COM_showMessageText($status, '', false);
+    $status = EVLIST_importCSV();
+    $content .= COM_showMessageText($status, '', true, 'error');
     $view = '';
     break;
 
@@ -1142,7 +1146,21 @@ case 'rsvp':
 
 case 'import':
     $T = new Template(EVLIST_PI_PATH . '/templates/');
-    $T->set_file('form', 'import_events.thtml');
+    if ($_EV_CONF['_is_uikit']) {
+        $T->set_file(array(
+            'form'  => 'import.uikit.thtml',
+            'instr' => 'import_csv_instr.thtml',
+        ) );
+        $T->set_var('required', '<i class="uk-icon uk-icon-exclamation-triangle ev-icon-danger" data-uk-tooltip title="' .
+            $LANG_EVLIST['required'] . '"></i>');
+    } else {
+        $T->set_file(array(
+            'form'  => 'import.thtml',
+            'instr' => 'import_csv_instr.thtml',
+        ) );
+        $T->set_var('required', '<span class="required">' . $LANG_EVLIST['required'] . '</span>');
+    }
+    $T->parse('import_csv_instr', 'instr');
     $T->parse('output', 'form');
     $content .= $T->finish($T->get_var('output'));
     break;

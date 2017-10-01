@@ -1,7 +1,7 @@
 # evList plugin for glFusion - Changelog
 
 ## v1.4.3
-Release TBD
+Release 2017-10-01
 - Move ticket format to a configuration item under RSVP
 - Show timezone in tooltips if not local
 - Implement Evlist namespace and class autoloader

@@ -467,7 +467,7 @@ class Event
      *  @param  array   $A      Optional array of values from $_POST
      *  @param  string  $table  Table name (submission or production)
      *  @param  boolean $forceNew   Hack to force this record to be "new"
-     *  @return boolean         True if no errors, False otherwise
+     *  @return string      Error text, or empty string on success
      */
     public function Save($A = '', $table = 'evlist_submissions', $forceNew=false)
     {

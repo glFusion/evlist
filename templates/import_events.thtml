@@ -1,5 +1,6 @@
 {# begin {templatelocation} #}
 <div class="block-box">
+<h1>DEPRECATED</h1>
   <h2>Batch Import of Events</h2>
   <span class="alert"><b>Be sure to back up your database before importing!</b></span>
   <p>You can import a batch of events into evList from a comma-separated text file.

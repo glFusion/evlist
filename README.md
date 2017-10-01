@@ -1,6 +1,6 @@
 # evlist
 Event List and calendar plugin for glFusion
-Version: 1.4.0
+Version: 1.4.3
 
 For the latest documentation, please see
 

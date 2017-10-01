@@ -100,6 +100,8 @@ $LANG_EVLIST = array(
 'fee'               => 'Fee',
 'new_ticket_type'   => 'New Ticket Type',
 'print_tickets'     => 'Print Tickets',
+'required'          => 'Required',
+'import'            => 'Import',
 'import_calendar'       => 'Importer à partir de Calendrier',
 'import_from_csv'       => 'Importer de CSV',
 'title'             => 'titre',
@@ -376,7 +378,7 @@ $LANG_EVLIST = array(
 'msg_item_updated' => 'Item has been updated',
 'msg_item_nochange' => 'Item was not changed',
 'print'         => 'Print',
-'balance_due'   => 'Balance Due',
+'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

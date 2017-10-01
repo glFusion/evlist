@@ -1,0 +1,33 @@
+{# begin {templatelocation} #}
+<p>You can import a batch of events into evList from a comma-separated text file.
+The import file must have the fields in the following order:</p>
+<p>
+  <ol>
+    <li>{$LANG_EVLIST['start_date']} (YYYY-MM-DD) {required}</li>
+    <li>{$LANG_EVLIST['end_date']} (YYYY-MM-DD) {required}</li>
+    <li>{$LANG_EVLIST['start_time']} ("00:00:00" for allday events) {required}</li>
+    <li>{$LANG_EVLIST['end_time']} ("00:00:00" for allday events) {required}</li>
+    <li>{$LANG_EVLIST['title']} {required}</li>
+    <li>{$LANG_EVLIST['event_summary']}</li>
+    <li>{$LANG_EVLIST['full_desc']}</li>
+    <li>URL</li>
+    <li>{$LANG_EVLIST['ev_location']}</li>
+    <li>{$LANG_EVLIST['street_address']}</li>
+    <li>{$LANG_EVLIST['city']}</li>
+    <li>{$LANG_EVLIST['state']}</li>
+    <li>{$LANG_EVLIST['country']}</li>
+    <li>{$LANG_EVLIST['zip']}</li>
+    <li>{$LANG_EVLIST['ev_contact']}</li>
+    <li>E-Mail</li>
+    <li>{$LANG_EVLIST['phone']}</li>
+  </ol>
+</p>
+<p>Only the first 5 fields are required, the rest may be blank or missing if they&apos;re not needed.
+  <br />
+  <ol>
+    <li>All fields must be enclosed in double quotes (&quot;), must not contain quotes, and must be separated by commas (,).</li>
+    <li>Date fields must be given as &quot;YYYY-MM-DD&quot; and time fields must be &quot;HH:MM:SS&quot using 24-hour time.</li>
+    <li>Recurring and Split events are not supported.</li>
+  </ol>
+</p>
+{# begin {templatelocation} #}

@@ -101,6 +101,8 @@ $LANG_EVLIST = array(
 'fee'               => 'Ticket-Preis',
 'new_ticket_type'   => 'Neue Ticket-Kategorie',
 'print_tickets'     => 'Tickets drucken',
+'required'          => 'Required',
+'import'            => 'Import',
 'import_calendar'   => 'Kalender-Import',
 'import_from_csv'   => 'CSV-Import',
 'title'             => 'Titel',
@@ -363,7 +365,7 @@ $LANG_EVLIST = array(
 'msg_item_updated' => 'Eintrag wurde aktualisiert',
 'msg_item_nochange' => 'Eintrag wurde nicht geändert',
 'print'         => 'Print',
-'balance_due'   => 'Balance Due',
+'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
 );
 
 // Localization of the Admin Configuration UI

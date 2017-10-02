@@ -77,7 +77,7 @@ function evlist_upgrade()
     } else {
         return false;
     }
-    $installed_ver = plugin_chkVersion_paypal();
+    $installed_ver = plugin_chkVersion_evlist();
 
     $_TABLES['evlist_settings'] = $_DB_table_prefix . 'evlist_settings';
 
@@ -298,7 +298,7 @@ function evlist_upgrade()
     }
 
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
-        if (!PAYPAL_do_set_version($installed_ver)) return false;
+        if (!EVLIST_do_set_version($installed_ver)) return false;
     }
 
     CTL_clearCache();

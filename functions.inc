@@ -561,7 +561,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         return '';
     }
 
-    if (!EVLIST_isCurrentVersion()) return '';
+//    if (!EVLIST_isCurrentVersion()) return '';
 
     // If we show only on the homepage, check if that's where we are
     // If a topic is being displayed, then we're not on the homepage
@@ -585,7 +585,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
         break;
     case 3:     // calendar format
-        $content = View::getView();
+        $content = Evlist\View::getView();
         break;
     case 0:     // disabled
     default:
@@ -1885,7 +1885,6 @@ function EVLIST_siteFooter()
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
     global $_EV_CONF;
-COM_errorLog("In smallmonth");
 
     // PHP block calendar is always current, regardless of session vars
     list($y, $m, $d) = explode('-', $_EV_CONF['_today']);
@@ -2098,6 +2097,14 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
     return $retval;
 }
 
+
+/**
+*   Return the template names that support ad blocks
+*/
+function plugin_supportadblock_evlist()
+{
+    return array('evlist_event');
+}
 
 
 /**

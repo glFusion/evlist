@@ -51,9 +51,9 @@ if (!defined ('GVERSION')) {
 */
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.4.3';
+$_EV_CONF['pi_version']      = '1.4.4';
 $_EV_CONF['gl_version']      = '1.6.0';
-$_EV_CONF['pi_url']          = 'http://www.glfusion.org';
+$_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 
 
 $_TABLES['evlist_events']       = $_DB_table_prefix . 'evlist_events';

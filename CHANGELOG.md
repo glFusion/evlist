@@ -1,5 +1,11 @@
 # evList plugin for glFusion - Changelog
 
+## v1.4.4
+Release 2017-10-02
+- Fix missing namespace in calendar-format centerblock
+- Add adblock tags to event view templates
+- Fix function calls referencing the wrong plugin in upgrade.php
+
 ## v1.4.3
 Release 2017-10-01
 - Move ticket format to a configuration item under RSVP

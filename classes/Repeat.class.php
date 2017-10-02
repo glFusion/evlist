@@ -814,6 +814,7 @@ class Repeat
             ) );
         }
 
+        $T->set_var('adblock', PLG_displayAdBlock('evlist_event', 0));
         $T->parse ('output','event');
         $retval .= $T->finish($T->get_var('output'));
         return $retval;

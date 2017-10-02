@@ -314,6 +314,8 @@
 {!endif}
 </div>
 
+{adblock}
+
 <script type="text/javascript">
 var showregdiv = 0;
 function EV_toggleRegDiv() {

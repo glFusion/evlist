@@ -325,6 +325,7 @@
   {usercomments}
 </div>
 {!endif}
+{adblock}
 </div>
 
 {!if admin_rsvp}
@@ -335,7 +336,6 @@
   </div>
 </div>
 {!endif}
-
 
 <script type="text/javascript">
 var showregdiv = 0;

@@ -154,7 +154,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '2',
   PRIMARY KEY (`cal_id`)
-)";
+) ENGINE=MyISAM";
 
 $_SQL['evlist_rsvp'] = "CREATE TABLE {$_TABLES['evlist_rsvp']} (
   `ev_id` varchar(128) NOT NULL DEFAULT '',
@@ -163,7 +163,7 @@ $_SQL['evlist_rsvp'] = "CREATE TABLE {$_TABLES['evlist_rsvp']} (
   `num_attendees` int(4) unsigned NOT NULL DEFAULT '1',
   `dt_reg` int(11) DEFAULT '0',
   PRIMARY KEY (`ev_id`,`rp_id`,`uid`)
-)";
+) ENGINE=MyISAM";
 
 $_EV_UPGRADE = array(
 '1.3.0' => array(
@@ -180,7 +180,7 @@ $_EV_UPGRADE = array(
       `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '2',
       `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '2',
       PRIMARY KEY (`cal_id`)
-    )",
+    ) ENGINE=MyISAM",
     "CREATE TABLE {$_TABLES['evlist_repeat']} (
       `rp_id` int(10) NOT NULL AUTO_INCREMENT,
       `rp_ev_id` varchar(128) DEFAULT NULL,
@@ -249,13 +249,15 @@ $_EV_UPGRADE = array(
       PRIMARY KEY (`tic_id`),
       KEY `evt_rep` (`ev_id`,`rp_id`),
       KEY `user` (`uid`,`ev_id`),
-      KEY `ev_dt` (`ev_id`,`dt`) )",
+      KEY `ev_dt` (`ev_id`,`dt`)
+    ) ENGINE=MyISAM",
     "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
       `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
       `description` varchar(255) DEFAULT NULL,
       `event_pass` tinyint(1) unsigned NOT NULL DEFAULT '0',
       `enabled` tinyint(1) NOT NULL DEFAULT '1',
-      PRIMARY KEY (`id`) )",
+      PRIMARY KEY (`id`)
+    ) ENGINE=MyISAM",
     "INSERT INTO {$_TABLES['evlist_tickettypes']} VALUES (
         0, 'General Admission', 0, 1)",
     "UPDATE {$_TABLES['features']} SET ft_descr = 'Allowed to submit events'
@@ -271,7 +273,8 @@ $_EV_UPGRADE = array(
       `type` varchar(50) NOT NULL DEFAULT '',
       `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       `data` text,
-      PRIMARY KEY (`type`,`ts`))",
+      PRIMARY KEY (`type`,`ts`)
+    ) ENGINE=MyISAM",
     "ALTER TABLE {$_TABLES['evlist_events']}
         CHANGE id id varchar(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_repeat']}

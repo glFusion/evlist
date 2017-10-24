@@ -196,7 +196,7 @@ class View_list extends View
         $retval .= $T->finish($T->get_var('output'));
 
         // Set page navigation
-        $retval .= EVLIST_pagenav($total_events);
+        $retval .= EVLIST_pagenav($total_events, $this->cat, $page);
         //$retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
         return $retval;
     }

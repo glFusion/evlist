@@ -278,6 +278,11 @@ class Reminder
     {
         global $_TABLES, $_CONF, $LANG, $LANG_EVLIST;
 
+        // Guard against sending reminders for invalid events
+        if ($this->Repeat->rp_id < 1) {
+            return;
+        }
+
         // Load the user's language
         if (!isset(self::$langs[$R->uid])) {
             self::$langs[$this->uid] = DB_getItem($_TABLES['users'], 'language',

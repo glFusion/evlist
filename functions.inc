@@ -2187,7 +2187,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                 $opt_where .= ' AND rep.rp_id = ' . (int)$value;
                 break;
             case 'ical':
-                $opt_where .= ' AND cal.cal_ena_ical = '.($value == 1 ? 1 : 0);
+                $opt_where .= ' AND cal.cal_ena_ical = ' . ($value == 1 ? 1 : 0);
                 break;
             case 'cat':
                 if ($value > 0) {
@@ -2225,7 +2225,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                     $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 4:     // include if end date has not passed
-                    $dt_sql = "rep.rp_end >= '$end'";
+                    $dt_sql = "rep.rp_end >= '{$_EV_CONF['_today']} 23:59:59'";
                     break;
                 }
                 // Always limit to events starting before the specified end date

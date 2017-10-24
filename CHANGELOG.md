@@ -2,6 +2,8 @@
 ## v1.4.5
 Unreleased
 - Fix centerblock calendar
+- Fix paging in list view
+- Fix upcoming selection where end date has not passed
 
 ## v1.4.4
 Release 2017-10-02

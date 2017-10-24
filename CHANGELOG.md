@@ -1,4 +1,7 @@
 # evList plugin for glFusion - Changelog
+## v1.4.5
+Unreleased
+- Fix centerblock calendar
 
 ## v1.4.4
 Release 2017-10-02

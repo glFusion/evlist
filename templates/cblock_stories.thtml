@@ -1,7 +1,7 @@
 {# begin {templatelocation} #}
 <!-- BEGIN eventRow -->
-<div class="story">
-   <h1><a 
+<article class="uk-article tm-article uk-margin-large-bottom">
+   <h1 class="uk-article-title tm-article-title uk-margin-bottom-remove"><a
 {!if is_meetup}
         href="{ev_url}" target="_blank"
 {!else}
@@ -11,7 +11,7 @@
     <div class="story-body">
         {summary}
     </div>
-</div>
+</article>
 <div class="block-divider"> </div>
 <!-- END eventRow -->
 {# end {templatelocation} #}

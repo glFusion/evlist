@@ -420,7 +420,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     }
 
     $url = '/evlist/event.php?view=x&eid=';
-    $q = '&query=' . urlencode($query);
+    //$q = '&query=' . urlencode($query);
     $sql = "SELECT e.id, d.title, d.summary as description,
                 UNIX_TIMESTAMP(r.rp_date_start) AS date,
                 e.hits, e.owner_id AS uid, gl.username,
@@ -561,8 +561,6 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         return '';
     }
 
-//    if (!EVLIST_isCurrentVersion()) return '';
-
     // If we show only on the homepage, check if that's where we are
     // If a topic is being displayed, then we're not on the homepage
     if ($_EV_CONF['topic_centerblock'] == 'home' &&
@@ -585,7 +583,8 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
         break;
     case 3:     // calendar format
-        $content = Evlist\View::getView();
+        $view = Evlist\View::getView('month');
+        $display = $view->Render();
         break;
     case 0:     // disabled
     default:

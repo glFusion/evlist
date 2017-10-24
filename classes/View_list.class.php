@@ -70,7 +70,6 @@ class View_list extends View
         $page = empty($_GET['page']) ? 1 : (int)$_GET['page'];
         $opts = array('cat'=>$this->cat,
                 'page'=>$page,
-                'limit'=>$_EV_CONF['limit_list'],
                 'cal'=>$this->cal,
             );
         switch ($this->range) {
@@ -99,6 +98,9 @@ class View_list extends View
             break;
         }
 
+        $events = EVLIST_getEvents($start, $end, $opts);
+        $total_events = count($events);
+        $opts['limit'] = $_EV_CONF['limit_list'];
         $events = EVLIST_getEvents($start, $end, $opts);
 
         if (!empty($this->cat)) {
@@ -194,7 +196,7 @@ class View_list extends View
         $retval .= $T->finish($T->get_var('output'));
 
         // Set page navigation
-        $retval .= EVLIST_pagenav(count($events));
+        $retval .= EVLIST_pagenav($total_events);
         //$retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
         return $retval;
     }

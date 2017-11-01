@@ -4,6 +4,8 @@ Unreleased
 - Fix centerblock calendar
 - Fix paging in list view
 - Fix upcoming selection where end date has not passed
+- Set current page in list page navigation
+- Fix namespace for Date class instantiation in Recur.class.php
 
 ## v1.4.4
 Release 2017-10-02

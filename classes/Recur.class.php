@@ -183,8 +183,8 @@ class Recur
         global $_CONF;
 
         if ($this->duration > 0) {
-            $d = new Date($start, $_CONF['timezone']);
-            $e = $d->Add(new DateInterval("P{$this->duration}D"));
+            $d = new \Date($start, $_CONF['timezone']);
+            $e = $d->Add(new \DateInterval("P{$this->duration}D"));
             $enddate = $e->format('Y-m-d', true);
         } else {
             $enddate = $start;

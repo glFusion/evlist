@@ -184,7 +184,7 @@ class Recur
 
         if ($this->duration > 0) {
             $d = new \Date($start, $_CONF['timezone']);
-            $e = $d->Add(new \DateInterval("P{$this->duration}D"));
+            $e = $d->add(new \DateInterval("P{$this->duration}D"));
             $enddate = $e->format('Y-m-d', true);
         } else {
             $enddate = $start;

@@ -544,7 +544,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             break;
         case 'title':
             $rp_id = Evlist\Repeat::getNearest($A['id']);
-            if ($rp_id !== false) {
+            if ($rp_id) {
                 $retval = COM_createLink($fieldvalue, EVLIST_URL .
                         '/event.php?eid=' . $rp_id);
             } else {

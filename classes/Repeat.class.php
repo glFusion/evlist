@@ -1185,22 +1185,11 @@ class Repeat
         if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
         $D = new \Date($ts, $_CONF['timezone']);
         $sql_date = $D->toMySQL(true);
-        $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
-                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+        return DB_getItem($_TABLES['evlist_repeat'], 'rp_id',
+                "rp_ev_id = '" . DB_escapeString($ev_id) . "'
                     AND rp_end >= '$sql_date'
                 ORDER BY rp_start ASC
-                LIMIT 1";
-        $res = DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog(__METHOD__ . "() error: $sql");
-            return false;
-        }
-        if (DB_numRows($res) == 1) {
-            $A = DB_fetchArray($res, false);
-            return $A['rp_id'];
-        } else {
-            return false;
-        }
+                LIMIT 1");
     }
 
 
@@ -1215,21 +1204,10 @@ class Repeat
     {
         global $_TABLES;
 
-        $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
-                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+        return DB_getItem($_TABLES['evlist_repeat'], 'rp_id',
+                "rp_ev_id = '" . DB_escapeString($ev_id) . "'
                 ORDER BY rp_end DESC
-                LIMIT 1";
-        $res = DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog(__METHOD__ . "() error: $sql");
-            return false;
-        }
-        if (DB_numRows($res) == 1) {
-            $A = DB_fetchArray($res, false);
-            return $A['rp_id'];
-        } else {
-            return false;
-        }
+                LIMIT 1");
     }
 
 
@@ -1243,20 +1221,10 @@ class Repeat
     {
         global $_TABLES;
 
-        $sql = "SELECT rp_id FROM {$_TABLES['evlist_repeat']}
-                WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'
+        return DB_getItem($_TABLES['evlist_repeat'], 'rp_id',
+                "rp_ev_id = '" . DB_escapeString($ev_id) . "'
                 ORDER BY rp_start ASC
-                LIMIT 1";
-        $res = DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog(__METHOD__ . "() error: $sql");
-        }
-        if (DB_numRows($res) != 1) {
-            return false;
-        } else {
-            $A = DB_fetchArray($res, false);
-            return $A['rp_id'];
-        }
+                LIMIT 1");
     }
 
 
@@ -1273,7 +1241,7 @@ class Repeat
     public static function getNearest($ev_id)
     {
         $rp_id = self::getUpcoming($ev_id);
-        if ($rp_id === false) {
+        if ($rp_id === NULL) {
             $rp_id = self::getLast($ev_id);
         }
         return $rp_id;

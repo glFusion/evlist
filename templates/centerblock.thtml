@@ -19,7 +19,7 @@
 {!if is_meetup}
             href="{ev_url}" target="_blank"
 {!else}
-            href="{pi_url}/event.php?eid={eid}"
+            href="{pi_url}/event.php?view=instance&rp_id={eid}"
 {!endif}
         >{title}</a></b>
     </td>

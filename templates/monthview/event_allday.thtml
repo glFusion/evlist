@@ -4,7 +4,7 @@
 {!if is_meetup}
   <a href="{ev_url}" target="_blank"
 {!else}
-  <a href="{pi_url}/event.php?eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}" 
+  <a href="{pi_url}/event.php?view=instance&eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}"
 {!endif}
     data-uk-tooltip={cls:'evTooltip'} title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
 </div>

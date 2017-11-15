@@ -31,7 +31,7 @@
 {!if is_meetup}
         href="{ev_url}" target="_blank">
 {!else}
-        href="{pi_url}/event.php?eid={event_id}">
+        href="{pi_url}/event.php?view=instance&eid={event_id}">
 {!endif}
         {event_title}</a>
       </div>

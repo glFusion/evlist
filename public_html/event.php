@@ -289,7 +289,7 @@ case 'tickreset_x':
     exit;
 }
 
-$add_link = true;
+$add_link = true;   // Flag to indicate whether to show the Add Event link
 switch ($view) {
 case 'edit':
     switch ($actionval) {
@@ -378,27 +378,32 @@ case 'printtickets':
     break;
 
 case 'view':
+case 'print':
 default:
     // Default action, view the event
     if (empty($eid) && empty($rp_id)) {
         // No ID params given, try getting from the friendly URL
         COM_setArgNames(array('view', 'eid','ts','range','cat'));
         $actionval = COM_getArgument('view');
-        $eid = COM_sanitizeID(COM_getArgument('eid'),false);
+        $eid = COM_sanitizeID(COM_getArgument('eid'), false);
     }
-    if ($actionval == 'event' && !empty($eid)) {
+    switch ($actionval) {
+    case 'event':
         // Given an event ID, get the nearest instance to display
         $rp_id = Evlist\Repeat::getNearest($eid);
-        if ($rp_id === false) {
+        if (!$rp_id) {
             COM_refresh($EVLIST_URL . '/index.php');
         }
-    } else {
-        // Use the event ID param as an instance ID
-        $rp_id = $eid;
+        break;
+    case 'instance':
+    case 'repeat':
+    default:
+        if (empty($rp_id)) $rp_id = $eid;
+        break;
     }
     if (!empty($rp_id)) {
         $Rep = new Evlist\Repeat($rp_id);
-        $pagetitle = COM_stripslashes($Rep->Event->title);
+        $pagetitle = COM_stripslashes($Rep->Event->Detail->title);
         if ($view == 'print') {
             $template = 'print';
             $query = '';

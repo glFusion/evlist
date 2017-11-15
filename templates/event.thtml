@@ -306,6 +306,11 @@
   </form> 
 </div>
 {!endif}
+{!if social_icons}
+<div style="clear:both;">
+  {social_icons}
+</div>
+{!endif}
 
 {!if usercomments}
 <div style="clear:both;">

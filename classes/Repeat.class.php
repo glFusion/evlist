@@ -353,7 +353,7 @@ class Repeat
     */
     public function Render($rp_id=0, $query='', $tpl='', $cmtmode='nested', $cmtorder='ASC')
     {
-        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK;
+        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK, $LANG_LOCALE;
 
         $retval = '';
 
@@ -396,6 +396,9 @@ class Repeat
                 'contact' => 'contact.thtml',
         ) );
 
+        USES_lib_social();
+        $permalink = COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $this->Event->id);
+        $ss = SOC_getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
         // If plain text then replace newlines with <br> tags
         if ($this->Event->postmode == '1') {       //plaintext
             $this->Event->Detail->summary = nl2br($this->Event->Detail->summary);
@@ -545,7 +548,18 @@ class Repeat
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
             'iconset'   => $_EV_CONF['_iconset'],
             'is_uikit'  => $_EV_CONF['_is_uikit'],
+            'social_icons'  => $ss,
         ) );
+
+        $outputHandle = \outputHandler::getInstance();
+        $outputHandle->addLink('canonical', $permalink, HEADER_PRIO_NORMAL);
+        $outputHandle->addMeta('property','og:site_name', urlencode($_CONF['site_name']), HEADER_PRIO_NORMAL);
+        $outputHandle->addMeta('property','og:locale', isset($LANG_LOCALE) ? $LANG_LOCALE : 'en_US', HEADER_PRIO_NORMAL);
+        $outputHandle->addMeta('property','og:title', $this->Event->Detail->title, HEADER_PRIO_NORMAL);
+        $outputHandle->addMeta('property','og:type', 'event', HEADER_PRIO_NORMAL);
+        $outputHandle->addMeta('property','og:url', $permalink, HEADER_PRIO_NORMAL);
+        $outputHandle->AddMeta('name', 'description', $this->Event->Detail->summary, HEADER_PRIO_NORMAL);
+        $outputHandle->AddMeta('property', 'og:description', $this->Event->Detail->summary, HEADER_PRIO_NORMAL);
 
         // Show the user comments. Moderators and event owners can delete comments
         if (plugin_commentsupport_evlist() && $this->Event->enable_comments < 2) {

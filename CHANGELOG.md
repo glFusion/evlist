@@ -6,6 +6,7 @@ Unreleased
 - Fix upcoming selection where end date has not passed
 - Set current page in list page navigation
 - Fix namespace for Date class instantiation in Recur.class.php
+- Add social sharing buttons
 
 ## v1.4.4
 Release 2017-10-02

@@ -80,7 +80,7 @@ class Repeat
     */
     public function __set($var, $value='')
     {
-        global $_USER;
+        global $_USER, $_CONF;
 
         switch ($var) {
         case 'ev_id':
@@ -172,8 +172,8 @@ class Repeat
         if ($fromDB) {      // Read from the database
 
             // dates are YYYY-MM-DD
-            list($startyear, $startmonth, $startday) = explode('-', $row['rp_start_date']);
-            list($endyear, $endmonth, $endday) = explode('-', $row['rp_end_date']);
+            list($startyear, $startmonth, $startday) = explode('-', $row['rp_date_start']);
+            list($endyear, $endmonth, $endday) = explode('-', $row['rp_date_end']);
 
         } else {            // Coming from the form
 
@@ -353,7 +353,8 @@ class Repeat
     */
     public function Render($rp_id=0, $query='', $tpl='', $cmtmode='nested', $cmtorder='ASC')
     {
-        global $_CONF, $_USER, $_EV_CONF, $_TABLES, $LANG_EVLIST, $LANG_WEEK, $LANG_LOCALE;
+        global $_CONF, $_USER, $_EV_CONF, $LANG_EVLIST, $LANG_WEEK,
+                $LANG_LOCALE, $_SYSTEM;
 
         $retval = '';
 
@@ -530,8 +531,8 @@ class Repeat
             'end_time2' => $time_end2,
             'start_date' => $date_start,
             'end_date' => $date_end,
-            'start_datetime1' => $date_start . $time_start,
-            'end_datetime1' => $date_end . $time_end,
+            'start_datetime1' => $date_start . $time_start1,
+            'end_datetime1' => $date_end . $time_end2,
             'allday_event' => $this->Event->allday == 1 ? 'true' : '',
             'is_recurring' => $this->Event->recurring,
             'can_subscribe' => $this->Event->Calendar->cal_ena_ical,
@@ -630,10 +631,8 @@ class Repeat
                     }
                     $T->set_var(array(
                         'register_link' => 'true',
-                        'ticket_options' => $options,
                         'ticket_types_multi' => count($this->Event->options['tickets']) > 1 ? 'true' : '',
                     ) );
-
                 }
             }
 
@@ -1169,7 +1168,7 @@ class Repeat
         $evCart = array(
             'item_number' => 'evlist:eventfee:' . $this->Event->id . '/' .
                     $tick_type . '/' . $rp_id,
-            'item_name' => $TickType->description . ': ' . $LANG_EVLIST['event_fee'] . ' - ' .
+            'item_name' => $TickType->description . ': ' . $LANG_EVLIST['fee'] . ' - ' .
                     $this->Event->Detail->title . ' ' . $this->start_date1 .
                     ' ' . $this->start_time1,
             'short_description' => $TickType->description . ': ' .

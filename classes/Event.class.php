@@ -428,7 +428,7 @@ class Event
 
         $sql = "SELECT * FROM {$_TABLES[$this->table]} WHERE id='$this->id'";
         $result = DB_query($sql);
-        if (!$result || DB_numRows($result != 1)) {
+        if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
             $row = DB_fetchArray($result, false);
@@ -690,7 +690,10 @@ class Event
         }
 
         if (empty($this->Errors)) {
-            PLG_itemSaved($this->id, 'evlist');
+            if ($this->table = 'evlist_events') {
+                PLG_itemSaved($this->id, 'evlist');
+                Cache::clearCache();
+            }
             return '';
         } else {
             return $this->PrintErrors();
@@ -825,10 +828,73 @@ class Event
             break;
         }
 
+        if ($this->recurring != '1') {
+            $T->set_var(array(
+                'recurring_show'    => ' style="display:none;"',
+                'format_opt'        => '0',
+            ) );
+            $rec_type = 0;
+            //for ($i = 1; $i <= 6; $i++) {
+            //    $T->set_var('format' . $i . 'show', ' style="display:none;"');
+            //}
+        } else {
+            $rec_type = (int)$this->rec_data['type'];
+            $T->set_var(array(
+                'recurring_show' => '',
+                'recurring_checked' => EVCHECKED,
+                'format_opt'    => $rec_type,
+            ) );
+        }
+
+        if (isset($this->rec_data['stop']) &&
+                    !empty($this->rec_data['stop'])) {
+            $T->set_var(array(
+                'stopdate'      => $this->rec_data['stop'],
+                'd_stopdate'    =>
+                            EVLIST_formattedDate($this->rec_data['stop']),
+            ) );
+        }
+
+        // Set up the recurring options needed for the current event
+        $recweekday  = '';
+        switch ($rec_type) {
+        case 0:
+            // Not a recurring event
+            break;
+        case EV_RECUR_MONTHLY:
+            if (is_array($this->rec_data['listdays'])) {
+                foreach ($this->rec_data['listdays'] as $mday) {
+                    $T->set_var('mdchk'.$mday, EVCHECKED);
+                }
+            }
+            break;
+        case EV_RECUR_WEEKLY:
+            //$T->set_var('listdays_val', COM_stripslashes($rec_data[0]));
+            if (is_array($this->rec_data['listdays']) &&
+                    !empty($this->rec_data['listdays'])) {
+                foreach($this->rec_data['listdays'] as $day) {
+                    $day = (int)$day;
+                    if ($day > 0 && $day < 8) {
+                        $T->set_var('daychk'.$day, EVCHECKED);
+                    }
+                }
+            }
+            break;
+        case EV_RECUR_DOM:
+            $recweekday = $this->rec_data['weekday'];
+            break;
+        case EV_RECUR_DATES:
+            $T->set_var(array(
+                'stopshow'      => 'style="display:none;"',
+                'custom_val' => implode(',', $this->rec_data['custom']),
+            ) );
+            break;
+        }
+
         // Basic tabs for editing both events and instances, show up on
         // all edit forms
         $tabs = array('ev_info', 'ev_location', 'ev_contact',);
-
+        $alert_msg = '';
         $rp_id = (int)$rp_id;
         if ($rp_id > 0) {   // Editing a single occurrence
             // Make sure the current user has access to this event.
@@ -894,7 +960,7 @@ class Event
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->rec_data['type']),
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], isset($this->rec_data['type']) ? $this->rec_data['type'] : ''),
                 'recurring_weekday_options' => EVLIST_GetOptions(\Date_Calc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
@@ -943,7 +1009,6 @@ class Event
 
         $retval = '';
         //$recinterval = '';
-        $recweekday  = '';
 
         $ownerusername = DB_getItem($_TABLES['users'],
                     'username', "uid='{$this->owner_id}'");
@@ -954,7 +1019,7 @@ class Event
         $location = $this->Detail->location;
         if (($this->isAdmin ||
                 ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1))
-                && $A['postmode'] == 'html') {
+                && $this->postmode == 'html') {
             $postmode = '2';      //html
         } else {
             $postmode = '1';            //plaintext
@@ -998,32 +1063,6 @@ class Event
             $endminute1 = $startminute1;
         }
 
-        if ($this->recurring != '1') {
-            $T->set_var(array(
-                'recurring_show'    => ' style="display:none;"',
-                'format_opt'        => '0',
-            ) );
-            //for ($i = 1; $i <= 6; $i++) {
-            //    $T->set_var('format' . $i . 'show', ' style="display:none;"');
-            //}
-        } else {
-            $rec_type = (int)$this->rec_data['type'];
-            $T->set_var(array(
-                'recurring_show' => '',
-                'recurring_checked' => EVCHECKED,
-                'format_opt'    => $rec_type,
-            ) );
-        }
-
-        if (isset($this->rec_data['stop']) &&
-                    !empty($this->rec_data['stop'])) {
-            $T->set_var(array(
-                'stopdate'      => $this->rec_data['stop'],
-                'd_stopdate'    =>
-                            EVLIST_formattedDate($this->rec_data['stop']),
-            ) );
-        }
-
         // Skip weekends. Default to "no" if not already set for this event
         $skip = empty($this->rec_data['skip']) ? 0 : $this->rec_data['skip'];
 
@@ -1034,53 +1073,19 @@ class Event
             $freq = 1;
         }
         $T->set_var(array(
-            'freq_text' => $LANG_EVLIST['rec_periods'][$this->rec_data['type']],
+            'freq_text' => $LANG_EVLIST['rec_periods'][$rec_type],
             'rec_freq'  => $freq,
             "skipnext{$skip}_checked" => EVCHECKED,
         ) );
 
         foreach ($LANG_EVLIST['rec_intervals'] as $key=>$str) {
             $T->set_var('dom_int_txt_' . $key, $str);
-            if (is_array($this->rec_data['interval'])) {
+            if (isset($this->rec_data['interval']) &&
+                    is_array($this->rec_data['interval'])) {
                 if (in_array($key, $this->rec_data['interval'])) {
                     $T->set_var('dom_int_chk_'.$key, EVCHECKED);
                 }
             }
-        }
-
-        // Set up the recurring options needed for the current event
-        switch ($rec_type) {
-        case 0:
-            // Not a recurring event
-            break;
-        case EV_RECUR_MONTHLY:
-            if (is_array($this->rec_data['listdays'])) {
-                foreach ($this->rec_data['listdays'] as $mday) {
-                    $T->set_var('mdchk'.$mday, EVCHECKED);
-                }
-            }
-            break;
-        case EV_RECUR_WEEKLY:
-            $T->set_var('listdays_val', COM_stripslashes($rec_data[0]));
-            if (is_array($this->rec_data['listdays']) &&
-                    !empty($this->rec_data['listdays'])) {
-                foreach($this->rec_data['listdays'] as $day) {
-                    $day = (int)$day;
-                    if ($day > 0 && $day < 8) {
-                        $T->set_var('daychk'.$day, EVCHECKED);
-                    }
-                }
-            }
-            break;
-        case EV_RECUR_DOM:
-            $recweekday = $this->rec_data['weekday'];
-            break;
-        case EV_RECUR_DATES:
-            $T->set_var(array(
-                'stopshow'      => 'style="display:none;"',
-                'custom_val' => implode(',', $this->rec_data['custom']),
-            ) );
-            break;
         }
 
         $start1 = EVLIST_TimeSelect('start1', $this->time_start1);
@@ -1177,7 +1182,11 @@ class Event
                 // Check enabled tickets. Ticket type 1 enabled by default
                 if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
                     $checked = 'checked="checked"';
-                    $fee = (float)$this->options['tickets'][$tick_id]['fee'];
+                    if (isset($this->options['tickets'])) {
+                        $fee = (float)$this->options['tickets'][$tick_id]['fee'];
+                    } else {
+                        $fee = 0;
+                    }
                 } else {
                     $checked = '';
                     $fee = 0;
@@ -1256,6 +1265,7 @@ class Event
                 FROM {$_TABLES['evlist_categories']} tc
                 WHERE tc.status='1' ORDER BY tc.name");
             $T->set_block('editor', 'catSelect', 'catSel');
+            $catlist = '';
             while ($A = DB_fetchArray($cresult, false)) {
                 if (isset($_POST['categories']) && is_array($_POST['categories'])) {
                     // Coming from a form re-entry

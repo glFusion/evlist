@@ -21,6 +21,7 @@ class evMeetup
 {
     var $key;
     var $params;
+    private static $tag = 'evlist_meetup';
 
     /**
     *   Constructor
@@ -79,22 +80,29 @@ class evMeetup
 
         // cache_minutes is already sanitized as an intgeger
         if ($key != '') $this->key = $key;
-        $key = DB_escapeString($this->key);
-        $sql = "SELECT * FROM {$_TABLES['evlist_cache']} WHERE
-                type = '$key' AND
-                ts > NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE";
-        //echo $sql;die;
-        $res = DB_query($sql);
-        if ($res && DB_numRows($res) == 1) {
-            $A = DB_fetchArray($res, false);
+        if (GVERSION >= '1.8.0') {
+            $A = Cache::getCache($this->key, 'evlist_meetup');
+            if (!empty($A)) {
+                return $A;
+            }
         } else {
-            $A = array();
-        }
+            $key = DB_escapeString($this->key);
+            $sql = "SELECT * FROM {$_TABLES['evlist_cache']} WHERE
+                    type = '$key' AND
+                    ts > NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE";
+            //echo $sql;die;
+            $res = DB_query($sql);
+            if ($res && DB_numRows($res) == 1) {
+                $A = DB_fetchArray($res, false);
+            } else {
+                $A = array();
+            }
 
-        if (!empty($A)) {
-            // Got current cache data, return it
-            $events = @json_decode($A['data']);
-            return $events;
+            if (!empty($A)) {
+                // Got current cache data, return it
+                $events = @json_decode($A['data']);
+                return $events;
+            }
         }
 
         // Try to get new data from the provider
@@ -154,21 +162,24 @@ class evMeetup
     {
         global $_TABLES, $_EV_CONF;
 
-        $db_data = DB_escapeString(json_encode($data));
-        $key = DB_escapeString($this->key);
+        if (GVERSION < '1.8.0') {
+            $db_data = DB_escapeString(json_encode($data));
+            $key = DB_escapeString($this->key);
 
-        // Delete any stale entries and the current location to be replaced
-        // cache_minutes is already sanitized as an intgeger
-        DB_query("DELETE FROM {$_TABLES['evlist_cache']}
-            WHERE ts < NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE");
+            // Delete any stale entries and the current location to be replaced
+            // cache_minutes is already sanitized as an intgeger
+            DB_query("DELETE FROM {$_TABLES['evlist_cache']}
+                WHERE ts < NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE");
 
-        // Insert the new record to be cached
-        DB_query("INSERT INTO {$_TABLES['evlist_cache']}
-                (type, data)
-            VALUES
-                ('$key', '$db_data')");
-
-    }   // function updateCache()
+            // Insert the new record to be cached
+            DB_query("INSERT INTO {$_TABLES['evlist_cache']}
+                    (type, data)
+                VALUES
+                    ('$key', '$db_data')");
+        } else {
+            Cache::setCache($this->key, $data, self::$tag);
+        }
+    }
 
 }   // class evMeetup
 

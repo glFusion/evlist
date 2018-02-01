@@ -575,24 +575,34 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         }
     }
 
-    // overloading the previously-boolean enable_centerblock option to
-    // indicate the centerblock format.
-    switch ($_EV_CONF['enable_centerblock']) {
-    case 1:     // table format
-    case 2:     // story format
-        $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
-        break;
-    case 3:     // calendar format
-        $view = Evlist\View::getView('month');
-        $display = $view->Render();
-        break;
-    case 0:     // disabled
-    default:
-        return '';
+    $display = '';
+    if (GVERSION >= '1.8.0') {
+        $c = glFusion\Cache::getInstance();
+        $key = 'evlistcb__'.$_EV_CONF['enable_centerblock'] . '_' .$c->securityHash(true,true);
+        if ( $c->has($key)) $display = $c->get($key);
     }
-
-    if ($where == 0) {      // replacing home page
-        $display = EVLIST_siteHeader() . $display . EVLIST_siteFooter();
+    if (empty($display)) {  // not found in cache
+        // overloading the previously-boolean enable_centerblock option to
+        // indicate the centerblock format.
+        switch ($_EV_CONF['enable_centerblock']) {
+        case 1:     // table format
+        case 2:     // story format
+            $display = EVLIST_cb_content($_EV_CONF['enable_centerblock']);
+            break;
+        case 3:     // calendar format
+            $view = Evlist\View::getView('month');
+            $display = $view->Render();
+            break;
+        case 0:     // disabled
+            default:
+            $display = '';
+        }
+        $c->set($key,$display,array('evlist','evlistcb'));
+    }
+    if (!empty($display)) {
+        if ($where == 0) {      // replacing home page
+            $display = EVLIST_siteHeader() . $display . EVLIST_siteFooter();
+        }
     }
     return $display;
 }
@@ -721,10 +731,10 @@ function EVLIST_cb_content($format)
 
             $s_ts1 = strtotime($A['rp_date_start'].' '.$A['rp_time_start1']);
             $e_ts1= strtotime($A['rp_date_end'].' '.$A['rp_time_end1']);
-            $email = EVLIST_obfuscate($A['email']);
+            $email = isset($A['email']) ? EVLIST_obfuscate($A['email']) : '';
             $cssid = ($cssid ==1) ? 2: 1;
 
-            if ($A['postmode'] != 'plaintext') {
+            if (isset($A['postmode']) && $A['postmode'] != 'plaintext') {
                 $full_desc = PLG_replaceTags($A['full_description']);
             } else {
                 $full_desc = $A['full_description'];
@@ -738,21 +748,21 @@ function EVLIST_cb_content($format)
                 'title'     => $A['title'],
                 'summary'   => $summary,
                 'full_description' => $full_desc,
-                'contact'   => $A['contact'],
-                'location'  => $A['location'],
+                'contact'   => isset($A['contact']) ? $A['contact'] : '',
+                'location'  => isset($A['location']) ? $A['location'] : '',
                 'ev_url'    => isset($A['url']) ? $A['url'] : '',
-                'street'    => $A['street'],
-                'city'      => $A['city'],
-                'province'  => $A['province'],
-                'country'   => $A['country'],
+                'street'    => isset($A['street']) ? $A['street'] : '',
+                'city'      => isset($A['city']) ? $A['city'] : '',
+                'province'  => isset($A['province']) ? $A['province'] : '',
+                'country'   => isset($A['country']) ? $A['country'] : '',
                 'email'     => $email,
-                'phone'     => $A['phone'],
+                'phone'     => isset($A['phone']) ? $A['phone'] : '',
                 'startdate' => EVLIST_formattedDate($s_ts1),
                 'enddate'   => EVLIST_formattedDate($e_ts1),
                 'starttime1' => EVLIST_formattedTime($s_ts1),
                 'endtime1'  => EVLIST_formattedTime($e_ts1),
             ) );
-            if ($A['split'] == 1) {
+            if (isset($A['split']) && $A['split'] == 1) {
                 $s_ts2 = strtotime($A['rp_date_start'] . ' ' . $A['rp_time_start2']);
                 $e_ts2= strtotime($A['rp_date_end'] . ' ' . $A['rp_time_end2']);
                 $T->set_var(array(
@@ -1259,10 +1269,10 @@ function evlist_hit($eid)
 *   Get the links to categories related to a specific event
 *
 *   @param  string  $eid    Event ID
-*   @param  string  @andrange   Range to pass wo url TODO: required?
+*   @param  string  $andrange   Range to pass wo url TODO: required?
 *   @return string      HTML for category inls
 */
-function EVLIST_getCatLinks($eid, $andrange)
+function EVLIST_getCatLinks($eid, $andrange = '')
 {
     global $_TABLES, $_CONF;
 
@@ -1452,7 +1462,6 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     $count = 0;
     $rp_shown = array();    // Store repeat ids to avoid dups
     foreach ($events as $ev_dt=>$daydata) {
-
         // Get each event by day into $daydata, then each event for the
         // day goes into $ev
         $startdate = EVLIST_formattedDate(strtotime($ev_dt));
@@ -2307,37 +2316,43 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 {
     global $_EV_CONF, $_USER;
 
-    $events = array();
-    $sql = EVLIST_getEvents_sql($start, $end, $opts);
-    $result = DB_query($sql, 1);
 
-    if (!$result || DB_error())
-        return $events;
+    $key = $start . '-' . $end . @serialize($opts);
+    $key = md5($key);
+    $events = Evlist\Cache::getCache($key, 'evlist_events');
 
-    USES_lglib_class_datecalc();
-
-    while ($A = DB_fetchArray($result, false)) {
-        // Set a valid foreground and background color
-        if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
-        if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
-        //if ($A['tzid'] == 'local') $A['tzid'] = $_USER['tzid'];
-        if ($A['rp_date_start'] == $A['rp_date_end']) {
-            // Single-day event just gets added to the array
-            $events[$A['rp_date_start']][] = $A;
-        } else {
-            // Multi-day events get a record for each day up to the event end
-            // or limit, whichever comes first
-            $end_date = min($A['rp_date_end'], $end);
-            $newdate = max($A['rp_date_start'], $start);
-            while ($newdate <= $end_date) {
-                if (!isset($events[$newdate]))
-                    $events[$newdate] = array();
-                $events[$newdate][] = $A;
-                list($y, $m, $d) = explode('-', $newdate);
-                $newdate = Date_Calc::nextDay($d, $m, $y, '%Y-%m-%d');
-            }
+    if (is_null($events)) {     // not found in cache, read from DB
+        $events = array();
+        $sql = EVLIST_getEvents_sql($start, $end, $opts);
+        $result = DB_query($sql, 1);
+        if ($result && !DB_error()) {
+            USES_lglib_class_datecalc();
+            while ($A = DB_fetchArray($result, false)) {
+                $events[$A['rp_date_start']] = array();
+                // Set a valid foreground and background color
+                if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
+                if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
+                if ($A['rp_date_start'] == $A['rp_date_end']) {
+                    // Single-day event just gets added to the array
+                    $events[$A['rp_date_start']][] = $A;
+                } else {
+                    // Multi-day events get a record for each day up to the event end
+                    // or limit, whichever comes first
+                    $end_date = min($A['rp_date_end'], $end);
+                    $newdate = max($A['rp_date_start'], $start);
+                    while ($newdate <= $end_date) {
+                        if (!isset($events[$newdate]))
+                            $events[$newdate] = array();
+                        $events[$newdate][] = $A;
+                        list($y, $m, $d) = explode('-', $newdate);
+                        $newdate = Date_Calc::nextDay($d, $m, $y, '%Y-%m-%d');
+                    }
+                }
+            }   // while
         }
-    }   // while
+
+        Evlist\Cache::setCache($key, $events, 'evlist_events');
+    }
 
     // Now, get Meetup events
     if ($_EV_CONF['meetup_enabled']) {

@@ -32,6 +32,8 @@ class Cache
     {
         global $_EV_CONF;
 
+        if (GVERSION < '1.8.0') return NULL;
+
         $cache_mins = (int)$_EV_CONF['meetup_cache_minutes'];
         if ($cache_mins < 10) $cache_mins = 30;
         if ($tag == '')
@@ -48,9 +50,15 @@ class Cache
     *   Completely clear the cache.
     *   Called after upgrade.
     */
-    public static function clearCache()
+    public static function clearCache($tag = '')
     {
-        \glFusion\Cache::getInstance()->deleteItemsByTag(self::$tag);
+        if (GVERSION < '1.8.0') return NULL;
+        $tags = array(self::$tag);
+        if (!empty($tag)) {
+            if (!is_array($tag)) $tag = array($tag);
+            $tags = array_merge($tags, $tag);
+        }
+        \glFusion\Cache::getInstance()->deleteItemsByTagsAll($tags);
     }
 
 
@@ -59,10 +67,9 @@ class Cache
     *
     *   @return string          Encoded key string to use as a cache ID
     */
-    private static function _makeKey($key, $tag='')
+    private static function _makeKey($key)
     {
-        if ($tag == '') $tag = self::$tag;
-        return $tag[0] . '_' . $key;
+        return self::$tag . '_' . $key;
     }
 
     
@@ -70,8 +77,9 @@ class Cache
     {
         global $_EV_CONF;
 
+        if (GVERSION < '1.8.0') return NULL;
         $key = self::_makeKey($key);
-        if (GVERSION < '1.8.0') {
+        if (GVERSION < '1.8.0' && $tag == 'evlist_meetup') {
             $retval = array();
             $cache_mins = (int)$_EV_CONF['meetup_cache_minutes'];
             if ($cache_mins < 10) $cache_mins = 30;

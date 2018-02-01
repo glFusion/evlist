@@ -109,7 +109,7 @@ function EVLIST_adminHeader($page)
                               COM_getBlockTemplate('_admin_block', 'header'));
     $retval .= ADMIN_createMenu(
         $menu_arr,
-        $LANG_EVLIST['admin_instr'][$page],
+        isset($LANG_EVLIST['admin_instr'][$page]) ? $LANG_EVLIST['admin_instr'][$page] : '',
         plugin_geticon_evlist()
     );
     $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
@@ -365,6 +365,7 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
+    $retval = '';
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
@@ -518,6 +519,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
     static $del_icon = NULL;
+    $retval = '';
 
     switch($fieldname) {
         case 'edit':
@@ -535,7 +537,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             $retval = '<a href="' . EVLIST_URL . 
                 '/event.php?clone=x&amp;eid=' . $A['id'] . 
                 '" title="' . $LANG_EVLIST['copy'] . '">';
-            if ($_EV_CONF['is_uikid']) {
+            if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-clone"></i>';
             } else {
                 $retval .= $icon_arr['copy'];
@@ -666,6 +668,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
+    $retval = '';
     switch($fieldname) {
         case 'edit':
             $retval = '<a href="' . EVLIST_ADMIN_URL . 
@@ -686,7 +689,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
                 $switch = '';
                 $enabled = 0;
             }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\" 
+            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\" 
                 id=\"togenabled{$A['cal_id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
                 '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
@@ -867,6 +870,7 @@ $expected = array(
     'tickets',
 );
 $action = 'view';
+$actionval = '';
 $view = '';
 foreach($expected as $provided) {
     if (isset($_POST[$provided])) {

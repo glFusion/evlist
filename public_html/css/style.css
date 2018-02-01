@@ -732,3 +732,8 @@ div.evPrtDataItem div.evdata {
     height: inherit;
   }
 }
+
+.ev-social {
+    clear: both;
+    margin-bottom: 5px;
+}

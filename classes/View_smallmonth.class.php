@@ -96,7 +96,7 @@ class View_smallmonth extends View
                         // Show event titles on different lines if more than one
                         if (!empty($popup)) $popup .= self::tooltip_newline();
                         // Don't show a time for all-day events
-                        if ($event['allday'] == 0 &&
+                        if (!isset($event['allday']) || $event['allday'] == 0 &&
                             $event['rp_date_start'] == $event['rp_date_end']) {
                             $dt = new \Date($event['rp_date_start'] . ' ' . $event['rp_time_start1'], $tz);
                             // Time is a localized string, not a timestamp, so

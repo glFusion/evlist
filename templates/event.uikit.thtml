@@ -72,7 +72,7 @@
         <i title="{$LANG_ADMIN['delete']}" class="{iconset}-trash-o ev-icon-danger tooltip"></i>
       </a>
       {!endif}
-      <a href="{pi_url}/event.php?clone=x&eid={ev_id}">
+      <a href="{pi_url}/event.php?clone=x&eid={ev_id}&rp_id={rp_id}">
         <i title="{$LANG_ADMIN['copy']}" class="{iconset}-files-o ev-icon-info tooltip"></i>
       </a>
     {!endif}

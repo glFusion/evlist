@@ -32,7 +32,7 @@
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
 *   @version    1.4.5
 *   @license    http://opensource.org/licenses/gpl-2.0.php
@@ -52,7 +52,7 @@ if (!defined ('GVERSION')) {
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
 $_EV_CONF['pi_version']      = '1.4.5';
-$_EV_CONF['gl_version']      = '1.6.0';
+$_EV_CONF['gl_version']      = '1.7.0';
 $_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 
 

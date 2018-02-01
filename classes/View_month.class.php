@@ -45,7 +45,7 @@ class View_month extends View
     */
     public function Content()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH;
+        global $_CONF, $_EV_CONF, $LANG_MONTH, $_USER;
 
         $retval = '';
 
@@ -131,6 +131,8 @@ class View_month extends View
                 foreach ($events[$daydata] as $event) {
 
                     if (empty($event['title'])) continue;
+                    if (!isset($event['allday'])) $event['allday'] = 0;
+                    if (!isset($event['split'])) $event['split'] = 0;
                     $ev_hover = '';
                     $ev_title = COM_truncate($event['title'], 40, '...');
 
@@ -177,8 +179,8 @@ class View_month extends View
                     }
                     $T->set_var(array(
                         'cal_id'    => $event['cal_id'],
-                        'cal_id_url' => $cal_id,    // calendar requested
-                        'cat_id'    => $cat,
+                        'cal_id_url' => $event['cal_id'],    // calendar requested
+                        'cat_id'    => $this->cat,
                         'ev_hover'  => $ev_hover,
                         'ev_title'  => $ev_title,
                         'eid'       => $event['rp_id'],

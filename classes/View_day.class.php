@@ -51,10 +51,11 @@ class View_day extends View
         $today = new \Date($today_sql);
         $dtPrev = new \Date($today->toUnix() - 86400);
         $dtNext = new \Date($today->toUnix() + 86400);
-        $monthname = $LANG_MONTH[$today->month];
+        $monthname = $LANG_MONTH[$this->month];
         $dayofweek = $today->dayofweek;
         if ($dayofweek == 7) $dayofweek = 0;
         $dayname = $LANG_WEEK[$dayofweek + 1];
+        $token = SEC_createToken(); // for image deletion links
 
         $tpl = $this->getTemplate();
         $T = new \Template(EVLIST_PI_PATH . '/templates/dayview');
@@ -109,7 +110,8 @@ class View_day extends View
             $link = date($_CONF['timeonly'], mktime($i, 0));
             if (EVLIST_canSubmit()) {
                 $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
-                        $month . '&amp;day=' . $day . '&amp;year=' . $year .
+                        $today->month . '&amp;day=' . $today->day .
+                        '&amp;year=' . $today->year .
                         '&amp;hour=' . $i . '">' . $link . '</a>';
             }
             $T->set_var ($i . '_hour',$link);
@@ -187,23 +189,24 @@ class View_day extends View
             $link = date($_CONF['timeonly'], mktime($i, 0));
             if (EVLIST_canSubmit()) {
                 $link = '<a href="' . EVLIST_URL . '/event.php?edit=x&amp;month=' .
-                        $month . '&amp;day=' . $day . '&amp;year=' . $year .
+                        $today->month . '&amp;day=' . $today->day .
+                        '&amp;year=' . $today->year .
                         '&amp;hour=' . $i . '">' . $link . '</a>';
             }
             $T->parse ($i . '_cols', 'column', true);
         }
         $T->set_var(array(
-            'month'         => $month,
-            'day'           => $day,
-            'year'          => $year,
+            'month'         => $today->month,
+            'day'           => $today->day,
+            'year'          => $today->year,
             'prevmonth'     => $dtPrev->format('n', false),
             'prevday'       => $dtPrev->format('j', false),
             'prevyear'      => $dtPrev->format('Y', false),
             'nextmonth'     => $dtNext->format('n', false),
             'nextday'       => $dtNext->format('j', false),
             'nextyear'      => $dtNext->format('Y', false),
-            'urlfilt_cal'   => $cal,
-            'urlfilt_cat'   => $cat,
+            'urlfilt_cal'   => $this->cal,
+            'urlfilt_cat'   => $this->cat,
             'cal_header'    => $this->Header(),
             'cal_footer'    => $this->Footer(),
             'pi_url'        => EVLIST_URL,
@@ -306,12 +309,12 @@ class View_day extends View
                         // know that the start and end times are on the same day.
                         //$starthour = date('G', strtotime($A['rp_date_start'] .
                         //                ' ' . $A['rp_time_start2']));
-                        $dtStart->setTimestamp(strtotime($event['rp_date_start'] .
-                                ' ' . $event['rp_time_start2']));
+                        $dtStart->setTimestamp(strtotime($A['rp_date_start'] .
+                                ' ' . $A['rp_time_start2']));
                         $starthour = $dtStart->format('G', false);
                         $time_start = $dtStart->format($_CONF['timeonly'], false);
-                        $dtEnd->setTimestamp(strtotime($event['rp_date_start'] .
-                                ' ' . $event['rp_time_end2']));
+                        $dtEnd->setTimestamp(strtotime($A['rp_date_start'] .
+                                ' ' . $A['rp_time_end2']));
                         $time_end = $dtEnd->format($_CONF['timeonly'], false);
                         $hourlydata[(int)$starthour][] = array(
                             'starthour' => $starthour,

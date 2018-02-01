@@ -81,20 +81,17 @@ class Recur
     *   @paam   integer $y  current year
     *   @return array           array of (scheduled, actual) dates
     */
-    private function GetNextDate($d, $m, $y)
+    private function getNextDate($d, $m, $y)
     {
         $newdate = array();
-
         $newdate[0] = $this->incrementDate($d, $m, $y);
-        $newdate[1] = $newdate[0];      // normally, scheduled = actual
-
         if ($this->skip > 0) {
             $newdate[1] = $this->SkipWeekend($newdate[0]);
+        } else {
+            $newdate[1] = $newdate[0];      // normally, scheduled = actual
         }
-
         return $newdate;
-
-    }   // function GetNextDate()
+    }
 
 
     /**
@@ -156,13 +153,13 @@ class Recur
             $this->storeEvent($occurrence[1]);
             $count++;
 
-            $occurrence = $this->GetNextDate($day, $month, $year);
+            $occurrence = $this->getNextDate($day, $month, $year);
             while ($occurrence[1] === NULL) {
                 if ($occurrence === NULL) {
                     break 2;
                 }
                 list($year, $month, $day) = explode('-', $occurrence[0]);
-                $occurrence = $this->GetNextDate($day, $month, $year);
+                $occurrence = $this->getNextDate($day, $month, $year);
             }
             list($year, $month, $day) = explode('-', $occurrence[0]);
         }

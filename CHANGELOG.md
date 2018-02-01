@@ -1,6 +1,7 @@
 # evList plugin for glFusion - Changelog
 ## v1.4.5
 Unreleased
+- E_ALL fixes
 - Fix centerblock calendar
 - Fix paging in list view
 - Fix upcoming selection where end date has not passed

@@ -28,6 +28,7 @@ class View
     protected $day;         // Day of display
     protected $cat;         // Category to display
     protected $cal;         // Calendar to display
+    protected $opts;        // Misc. options
     protected $cal_used;    // Array of calendars used in display
     protected $range;       // Range selector (past, future, etc)
     protected $today;       // Holder for today's date
@@ -110,7 +111,7 @@ class View
         $this->day = (int)$day;
         $this->cat = (int)$cat;
         $this->cal = (int)$cal;
-        $this->opt = is_array($opts) ? $opts : array();
+        $this->opts = is_array($opts) ? $opts : array();
         $this->setSession();
     }
 
@@ -183,7 +184,6 @@ class View
         } else {
             $add_event_link = '';
         }
-
         $T->set_var(array(
             'pi_url'    => EVLIST_URL,
             'year'      => $this->year,
@@ -198,8 +198,8 @@ class View
             'event_type_select' => $type_options,
             'range_options' => $range_options,
             'action_url'    => EVLIST_URL . '/index.php',
-            'view'      => $this->view,
-            'curdate'   => sprintf("%d-%02d-%02d", $year, $month, $day),
+            //'view'      => $this->view,
+            'curdate'   => sprintf("%d-%02d-%02d", $this->year, $this->month, $this->day),
             'urlfilt_cal' => (int)$this->cal,
             'urlfilt_cat' => (int)$this->cat,
             'use_json' => 'true',

@@ -113,7 +113,7 @@ class View_list extends View
             //return empty list msg
             $T->set_var(array(
                 'title' => '',
-                'block_title' => $block_title,
+                //'block_title' => $block_title,
                 'empty_listmsg' => $LANG_EVLIST['no_match'],
             ) );
         } else {
@@ -138,7 +138,7 @@ class View_list extends View
                     // events, new window for meetup events
                     if ($A['cal_id'] > 0) {
                         $url = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
-                            $A['rp_id'] . $timestamp . $andrange . $andcat);
+                            $A['rp_id'] . $andcat);
                         $url_attr = array();
                     } elseif (!empty($A['url'])) {
                         // This is a meetup event with a URL
@@ -158,30 +158,29 @@ class View_list extends View
                     $datesummary = sprintf($LANG_EVLIST['event_begins'],
                         $d->format($_CONF['date'], true));
                     $morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
-                        $A['rp_id'] . $andrange . $andcat);
+                        $A['rp_id'] . $andcat);
                     $morelink = '<a href="' . $morelink . '">' .
                         $LANG_EVLIST['read_more'] . '</a>';
-
+                    $contactlink = '';
                     if (empty($A['email'])) {
-                        $contactlink = $_CONF['site_url'] . '/profiles.php?uid=' .
-                            $A['owner_id'];
+                        if (isset($A['owner_id'])) {
+                            $contactlink = $_CONF['site_url'] . '/profiles.php?uid=' .
+                                $A['owner_id'];
+                        }
                     } else {
                         $contactlink = 'mailto:' .
                                 EVLIST_obfuscate($A['email']);
                     }
-                    $contactlink = '<a href="' . $contactlink . '">' .
-                        $LANG_EVLIST['ev_contact'] . '</a>';
-
                     $T->set_var(array(
                         'title' => $titlelink,
                         'date_summary' => $datesummary,
                         'summary' => $summary,
                         'more_link' => $morelink,
                         'contact_link' => $contactlink,
-                        'contact_name' => $A['contact'],
-                        'owner_name' => COM_getDisplayName($A['owner_id']),
-                        'block_title' => $block_title,
-                        'category_links' => EVLIST_getCatLinks($A['ev_id'], $andrange),
+                        'contact_name' => isset($A['contact']) ? $A['contact'] : '',
+                        'owner_name' => isset($A['owner_id']) ? COM_getDisplayName($A['owner_id']) : '',
+                        //'block_title' => $block_title,
+                        'category_links' => isset($A['ev_id']) ? EVLIST_getCatLinks($A['ev_id']) : '',
                         'cal_id' => $A['cal_id'],
                         'cal_name' => $A['cal_name'],
                         'cal_fgcolor' => $A['fgcolor'],

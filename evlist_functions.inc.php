@@ -522,10 +522,9 @@ function EVLIST_adminRSVP($rp_id)
         'sql'       => $sql,
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_getField_rsvp',
+    return ADMIN_list('evlist', 'EVLIST_getField_rsvp',
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 '', '', $options_arr);
-    return $retval;
 }
 
 
@@ -571,7 +570,7 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
     case 'used':
         if ($fieldvalue > 0) {
             $d = new Date($fieldvalue);
-            $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeformat'], false);
+            $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
         } else {
             $retval = '';
         }

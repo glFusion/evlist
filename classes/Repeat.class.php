@@ -433,6 +433,10 @@ class Repeat
         $this->dtEnd1 = $this->date_end . ' ' . $this->time_end1;
         $date_start = $this->dtStart1->format($_CONF['dateonly'], $this->use_tz);
         $date_end = $this->dtEnd1->format($_CONF['dateonly'], $this->use_tz);
+        $time_start1 = '';
+        $time_end1 = '';
+        $time_start2 = '';
+        $time_end2 = '';
         if ($date_end == $date_start) $date_end = '';
         if ($this->Event->allday == '1') {
             $allday = '<br />' . $LANG_EVLIST['all_day_event'];
@@ -441,9 +445,6 @@ class Repeat
             if ($this->time_start1 != '') {
                 $time_start1 = $this->dtStart1->format($_CONF['timeonly'], $this->use_tz);
                 $time_end1 =  $this->dtEnd1->format($_CONF['timeonly'], $this->use_tz);
-            } else {
-                $time_start1 = '';
-                $time_end1 = '';
             }
             //$time_period = $time_start . $time_end;
             if ($this->Event->split == '1') {
@@ -451,9 +452,6 @@ class Repeat
                 $this->dtEnd2 = $this->date_start . ' ' . $this->time_end2;
                 $time_start2 = $this->dtStart2->format($_CONF['timeonly'], $this->use_tz);
                 $time_end2 = $this->dtEnd2->format($_CONF['timeonly'], $this->use_tz);
-            } else {
-                $time_start2 = '';
-                $time_end2 = '';
             }
         }
 
@@ -1124,7 +1122,7 @@ class Repeat
     *   @param  integer $rp_id  Repeat ID
     *   @return array       Array of occurrences
     */
-    public static function GetRepeats($ev_id, $rp_id=0)
+    public static function getRepeats($ev_id, $rp_id=0)
     {
         global $_TABLES;
 

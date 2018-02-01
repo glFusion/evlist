@@ -6,7 +6,10 @@
     <h1>{title}</h1>
     <p>{summary}</p>
     {date_summary}<br />
-    {more_link} | {contact_link}
+    {more_link}
+{!if contact_link}
+ | <a href="{contact_link}">{$LANG_EVLIST['ev_contact']}</a>
+{!endif}
     {edit_links}<br />
     <div class="clearboth"></div>
 </div>

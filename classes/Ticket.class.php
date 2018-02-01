@@ -3,9 +3,9 @@
 *   Class to manage tickets and registrations
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015-2016 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2015-2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.1
+*   @version    1.4.5
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -164,7 +164,7 @@ class Ticket
     *   @param  integer $uid    Optional User ID, default = current user
     *   @return     string  Ticket identifier
     */
-    public function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0)
+    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0)
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
@@ -248,13 +248,10 @@ class Ticket
     *
     *   @param  integer $id     ID of ticket to delete
     */
-    public function Delete($id='')
+    public static function Delete($id='')
     {
         global $_TABLES;
 
-        if ($id == '' && is_object($this)) {
-            $id = $this->tic_id;
-        }
         if (is_array($id)) {
             foreach ($id as $idx=>$tic_id) {
                 $id[$idx] = DB_escapeString($tic_id);
@@ -307,7 +304,7 @@ class Ticket
     *   @param  string  $paid       'paid', 'unpaid', or empty for all
     *   @return array       Array of Ticket objects, indexed by ID
     */
-    public static function GetTickets($ev_id, $rp_id = 0, $uid = 0, $paid='')
+    public static function getTickets($ev_id, $rp_id = 0, $uid = 0, $paid='')
     {
         global $_TABLES;
 
@@ -373,7 +370,7 @@ class Ticket
         $checkin_url = $_CONF['site_admin_url'] . '/plugins/evlist/checkin.php?tic=';
 
         // get the tickets, paid and unpaid. Need event id and uid.
-        $tickets = self::GetTickets($ev_id, $rp_id, $uid);
+        $tickets = self::getTickets($ev_id, $rp_id, $uid);
 
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
@@ -415,8 +412,8 @@ class Ticket
 
             // Get the repeat(s) for the ticket(s) to print a ticket for each
             // occurrence.
-            $repeats = Repeat::GetRepeats($ticket->ev_id, $ticket->rp_id);
-            if (empty($repeats)) return;
+            $repeats = Repeat::getRepeats($ticket->ev_id, $ticket->rp_id);
+            if (empty($repeats)) continue;
 
             foreach ($repeats as $rp_id => $event) {
                 $counter++;
@@ -527,8 +524,9 @@ class Ticket
             return $retval;
         }
 
-        // get the tickets, paid and unpaid. Need event id and uid.
-        $tickets = self::GetTickets($ev_id, $rp_id, $uid);
+        // get the tickets, paid and unpaid.
+        // $uid = 0 to export all
+        $tickets = self::getTickets($Rp->ev_id, $rp_id, 0);
 
         $header = array(
             $LANG_EVLIST['ticket_num'],

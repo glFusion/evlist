@@ -124,7 +124,7 @@ class View_week extends View
             $T->set_block('week', 'eventBlock', 'eBlk');
             foreach ($events[$weekData] as $A) {
                 $tz = $A['tzid'] == 'local' ? $_USER['tzid'] : $A['tzid'];
-                if ($A['allday'] == 1 ||
+                if (isset($A['allday']) && $A['allday'] == 1 ||
                         ($A['rp_date_start'] < $weekData &&
                         $A['rp_date_end'] > $weekData)) {
                     $event_time = $LANG_EVLIST['allday'];
@@ -145,7 +145,7 @@ class View_week extends View
                     $event_time = $starttime . ' - ' . $endtime;
                     if ($A['tzid'] != 'local') $event_time .= ' ( ' . $s_dt->format('T',true) . ')';
 
-                    if ($A['split'] == 1 && !empty($A['rp_time_start2'])) {
+                    if (isset($A['split']) && $A['split'] == 1 && !empty($A['rp_time_start2'])) {
                         $s_dt2 = new \Date($weekData . ' ' . $A['rp_time_start2'], $tz);
                         $e_dt2 = new \Date($weekData . ' ' . $A['rp_time_end2'], $tz);
                         $starttime2 = $s_dt2->format($_CONF['timeonly'], true);
@@ -157,7 +157,7 @@ class View_week extends View
                     $this->cal_used[$A['cal_id']] = array(
                         'cal_name' => $A['cal_name'],
                         'cal_ena_ical' => $A['cal_ena_ical'],
-                        'cal_id' => $event['cal_id'],
+                        'cal_id' => $A['cal_id'],
                         'fgcolor' => $A['fgcolor'],
                         'bgcolor' => $A['bgcolor'],
                     );
@@ -169,7 +169,7 @@ class View_week extends View
                     'event_summary' => htmlspecialchars($A['summary']),
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
-                    'delete_imagelink' => EVLIST_deleteImageLink($A, $token),
+                    'delete_imagelink' => EVLIST_deleteImageLink($A, SEC_createToken()),
                     //'event_title_and_link' => $eventlink,
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],

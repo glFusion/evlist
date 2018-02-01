@@ -177,7 +177,7 @@ class Detail
         $result = DB_query("SELECT * 
                     FROM {$_TABLES['evlist_detail']} 
                     WHERE det_id='{$this->det_id}'");
-        if (!$result || DB_numRows($result != 1)) {
+        if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
             $row = DB_fetchArray($result, false);

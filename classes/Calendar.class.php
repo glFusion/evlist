@@ -210,8 +210,7 @@ class Calendar
         ) );
 
         $T->parse('output','modify');
-        $display .= $T->finish($T->get_var('output'));
-        return $display;
+        return $T->finish($T->get_var('output'));
     }
 
 

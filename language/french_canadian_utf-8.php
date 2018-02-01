@@ -381,6 +381,21 @@ $LANG_EVLIST = array(
 'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
 );
 
+$LANG_EVLIST_HELP = array(
+'calendar' => 'Select the calendar where this event will appear. Calendars can be included or excluded from views and feeds.',
+'ev_title' => 'Enter the title for this event. This text will appear in most calendars as a hover link to the event summary.',
+'ev_summary' => 'Enter a fairly short description of the event. This will appear on the event display, and also when a user hovers the mouse over the event title in calendar views.',
+'ev_dscp' => 'Enter an optional detailed description of this event. This text appears only on the event detail page.',
+'ev_url' => 'Enter an optional URL for the event, such as a link to a site article or an external web page.',
+'ev_enabled' => 'Check this box to enable the event. Events can be temporarily hidden from view without deleting them.',
+'ena_reminders' => 'If this box is checked, users can enter an email address to have a reminder sent to them a number of days before the event.',
+'sel_categories' => 'Categories are optional and a way to relate events together. Select one or more existing categories by checking their checkboxes, or create a new category by entering some text in the provided field.',
+'split' => 'Check this box if the event is split into two times each day, e.g. 9:00am - 11:00am and 1:00pm - 4:00pm. If this box is checked, additional fields will appear where you can enter the starting and ending times for the second session.',
+'startdt' => 'Enter the start date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the starting time by using the dropdown selections.',
+'enddt' => 'Enter the ending date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the ending time by using the dropdown selections.',
+'timezone' => 'If the &quot;local timezone&quot; checkbox is unchecked, you can select a timezone for this event which will be displayed next to the date/time information. If the local timezone is checked then no timezone will be shown; this is the same as previous versions of evList.',
+);
+
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";
 $PLG_evlist_MESSAGE2         = "Vous\pleines déjà signé pour Cet événement. ";
 $PLG_evlist_MESSAGE3         = 'Cet événement est plein. ';

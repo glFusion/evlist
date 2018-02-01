@@ -315,7 +315,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="cal_id">
           {$LANG_EVLIST['calendar']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_calendar', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['calendar']}"></i>
         </label>
         <div class="uk-form-controls">
         {!if cal_name}
@@ -331,7 +331,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="title">
           {$LANG_EVLIST['event_title']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_title']}"></i>
         </label>
         <div class="uk-form-controls">
           <input required type="text" name="title" class="required"
@@ -343,8 +343,8 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row">
         <label class="uk-form-label" for="summary">
-            {$LANG_EVLIST['event_summary']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_summary', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          {$LANG_EVLIST['event_summary']}:
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_summary']}"></i>
         </label>
         <div class="uk-form-controls">
           <textarea name="summary" id="summary"
@@ -355,7 +355,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="description">
           {$LANG_EVLIST['full_desc']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_dscp']}"></i>
         </label>
         <div class="uk-form-controls">
           <textarea name="full_description" id="description" class="uk-form-width-large" style="width:100%"
@@ -378,7 +378,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row">
         <label class="uk-form-label" for="url">{$LANG_EVLIST['url']}:
-        <a href="#" onclick="popupWindow('{doc_url}#desc_url', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_url']}"></i>
         </label>
         <div class="uk-form-controls">
           <input type="text" name="url" id="url" style="width:50%"
@@ -388,7 +388,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row">
         <label class="uk-form-label" for="status">{$LANG_EVLIST['enabled']}
-        <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_enabled']}"></i>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" name="status" value="1" id="status" {status_checked} />
@@ -398,8 +398,8 @@ function toggleRSVPdetail(val)
       {!if enable_reminders}
       <div class="uk-form-row">
         <label class="uk-form-label" for="enable_reminders">
-            {$LANG_EVLIST['enable_reminders_q']}
-          <a href="#" onclick="popupWindow('{doc_url}#desc_reminders', 'Help', 640, 480, 1);return false;" class="toolbar"><img src="{layout_url}/images/button_help.png" alt="{$LANG_EVLIST['clk_help']}" /></a>
+          {$LANG_EVLIST['enable_reminders_q']}
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ena_reminders']}"></i>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} />
@@ -409,7 +409,9 @@ function toggleRSVPdetail(val)
 
       {!if commentsupport}
       <div class="uk-form-row">
-        <label for="enable_comments" class="uk-form-label">{$LANG_EVLIST['enable_comments']}</label>
+        <label for="enable_comments" class="uk-form-label">{$LANG_EVLIST['enable_comments']}
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ena_comments']}"></i>
+        </label>
         <div class="uk-form-controls">
           <select name="enable_comments">
             <option value="0" {ena_cmt_0}>{$LANG_EVLIST['yes']}</option>
@@ -424,14 +426,17 @@ function toggleRSVPdetail(val)
 
     {!if category_section}
     <fieldset class="evForm">
-      <legend>{$LANG_EVLIST['categories']}</legend>
+      <legend>{$LANG_EVLIST['categories']}
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['sel_categories']}"></i>
+      </legend>
       <span><strong>{$LANG_EVLIST['add_to_cats']}</strong>.</span>
       <br />
       {$LANG_EVLIST['cat_note1']}<br />
       <span class="evFieldNote">{$LANG_EVLIST['cats_not_req']}</span>
       <br />
       <div class="uk-form-row">
-        <label class="uk-form-label">{$LANG_EVLIST['sel_category']}</label>
+        <label class="uk-form-label">{$LANG_EVLIST['sel_category']}
+        </label>
         <div class="uk-form-controls">
           <select multiple name="categories[]">
         <!-- BEGIN catSelect -->
@@ -456,7 +461,7 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_startdate1">
           {$LANG_EVLIST['start_date']}:
-          <span id="date_start" class="tooltip_cfg tooltipstered"></span>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['startdt']}"></i>
         </label>
         <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="startdt1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
@@ -482,7 +487,7 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_enddate1">
           {$LANG_EVLIST['end_date']}:
-          <span id="date_end" class="tooltip_cfg tooltipstered"></span>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['enddt']}"></i>
         </label>
         <div class="uk-form-controls">
           <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
@@ -506,7 +511,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row" id="timezone">
         <label for="tzid" class="uk-form-label">{$LANG_EVLIST['timezone']}:
-          <span id="tz" class="tooltip_cfg tooltipstered"></span>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['timezone']}"></i>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" id="tz_local" name="tz_local" onclick="showhide_tzselect(this)" {tz_islocal}>&nbsp;{$LANG_EVLIST['tz_local']}<br />
@@ -516,7 +521,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
-          <span id="split_doc" class="tooltip_cfg tooltipstered"></span>
+          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['split']}"></i>
           <input type="checkbox" name="split" value="1"
                 id="split" {split_checked} onclick="showhideallday()" />
           &nbsp;&nbsp;

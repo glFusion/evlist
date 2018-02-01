@@ -79,6 +79,7 @@ $expected = array('edit', 'cancel',
     'view',
 );
 $action = 'view';
+$actionval = '';
 $view = '';
 foreach($expected as $provided) {
     if (isset($_POST[$provided])) {
@@ -114,6 +115,7 @@ $cat_id = isset($_GET['cat']) ? $_GET['cat'] : '';
 
 $pagetitle = '';        // Default to empty page title
 $template = '';         // Use the default template if none provided
+$content = '';
 
 // Get the system message, if any.  There should only be a message if our
 // next action is a view, since an action might override the message value.
@@ -211,7 +213,7 @@ case 'delrepeat':
             (int)$_REQUEST['rp_id'] : 0;
     if ($rp_id > 0) {
         $R = new Evlist\Repeat($rp_id);
-        if ($R->Event->canEdit()) {
+        if ($R->Event && $R->Event->canEdit()) {
             $R->Delete();
         }
     }
@@ -330,6 +332,7 @@ case 'edit':
 
 case 'clone':
     if (isset($_GET['eid'])) {
+        EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
         $Ev = new Evlist\Event($_GET['eid']);
         if ($Ev->id == '' || !$Ev->canEdit())      // Event not found
             break;
@@ -348,6 +351,8 @@ case 'none':
 case 'home':
     if (!empty($msg)) {
         $msg_url = "?msg=$msg";
+    } else {
+        $msg_url = '';
     }
     echo COM_refresh(EVLIST_URL . '/index.php' . $msg_url);
     exit;

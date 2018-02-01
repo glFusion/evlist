@@ -115,8 +115,8 @@ if (empty($month))
 if (empty($day))
     $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
 
-EVLIST_setReturn($view);
-
+EVLIST_setReturn(EVLIST_URL . '/index.php?view=' . $view);
+$content = '';
 switch ($view) {
 case 'pday':
 case 'pweek':
@@ -185,7 +185,7 @@ default:
     break;
 }
 
-$display = EVLIST_siteHeader($LANG_EVLIST['pi_name']);
+$display = EVLIST_siteHeader($LANG_EVLIST['pi_title']);
 if (!empty($msg)) {
     //msg block
     $display .= COM_startBlock('','','blockheader-message.thtml');

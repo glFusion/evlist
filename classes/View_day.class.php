@@ -128,7 +128,6 @@ class View_day extends View
                 $A = current($hourevents);
                 $tz = $A['data']['tzid'] == 'local' ? $_USER['tzid'] : $A['data']['tzid'];
                 $s_dt = new \Date($A['data']['rp_date_start'] . ' ' . $A['data']['rp_time_start1'], $tz);
-                $e_dt = new \Date($A['data']['rp_date_end'] . ' ' . $A['data']['rp_time_end1'], $tz);
 
                 if (isset($A['data']['cal_id'])) {
                     $this->cal_used[$A['data']['cal_id']] = array(
@@ -145,14 +144,8 @@ class View_day extends View
                 } else {
                     $start_time = '';
                 }
-                $start_time .= $s_dt->format($_CONF['timeonly'], true);
-
-                if ($e_dt->format('Y-m-d', true) != $today->format('Y-m-d', true)) {
-                    $end_time = $e_dt->format($_CONF['shortdate']) . ' @ ';
-                } else {
-                    $end_time = '';
-                }
-                $end_time .= $e_dt->format($_CONF['timeonly'], true);
+                $start_time .= $A['time_start'];
+                $end_time = $A['time_end'];
 
                 // Show the timezone abbr. if not "user local"
                 if ($A['data']['tzid'] != 'local') $end_time .= ' (' . $e_dt->format('T', true) . ')';
@@ -277,19 +270,11 @@ class View_day extends View
                         $hr = '23';;
                         $min = $tm_tmp[1];
                         $A['rp_times_end1'] = implode(':', array($hr, $min, '00'));
-                    //} else {
-                    //    $endhour = date('G', strtotime($A['rp_date_end'] .
-                    //                    ' ' . $A['rp_time_end1']));
                     }
                     $dtStart = new \Date(strtotime($A['rp_date_start'] .
                                     ' ' . $A['rp_time_start1']));
                     $dtEnd = new \Date(strtotime($A['rp_date_end'] .
                                     ' ' . $A['rp_time_end1']));
-
-                    //if (date('i', strtotime($A['rp_date_end'] . ' ' .
-                    //            $A['rp_time_end1'])) == '00') {
-                    //    $endhour = $endhour - 1;
-                    //}
 
                     // Save the start & end times in separate variables.
                     // This way we can add $A to a different hour if it's a split.
@@ -326,7 +311,6 @@ class View_day extends View
                             'time_end'   => $time_end,
                             'data'       => $A,
                         );
-
                     }
                 }
             }

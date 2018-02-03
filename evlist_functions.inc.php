@@ -266,6 +266,8 @@ function EVLIST_deleteImageLink($A, $token)
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST;
 
     $retval = '';
+    if ($A['cal_name'] == 'meetup') return '';
+
     if (plugin_ismoderator_evlist() ||
         SEC_hasAccess($A['owner_id'], $A['group_id'], $A['perm_owner'],
                 $A['perm_group'], $A['perm_members'], $A['perm_anon']) == 3) {

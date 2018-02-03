@@ -251,9 +251,10 @@ class View_day extends View
                 unset($A['rec_data']);
                 unset($A['options']);
 
-                if ($A['allday'] == 1 ||
+                if ($A['cal_name'] != 'meetup' &&
+                    ( $A['allday'] == 1 ||
                     ( ($A['rp_date_start'] < $this->today_sql) &&
-                    ($A['rp_date_end'] > $this->today_sql) )
+                    ($A['rp_date_end'] > $this->today_sql) ) )
                 ) {
                     // This is an allday event, or spans days
                     $alldaydata[] = $A;
@@ -262,17 +263,20 @@ class View_day extends View
                     // events, see if it actually starts before or after today
                     // and adjust the times accordingly.
                     if ($A['rp_date_start'] < $this->today_sql) {
-                        list($hr, $min, $sec) = explode(':', $A['rp_time_start1']);
+                        $tm_tmp = explode(':', $A['rp_time_start1']);
+                        $hr = $tm_tmp[0];
+                        $min = $tm_tmp[1];
                         $hr = '00';
-                        $A['rp_times_start1'] = implode(':', array($hr, $min, $sec));
+                        $A['rp_times_start1'] = implode(':', array($hr, $min, '00'));
                     //} else {
                     //    $starthour = date('G', strtotime($A['rp_date_start'] .
                     //                    ' ' . $A['rp_time_start^1']));
                     }
                     if ($A['rp_date_end'] > $this->today_sql) {
-                        list($hr, $min, $sec) = explode(':', $A['rp_time_end1']);
-                        $hr = '23';
-                        $A['rp_times_end1'] = implode(':', array($hr, $min, $sec));
+                        $tm_tmp = explode(':', $A['rp_time_end1']);
+                        $hr = '23';;
+                        $min = $tm_tmp[1];
+                        $A['rp_times_end1'] = implode(':', array($hr, $min, '00'));
                     //} else {
                     //    $endhour = date('G', strtotime($A['rp_date_end'] .
                     //                    ' ' . $A['rp_time_end1']));
@@ -302,7 +306,7 @@ class View_day extends View
                         'data'       => $A,
                     );
 
-                    if ($A['split'] == 1 &&
+                    if (isset($A['split']) && $A['split'] == 1 &&
                         $A['rp_time_end2'] > $A['rp_time_start2']) {
                         // This is a split event, second half occurs later today.
                         // Events spanning multiple days can't be split, so we

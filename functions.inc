@@ -579,7 +579,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     if (GVERSION >= '1.8.0') {
         $c = glFusion\Cache::getInstance();
         $key = 'evlistcb__'.$_EV_CONF['enable_centerblock'] . '_' .$c->securityHash(true,true);
-        if ( $c->has($key)) $display = $c->get($key);
+        if ($c->has($key)) $display = $c->get($key);
     }
     if (empty($display)) {  // not found in cache
         // overloading the previously-boolean enable_centerblock option to
@@ -597,7 +597,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
             default:
             $display = '';
         }
-        $c->set($key,$display,array('evlist','evlistcb'));
+        $c->set($key, $display, array('evlist','evlistcb'));
     }
     if (!empty($display)) {
         if ($where == 0) {      // replacing home page
@@ -2350,7 +2350,6 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 }
             }   // while
         }
-
         Evlist\Cache::setCache($key, $events, 'evlist_events');
     }
 
@@ -2382,7 +2381,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
     if (isset($opts['cat']) && $opts['cat'] > 0) return array();
 
     // Create a unique key for the query for cache identification
-    $key = $start . '-' . $end . @serialize($opts);
+    $key = $start . '-' . $end;
     $key = md5($key);
     $M = new Evlist\evMeetup($key);
     $Mevents = $M->getEvents($start, $end);

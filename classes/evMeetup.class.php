@@ -72,23 +72,21 @@ class evMeetup
     *
     *   @return array   Array of event information
     */
-    public function getEvents($start='', $end='', $key='')
+    public function getEvents($start='', $end='')
     {
         global $_TABLES, $_EV_CONF, $_CONF;
 
         $events = array();
-
-        // cache_minutes is already sanitized as an intgeger
-        if ($key != '') $this->key = $key;
         if (GVERSION >= '1.8.0') {
-            $A = Cache::getCache($this->key, 'evlist_meetup');
-            if (!empty($A)) {
+            $key = self::$tag . '_' . md5($start.'_'.$end);
+            $A = Cache::getCache($key);
+            if ($A !== NULL) {
                 return $A;
             }
         } else {
             $key = DB_escapeString($this->key);
             $sql = "SELECT * FROM {$_TABLES['evlist_cache']} WHERE
-                    type = '$key' AND
+                    type = 'meetup' AND
                     ts > NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE";
             //echo $sql;die;
             $res = DB_query($sql);
@@ -139,7 +137,7 @@ class evMeetup
                     if (!isset($events[$dt])) $events[$dt] = array();
                     $events[$dt][] = $event;
                 }
-                $this->updateCache($events);
+                $this->updateCache($key, $events);
             }
         }
         catch(\Exception $e) {
@@ -158,7 +156,7 @@ class evMeetup
     *
     *   @param  mixed   $data   Data, typically an array
     */
-    public function updateCache($data)
+    public function updateCache($key, $data)
     {
         global $_TABLES, $_EV_CONF;
 
@@ -177,7 +175,7 @@ class evMeetup
                 VALUES
                     ('$key', '$db_data')");
         } else {
-            Cache::setCache($this->key, $data, self::$tag);
+            Cache::setCache($key, $data, self::$tag);
         }
     }
 

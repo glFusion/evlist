@@ -302,6 +302,7 @@ function evlist_upgrade()
     }
 
     CTL_clearCache();
+    Evlist\Cache::clearCache();
     COM_errorLog("Successfully updated the {$_EV_CONF['pi_display_name']} Plugin", 1);
     return true;
 }

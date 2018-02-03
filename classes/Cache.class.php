@@ -34,31 +34,36 @@ class Cache
 
         if (GVERSION < '1.8.0') return NULL;
 
-        $cache_mins = (int)$_EV_CONF['meetup_cache_minutes'];
-        if ($cache_mins < 10) $cache_mins = 30;
+        $cache_secs = (int)$_EV_CONF['meetup_cache_minutes'] * 60;
+        if ($cache_secs < 600) $cache_secs = 1800;
         if ($tag == '')
             $tag = array(self::$tag);
         else
             $tag = array($tag, self::$tag);
         $key = self::_makeKey($key, $tag);
-        \glFusion\Cache::getInstance()
-            ->set($key, $data, $tag, $cache_mins * 60);
+        \glFusion\Cache::getInstance()->set($key, $data, $tag, $cache_secs);
     }
 
 
     /**
     *   Completely clear the cache.
     *   Called after upgrade.
+    *   Entries matching all tags, including default tag, are removed.
+    *
+    *   @param  mixed   $tag    Single or array of tags
     */
     public static function clearCache($tag = '')
     {
-        if (GVERSION < '1.8.0') return NULL;
-        $tags = array(self::$tag);
-        if (!empty($tag)) {
-            if (!is_array($tag)) $tag = array($tag);
-            $tags = array_merge($tags, $tag);
+        if (GVERSION < '1.8.0') {
+            DB_query("TRUNCATE {$_TABLES['evlist_cache']}");
+        } else {
+            $tags = array(self::$tag);
+            if (!empty($tag)) {
+                if (!is_array($tag)) $tag = array($tag);
+                $tags = array_merge($tags, $tag);
+            }
+            \glFusion\Cache::getInstance()->deleteItemsByTagsAll($tags);
         }
-        \glFusion\Cache::getInstance()->deleteItemsByTagsAll($tags);
     }
 
 
@@ -77,8 +82,6 @@ class Cache
     {
         global $_EV_CONF;
 
-        if (GVERSION < '1.8.0') return NULL;
-        $key = self::_makeKey($key);
         if (GVERSION < '1.8.0' && $tag == 'evlist_meetup') {
             $retval = array();
             $cache_mins = (int)$_EV_CONF['meetup_cache_minutes'];
@@ -101,8 +104,12 @@ class Cache
             }
             return $retval;
         } else {
-            return \glFusion\Cache::getInstance()
-                ->get(self::_makeKey($key, $tag));
+            $key = self::_makeKey($key, $tag);
+            if (\glFusion\Cache::getInstance()->has($key)) {
+                return \glFusion\Cache::getInstance()->get($key);
+            } else {
+                return NULL;
+            }
         }
     }
 

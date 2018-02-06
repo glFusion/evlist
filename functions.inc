@@ -172,6 +172,7 @@ function plugin_autouninstall_evlist()
         'php_blocks' => array('phpblock_evlist_upcoming',
                         'phpblock_evlist_smallmonth'),
     );
+    Evlist\Cache::clearCache();
     return $out;
 }
 

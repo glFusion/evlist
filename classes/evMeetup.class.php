@@ -77,7 +77,7 @@ class evMeetup
         global $_TABLES, $_EV_CONF, $_CONF;
 
         $events = array();
-        if (GVERSION >= '1.8.0') {
+        if (version_compare(GVERSION, '1.8.0', '>=')) {
             $key = self::$tag . '_' . md5($start.'_'.$end);
             $A = Cache::getCache($key);
             if ($A !== NULL) {
@@ -160,7 +160,7 @@ class evMeetup
     {
         global $_TABLES, $_EV_CONF;
 
-        if (GVERSION < '1.8.0') {
+        if (version_compare(GVERSION, '1.8.0', '<')) {
             $db_data = DB_escapeString(json_encode($data));
             $key = DB_escapeString($this->key);
 

@@ -32,7 +32,7 @@ class Cache
     {
         global $_EV_CONF;
 
-        if (GVERSION < '1.8.0') return NULL;
+        if (version_compare(GVERSION, '1.8.0', '<')) return NULL;
 
         $cache_secs = (int)$_EV_CONF['meetup_cache_minutes'] * 60;
         if ($cache_secs < 600) $cache_secs = 1800;
@@ -54,7 +54,7 @@ class Cache
     */
     public static function clearCache($tag = '')
     {
-        if (GVERSION < '1.8.0') {
+        if (version_compare(GVERSION, '1.8.0', '<')) {
             DB_query("TRUNCATE {$_TABLES['evlist_cache']}");
         } else {
             $tags = array(self::$tag);
@@ -82,7 +82,7 @@ class Cache
     {
         global $_EV_CONF;
 
-        if (GVERSION < '1.8.0' && $tag == 'evlist_meetup') {
+        if (version_compare(GVERSION, '1.8.0', '<') && $tag == 'evlist_meetup') {
             $retval = array();
             $cache_mins = (int)$_EV_CONF['meetup_cache_minutes'];
             if ($cache_mins < 10) $cache_mins = 30;

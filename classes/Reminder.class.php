@@ -282,9 +282,8 @@ class Reminder
         if ($this->Repeat->rp_id < 1) {
             return;
         }
-
         // Load the user's language
-        if (!isset(self::$langs[$R->uid])) {
+        if (!isset(self::$langs[$this->uid])) {
             self::$langs[$this->uid] = DB_getItem($_TABLES['users'], 'language',
                     "uid = '{$this->uid}'");
         }
@@ -295,7 +294,7 @@ class Reminder
         $summary = COM_stripslashes($this->Repeat->Event->summary);
         $date_start = $this->Repeat->dtStart1->format($_CONF['dateonly']);
         $event_url = EVLIST_URL . '/event.php?eid=' . $this->rp_id;
-        if ($A['allday'] == 1) {
+        if ($this->Repeat->Event->allday == 1) {
             $times = $LANG['allday'];
         } else {
             $times = EVLIST_formattedTime($this->Repeat->time_start1) . ' - ' .

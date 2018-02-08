@@ -35,6 +35,8 @@
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
+global $_EV_CONF;
+global $_CONF;
 
 $LANG_EVLIST = array(
 'pi_title'          => 'Calendario de Eventos',

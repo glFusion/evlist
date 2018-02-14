@@ -577,7 +577,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     }
 
     $display = '';
-    if (version_compare(GVERSION, '1.8.0', '>=') {
+    if (version_compare(GVERSION, '1.8.0', '>=')) {
         $c = glFusion\Cache::getInstance();
         $key = 'evlistcb__'.$_EV_CONF['enable_centerblock'] . '_' .$c->securityHash(true,true);
         if ($c->has($key)) $display = $c->get($key);

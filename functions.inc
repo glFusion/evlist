@@ -577,7 +577,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
     }
 
     $display = '';
-    if (GVERSION >= '1.8.0') {
+    if (version_compare(GVERSION, '1.8.0', '>=') {
         $c = glFusion\Cache::getInstance();
         $key = 'evlistcb__'.$_EV_CONF['enable_centerblock'] . '_' .$c->securityHash(true,true);
         if ($c->has($key)) $display = $c->get($key);
@@ -2318,13 +2318,12 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     global $_EV_CONF, $_USER;
 
 
-    $key = $start . '-' . $end . @serialize($opts);
-    $key = md5($key);
+    $sql = EVLIST_getEvents_sql($start, $end, $opts);
+    $key = md5($sql);
     $events = Evlist\Cache::getCache($key, 'evlist_events');
 
     if (is_null($events)) {     // not found in cache, read from DB
         $events = array();
-        $sql = EVLIST_getEvents_sql($start, $end, $opts);
         $result = DB_query($sql, 1);
         if ($result && !DB_error()) {
             USES_lglib_class_datecalc();

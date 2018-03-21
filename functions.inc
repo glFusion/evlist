@@ -172,7 +172,7 @@ function plugin_autouninstall_evlist()
         'php_blocks' => array('phpblock_evlist_upcoming',
                         'phpblock_evlist_smallmonth'),
     );
-    Evlist\Cache::clearCache();
+    Evlist\Cache::clear();
     return $out;
 }
 
@@ -2320,7 +2320,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 
     $sql = EVLIST_getEvents_sql($start, $end, $opts);
     $key = md5($sql);
-    $events = Evlist\Cache::getCache($key, 'evlist_events');
+    $events = Evlist\Cache::get($key, 'evlist_events');
 
     if (is_null($events)) {     // not found in cache, read from DB
         $events = array();
@@ -2350,13 +2350,14 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 }
             }   // while
         }
-        Evlist\Cache::setCache($key, $events, 'evlist_events');
+        Evlist\Cache::set($key, $events, 'evlist_events');
     }
 
     // Now, get Meetup events
     if ($_EV_CONF['meetup_enabled']) {
         EVLIST_getMeetupEvents($start, $end, $opts, $events);
     }
+    EVLIST_getBirthdays($start, $end, $events);
     return $events;
 }
 
@@ -2566,6 +2567,57 @@ function EVLIST_getIcon($name, $style='info')
     if ($style != '')
         $style = ' ev-icon-' . $style;
     return $_EV_CONF['_iconset'] . '-' . $name . $style;
+}
+
+
+/**
+*   Get member birthdays if the Birthdays plugin is enabled.
+*
+*   @param  string  $start      Start date
+*   @param  string  $end        Ending date
+*   @param  array   &$events    Events array to update
+*/
+function EVLIST_getBirthdays($start, $end, &$events)
+{
+    global $_CONF, $_EV_CONF, $LANG_EVLIST;
+
+    if (!$_EV_CONF['show_birthdays']) return;
+
+    $status = LGLIB_invokeService('birthdays', 'getBirthdays',
+            array('start' => $start, 'end' => $end), $birthdays, $svc_msg);
+    // in case of error, do nothing
+    if ($status != PLG_RET_OK || empty($birthdays)) return;
+
+    foreach ($birthdays as $ev_date=>$uids) {
+        if ($ev_date < $start || $ev_date > $end) continue;
+        foreach ($uids as $uid) {
+            $dscp = COM_getDisplayName($uid);
+            if (!isset($events[$ev_date])) $events[$ev_date] = array();
+            $events[$ev_date][] = array(
+                'cal_name' => 'birthdays',
+                'cal_ena_ical' => 0,
+                'cal_id' => -2,
+                'rp_id' => '',
+                'rp_ev_id' => '',
+                'rp_date_start' => $ev_date,
+                'rp_date_end' => $ev_date,
+                'rp_time_start1' => '',
+                'rp_time_end1' => '',
+                'title' => $dscp,
+                'summary' => $dscp,
+                'full_description' => sprintf($LANG_EVLIST['hover_birthday'], $dscp),
+                'url' => '',
+                'show_upcoming' => 0,
+                'fgcolor' => 'inherit',
+                'bgcolor' => 'inherit',
+                'tzid' => $_CONF['timezone'],
+                'allday' => 1,
+            );
+        }
+    }
+    if (!empty($birthdays)) {
+        ksort($events);
+    }
 }
 
 

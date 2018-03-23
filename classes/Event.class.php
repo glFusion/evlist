@@ -151,14 +151,24 @@ class Event
                 // Load the Detail object.  May need to load a special one
                 // if we're editing a repeat instance.
                 if ($detail > 0 && $detail != $this->det_id) {
-                    $this->Detail = new Detail($detail);
+                    $this->Detail = Detail::getInstance($detail);
                 } else {
                     // Normal, load our own detail object
-                    $this->Detail = new Detail($this->det_id);
+                    $this->Detail = Detail::getInstance($this->det_id);
                 }
             }
         }
         $this->isAdmin = plugin_isadmin_evlist();
+    }
+
+
+    public static function getInstance($ev_id)
+    {
+        static $records = array();
+        if (!array_key_exists($ev_id, $records)) {
+            $records[$ev_id] = new self($ev_id);
+        }
+        return $records[$ev_id];
     }
 
 
@@ -501,9 +511,9 @@ class Event
             $this->MakeRecData();
         }
 
-        if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
+        /*if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
             $this->isNew = false;
-        }
+        }*/
 
         // Authorized to bypass the queue
         if ($this->isAdmin || plugin_ismoderator_evlist()) {
@@ -692,7 +702,7 @@ class Event
         if (empty($this->Errors)) {
             if ($this->table = 'evlist_events') {
                 PLG_itemSaved($this->id, 'evlist');
-                Cache::clearCache();
+                Cache::clear();
             }
             return '';
         } else {
@@ -1172,6 +1182,7 @@ class Event
                         $this->tzid == 'local' ? $_CONF['timezone'] : $this->tzid,
                         array('id' => 'tzid', 'name' => 'tzid')),
             'tz_islocal'    => $this->tzid == 'local' ? EVCHECKED : '',
+            'isNew'         => (int)$this->isNew,
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {

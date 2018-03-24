@@ -1,7 +1,4 @@
 {# begin {templatelocation} #}
-<script type="text/javascript" 
-    src="{site_url}/evlist/js/colorpicker.js">
-</script>
 <script type="text/javascript">
 <!--
 {!if mootools}
@@ -63,14 +60,10 @@ $(document).ready(function() {
         <label for="fld_fgcolor">{$LANG_EVLIST['foreground']}: </label>
         <input name="fgcolor" type="text" id="fld_fgcolor" size="7" maxlength="7" 
             value="{fgcolor}" style="background:{fgcolor}" /> 
-        <span onclick="openPicker('fld_fgcolor')">
-          <img src="{site_url}/evlist/images/colors.png">
         </span>
         <label for="bgcolor">{$LANG_EVLIST['background']}: </label>
         <input name="bgcolor" type="text" id="fld_bgcolor" size="7" maxlength="7" 
             value="{bgcolor}" style="background:{bgcolor}" /> 
-        <span onclick="openPicker('fld_bgcolor')">
-          <img src="{site_url}/evlist/images/colors.png" />
         </span>
       </div>
     </div>
@@ -133,4 +126,5 @@ $(document).ready(function() {
   <button type="reset" class="uk-button uk-button-primary" name="cancel" value="{$LANG_ADMIN['cancel']}"
       onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
 </form>
-{# begin {templatelocation} #}
+{colorpicker}
+{# end {templatelocation} #}

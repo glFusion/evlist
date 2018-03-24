@@ -224,6 +224,13 @@ class Calendar
             'can_delete'    => $this->cal_id > 1 ? 'true' : '',
             'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
             'help_url' => LGLIB_getDocUrl('calendar', 'evlist'),
+            'colorpicker' => LGLIB_colorpicker(array(
+                    'fg_id'     => 'fld_fgcolor',
+                    'fg_color'  => $this->fgcolor,
+                    'bg_id'     => 'fld_bgcolor',
+                    'bg_color'  => $this->bgcolor,
+                    'sample_id' => 'sample',
+                )),
         ) );
 
         $T->parse('output','modify');

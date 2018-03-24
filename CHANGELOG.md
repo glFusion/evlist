@@ -1,6 +1,9 @@
 # evList plugin for glFusion - Changelog
 ## v1.4.5
 Unreleased
+- Use the common colorpicker from LGLIB
+- Integration with the Birthdays plugin
+- Fix error when re-editing a new event due to an error
 - E_ALL fixes
 - Fix centerblock calendar
 - Fix paging in list view

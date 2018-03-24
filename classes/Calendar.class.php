@@ -45,10 +45,27 @@ class Calendar
         $this->cal_status   = 1;
         $this->cal_ena_ical = 1;
 
-        if ($this->cal_id > 0) {
+        if ($this->cal_id != 0) {
             if ($this->Read())
                 $this->isNew = false;
         }
+    }
+
+
+    /**
+    *   Get an instance of a calendar.
+    *   Saves objects in a static variable to minimize DB lookups
+    *
+    *   @param  integer $cal_id Calendar ID
+    *   @return object          Calendar object
+    */
+    public static function getInstance($cal_id)
+    {
+        static $cals = array();
+        if (!array_key_exists($cal_id, $cals)) {
+            $cals[$cal_id] = new self($cal_id);
+        }
+        return $cals[$cal_id];
     }
 
 
@@ -61,7 +78,7 @@ class Calendar
     {
         global $_TABLES;
 
-        if ($cal_id > 0)
+        if ($cal_id != 0)
             $this->cal_id = $cal_id;
 
         $sql = "SELECT *
@@ -226,7 +243,7 @@ class Calendar
         if (is_array($A) && !empty($A))
             $this->SetVars($A);
 
-        if ($this->cal_id > 0) {
+        if ($this->cal_id != 0) {
             $this->isNew = false;
         } else {
             $this->isNew = true;
@@ -282,7 +299,7 @@ class Calendar
         }
 
         $newcal = (int)$newcal;
-        if ($newcal > 0) {
+        if ($newcal != 0) {
             // Make sure the new calendar exists
             if (DB_count($_TABLES['evlist_calendars'], 'cal_id', $newcal) != 1) {
             return false;

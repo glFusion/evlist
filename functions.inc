@@ -202,11 +202,11 @@ function plugin_upgrade_evlist()
 */
 function plugin_cclabel_evlist()
 {
-    global $_EV_CONF;
+    global $LANG_EVLIST;
 
     if (plugin_isadmin_evlist()) {
         return array(
-                $_EV_CONF['pi_name'],
+                $LANG_EVLIST['pi_title'],
                 EVLIST_ADMIN_URL . '/index.php',
                 plugin_geticon_evlist(),
         );
@@ -994,7 +994,7 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 *   Run scheduled tasks for the plugin.
 *   - Send event reminders
 */
-function plugin_runScheduledTask_evlist()
+function Xplugin_runScheduledTask_evlist()
 {
     if (!EVLIST_isCurrentVersion()) return;
 
@@ -2386,6 +2386,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
     $key = md5($key);
     $M = new Evlist\evMeetup($key);
     $Mevents = $M->getEvents($start, $end);
+    $Cal = Evlist\Calendar::getInstance(-1);
     foreach ($Mevents as $ev_date=>$ev_events) {
         foreach ($ev_events as $event) {
             // Format the meetup.com date information into the expected layout
@@ -2402,7 +2403,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
             $events[$ev_date][] = array(
                 'cal_name' => 'meetup',
                 'cal_ena_ical' => 0,
-                'cal_id' => -1,
+                'cal_id' => $Cal->cal_id,
                 'rp_id' => $event->id,
                 'rp_ev_id' => $event->id,
                 'rp_date_start' => $ev_date,
@@ -2414,8 +2415,8 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
                 'full_description' => $event->description,
                 'url' => $event->event_url,
                 'show_upcoming' => 1,   // force to be shown in upcoming block
-                'fgcolor' => 'inherit',
-                'bgcolor' => 'inherit',
+                'fgcolor' => $Cal->fgcolor,
+                'bgcolor' => $Cal->bgcolor,
                 'tzid' => $event->timezone,
             );
         }
@@ -2588,6 +2589,8 @@ function EVLIST_getBirthdays($start, $end, &$events)
     // in case of error, do nothing
     if ($status != PLG_RET_OK || empty($birthdays)) return;
 
+    $Cal = \Evlist\Calendar::getInstance(-2);
+
     foreach ($birthdays as $ev_date=>$uids) {
         if ($ev_date < $start || $ev_date > $end) continue;
         foreach ($uids as $uid) {
@@ -2596,7 +2599,7 @@ function EVLIST_getBirthdays($start, $end, &$events)
             $events[$ev_date][] = array(
                 'cal_name' => 'birthdays',
                 'cal_ena_ical' => 0,
-                'cal_id' => -2,
+                'cal_id' => $Cal->cal_id,
                 'rp_id' => '',
                 'rp_ev_id' => '',
                 'rp_date_start' => $ev_date,
@@ -2608,8 +2611,8 @@ function EVLIST_getBirthdays($start, $end, &$events)
                 'full_description' => sprintf($LANG_EVLIST['hover_birthday'], $dscp),
                 'url' => '',
                 'show_upcoming' => 0,
-                'fgcolor' => 'inherit',
-                'bgcolor' => 'inherit',
+                'fgcolor' => $Cal->fgcolor,
+                'bgcolor' => $Cal->bgcolor,
                 'tzid' => $_CONF['timezone'],
                 'allday' => 1,
             );

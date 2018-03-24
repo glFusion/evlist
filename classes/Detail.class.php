@@ -76,6 +76,16 @@ class Detail
     }
 
 
+    public static function getInstance($det_id)
+    {
+        static $records = array();
+        if (!array_key_exists($det_id, $records)) {
+            $records[$det_id] = new self($det_id);
+        }
+        return $records[$det_id];
+    }
+
+
     /**
     *   Set a property's value.
     *

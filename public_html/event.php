@@ -192,9 +192,9 @@ case 'saveevent':
     } else {
         $view = 'home';
         if ($Ev->table == 'evlist_submissions') {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][9]);
+            COM_setMsg($LANG_EVLIST['messages'][9]);
         } else {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
+            COM_setMsg($LANG_EVLIST['messages'][2]);
         }
     }
     break;
@@ -238,8 +238,6 @@ case 'register':
     }
     $Ev = new Evlist\Repeat($rp_id);
     $msg = $Ev->Register($_POST['tick_count'], $_POST['tick_type']);
-    //if ($msg == 0) $msg = 24;   // Set "success" message.
-    //LGLIB_storeMessage($LANG_EVLIST['messages'][$msg]);
     echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;
 
@@ -252,14 +250,14 @@ case 'cancelreg':
     $status = $Ev->CancelRegistration(0, $_POST['num_cancel']);
     if ($status) {
         // success
-        LGLIB_storeMessage($LANG_EVLIST['messages'][25]);
+        COM_setMsg($LANG_EVLIST['messages'][25]);
         // See if there are any other ticket and let the user know
         $cnt = $Ev->isRegistered();
         if ($cnt > 0) {
-            LGLIB_storeMessage(sprintf($LANG_EVLIST['messages'][28], $cnt));
+            COM_setMsg(sprintf($LANG_EVLIST['messages'][28], $cnt));
         }
     } else {
-        LGLIB_storeMessage($LANG_EVLIST['messages'][23]);
+        COM_setMsg($LANG_EVLIST['messages'][23]);
     }
     echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;

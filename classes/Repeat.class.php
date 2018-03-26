@@ -853,7 +853,7 @@ class Repeat
         // registering another user, don't check access
         if ($this->Event->options['use_rsvp'] == 0 ||
             ($uid == 0 && !$this->Event->hasAccess(2))) {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][20]);
+            COM_setMsg($LANG_EVLIST['messages'][20]);
             return 20;
         } elseif ($this->Event->options['use_rsvp'] == 1) {
             // Registering for entire event, all repeats
@@ -864,7 +864,7 @@ class Repeat
         }
 
         if (!isset($this->Event->options['tickets'][$tick_type])) {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][24]);
+            COM_setMsg($LANG_EVLIST['messages'][24]);
             return 24;
         }
 
@@ -885,7 +885,7 @@ class Repeat
                 $this->Event->options['max_rsvp'] < $new_total) {
             if ($this->Event->options['rsvp_waitlist'] == 0 || $fee > 0) {
                 // Event is full, no waiting list. Can't waitlist paid tickets.
-                LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
+                COM_setMsg($LANG_EVLIST['messages'][22]);
                 return 22;
             } else {
                 // Set message indicating the waiting list and continue to register
@@ -896,7 +896,7 @@ class Repeat
                 } else {
                     $str = $waitlist;
                 }
-                LGLIB_storeMessage($LANG_EVLIST['messages']['22'] . ' ' .
+                COM_setMsg($LANG_EVLIST['messages']['22'] . ' ' .
                     sprintf($LANG_EVLIST['messages'][27], $str));
             }
         }
@@ -905,15 +905,15 @@ class Repeat
             // add tickes to the shopping cart. Tickets will be created
             // when paid.
             $this->AddToCart($tick_type, $num_attendees);
-            LGLIB_storeMessage($LANG_EVLIST['messages']['24']);
+            COM_setMsg($LANG_EVLIST['messages']['24']);
             $status = LGLIB_invokeService('paypal', 'getURL',
                 array('type'=>'checkout'), $url, $msg);
             if ($status == PLG_RET_OK) {
-                LGLIB_storeMessage(sprintf($LANG_EVLIST['messages']['26'],
+                COM_setMsg(sprintf($LANG_EVLIST['messages']['26'],
                     $url), '', true);
             }
         } else {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][24]);
+            COM_setMsg($LANG_EVLIST['messages'][24]);
         }
 
         // for free tickets, just create the ticket records

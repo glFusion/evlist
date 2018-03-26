@@ -934,9 +934,9 @@ case 'saveevent':
     } else {
         $view = 'home';
         if ($Ev->table == 'evlist_submissions') {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][9]);
+            COM_setMsg($LANG_EVLIST['messages'][9]);
         } else {
-            LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
+            COM_setMsg($LANG_EVLIST['messages'][2]);
         }
         echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     }
@@ -951,7 +951,7 @@ case 'saverepeat':
         $content .= $Rp->Edit();
         $view = 'none';
     } else {
-        LGLIB_storeMessage($LANG_EVLIST['messages'][2]);
+        COM_setMsg($LANG_EVLIST['messages'][2]);
         echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     }
     break;

@@ -63,8 +63,9 @@ class View_day extends View
             'column'    => 'column.thtml',
             'event'     => 'singleevent.thtml',
             'dayview'   => $tpl . '.thtml',
+            'birthday'  => 'birthday.thtml',
+            'meetup'    => 'meetup.thtml',
         ) );
-
         $events = EVLIST_getEvents($today_sql, $today_sql,
                 array('cat'=>$this->cat, 'cal'=>$this->cal));
         list($allday, $hourly) = $this->getViewData($events);
@@ -93,13 +94,21 @@ class View_day extends View
                     'bgcolor'           => $A['bgcolor'],
                     'fgcolor'       => $A['fgcolor'],
                     'cal_id'        => $A['cal_id'],
+                    'br'            => $i < $alldaycount ? '<br />' : '',
                 ) );
-                if ($i < $alldaycount) {
-                    $T->set_var('br', '<br />');
-                } else {
-                    $T->set_var('br', '');
+                switch ($A['cal_id']) {
+                case -1:
+                    $T->parse('allday_events', 'meetup', true);
+                    break;
+                case -2:
+                    $T->set_var('icon', 'birthday-cake');
+                    $T->set_var('ev_hover', sprintf($LANG_EVLIST['hover_birthday'], $A['summary']));
+                    $T->parse('allday_events', 'birthday', true);
+                    break;
+                default:
+                    $T->parse('allday_events', 'event', true);
+                    break;
                 }
-                $T->parse('allday_events', 'event', true);
                 next($allday);
             }
         } else {
@@ -128,6 +137,7 @@ class View_day extends View
                 $A = current($hourevents);
                 $tz = $A['data']['tzid'] == 'local' ? $_USER['tzid'] : $A['data']['tzid'];
                 $s_dt = new \Date($A['data']['rp_date_start'] . ' ' . $A['data']['rp_time_start1'], $tz);
+                $e_dt = new \Date($A['data']['rp_date_end'] . ' ' . $A['data']['rp_time_end1'], $tz);
 
                 if (isset($A['data']['cal_id'])) {
                     $this->cal_used[$A['data']['cal_id']] = array(
@@ -161,7 +171,9 @@ class View_day extends View
                     'cal_id'        => $A['data']['cal_id'],
                     'event_time'    => $start_time . ' - ' . $end_time,
                 ) );
-                if ($A['data']['cal_id'] < 0) {
+                // Only evlist and meetup events are hourly, birthdays are
+                // handled as allday events above.
+                if ($A['data']['cal_id'] == -1) {
                     $T->set_var(array(
                         'is_meetup' => 'true',
                         'ev_url' => $A['data']['url'],

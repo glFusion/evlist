@@ -65,6 +65,9 @@ class View_week extends View
         $tpl = $this->getTemplate();
         $T->set_file(array(
             'week'      => $tpl . '.thtml',
+            'meetup'    => 'meetup.thtml',
+            'birthday'  => 'birthday.thtml',
+            'event'     => 'event.thtml',
         ) );
 
         $daynames = self::DayNames();
@@ -170,17 +173,22 @@ class View_week extends View
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
                     'delete_imagelink' => EVLIST_deleteImageLink($A, SEC_createToken()),
-                    //'event_title_and_link' => $eventlink,
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
                 ) );
-                if ($A['cal_id'] < 0) {
-                    $T->set_var(array(
-                        'is_meetup' => 'true',
-                        'ev_url' => $A['url'],
-                    ) );
-                } else {
-                    $T->clear_var('is_meetup');
+                switch ($A['cal_id']) {
+                case -1:
+                    $T->set_var(array('ev_url', $A['url']));
+                    $T->parse('event', 'meetup', false);
+                    break;
+                case -2:
+                    $T->set_var('icon', 'birthday-cake');
+                    $T->set_var('hover', sprintf($LANG_EVLIST['hover_birthday'], $A['summary']));
+                    $T->parse('event', 'birthday', false);
+                    break;
+                default:
+                    $T->parse('event', 'event', false);
+                    break;
                 }
                 $T->parse('eBlk', 'eventBlock', true);
             }

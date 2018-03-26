@@ -44,17 +44,11 @@
   </tr>
   <tr>
     <td colspan="2" class="cal-dayview-times">
-      <!-- BEGIN eventBlock -->
+<!-- BEGIN eventBlock -->
       <div class="show_cal{cal_id} evlistWeeklyEvent">
-        {delete_imagelink} {event_times}
-{!if is_meetup}
-        <a class="cal-event" style="color:{fgcolor};" href="{ev_url}" target="_blank">
-{!else}
-        <a class="cal-event" style="color:{fgcolor};" href="{pi_url}/event.php?eid={event_id}">
-{!endif}
-        {event_title}</a>
+        {event}
       </div>
-      <!-- END eventBlock -->
+<!-- END eventBlock -->
       {events_day}
     </td>
   </tr>

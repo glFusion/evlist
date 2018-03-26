@@ -1,0 +1,13 @@
+{# begin {templatelocation} #}
+  {delete_imagelink}&nbsp;{event_times}
+  <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{event_summary}">
+{!if bgcolor}
+  <span style="color:#000;background-color:{bgcolor};">
+{!endif}
+    <a class="cal-event" style="color:{fgcolor};" href="{site_url}/evlist/event.php?view=instance&eid={event_id}">
+    {event_title}</a>
+{!if bgcolor}
+  </span>
+{!endif}
+  </span>{br}
+{# end {templatelocation} #}

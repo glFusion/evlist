@@ -45,7 +45,7 @@ class View_month extends View
     */
     public function Content()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH, $_USER;
+        global $_CONF, $_EV_CONF, $LANG_MONTH, $_USER, $LANG_EVLIST;
 
         $retval = '';
 
@@ -59,6 +59,7 @@ class View_month extends View
         $daynames = self::DayNames();
         $events = EVLIST_getEvents($starting_date, $ending_date,
                 array('cat'=>$this->cat, 'cal'=>$this->cal));
+
         $nextmonth = $this->month + 1;
         $nextyear = $this->year;
         if ($nextmonth > 12) {
@@ -78,6 +79,7 @@ class View_month extends View
             'monthview'  => $tpl . '.thtml',
             'allday_event' => 'event_allday.thtml',
             'timed_event' => 'event_timed.thtml',
+            'birthday_event' => 'birthday.thtml',
         ) );
 
         foreach ($daynames as $key=>$dayname) {
@@ -188,18 +190,29 @@ class View_month extends View
                         'bgcolor'   => $event['bgcolor'],
                         'pi_url'        => EVLIST_URL,
                     ) );
-                    if ($event['cal_id'] < 0) {
+                    switch ($event['cal_id']) {
+                    case -1:
                         $T->set_var(array(
                             'is_meetup' => 'true',
                             'ev_url' => $event['url'],
                         ) );
-                    } else {
-                        $T->clear_var('is_meetup');
-                    }
-                    if ($event['allday'] == 1) {
                         $dayentries .= $T->parse('output', 'allday_event', true);
-                    } else {
-                        $dayentries .= $T->parse('output', 'timed_event', true);
+                        break;
+                    case -2:
+                        $T->set_var(array(
+                            'icon'  => 'birthday-cake',
+                            'ev_hover' => sprintf($LANG_EVLIST['hover_birthday'], $event['summary']),
+                            'ev_url' => '',
+                        ) );
+                        $dayentries .= $T->parse('output', 'birthday_event', true);
+                        break;
+                    default:
+                        if ($event['allday'] == 1) {
+                            $dayentries .= $T->parse('output', 'allday_event', true);
+                        } else {
+                            $dayentries .= $T->parse('output', 'timed_event', true);
+                        }
+                        break;
                     }
 
                 }

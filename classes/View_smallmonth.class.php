@@ -28,7 +28,7 @@ class View_smallmonth extends View
     */
     public function Render()
     {
-        global $_CONF, $_EV_CONF, $LANG_MONTH, $_SYSTEM, $_USER;
+        global $_CONF, $_EV_CONF, $LANG_MONTH, $_USER, $LANG_EVLIST;
 
         $retval = '';
 
@@ -105,7 +105,11 @@ class View_smallmonth extends View
                             if ($event['tzid'] != 'local') $popup .= ' ' . $dt->format('T');
                             $popup .= ': ';
                         }
-                        $popup .= htmlentities($event['title']);
+                        if ($event['cal_id'] == -2) {
+                            $popup .= sprintf($LANG_EVLIST['hover_birthday'], $event['title']);
+                        } else {
+                            $popup .= htmlentities($event['title']);    
+                        }
                     }
                     $T->set_var('popup', $popup);
                 } else {

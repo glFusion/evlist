@@ -55,6 +55,7 @@ $LANG_EVLIST = array(
 'edit_repeat'       => 'Diese Wiederholung',
 'edit_event'        => 'Veranstaltungs-Reihe',
 'add_event'         => 'Veranstaltung hinzufügen',
+'edit_calendar'     => 'Edit Calendar',
 'err_missing_title' => '* <i>Veranstaltungs-Titel</i> ist ein benötigtes Feld.',
 'err_missing_weekdays' => 'Du musst mindestens einen Tag für eine Wiederholung des Wochentags angeben.',
 'err_times'         => 'Uhrzeit-Ende kann nicht vor Uhrzeit-Beginn sein.',
@@ -368,6 +369,8 @@ $LANG_EVLIST = array(
 'msg_item_nochange' => 'Eintrag wurde nicht geändert',
 'print'         => 'Print',
 'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
+'hover_birthday' => '%s&apos;s Birthday',
+'sample'        => 'Sample',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -429,6 +432,7 @@ $LANG_confignames['evlist'] = array(
     'meetup_enabled'        => 'Meetup.com integrieren',
     'commentsupport'        => 'Kommentare erlauben?',
     'ticket_format'         => 'Ticket Format String',
+    'birthdays_enabled'     => 'Show birthdays from the Birthdays plugin?',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Haupteinstellungen',

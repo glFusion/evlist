@@ -53,6 +53,7 @@ $LANG_EVLIST = array(
 'edit_repeat'           => 'Modifier cette instance',
 'edit_event'            => 'Modifier l événement',
 'add_event'             => 'Ajouter un événement',
+'edit_calendar'     => 'Edit Calendar',
 'err_missing_title'         => 'un titre est requis. ',
 'err_missing_weekdays'      => 'Vous devez spécifier au moins un jour pour un jour de semaine récurrence. ',
 'err_times'             => ' L heure de fin ne peut pas être avant l heure de départ. ',
@@ -381,6 +382,8 @@ $LANG_EVLIST = array(
 'msg_item_nochange' => 'Item was not changed',
 'print'         => 'Print',
 'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
+'hover_birthday' => '%s&apos;s Birthday',
+'sample'        => 'Sample',
 );
 
 $LANG_EVLIST_HELP = array(

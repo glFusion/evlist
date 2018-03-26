@@ -15,13 +15,16 @@
   <!-- BEGIN eventRow -->
   <tr class="pluginRow{cssid}">
     <td class="" style="padding-left:6px; height:20px;">
-        <b><a data-uk-tooltip class="gl_mootip" title="{summary}::{startdate}"
-{!if is_meetup}
-            href="{ev_url}" target="_blank"
+        <b>
+{!if is_birthday}
+        <span data-uk-tooltip title="{full_dscp}">{title}</span>
+{!elseif is_meetup}
+        <a data-uk-tooltip class="gl_mootip" title="{summary}::{startdate}"
+            href="{ev_url}" target="_blank">{title}</a>
 {!else}
-            href="{pi_url}/event.php?view=instance&rp_id={eid}"
+        <a data-uk-tooltip title="{summar}::{startdate}"
+            href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
 {!endif}
-        >{title}</a></b>
     </td>
     <td class="pluginLinks" style="padding-left:6px; height:20px;">
         {summary}

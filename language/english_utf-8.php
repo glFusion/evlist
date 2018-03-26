@@ -375,6 +375,8 @@ You may either move existing events to a new calendar, or delete those events.',
 'print'         => 'Print',
 'balance_due'   => 'Balance Due',
 'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
+'hover_birthday' => '%s&apos;s Birthday',
+'sample'        => 'Sample',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -441,6 +443,7 @@ $LANG_confignames['evlist'] = array(
     'meetup_enabled'        => 'Enable Meetup.com integration?',
     'commentsupport'        => 'Enable Comments?',
     'ticket_format'         => 'Ticket Format String',
+    'birthdays_enabled'     => 'Show birthdays from the Birthdays plugin?',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',

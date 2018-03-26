@@ -1,10 +1,6 @@
 {# begin {templatelocation} #}
 <div class="monthview_timed show_cal{cal_id} event">
-{!if is_meetup}
-  <a href="{ev_url}" target="_blank"
-{!else}
   <a href="{pi_url}/event.php?view=instance&eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}"
-{!endif}
     data-uk-tooltip={cls:'evTooltip'} title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
 </div>
 {# end {templatelocation} #}

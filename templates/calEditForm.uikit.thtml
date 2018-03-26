@@ -64,6 +64,7 @@ $(document).ready(function() {
         <label for="bgcolor">{$LANG_EVLIST['background']}: </label>
         <input name="bgcolor" type="text" id="fld_bgcolor" size="7" maxlength="7" 
             value="{bgcolor}" style="background:{bgcolor}" /> 
+      &nbsp;&nbsp;&nbsp;<span id="sample" style="background-color:{bgcolor};color:{fgcolor};">{$LANG_EVLIST['sample']}</span>
         </span>
       </div>
     </div>

@@ -1007,7 +1007,7 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 *   Run scheduled tasks for the plugin.
 *   - Send event reminders
 */
-function Xplugin_runScheduledTask_evlist()
+function plugin_runScheduledTask_evlist()
 {
     if (!EVLIST_isCurrentVersion()) return;
 

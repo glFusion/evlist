@@ -134,7 +134,6 @@ class Reminder
         if ($this->rp_id > 0) {
             $sql .= " AND rp_id = '{$this->rp_id}'";
         }
-
         $res = DB_query($sql);
         if (!$res || DB_numRows($res) != 1) {
             $this->isNew = true;
@@ -241,9 +240,10 @@ class Reminder
         $Rems = array();
         $sql = "SELECT * FROM {$_TABLES['evlist_remlookup']}
                 WHERE date_start <= (UNIX_TIMESTAMP() + (days_notice * 86400))";
+        //echo $sql;die;
         $res = DB_query($sql);
         while ($A = DB_fetchArray($res, false)) {
-            $Rems[] = new Reminder($A['rp_id']);
+            $Rems[] = new self($A['rp_id']);
         }
         return $Rems;
     }
@@ -341,7 +341,6 @@ class Reminder
         $T->parse('output', 'msg');
         $message = $T->finish($T->get_var('output'));
         $mailto = COM_formatEmailAddress($this->name, $this->email);
-
         //mail reminder
         COM_mail($mailto, $subject, $message, '', true);
     }

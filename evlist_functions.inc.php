@@ -150,11 +150,12 @@ function EVLIST_12to24($hour, $ampm='')
 /**
 *   Organizes events by hour, and separates all-day events.
 *
+*   @deprecated
 *   @param  array   $events     Array of all events
 *   @param  string  $today      Current date, YYYY-MM-DD.  Optional.
 *   @return array               Array of 2 arrays, allday and hourly
 */
-function EVLIST_getDayViewData($events, $today = '')
+function XXEVLIST_getDayViewData($events, $today = '')
 {
     global $_CONF, $_EV_CONF;
 
@@ -266,7 +267,7 @@ function EVLIST_deleteImageLink($A, $token)
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST;
 
     $retval = '';
-    if ($A['cal_name'] == 'meetup') return '';
+    if ($A['cal_id'] < 0) return '';
 
     if (plugin_ismoderator_evlist() ||
         SEC_hasAccess($A['owner_id'], $A['group_id'], $A['perm_owner'],

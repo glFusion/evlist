@@ -276,7 +276,7 @@ function evlist_upgrade()
                     return false;
                 }
             }
-   
+
             // This column should have been there from the beginning, but on
             // at least one site it was missing. Add it here, but ignore any
             // SQL error since it's probably already there. 
@@ -295,14 +295,22 @@ function evlist_upgrade()
             }
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
-    }
+
+        case '1.4.3':
+        case '1.4.4':
+            $currentVersion = '1.4.5';
+            $c->add('birthdays_enabled', $_CONF_EVLIST_DEFAULT['birthdays_enabled'], 'select',
+                    30, 10, 0, 70, true, 'evlist');
+            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+            if (!EVLIST_do_set_version($currentVersion)) return false;
+     }
 
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
         if (!EVLIST_do_set_version($installed_ver)) return false;
     }
 
     CTL_clearCache();
-    Evlist\Cache::clearCache();
+    Evlist\Cache::clear();
     COM_errorLog("Successfully updated the {$_EV_CONF['pi_display_name']} Plugin", 1);
     return true;
 }
@@ -560,6 +568,39 @@ function EVLIST_do_set_version($ver)
         return false;
     } else {
         return true;
+    }
+}
+
+
+/**
+*   Remove deprecated files
+*/
+function EVLIST_remove_old_files()
+{
+    $paths = array(
+        // private/plugins/evlist
+        __DIR__ => array(
+            'DateCalc.class.php',
+            'evCalendar.class.php',
+            'evCategory.class.php',
+            'evDetail.class.php',
+            'evEvent.class.php',
+            'evRecur.class.php',
+            'evRepeat.class.php',
+            'evTicket.class.php',
+            'evTicketType.class.php',
+            'evView.class.php',
+        ),
+        // public_html/evlist
+        $_CONF['path_html'] . 'evlist' => array(
+            'js/colorpicker.js',
+        ),
+    );
+
+    foreach ($paths as $path) {
+        foreach ($path as $file) {
+            @unlink("$path/$file");
+        }
     }
 }
 

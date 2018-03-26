@@ -102,6 +102,11 @@ $INSTALL_plugin['evlist'] = array(
             'sql' => $_SQL['evlist_tickettypes'],
         ),
 
+    array(  'type' => 'table',
+            'table' => $_TABLES['evlist_cache'],
+            'sql' => $_SQL['evlist_cache'],
+        ),
+
     array(  'type' => 'group', 
             'group' => 'evList Admin', 
             'desc' => 'Administrator of the evList Plugin',

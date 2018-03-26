@@ -74,9 +74,9 @@ if ($_EV_CONF['use_locator'] == 1) {
 }
 
 // Local configuration overrides can be set by having a config.php file.
-if (file_exists(EVLIST_PI_PATH . '/config.php')) {
+if (file_exists(__DIR__ . '/config.php')) {
     /** Include local configuration overrides */
-    include_once EVLIST_PI_PATH . '/config.php';
+    include_once __DIR__ . '/config.php';
 }
 
 // Override plugin config if login is required globally
@@ -94,7 +94,7 @@ if (empty($_EV_CONF['meetup_gid']) || empty($_EV_CONF['meetup_key'])) {
 }
 
 // Include the user's language file, if found.  Default to englsh.
-$langpath = EVLIST_PI_PATH . '/language';
+$langpath = __DIR__ . '/language';
 $langfile = $_CONF['language'] . '.php';
 if (!is_file("$langpath/$langfile")) {
     $langfile = 'english.php';
@@ -138,7 +138,7 @@ spl_autoload_register(function($class)
 });
 
 function USES_evlist_functions()
-{    require_once EVLIST_PI_PATH . '/evlist_functions.inc.php'; }
+{    require_once __DIR__ . '/evlist_functions.inc.php'; }
 
 /**
 *   Return the current code (not necessarily installed) version
@@ -165,6 +165,7 @@ function plugin_autouninstall_evlist()
                         'evlist_lookup','evlist_remlookup',
                         'evlist_repeat', 'evlist_submissions',
                         'evlist_tickets', 'evlist_tickettypes',
+                        'evlist_cache',
         ),
         'groups'    => array('evlist Admin'),
         'features'  => array('evlist.admin', 'evlist.submit'),
@@ -184,8 +185,8 @@ function plugin_autouninstall_evlist()
 */
 function plugin_upgrade_evlist()
 {
-    if (@file_exists(EVLIST_PI_PATH . '/upgrade.php')) {
-        require_once EVLIST_PI_PATH . '/upgrade.php';
+    if (@file_exists(__DIR__ . '/upgrade.php')) {
+        require_once __DIR__ . '/upgrade.php';
         return evlist_upgrade();
     } else {
         // upgrades are done by the install script - return a generic error
@@ -598,7 +599,9 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
             default:
             $display = '';
         }
-        $c->set($key, $display, array('evlist','evlistcb'));
+        if (version_compare(GVERSION, '1.8.0', '>=')) {
+            $c->set($key, $display, array('evlist','evlistcb'));
+        }
     }
     if (!empty($display)) {
         if ($where == 0) {      // replacing home page
@@ -693,7 +696,7 @@ function EVLIST_cb_content($format)
         }
     }
 
-    $T = new Template(EVLIST_PI_PATH . '/templates/');
+    $T = new Template(__DIR__ . '/templates/');
     $T->set_file('centerblock', $tpl_file);
 
     $T->set_var(array(
@@ -710,12 +713,17 @@ function EVLIST_cb_content($format)
     foreach ($events as $date=>$day) {
         if ($date == '_empty_') continue;
         foreach ($day as $A) {
-            $count++;
-            if ($count > $limit) break;
+            // Don't display birthdays as story items
+            if ($format == 2 && $A['cal_id'] == -2) continue;
 
             // Make sure we only show each event once for multiday
             if (array_key_exists($A[$dup_chk], $rp_shown))
                 continue;
+
+            // Now increment and check the counter.
+            $count++;
+            if ($count > $limit) break;
+
             $rp_shown[$A[$dup_chk]] = 1;
 
             // Prepare the summary for display. Remove links and autotags
@@ -736,19 +744,24 @@ function EVLIST_cb_content($format)
             $cssid = ($cssid ==1) ? 2: 1;
 
             if (isset($A['postmode']) && $A['postmode'] != 'plaintext') {
-                $full_desc = PLG_replaceTags($A['full_description']);
+                $full_dscp = PLG_replaceTags($A['full_description']);
             } else {
-                $full_desc = $A['full_description'];
+                $full_dscp = $A['full_description'];
+            }
+            if ($A['cal_id'] == -2) {
+                $full_dscp= sprintf($LANG_EVLIST['hover_birthday'], $A['summary']);
+                $summary = $full_dscp;
             }
 
             $T->set_var(array(
                 'cssid'     => $cssid,
-                'is_meetup' => $A['cal_id'] < 0 ? 'true' : '',
+                'is_meetup' => $A['cal_id'] == -1 ? true : false,
+                'is_birthday' => $A['cal_id'] == -2 ? true : false,
                 'eid'       => $A['rp_id'],
                 'pi_url'    => EVLIST_URL,
                 'title'     => $A['title'],
                 'summary'   => $summary,
-                'full_description' => $full_desc,
+                'full_dscp' => $full_dscp,
                 'contact'   => isset($A['contact']) ? $A['contact'] : '',
                 'location'  => isset($A['location']) ? $A['location'] : '',
                 'ev_url'    => isset($A['url']) ? $A['url'] : '',
@@ -1456,7 +1469,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     $events = EVLIST_getEvents($_EV_CONF['_today'], $end, $opts);
     if (empty($events)) return $retval;
 
-    $T = new Template(EVLIST_PI_PATH . '/templates/');
+    $T = new Template(__DIR__ . '/templates/');
     $T->set_file('block','phpblock.thtml');
     $listlink = COM_buildURL(EVLIST_URL . '/index.php');
 
@@ -1806,7 +1819,9 @@ function plugin_getconfigelementhelp_evlist($element, $doclang )
 */
 function EVLIST_getDocURL($file='', $doclang='english')
 {
-    $doc_path = EVLIST_PI_PATH . "/docs/$doclang/";
+    global $_CONF;
+
+    $doc_path = $_CONF['path_html'] . "/evlist/docs/$doclang/";
     $doc_url = '';
 
     if ($file != '') {
@@ -1940,7 +1955,7 @@ function plugin_loadlanguage_evlist($requested='')
     }
 
     // Search the array for desired language files, in order.
-    $langpath = EVLIST_PI_PATH . '/language';
+    $langpath = __DIR__ . '/language';
     foreach ($languages as $language) {
         if (file_exists("$langpath/$language.php")) {
             include "$langpath/$language.php";
@@ -2582,7 +2597,7 @@ function EVLIST_getBirthdays($start, $end, &$events)
 {
     global $_CONF, $_EV_CONF, $LANG_EVLIST;
 
-    if (!$_EV_CONF['show_birthdays']) return;
+    if (!$_EV_CONF['birthdays_enabled']) return;
 
     $status = LGLIB_invokeService('birthdays', 'getBirthdays',
             array('start' => $start, 'end' => $end), $birthdays, $svc_msg);

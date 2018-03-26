@@ -141,7 +141,7 @@ $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
-  `cal_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cal_id` int(11) NOT NULL AUTO_INCREMENT,
   `cal_name` varchar(255) NOT NULL DEFAULT '',
   `cal_status` tinyint(1) unsigned DEFAULT '1',
   `cal_ena_ical` tinyint(1) unsigned DEFAULT '1',
@@ -322,6 +322,13 @@ $_EV_UPGRADE = array(
     "UPDATE {$_TABLES['evlist_repeat']} SET
         rp_start = CONCAT(rp_date_start, ' ', rp_time_end1),
         rp_end = concat(rp_date_end, ' ', IF (rp_time_end2 > '00:00:00', rp_time_end2, rp_time_end1))",
+    ),
+'1.4.5' => array(
+    "ALTER TABLE {$_TABLES['evlist_calendars']}
+        CHANGE cal_id cal_id int(11) not null auto_increment",
+    "INSERT INTO {$_TABLES['evlist_calendars']} VALUES
+        (-1, 'Meetup Events', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2),
+        (-2, 'Birthdays', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2)",
     ),
 );
 $_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];

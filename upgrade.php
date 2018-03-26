@@ -308,7 +308,7 @@ function evlist_upgrade()
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
         if (!EVLIST_do_set_version($installed_ver)) return false;
     }
-
+    EVLIST_remove_old_files();
     CTL_clearCache();
     Evlist\Cache::clear();
     COM_errorLog("Successfully updated the {$_EV_CONF['pi_display_name']} Plugin", 1);
@@ -577,6 +577,8 @@ function EVLIST_do_set_version($ver)
 */
 function EVLIST_remove_old_files()
 {
+    global $_CONF;
+
     $paths = array(
         // private/plugins/evlist
         __DIR__ => array(

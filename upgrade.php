@@ -582,16 +582,16 @@ function EVLIST_remove_old_files()
     $paths = array(
         // private/plugins/evlist
         __DIR__ => array(
-            'DateCalc.class.php',
-            'evCalendar.class.php',
-            'evCategory.class.php',
-            'evDetail.class.php',
-            'evEvent.class.php',
-            'evRecur.class.php',
-            'evRepeat.class.php',
-            'evTicket.class.php',
-            'evTicketType.class.php',
-            'evView.class.php',
+            'classes/DateCalc.class.php',
+            'classes/evCalendar.class.php',
+            'classes/evCategory.class.php',
+            'classes/evDetail.class.php',
+            'classes/evEvent.class.php',
+            'classes/evRecur.class.php',
+            'classes/evRepeat.class.php',
+            'classes/evTicket.class.php',
+            'classes/evTicketType.class.php',
+            'classes/evView.class.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(
@@ -599,8 +599,8 @@ function EVLIST_remove_old_files()
         ),
     );
 
-    foreach ($paths as $path) {
-        foreach ($path as $file) {
+    foreach ($paths as $path=>$files) {
+        foreach ($files as $file) {
             @unlink("$path/$file");
         }
     }

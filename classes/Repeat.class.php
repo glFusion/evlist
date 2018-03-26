@@ -882,7 +882,7 @@ class Repeat
         $total_reg = $this->TotalRegistrations();
         $new_total = $total_reg + $num_attendees;
         if ($this->Event->options['max_rsvp'] > 0 &&
-                $this->Event->options['max_rsvp'] <= $new_total) {
+                $this->Event->options['max_rsvp'] < $new_total) {
             if ($this->Event->options['rsvp_waitlist'] == 0 || $fee > 0) {
                 // Event is full, no waiting list. Can't waitlist paid tickets.
                 LGLIB_storeMessage($LANG_EVLIST['messages'][22]);

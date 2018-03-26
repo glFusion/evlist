@@ -954,6 +954,7 @@ function toggleRSVPdetail(val)
     {!endif}
     </div>
 
+    <input type="hidden" name="isNew" value="{isNew}" />
     <input type="hidden" name="eid" value="{eid}" />
     <input type="hidden" name="rp_id" value="{rp_id}" />
     {submission}

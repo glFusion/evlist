@@ -54,8 +54,8 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
         }
         $Tick = new Evlist\TicketType($tick_type);
         $Ev = new Evlist\Event($ev_id);
-        if (isset($Ev->ptions['tickets'][$tick_type])) {
-            $fee = (float)$Ev->options['tickets'][$tick_type];
+        if (isset($Ev->options['tickets'][$tick_type])) {
+            $fee = (float)$Ev->options['tickets'][$tick_type]['fee'];
         } else {
             $fee = 0;
         }
@@ -65,7 +65,7 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
             $Ev = new Evlist\Repeat($rp_id);
             if ($Ev->rp_id == $rp_id) { // valid repeat ID
                 $short_desc .=
-                    ', ' . $Ev->start_date1 . ' ' . $Ev->start_time1;
+                    ', ' . $Ev->date_start . ' ' . $Ev->time_start1;
             } else {
                 return PLG_RET_ERROR;
             }

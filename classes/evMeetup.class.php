@@ -79,7 +79,7 @@ class evMeetup
         $events = array();
         if (version_compare(GVERSION, '1.8.0', '>=')) {
             $key = self::$tag . '_' . md5($start.'_'.$end);
-            $A = Cache::getCache($key);
+            $A = Cache::get($key);
             if ($A !== NULL) {
                 return $A;
             }
@@ -175,7 +175,7 @@ class evMeetup
                 VALUES
                     ('$key', '$db_data')");
         } else {
-            Cache::setCache($key, $data, self::$tag);
+            Cache::set($key, $data, self::$tag);
         }
     }
 

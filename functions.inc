@@ -2416,7 +2416,7 @@ function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
             $dt->setTimeStamp(($event->time + $duration) / 1000, $event->timezone);
             $ev_end = $dt->format($_CONF['timeonly'], true);
             $events[$ev_date][] = array(
-                'cal_name' => 'meetup',
+                'cal_name' => $Cal->cal_name,
                 'cal_ena_ical' => 0,
                 'cal_id' => $Cal->cal_id,
                 'rp_id' => $event->id,
@@ -2612,7 +2612,7 @@ function EVLIST_getBirthdays($start, $end, &$events)
             $dscp = COM_getDisplayName($uid);
             if (!isset($events[$ev_date])) $events[$ev_date] = array();
             $events[$ev_date][] = array(
-                'cal_name' => 'birthdays',
+                'cal_name' => $Cal->cal_name,
                 'cal_ena_ical' => 0,
                 'cal_id' => $Cal->cal_id,
                 'rp_id' => '',

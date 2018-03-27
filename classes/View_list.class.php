@@ -148,6 +148,9 @@ class View_list extends View
                     $title = COM_stripslashes($A['title']);
                     if (!empty($url)) {
                         $titlelink = COM_createLink($title, $url, $url_attr);
+                    } elseif ($A['cal_id'] == -2) {
+                        $titlelink = sprintf($LANG_EVLIST['hover_birthday'], $title);
+                        $A['summary'] = '';
                     } else {
                         $titlelink = $A['title'];
                     }
@@ -155,12 +158,16 @@ class View_list extends View
                     $summary = PLG_replaceTags(COM_stripslashes($A['summary']));
                     $tz = $A['tzid'] == 'local' ? $_USER['tzid'] : $A['tzid'];
                     $d = new \Date($A['rp_date_start'] . ' ' . $A['rp_time_start1'], $tz);
-                    $datesummary = sprintf($LANG_EVLIST['event_begins'],
-                        $d->format($_CONF['date'], true));
-                    $morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
+                    if (isset($A['allday']) && $A['allday']) {
+                        $datesummary = $d->format($_CONF['date'], true);
+                    } else {
+                        $datesummary = sprintf($LANG_EVLIST['event_begins'],
+                            $d->format($_CONF['date'], true) . ' ' . $d->format($_CONF['timeonly'], true));
+                    }
+                    /*$morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                         $A['rp_id'] . $andcat);
                     $morelink = '<a href="' . $morelink . '">' .
-                        $LANG_EVLIST['read_more'] . '</a>';
+                        $LANG_EVLIST['read_more'] . '</a>';*/
                     $contactlink = '';
                     if (empty($A['email'])) {
                         if (isset($A['owner_id'])) {
@@ -175,7 +182,7 @@ class View_list extends View
                         'title' => $titlelink,
                         'date_summary' => $datesummary,
                         'summary' => $summary,
-                        'more_link' => $morelink,
+                        //'more_link' => $morelink,
                         'contact_link' => $contactlink,
                         'contact_name' => isset($A['contact']) ? $A['contact'] : '',
                         'owner_name' => isset($A['owner_id']) ? COM_getDisplayName($A['owner_id']) : '',

@@ -4,16 +4,22 @@
       <span style="color:{cal_fgcolor};">{cal_name}</span>
     </div>
     <h1>{title}</h1>
+{!if summary}
     <p>{summary}</p>
+{!endif}
     {date_summary}<br />
     {more_link}
 {!if contact_link}
- | <a href="{contact_link}">{$LANG_EVLIST['ev_contact']}</a>
+    <a href="{contact_link}">{$LANG_EVLIST['ev_contact']}</a>
 {!endif}
+{!if edit_links}
     {edit_links}<br />
+{!endif}
     <div class="clearboth"></div>
 </div>
+{!if category_links}
 <div id="evlistCategoryLinks">
     {category_links}<br />
 </div>
+{!endif}
 {# end {templatelocation} #}

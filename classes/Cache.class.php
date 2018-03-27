@@ -38,6 +38,8 @@ class Cache
         if ($cache_secs < 600) $cache_secs = 1800;
         if ($tag == '')
             $tag = array(self::$tag);
+        elseif (is_array($tag))
+            array_push($tag, self::$tag);
         else
             $tag = array($tag, self::$tag);
         $key = self::_makeKey($key);
@@ -76,7 +78,8 @@ class Cache
     */
     private static function _makeKey($key)
     {
-        return self::$tag . '_' . $key;
+        return self::$tag . '_' . $key . '_' .
+            \glFusion\Cache::getInstance()->securityHash(true,true);
     }
 
 

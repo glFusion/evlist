@@ -577,12 +577,10 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
         }
     }
 
-    $display = '';
-    if (version_compare(GVERSION, '1.8.0', '>=')) {
-        $c = glFusion\Cache::getInstance();
-        $key = 'evlistcb__'.$_EV_CONF['enable_centerblock'] . '_' .$c->securityHash(true,true);
-        if ($c->has($key)) $display = $c->get($key);
-    }
+    // Try first to get from cache
+    $cache_key = 'evlistcb_' . $_EV_CONF['enable_centerblock'];
+    $display = Evlist\Cache::get($cache_key);
+
     if (empty($display)) {  // not found in cache
         // overloading the previously-boolean enable_centerblock option to
         // indicate the centerblock format.
@@ -599,9 +597,7 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
             default:
             $display = '';
         }
-        if (version_compare(GVERSION, '1.8.0', '>=')) {
-            $c->set($key, $display, array('evlist','evlistcb'));
-        }
+        Evlist\Cache::set($cache_key, $display, 'evlistcb');
     }
     if (!empty($display)) {
         if ($where == 0) {      // replacing home page

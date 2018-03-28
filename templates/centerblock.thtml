@@ -22,7 +22,7 @@
         <a data-uk-tooltip class="gl_mootip" title="{summary}::{startdate}"
             href="{ev_url}" target="_blank">{title}</a>
 {!else}
-        <a data-uk-tooltip title="{summar}::{startdate}"
+        <a data-uk-tooltip title="{summary}::{startdate}"
             href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
 {!endif}
     </td>

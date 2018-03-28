@@ -394,10 +394,12 @@ var updateReminder = function(el) {
     return false;
 }
 
+{!if show_reminderform}
 $(document).ready(function() {
   // update the add/del reminder section depending on whether one is set
   showReminder({reminder_set});
 });
+{!endif}
 
 function changeView(view)
 {

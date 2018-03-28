@@ -73,6 +73,23 @@ class Repeat
 
 
     /**
+    *   Get an instance of a repeat
+    *   Saves instances in a static array to speed multiple calls
+    *
+    *   @param  integer $rp_id  Repeat ID
+    *   @return object          Repeat object
+    */
+    public static function getInstance($rp_id)
+    {
+        static $repeats = array();
+        if (!isset($repeats[$rp_id])) {
+            $repeats[$rp_id] = new self($rp_id);
+        }
+        return $repeats[$rp_id];
+    }
+
+
+    /**
     *   Set a property's value.
     *
     *   @param  string  $var    Name of property to set.
@@ -771,7 +788,7 @@ class Repeat
         }
 
         $hasReminder = 0;
-        if ($_EV_CONF['enable_reminders'] == '1' &&
+        if (!COM_isAnonUser() && $_EV_CONF['enable_reminders'] == '1' &&
                 $this->Event->enable_reminders == '1' &&
                 time() < strtotime("-".$_EV_CONF['reminder_days']." days",
                     strtotime($this->date_start))) {

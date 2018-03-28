@@ -43,7 +43,7 @@ class Reminder
     public function __construct($rp_id='', $uid='')
     {
         if ($rp_id !== '') {
-            $this->Repeat = new Repeat($rp_id);
+            $this->Repeat = Repeat::getInstance($rp_id);
         }
         if ($this->Repeat->rp_id > 0) {
             $this->eid = $this->Repeat->ev_id;
@@ -243,7 +243,7 @@ class Reminder
         //echo $sql;die;
         $res = DB_query($sql);
         while ($A = DB_fetchArray($res, false)) {
-            $Rems[] = new self($A['rp_id']);
+            $Rems[] = new self($A['rp_id'], $A['uid']);
         }
         return $Rems;
     }
@@ -279,7 +279,7 @@ class Reminder
         global $_TABLES, $_CONF, $LANG, $LANG_EVLIST;
 
         // Guard against sending reminders for invalid events
-        if ($this->Repeat->rp_id < 1) {
+        if ($this->Repeat->rp_id < 1 || $this->email == '') {
             return;
         }
         // Load the user's language

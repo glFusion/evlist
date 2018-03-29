@@ -175,6 +175,7 @@ class View_week extends View
                     'delete_imagelink' => EVLIST_deleteImageLink($A, SEC_createToken()),
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
+                    'show'      => $this->getCalShowPref($A['cal_id']) ? '' : 'none',
                 ) );
                 switch ($A['cal_id']) {
                 case -1:

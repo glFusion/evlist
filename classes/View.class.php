@@ -481,6 +481,29 @@ class View
         }
     }
 
+
+    /**
+    *   Get the user preference whether to show a calendar.
+    *   This comes from the checkboxes that are saved to a
+    *   session var when checked or unchecked.
+    *
+    *   @param  integer $cal_id     ID of calendar to check
+    *   @return integer         1 to show calendar, 0 to hide
+    */
+    protected static function getCalShowPref($cal_id)
+    {
+        static $calprefs = NULL;
+        if ($calprefs === NULL) {
+            $calprefs = SESS_getVar('evlist.calshowpref');
+            if (!is_array($calprefs)) $calprefs = array();
+        }
+        if (array_key_exists($cal_id, $calprefs) && $calprefs[$cal_id] == 0) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
 }
 
 ?>

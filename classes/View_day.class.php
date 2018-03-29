@@ -95,6 +95,7 @@ class View_day extends View
                     'fgcolor'       => $A['fgcolor'],
                     'cal_id'        => $A['cal_id'],
                     'br'            => $i < $alldaycount ? '<br />' : '',
+                    'show'      => self::getCalShowPref($A['cal_id']) ? '' : 'none',
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
@@ -170,6 +171,7 @@ class View_day extends View
                     'bgcolor'       => '',
                     'cal_id'        => $A['data']['cal_id'],
                     'event_time'    => $start_time . ' - ' . $end_time,
+                    'show'      => self::getCalShowPref($A['data']['cal_id']) ? '' : 'none',
                 ) );
                 // Only evlist and meetup events are hourly, birthdays are
                 // handled as allday events above.

@@ -188,7 +188,8 @@ class View_month extends View
                         'eid'       => $event['rp_id'],
                         'fgcolor'   => $event['fgcolor'],
                         'bgcolor'   => $event['bgcolor'],
-                        'pi_url'        => EVLIST_URL,
+                        'pi_url'    => EVLIST_URL,
+                        'show'      => $this->getCalShowPref($event['cal_id']) ? '' : 'none',
                     ) );
                     switch ($event['cal_id']) {
                     case -1:

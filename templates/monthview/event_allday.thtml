@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
 <div class="monthview_allday show_cal{cal_id} event" 
-    style="background-color:{bgcolor};">
+    style="background-color:{bgcolor};display:{show}">
 {!if is_meetup}
   <a href="{ev_url}" target="_blank"
 {!else}

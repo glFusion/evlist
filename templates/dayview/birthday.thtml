@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div class="show_cal{cal_id}">
+<div class="show_cal{cal_id}" style="display:{show};">
   <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
   <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{ev_hover}">
 {!if bgcolor}

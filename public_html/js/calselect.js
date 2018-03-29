@@ -42,6 +42,20 @@ function SelectCal(cal_chk)
         //el[i].style.visibility = newvis;
         el[i].style.display = newvis;
     }
+    // Now call an AJAX url to save the preference in the session
+    var dataS = {
+        "action" : "savecalpref",
+        "id": cal_chk.id,
+        "state": cal_chk.checked ? 1 : 0,
+    };
+    data = $.param(dataS);
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: glfusionSiteUrl + "/evlist/ajax.php",
+        data: data
+    });
+    return false;
 }
 
 function getElementsByClass(node,searchClass,tag)

@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
-  <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
   <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{hover}">
+  <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">{event_title}</span>
 {!else}

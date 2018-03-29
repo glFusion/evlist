@@ -7,7 +7,7 @@
     <div class="uk-dropdown uk-dropdown-bottom">
 <!-- BEGIN cal_item -->
       <div style="float:left;width:100%;color:{fgcolor}">
-        <input checked="checked" type="checkbox" id="cal{key}" onclick="SelectCal(this)">&nbsp{cal_name}
+        <input {chk} type="checkbox" id="cal{key}" onclick="SelectCal(this)">&nbsp{cal_name}
       </div>
  <!-- END cal_item -->
     </div>

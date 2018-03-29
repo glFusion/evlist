@@ -45,7 +45,7 @@
   <tr>
     <td colspan="2" class="cal-dayview-times">
 <!-- BEGIN eventBlock -->
-      <div class="show_cal{cal_id} evlistWeeklyEvent">
+      <div class="show_cal{cal_id} evlistWeeklyEvent" style="display:{show};">
         {event}
       </div>
 <!-- END eventBlock -->

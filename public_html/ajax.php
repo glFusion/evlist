@@ -17,6 +17,18 @@ require_once __DIR__ . '/../lib-common.php';
 $content = '';
 
 switch ($_POST['action']) {
+case 'savecalpref':
+    if (!isset($_POST['id']) || empty($_POST['id'])) {
+        break;
+    }
+    $cal_id = str_replace('cal', '', $_POST['id']);
+    $state = isset($_POST['state']) ? (int)$_POST['state'] : 1;
+    $cals = SESS_getVar('evlist.calshowpref');
+    if (empty($cals)) $cals = array();
+    $cals[$cal_id] = $state;
+    SESS_setVar('evlist.calshowpref', $cals);
+    break;
+
 case 'getloc':
     if (!$_EV_CONF['use_locator']) {
         break;

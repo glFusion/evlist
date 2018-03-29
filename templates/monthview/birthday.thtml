@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
 <div class="monthview_allday show_cal{cal_id} event" 
-    style="background-color:{bgcolor};">
+    style="background-color:{bgcolor};display:{show};">
 <span data-uk-tooltip={cls:'evTooltip'} title="{ev_hover}" style="color:{fgcolor};">
   <i class="uk-icon uk-icon-{icon}"></i>&nbsp;{ev_title}
 </span>

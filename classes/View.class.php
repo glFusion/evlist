@@ -444,23 +444,24 @@ class View
         global $_EV_CONF;
 
         $boxes = '';
-        if (!is_array($this->cal_used) || empty($this->cal_used))
-            return $boxes;
-
-        $T = new \Template(EVLIST_PI_PATH . '/templates/');
-        $T->set_file('boxes', 'cal_checkboxes.thtml');
-        $T->set_block('boxes', 'cal_item', 'item');
-        asort($this->cal_used);
-        foreach ($this->cal_used as $key=>$cal) {
-            $T->set_var(array(
-                'fgcolor'   => $cal['fgcolor'],
-                'key'       => $key,
-                'cal_name'  => $cal['cal_name'],
-                'iconset'   => $_EV_CONF['_iconset'],
-            ) );
-            $T->parse('item', 'cal_item', true);
+        if (is_array($this->cal_used) && !empty($this->cal_used)) {
+            $T = new \Template(EVLIST_PI_PATH . '/templates/');
+            $T->set_file('boxes', 'cal_checkboxes.thtml');
+            $T->set_block('boxes', 'cal_item', 'item');
+            asort($this->cal_used);
+            foreach ($this->cal_used as $key=>$cal) {
+                $T->set_var(array(
+                    'fgcolor'   => $cal['fgcolor'],
+                    'key'       => $key,
+                    'cal_name'  => $cal['cal_name'],
+                    'iconset'   => $_EV_CONF['_iconset'],
+                    'chk'   => self::getCalShowPref($key) ? EVCHECKED : ''
+                ) );
+                $T->parse('item', 'cal_item', true);
+            }
+            $boxes = $T->parse('output', 'boxes');
         }
-        return $T->parse('output', 'boxes');
+        return $boxes;
     }
 
 

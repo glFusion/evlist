@@ -619,35 +619,39 @@ class Repeat
                           $total_tickets < $this->Event->options['max_user_rsvp'] )
                 ) {
                     $Ticks = TicketType::GetTicketTypes();
-                    if ($this->Event->options['max_user_rsvp'] > 0) {
-                        $T->set_block('event', 'tickCntBlk', 'tcBlk');
-                        $T->set_var('register_multi', true);
-                        $avail_tickets = $this->Event->options['max_user_rsvp'] -
-                                    $total_tickets;
-                        for ($i = 1; $i <= $avail_tickets; $i++) {
-                            $T->set_var('tick_cnt', $i);
-                            $T->parse('tcBlk', 'tickCntBlk', true);
+                    if (!empty($Ticks)) {
+                        if ($this->Event->options['max_user_rsvp'] > 0) {
+                            $T->set_block('event', 'tickCntBlk', 'tcBlk');
+                            $T->set_var('register_multi', true);
+                            $avail_tickets = $this->Event->options['max_user_rsvp'] -
+                                        $total_tickets;
+                            for ($i = 1; $i <= $avail_tickets; $i++) {
+                                $T->set_var('tick_cnt', $i);
+                                $T->parse('tcBlk', 'tickCntBlk', true);
+                            }
+                        } else {
+                            $T->set_var('register_unltd', 'true');
                         }
-                    } else {
-                        $T->set_var('register_unltd', 'true');
-                    }
-                    $T->set_block('event', 'tickTypeBlk', 'tBlk');
-                    foreach ($this->Event->options['tickets'] as $tick_id=>$data) {
-                        $status = LGLIB_invokeService('paypal', 'formatAmount',
-                                array('amount' => $data['fee']), $pp_fmt_amt, $svc_msg);
-                        $fmt_amt = $status == PLG_RET_OK ?
-                                $pp_fmt_amt : COM_numberFormat($data['fee'], 2);
+                        $T->set_block('event', 'tickTypeBlk', 'tBlk');
+                        foreach ($this->Event->options['tickets'] as $tick_id=>$data) {
+                            // Skip ticket types that may have been disabled
+                            if (!array_key_exists($tick_id, $Ticks)) continue;
+                            $status = LGLIB_invokeService('paypal', 'formatAmount',
+                                    array('amount' => $data['fee']), $pp_fmt_amt, $svc_msg);
+                            $fmt_amt = $status == PLG_RET_OK ?
+                                    $pp_fmt_amt : COM_numberFormat($data['fee'], 2);
+                            $T->set_var(array(
+                                'tick_type' => $tick_id,
+                                'tick_descr' => $Ticks[$tick_id]->description,
+                                'tick_fee' => $data['fee'] > 0 ? $fmt_amt : 'FREE',
+                            ) );
+                            $T->parse('tBlk', 'tickTypeBlk', true);
+                        }
                         $T->set_var(array(
-                            'tick_type' => $tick_id,
-                            'tick_descr' => $Ticks[$tick_id]->description,
-                            'tick_fee' => $data['fee'] > 0 ? $fmt_amt : 'FREE',
+                            'register_link' => 'true',
+                            'ticket_types_multi' => count($this->Event->options['tickets']) > 1 ? 'true' : '',
                         ) );
-                        $T->parse('tBlk', 'tickTypeBlk', true);
                     }
-                    $T->set_var(array(
-                        'register_link' => 'true',
-                        'ticket_types_multi' => count($this->Event->options['tickets']) > 1 ? 'true' : '',
-                    ) );
                 }
             }
 
@@ -824,6 +828,8 @@ class Repeat
         $T->set_block('event', 'registerBlock', 'rBlock');
         if (is_array($this->Event->options['tickets'])) {
             foreach ($this->Event->options['tickets'] as $tic_type=>$info) {
+                // Skip ticket types that may have been disabled
+                if (!array_key_exists($tic_type, $tick_types)) continue;
                 $T->set_var(array(
                     'tic_description' => $tick_types[$tic_type]->description,
                     'tic_fee' => COM_numberFormat($info['fee'], 2),

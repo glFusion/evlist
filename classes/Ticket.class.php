@@ -91,6 +91,10 @@ class Ticket
         case 'ev_id':
             $this->properties[$key] = trim($value);
             break;
+
+        case 'waitlist':
+            $this->properties[$key] = $value == 1 ? 1 : 0;
+            break;
         }
     }
 
@@ -129,6 +133,7 @@ class Ticket
         $this->paid = $A['paid'];
         $this->used = $A['used'];
         $this->dt = $A['dt'];
+        $this->waitlist = $A['waitlist'];
     }
 
 
@@ -162,9 +167,10 @@ class Ticket
     *   @param  integer $type   Type of ticket, from the ticket_types table
     *   @param  float   $fee    Optional Ticket Fee, default = 0 (free)
     *   @param  integer $uid    Optional User ID, default = current user
+    *   @param  integer $wl     Waitlisted ? 1 = yes, 0 = no
     *   @return     string  Ticket identifier
     */
-    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0)
+    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0)
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
@@ -173,7 +179,7 @@ class Ticket
         $rp_id = (int)$rp_id;
         $fee = (float)$fee;
         $type = (int)$type;
-
+        $wl = $wl == 0 ? 0 : 1;
         $tic_id = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
 
         $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
@@ -185,7 +191,8 @@ class Ticket
             paid = 0,
             uid = $uid,
             used = 0,
-            dt = UNIX_TIMESTAMP()";
+            dt = UNIX_TIMESTAMP(),
+            waitlist = $wl";
 
         //echo $sql;die;
         DB_query($sql, 1);
@@ -244,25 +251,36 @@ class Ticket
 
 
     /**
-    *   Deletes the current or specified ticket.
+    *   Deletes the specified ticket(s).
     *
-    *   @param  integer $id     ID of ticket to delete
+    *   @param  mixed   $id     Single or Array of ticket IDs to delete
     */
     public static function Delete($id='')
     {
         global $_TABLES;
 
         if (is_array($id)) {
+            $key = $id[0];
             foreach ($id as $idx=>$tic_id) {
                 $id[$idx] = DB_escapeString($tic_id);
             }
             $where = "IN ('" . implode("','", $id) . "')";
         } else {
+            $key = $id;
             $id = DB_escapeString($id);
             $where = "= '$id'";
         }
+        // Grab a ticket to get the event information to find out if the
+        // waitlist should be updated.
+        $tic = new self($key);
+        $Ev = new Event($tic->ev_id);
+        $max_rsvp = (int)$Ev->options['max_rsvp'];
         $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE tic_id $where";
         DB_query($sql);
+        // Now that the tickets have been deleted, reset the waitlist if needed
+        if ($max_rsvp > 0 && $Ev->options['rsvp_waitlist'] == 1) {
+            self::resetWaitlist($max_rsvp, $Ev->id, $tic->rp_id);
+        }
         EVLIST_log("Deleted tickets $where");
     }
 
@@ -333,7 +351,7 @@ class Ticket
         if (!empty($where)) {
             $sql_where = implode(' AND ', $where);
             $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE $sql_where
-                    ORDER BY dt ASC";
+                    ORDER BY waitlist, dt ASC";
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 // create empty objects and use SetVars to save DB lookups
@@ -392,6 +410,9 @@ class Ticket
         $tic_types = array();
         $counter = 0;
         foreach ($tickets as $tic_id=>$ticket) {
+            // Don't print waitlisted tickets
+            if ($ticket->waitlist == 1) continue;
+
             if (!isset($tick_types[$ticket->tic_type])) {
                 $tick_types[$ticket->tic_type] = new TicketType($ticket->tic_type);
             }
@@ -701,6 +722,44 @@ class Ticket
         $sql .= " LIMIT $count";
         DB_query($sql);
         return self::CountUnpaid($ev_id, $rp_id, $uid);
+    }
+
+
+    /**
+    *   Reset the waitlist status for tickets.
+    *   Called after deleting or cancelling tickets to move waitlisted
+    *   tickets to non-waitlisted.
+    *
+    *   @param  integer $max_rsvp   Max reservations
+    *   @param  string  $ev_id      Event ID
+    *   @param  integer $rp_id      Instance ID
+    *   @param  integer $count      Count of tickets that were removed
+    *   @return array               Array of updated ticket IDs
+    */
+    public static function resetWaitlist($max_rsvp, $ev_id, $rp_id)
+    {
+        global $_TABLES;
+
+        if ($max_rsvp == 0) return array();   // no max, nothing to change
+        $upd = array();
+        $tickets = self::getTickets($ev_id, $rp_id);
+        $i = 0;
+        foreach ($tickets as $tic_id=>$ticket) {
+            if ($i < $max_rsvp) {
+                if ($ticket->waitlist == 1) {
+                    $upd[] = DB_escapeString($tic_id);
+                }
+            }
+            $i++;
+        }
+        if (!empty($upd)) {
+            $sql_str = "'" . implode("','", $upd) . "'";
+            $sql = "UPDATE {$_TABLES['evlist_tickets']}
+                    SET waitlist = 0
+                    WHERE tic_id IN ($sql_str)";
+            DB_query($sql);
+        }
+        return $upd;
     }
 
 }   // class Ticket

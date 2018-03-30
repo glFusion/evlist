@@ -1,6 +1,7 @@
 # evList plugin for glFusion - Changelog
 ## v1.4.5
 Unreleased
+- Add waitlist status to ticket table, update when tickets are removed
 - Save calendar display checkbox in session variable
 - Use the common colorpicker from LGLIB
 - Integration with the Birthdays plugin

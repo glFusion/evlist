@@ -898,39 +898,40 @@ class Repeat
         // waitlisting is disabled
         $total_reg = $this->TotalRegistrations();
         $new_total = $total_reg + $num_attendees;
-        if ($this->Event->options['max_rsvp'] > 0 &&
-                $this->Event->options['max_rsvp'] < $new_total) {
+        $max_rsvp = $this->Event->options['max_rsvp'];
+        if ($max_rsvp > 0 && $max_rsvp < $new_total) {
             if ($this->Event->options['rsvp_waitlist'] == 0 || $fee > 0) {
                 // Event is full, no waiting list. Can't waitlist paid tickets.
-                COM_setMsg($LANG_EVLIST['messages'][22]);
+                LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
                 return 22;
             } else {
                 // Set message indicating the waiting list and continue to register
-                $waitlist = $new_total - $this->Event->options['max_rsvp'];
-                if ($waitlist == $num_attendees) {
+                $waitlist = $new_total - $max_rsvp;
+                if ($waitlist >= $num_attendees) {
                     // All tickets are waitlisted
                     $str = $LANG_EVLIST['all'];
                 } else {
+                    $waitlist = $new_total - $max_rsvp;
                     $str = $waitlist;
                 }
-                COM_setMsg($LANG_EVLIST['messages']['22'] . ' ' .
+                LGLIB_storeMessage($LANG_EVLIST['messages']['22'] . ' ' .
                     sprintf($LANG_EVLIST['messages'][27], $str));
             }
         }
 
         if ($fee > 0) {
-            // add tickes to the shopping cart. Tickets will be created
-            // when paid.
+            // add tickes to the shopping cart. Tickets will be flagged
+            // as unpaid.
             $this->AddToCart($tick_type, $num_attendees);
             COM_setMsg($LANG_EVLIST['messages']['24']);
             $status = LGLIB_invokeService('paypal', 'getURL',
                 array('type'=>'checkout'), $url, $msg);
             if ($status == PLG_RET_OK) {
-                COM_setMsg(sprintf($LANG_EVLIST['messages']['26'],
+                LGLIB_storeMessage(sprintf($LANG_EVLIST['messages']['26'],
                     $url), '', true);
             }
         } else {
-            COM_setMsg($LANG_EVLIST['messages'][24]);
+            LGLIB_storeMessage($LANG_EVLIST['messages'][24]);
         }
 
         // for free tickets, just create the ticket records
@@ -940,8 +941,12 @@ class Repeat
         } else {
             $t_rp_id = $this->rp_id;
         }
-        for ($i = 0; $i < $num_attendees; $i++) {
-            Ticket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid);
+        $wl = 0;
+        for ($i = 1; $i <= $num_attendees; $i++) {
+            if ($max_rsvp > 0) {
+                $wl = ($total_reg + $i) <= $max_rsvp ? 0 : 1;
+            }
+            Ticket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid, $wl);
         }
         return 0;
     }
@@ -966,9 +971,16 @@ class Repeat
                 ev_id = '" . $this->Event->id . "'
                 AND uid = $uid
                 AND fee = 0
-                ORDER BY dt DESC";
+                ORDER BY waitlist,dt DESC";
         if ($num > 0) $sql .= " LIMIT $num";
         DB_query($sql, 1);
+
+        if ($this->Event->options['max_rsvp'] > 0 &&
+            $this->Event->options['rsvp_waitlist'] == 1) {
+            // for free tickets, just create the ticket records
+            $TickType = new TicketType($tick_type);
+            Ticket::resetWaitlist($this->Event->options['max_rsvp'], $this->ev_id, $this->rp_id);
+        }
         return DB_error() ? false : true;
     }
 

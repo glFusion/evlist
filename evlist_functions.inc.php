@@ -37,9 +37,9 @@
 *
 *   @author     Lee P. Garner <lee@leegarner.com
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.3
+*   @version    1.4.5
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -435,10 +435,8 @@ function EVLIST_adminRSVP($rp_id)
     $Ev = new Evlist\Repeat($rp_id);
     if ($Ev->rp_id == 0) return '';
 
-    DB_query("SET @tk_count = 0;");
-    $sql = "SELECT @tk_count := @tk_count +1 as tic_count,
-                    tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                    tk.uid, tk.used, tt.description, u.fullname,
+    $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
+                    tk.uid, tk.used, tt.description, tk.waitlist, u.fullname,
                     {$Ev->Event->options['max_rsvp']} as max_rsvp
             FROM {$_TABLES['evlist_tickets']} tk
             LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
@@ -459,7 +457,7 @@ function EVLIST_adminRSVP($rp_id)
         $sql .= " AND rp_id = '{$Ev->rp_id}' ";
     }
 
-    $defsort_arr = array('field' => 'dt', 'direction' => 'ASC');
+    $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
     $text_arr = array(
         'has_menu'     => false,
         'has_extras'   => false,
@@ -494,7 +492,7 @@ function EVLIST_adminRSVP($rp_id)
                 'sort'  => false,
         ),
         array(  'text'  => $LANG_EVLIST['waitlisted'],
-                'field' => 'tic_count',
+                'field' => 'waitlist',
                 'sort'  => false,
         ),
     );
@@ -549,12 +547,8 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
     $retval = '';
 
     switch($fieldname) {
-    case 'tic_count':
-        if ($A['max_rsvp'] == 0 || $fieldvalue <= $A['max_rsvp']) {
-            $retval = '';
-        } else {
-            $retval = $LANG_EVLIST['yes'];
-        }
+    case 'waitlist':
+        $retval = $fieldvalue == 0 ? '' : $LANG_EVLIST['yes'];
         break;
 
     case 'uid':

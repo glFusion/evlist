@@ -165,6 +165,23 @@ $_SQL['evlist_rsvp'] = "CREATE TABLE {$_TABLES['evlist_rsvp']} (
   PRIMARY KEY (`ev_id`,`rp_id`,`uid`)
 ) ENGINE=MyISAM";
 
+$_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
+  `tic_id` varchar(128) NOT NULL,
+  `tic_type` int(11) unsigned NOT NULL DEFAULT '0',
+  `ev_id` varchar(128) NOT NULL,
+  `rp_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `fee` float(6,2) unsigned NOT NULL DEFAULT '0.00',
+  `paid` float(6,2) unsigned NOT NULL DEFAULT '0.00',
+  `uid` int(11) unsigned NOT NULL,
+  `used` int(11) unsigned NOT NULL DEFAULT '0',
+  `dt` int(11) unsigned DEFAULT '0',
+  `waitlist` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tic_id`),
+  KEY `evt_rep` (`ev_id`,`rp_id`),
+  KEY `user` (`uid`,`ev_id`),
+  KEY `ev_dt` (`ev_id`,`dt`)
+) ENGINE=MyISAM";
+
 $_EV_UPGRADE = array(
 '1.3.0' => array(
     "CREATE TABLE {$_TABLES['evlist_calendars']} (
@@ -329,9 +346,10 @@ $_EV_UPGRADE = array(
     "INSERT INTO {$_TABLES['evlist_calendars']} VALUES
         (-1, 'Meetup Events', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2),
         (-2, 'Birthdays', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2)",
+    "ALTER TABLE {$_TABLES['evlist_tickets']}
+        ADD waitlist tinyint(1) unsigned not null default 0",
     ),
 );
-$_SQL['evlist_tickets'] = $_EV_UPGRADE['1.3.7'][0];
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];
 

@@ -1692,15 +1692,15 @@ class Event
                 $this->rec_data : array();
 
             // Check the recurring event options
-            $diff = array_diff_assoc($old_rec, $new_rec);
+            $diff = self::_arrayDiffAssocRecursive($old_rec, $new_rec);
             if (!empty($diff)) return true;
 
             // Have to descend into sub-arrays manually.  Old and/or new
             // values may not be arrays if the recurrence type was changed.
             foreach (array('listdays', 'interval', 'custom') as $key) {
-                $oldA = is_array($old_rec[$key]) ? $old_rec[$key] : array();
-                $newA = is_array($new_rec[$key]) ? $new_rec[$key] : array();
-                $diff = array_diff_assoc($oldA, $newA);
+                $oldA = isset($old_rec[$key]) && is_array($old_rec[$key]) ? $old_rec[$key] : array();
+                $newA = isset($new_rec[$key]) && is_array($new_rec[$key]) ? $new_rec[$key] : array();
+                $diff = self::_arrayDiffAssocRecursive($oldA, $newA);
                 if (!empty($diff)) return true;
             }
         } else {
@@ -1711,6 +1711,37 @@ class Event
 
         // If all tests fail, return false (no need to update repeats
         return false;
+    }
+
+
+    /**
+    *   Recursively check two arrays for differences.
+    *   From http://nl3.php.net/manual/en/function.array-diff-assoc.php#73972
+    *
+    *   @param  array   $array1     First array
+    *   @param  array   $array2     Second array
+    *   @return mixed       Array of differences, or 0 if none.
+    */
+    private static function _arrayDiffAssocRecursive($array1, $array2)
+    {
+        $difference = array();
+        foreach($array1 as $key => $value) {
+            if (is_array($value)) {
+                if (!isset($array2[$key])) {
+                    $difference[$key] = $value;
+                } elseif (!is_array($array2[$key])) {
+                    $difference[$key] = $value;
+                } else  {
+                    $new_diff = self::_arrayDiffAssocRecursive($value, $array2[$key]);
+                    if ($new_diff !== 0) {
+                        $difference[$key] = $new_diff;
+                    }
+                }
+            } elseif (!isset($array2[$key]) || $array2[$key] != $value) {
+                $difference[$key] = $value;
+            }
+        }
+        return empty($difference) ? 0 : $difference;
     }
 
 

@@ -233,14 +233,11 @@ class TicketType
     *   @param  integer $id     Ticket type ID
     *   @return boolean     False if unused, True if used
     */
-    public function isUsed($id=0)
+    public static function isUsed($id=0)
     {
         global $_TABLES;
 
         $id = (int)$id;
-        if ($id == 0 && is_object($this)) {
-            $id = $this->id;
-        }
         $count = DB_count($_TABLES['evlist_tickets'], 'tic_type', $id);
         return $count == 0 ? false : true;
     }
@@ -299,6 +296,7 @@ class TicketType
         $key = $enabled ? 1 : 0;
 
         if (!isset($types[$key])) {
+            $types[$key] = array();
             $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']}";
             if ($enabled) $sql .= " WHERE enabled = 1";
             $res = DB_query($sql, 1);

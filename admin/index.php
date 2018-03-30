@@ -132,13 +132,13 @@ function EVLIST_adminlist_categories()
     $retval = '';
 
     $header_arr = array(
-        array('text' => $LANG_EVLIST['edit'], 
+        array('text' => $LANG_EVLIST['edit'],
                 'field' => 'edit', 'sort' => false,
                 'align' => 'center',
         ),
-        array('text' => $LANG_EVLIST['id'], 
+        array('text' => $LANG_EVLIST['id'],
                 'field' => 'id', 'sort' => true),
-        array('text' => $LANG_EVLIST['cat_name'], 
+        array('text' => $LANG_EVLIST['cat_name'],
                 'field' => 'name', 'sort' => true),
         array('text' => $LANG_EVLIST['enabled'],
                 'field' => 'status', 'sort' => false,
@@ -166,7 +166,7 @@ function EVLIST_adminlist_categories()
             'query_fields' => array('name'),
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_cat', 
+    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_cat',
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -187,13 +187,13 @@ function EVLIST_adminlist_tickettypes()
     $retval = '';
 
     $header_arr = array(
-        array('text' => $LANG_EVLIST['edit'], 
+        array('text' => $LANG_EVLIST['edit'],
                 'field' => 'edit', 'sort' => false,
                 'align' => 'center',
         ),
-        array('text' => $LANG_EVLIST['id'], 
+        array('text' => $LANG_EVLIST['id'],
                 'field' => 'id', 'sort' => true),
-        array('text' => $LANG_EVLIST['description'], 
+        array('text' => $LANG_EVLIST['description'],
                 'field' => 'description', 'sort' => true),
         array('text' => $LANG_EVLIST['enabled'],
                 'field' => 'enabled', 'sort' => false),
@@ -222,7 +222,7 @@ function EVLIST_adminlist_tickettypes()
             'query_fields' => array('description'),
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickettypes', 
+    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickettypes',
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -243,9 +243,9 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
     $retval = '';
 
     $header_arr = array(
-        array('text' => $LANG_EVLIST['id'], 
+        array('text' => $LANG_EVLIST['id'],
                 'field' => 'tick_id', 'sort' => true),
-        array('text' => $LANG_EVLIST['registrant'], 
+        array('text' => $LANG_EVLIST['registrant'],
                 'field' => 'uid', 'sort' => false),
         array('text' => $LANG_EVLIST['fee'],
                 'field' => 'fee', 'sort' => false),
@@ -277,7 +277,7 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
             'query_fields' => array(),
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickets', 
+    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickets',
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -298,16 +298,16 @@ function EVLIST_admin_list_events()
     $retval = '';
 
     $header_arr = array(
-        array('text' => $LANG_EVLIST['edit'], 
+        array('text' => $LANG_EVLIST['edit'],
                 'field' => 'edit', 'sort' => false,
                 'align' => 'center',
         ),
-        array('text' => $LANG_EVLIST['copy'], 
+        array('text' => $LANG_EVLIST['copy'],
                 'field' => 'copy', 'sort' => false,
                 'align' => 'center',
         ),
         array('text' => $LANG_EVLIST['id'], 'field' => 'id', 'sort' => true),
-        array('text' => $LANG_EVLIST['title'], 
+        array('text' => $LANG_EVLIST['title'],
                 'field' => 'title', 'sort' => true),
         array('text' => $LANG_EVLIST['start_date'],
                 'field' => 'date_start1', 'sort' => true),
@@ -333,7 +333,7 @@ function EVLIST_admin_list_events()
 
     // Select distinct to get only one entry per event.  We can only edit/modify
     // events here, not repeats
-    $sql = "SELECT DISTINCT(ev.id), det.title, ev.date_start1, ev.status 
+    $sql = "SELECT DISTINCT(ev.id), det.title, ev.date_start1, ev.status
             FROM {$_TABLES['evlist_events']} ev
             LEFT JOIN {$_TABLES['evlist_detail']} det
                 ON det.ev_id = ev.id
@@ -341,7 +341,7 @@ function EVLIST_admin_list_events()
 
     $query_arr = array('table' => 'users',
             'sql' => $sql,
-            'query_fields' => array('id', 'title', 'summary', 
+            'query_fields' => array('id', 'title', 'summary',
             'full_description', 'location', 'date_start1', 'status')
     );
 
@@ -368,7 +368,7 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
     $retval = '';
     switch($fieldname) {
         case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL . 
+            $retval = '<a href="' . EVLIST_ADMIN_URL .
                 '/index.php?editcat=x&amp;id=' . $A['id'].
                 '" title="' . $LANG_ADMIN['edit'] . '">';
             if ($_EV_CONF['_is_uikit']) {
@@ -386,8 +386,8 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
                 $switch = '';
                 $enabled = 0;
             }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\" 
-                name=\"cat_check\" 
+            $retval .= "<input type=\"checkbox\" $switch value=\"1\"
+                name=\"cat_check\"
                 id=\"togenabled{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
                 '"category","'.EVLIST_ADMIN_URL."\");' />".LB;
@@ -398,7 +398,7 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
                     EVLIST_ADMIN_URL. '/index.php?delcat=x&id=' . $A['id'],
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                         'title' => $LANG_ADMIN['delete'],
-                    ) 
+                    )
                 );
 
         break;
@@ -423,9 +423,10 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
 
+    $retval = '';
     switch($fieldname) {
         case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL . 
+            $retval = '<a href="' . EVLIST_ADMIN_URL .
                 '/index.php?editticket=' . $A['id'].
                 '" title="' . $LANG_ADMIN['edit'] . '" />' .
                 $icon_arr['edit'] . '</a>';
@@ -439,8 +440,8 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
                 $switch = '';
                 $enabled = 0;
             }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\" 
-                name=\"cat_check\" 
+            $retval = "<input type=\"checkbox\" $switch value=\"1\"
+                name=\"cat_check\"
                 id=\"tog{$fieldname}{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"{$fieldname}\",".
                 "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
@@ -452,7 +453,7 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
                     EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                         'title' => $LANG_ADMIN['delete'],
-                    ) 
+                    )
                 );
             }
             break;
@@ -491,7 +492,7 @@ function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_ar
             EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
             array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
             'title' => $LANG_ADMIN['delete'],
-            ) 
+            )
         );
         break;
     case 'uid':
@@ -523,8 +524,8 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 
     switch($fieldname) {
         case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL . 
-                '/index.php?edit=event&amp;eid=' . $A['id'] . 
+            $retval = '<a href="' . EVLIST_ADMIN_URL .
+                '/index.php?edit=event&amp;eid=' . $A['id'] .
                 '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '">';
             if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-edit"></i>';
@@ -534,8 +535,8 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= '</a>';
             break;
         case 'copy':
-            $retval = '<a href="' . EVLIST_URL . 
-                '/event.php?clone=x&amp;eid=' . $A['id'] . 
+            $retval = '<a href="' . EVLIST_URL .
+                '/event.php?clone=x&amp;eid=' . $A['id'] .
                 '" title="' . $LANG_EVLIST['copy'] . '">';
             if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-clone"></i>';
@@ -561,7 +562,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
                 $switch = '';
                 $enabled = 0;
             }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\" 
+            $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
                 id=\"event_{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
                 '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
@@ -579,7 +580,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
                     EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'],
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
                         'title' => $LANG_ADMIN['delete'],
-                    ) 
+                    )
                 );
             break;
         default:
@@ -604,16 +605,16 @@ function EVLIST_admin_list_calendars()
     $retval = '';
 
     $header_arr = array(
-        array(  'text'  => $LANG_EVLIST['edit'], 
+        array(  'text'  => $LANG_EVLIST['edit'],
                 'field' => 'edit',
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_EVLIST['id'], 
+        array(  'text'  => $LANG_EVLIST['id'],
                 'field' => 'cal_id',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_EVLIST['title'], 
+        array(  'text'  => $LANG_EVLIST['title'],
                 'field' => 'cal_name',
                 'sort'  => true,
             ),
@@ -645,11 +646,11 @@ function EVLIST_admin_list_calendars()
 
     $query_arr = array('table' => 'evlist_calendars',
             'sql' => $sql,
-            'query_fields' => array('id', 'cal_name',), 
+            'query_fields' => array('id', 'cal_name',),
     );
 
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_field_calendars', 
+    $retval .= ADMIN_list('evlist', 'EVLIST_admin_field_calendars',
                 $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -671,8 +672,8 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
     $retval = '';
     switch($fieldname) {
         case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL . 
-                '/index.php?editcal=' . $A['cal_id'] . 
+            $retval = '<a href="' . EVLIST_ADMIN_URL .
+                '/index.php?editcal=' . $A['cal_id'] .
                 '" title="' . $LANG_EVLIST['edit_calendar'] . '" />';
             if ($_EV_CONF['_is_uikit']) {
                 $retval .= '<i class="uk-icon-edit"></i>';
@@ -689,7 +690,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
                 $switch = '';
                 $enabled = 0;
             }
-            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\" 
+            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\"
                 id=\"togenabled{$A['cal_id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
                 '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
@@ -703,7 +704,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
                 }
                 $retval = COM_createLink(
                     $del_icon,
-                    EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . 
+                    EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' .
                         $A['cal_id'],
                     array(
                         'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');"
@@ -895,7 +896,7 @@ switch ($action) {
 case 'edit':
     $view = 'edit';
     break;
- 
+
 case 'tickdelete_x':
     if (is_array($_POST['delrsvp'])) {
         Evlist\Ticket::Delete($_POST['delrsvp']);
@@ -988,7 +989,7 @@ case 'delcat':
     break;
 
 case 'delevent':
-    $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ? 
+    $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ?
             $_REQUEST['eid'] : '';
     if ($eid != '') {
         Evlist\Event::Delete($eid);
@@ -1014,7 +1015,7 @@ case 'approve':
     // It'd be nice if the MODERATE functions weren't in moderate.php
     $id = isset($_POST['eid']) ? COM_sanitizeId($_POST['eid']) : '';
     if ($id != '') {
-        list($key, $table, $fields, $submissiontable) = 
+        list($key, $table, $fields, $submissiontable) =
             plugin_moderationvalues_evlist();
         DB_copy($table,$fields,$fields,$submissiontable,$key,$id);
         plugin_moderationapprove_evlist($id);
@@ -1040,7 +1041,7 @@ case 'import_cal':
     require_once EVLIST_PI_PATH . '/calendar_import.php';
     $errors = evlist_import_calendar_events();
     if ($errors == -1) {
-        $content .= COM_showMessageText($LANG_EVLIST['err_cal_notavail'], 
+        $content .= COM_showMessageText($LANG_EVLIST['err_cal_notavail'],
                 '', true);
     } elseif ($errors > 0) {
         $content .= COM_showMessageText(
@@ -1139,7 +1140,7 @@ case 'editticket':
 
 case 'rsvp':
     USES_evlist_functions();
-    $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? 
+    $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ?
             $_POST['rp_id'] :
             isset($_GET['rp_id']) && !empty($_GET['rp_id']) ?
             $_GET['rp_id'] : 0;

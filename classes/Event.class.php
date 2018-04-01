@@ -415,7 +415,6 @@ class Event
             }
             $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
         }
-
     }
 
 
@@ -1902,18 +1901,6 @@ class Event
             }
         }
         return $canedit;
-    }
-
-
-    /**
-    *   Check if this event is one from meetup.com
-    *   Indicated by a calendar ID of "-1"
-    *
-    *   @return boolean     True if this is a meetup event, False if not.
-    */
-    public function isMeetup()
-    {
-        return $this->cal_id == -1;
     }
 
 }   // class Event

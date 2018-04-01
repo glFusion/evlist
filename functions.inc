@@ -2595,10 +2595,12 @@ function EVLIST_getBirthdays($start, $end, &$events)
 
     if (!$_EV_CONF['birthdays_enabled']) return;
 
-    $status = LGLIB_invokeService('birthdays', 'getBirthdays',
-            array('start' => $start, 'end' => $end), $birthdays, $svc_msg);
-    // in case of error, do nothing
-    if ($status != PLG_RET_OK || empty($birthdays)) return;
+    $args = array(1 => array(
+        'start' => $start,
+        'end' => $end,
+    ));
+    $birthdays = PLG_callFunctionForOnePlugin('plugin_getBirthdays_birthdays', $args);
+    if (empty($birthdays)) return;  // Could be empty, not an error
 
     $Cal = \Evlist\Calendar::getInstance(-2);
 

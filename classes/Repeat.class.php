@@ -1221,16 +1221,13 @@ class Repeat
     *   Get the ID of the next upcoming instance of a given event.
     *
     *   @param  string  $ev_id  Event ID
-    *   @param  integer $ts     Starting timestamp, default to "now"
     *   @return integer         ID of the next instance of this event
     */
-    public static function getUpcoming($ev_id, $ts = NULL)
+    public static function getUpcoming($ev_id)
     {
         global $_EV_CONF, $_TABLES, $_CONF;
 
-        if ($ts === NULL) $ts = $_EV_CONF['_today_ts'];
-        $D = new \Date($ts, $_CONF['timezone']);
-        $sql_date = $D->toMySQL(true);
+        $sql_date = $_EV_CONF['now']->toMySQL(true);
         return DB_getItem($_TABLES['evlist_repeat'], 'rp_id',
                 "rp_ev_id = '" . DB_escapeString($ev_id) . "'
                     AND rp_end >= '$sql_date'
@@ -1278,6 +1275,8 @@ class Repeat
     *   Get the nearest event, upcoming or past.
     *   Try first to get the closest upcoming instance, then try for the
     *   most recent past instance.
+    *   Used when sharing social links to retrieve the instance that's most
+    *   likely of interest.
     *
     *   @uses   Repeat::getLast()
     *   @uses   Repeat::getUpcoming()

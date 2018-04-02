@@ -1,11 +1,14 @@
 {# begin {templatelocation} #}
 <div class="show_cal{cal_id}" style="display:{show};">
-  <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
   <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{ev_hover}">
 {!if bgcolor}
-  <span style="color:#000;background-color:{bgcolor};">{event_title}</span>
+  <span style="color:#000;background-color:{bgcolor};">
+    <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
+    {event_title}
+  </span>
 {!else}
-  {event_title}
+    <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
+    {event_title}
 {!endif}
   </span>{br}
 </div>

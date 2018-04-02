@@ -156,15 +156,7 @@ class View_week extends View
                         $event_time .= ' & ' . $starttime2 . ' - ' . $endtime2;
                     }
                 }
-                if (isset($A['cal_id'])) {
-                    $this->cal_used[$A['cal_id']] = array(
-                        'cal_name' => $A['cal_name'],
-                        'cal_ena_ical' => $A['cal_ena_ical'],
-                        'cal_id' => $A['cal_id'],
-                        'fgcolor' => $A['fgcolor'],
-                        'bgcolor' => $A['bgcolor'],
-                    );
-                }
+                $this->addCalUsed($A);
 
                 $T->set_var(array(
                     'event_times'   => $event_time,
@@ -184,10 +176,12 @@ class View_week extends View
                     break;
                 case -2:
                     $T->set_var('icon', 'birthday-cake');
+                    $T->set_var('bgcolor', $A['bgcolor']);
                     $T->set_var('hover', sprintf($LANG_EVLIST['hover_birthday'], $A['summary']));
                     $T->parse('event', 'birthday', false);
                     break;
                 default:
+                    $T->set_var('bgcolor', '');
                     $T->parse('event', 'event', false);
                     break;
                 }

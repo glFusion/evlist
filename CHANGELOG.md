@@ -2,7 +2,7 @@
 ## v1.4.5
 Unreleased
 - Add waitlist status to ticket table, update when tickets are removed
-- Save calendar display checkbox in session variable
+- Save calendar display checkbox changes in session variable
 - Use the common colorpicker from LGLIB
 - Integration with the Birthdays plugin
 - Fix error when re-editing a new event due to an error

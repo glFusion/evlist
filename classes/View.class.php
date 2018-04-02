@@ -29,7 +29,7 @@ class View
     protected $cat;         // Category to display
     protected $cal;         // Calendar to display
     protected $opts;        // Misc. options
-    protected $cal_used;    // Array of calendars used in display
+    protected $cal_used = array();    // Array of calendars used in display
     protected $range;       // Range selector (past, future, etc)
     protected $today;       // Holder for today's date
     protected $today_sql;   // Today's date in YYYY-MM-DD format. Used often.
@@ -502,6 +502,27 @@ class View
             return 0;
         } else {
             return 1;
+        }
+    }
+
+
+    /**
+    *   Add calender info to the cal_used array.
+    *   Used later to build the calendar checkboxes and subscription links.
+    *
+    *   @param  array   $event  Array of event info
+    */
+    protected function addCalUsed($event)
+    {
+        if (!isset($event['cal_id'])) return;   // invalid calendar info
+        if (!array_key_exists($event['cal_id'], $this->cal_used)) {
+            $this->cal_used[$event['cal_id']] = array(
+                    'cal_name' => $event['cal_name'],
+                    'cal_ena_ical' => $event['cal_ena_ical'],
+                    'cal_id' => $event['cal_id'],
+                    'fgcolor' => $event['fgcolor'],
+                    'bgcolor' => $event['bgcolor'],
+                );
         }
     }
 

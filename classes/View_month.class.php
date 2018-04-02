@@ -143,15 +143,7 @@ class View_month extends View
                     $summary = htmlentities(strip_tags($event['summary']));
 
                     // add the calendar to the array to create the JS checkboxes
-                    if (isset($event['cal_id'])) {
-                        $this->cal_used[$event['cal_id']] = array(
-                            'cal_name' => $event['cal_name'],
-                            'cal_ena_ical' => $event['cal_ena_ical'],
-                            'cal_id' => $event['cal_id'],
-                            'fgcolor' => $event['fgcolor'],
-                            'bgcolor' => $event['bgcolor'],
-                        );
-                    }
+                    $this->addCalUsed($event);
 
                     // Create the hover tooltip.  Timed events show the times first
                     if ($event['allday'] == 0) {

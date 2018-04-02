@@ -75,15 +75,7 @@ class View_day extends View
         if ($alldaycount > 0) {
             for ($i = 1; $i <= $alldaycount; $i++) {
                 $A = current($allday);
-                if (isset($A['cal_id'])) {
-                    $this->cal_used[$A['cal_id']] = array(
-                        'cal_name' => $A['cal_name'],
-                        'cal_ena_ical' => $A['cal_ena_ical'],
-                        'cal_id' => $A['cal_id'],
-                        'fgcolor' => $A['fgcolor'],
-                        'bgcolor' => $A['bgcolor'],
-                    );
-                }
+                $this->addCalUsed($A);
 
                 $T->set_var(array(
                     'delete_imagelink'  => EVLIST_deleteImageLink($A, $token),
@@ -140,15 +132,7 @@ class View_day extends View
                 $s_dt = new \Date($A['data']['rp_date_start'] . ' ' . $A['data']['rp_time_start1'], $tz);
                 $e_dt = new \Date($A['data']['rp_date_end'] . ' ' . $A['data']['rp_time_end1'], $tz);
 
-                if (isset($A['data']['cal_id'])) {
-                    $this->cal_used[$A['data']['cal_id']] = array(
-                        'cal_name' => $A['data']['cal_name'],
-                        'cal_ena_ical' => $A['data']['cal_ena_ical'],
-                        'cal_id' => $A['data']['cal_id'],
-                        'fgcolor' => $A['data']['fgcolor'],
-                        'bgcolor' => $A['data']['bgcolor'],
-                    );
-                }
+                $this->addCalUsed($A['data']);
 
                 if ($s_dt->format('Y-m-d', true) != $today->format('Y-m-d', true)) {
                     $start_time = $s_dt->format($_CONF['shortdate']) . ' @ ';

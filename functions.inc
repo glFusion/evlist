@@ -2646,11 +2646,6 @@ function EVLIST_Log($logentry = '')
 {
     global $_CONF, $_USER, $LANG01;
 
-    if (function_exists('LGLIB_log')) {
-        LGLIB_log('evlist', $logentry);
-        return;
-    }
-
     if ($logentry == '')
         return '';
 

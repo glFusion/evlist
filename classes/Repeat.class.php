@@ -1227,7 +1227,7 @@ class Repeat
     {
         global $_EV_CONF, $_TABLES, $_CONF;
 
-        $sql_date = $_EV_CONF['now']->toMySQL(true);
+        $sql_date = $_EV_CONF['_now']->toMySQL(true);
         return DB_getItem($_TABLES['evlist_repeat'], 'rp_id',
                 "rp_ev_id = '" . DB_escapeString($ev_id) . "'
                     AND rp_end >= '$sql_date'

@@ -53,7 +53,7 @@ if (!defined ('GVERSION')) {
 global $_DB_dbms, $c, $_CONF, $CONF_EVLIST_DEFAULT;
 require_once __DIR__ . "/sql/{$_DB_dbms}_install.php";
 require_once $_CONF['path'] . 'system/classes/config.class.php';
-require_once $_CONF['path'] . 'plugins/evlist/install_defaults.php';
+require_once __DIR__ . '/install_defaults.php';
 $c = config::get_instance();
 
 /**

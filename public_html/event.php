@@ -270,7 +270,7 @@ case 'tickdelete_x':
     // Delete one or more tickets, if admin or owner
     $rp = new Evlist\Repeat($_GET['rp_id']);
     if ($rp->isAdmin) {
-        if (is_array($_POST['delrsvp'])) {
+        if (isset($_POST['delrsvp']) && is_array($_POST['delrsvp'])) {
             Evlist\Ticket::Delete($_POST['delrsvp']);
         }
     }
@@ -281,7 +281,7 @@ case 'tickreset_x':
     // Reset the usage flag for one or more tickets if admin or owner
     $rp = new Evlist\Repeat($_GET['rp_id']);
     if ($rp->isAdmin) {
-        if (is_array($_POST['delrsvp'])) {
+        if (isset($_POST['delrsvp']) && is_array($_POST['delrsvp'])) {
             Evlist\Ticket::Reset($_POST['delrsvp']);
         }
     }

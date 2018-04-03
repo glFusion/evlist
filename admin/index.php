@@ -211,7 +211,7 @@ function EVLIST_adminlist_tickettypes()
                       'has_extras'   => false,
                       'title'        => $LANG_EVLIST['pi_title'].': ' .
                                         $LANG_EVLIST['categories'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?view=tickettypes',
                       'help_url'     => ''
     );
 
@@ -645,7 +645,7 @@ function EVLIST_admin_list_calendars()
                       'has_extras'   => false,
                       'title'        => $LANG_EVLIST['pi_title'].': ' .
                                         $LANG_EVLIST['calendars'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?view=calendars',
                       'help_url'     => ''
     );
 

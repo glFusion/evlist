@@ -312,7 +312,7 @@ class Event
                 $row['enable_reminders'] == 1 ? 1 : 0;
         $this->owner_id = $row['owner_id'];
         $this->group_id = $row['group_id'];
-        $this->enable_comments = $row['enable_comments'];
+        $this->enable_comments = isset($row['enable_comments']) ? 1 : 0;
 
         if (isset($row['categories']) && is_array($row['categories'])) {
             $this->categories = $row['categories'];
@@ -347,10 +347,12 @@ class Event
                 $this->time_start1 = '00:00:00';
                 $this->time_end1 = '23:59:59';
             } else {
-                $tmp = EVLIST_12to24($row['starthour1'], $row['start1_ampm']);
+                $start_ampm = isset($row['start1_ampm']) ? $row['start1_ampm'] : '';
+                $end_ampm = isset($row['end1_ampm']) ? $row['end1_ampm'] : '';
+                $tmp = EVLIST_12to24($row['starthour1'], $start_ampm);
                 $this->time_start1 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute1']);
-                $tmp = EVLIST_12to24($row['endhour1'], $row['end1_ampm']);
+                $tmp = EVLIST_12to24($row['endhour1'], $end_ampm);
                 $this->time_end1 = sprintf('%02d:%02d:00',
                     $tmp, $row['endminute1']);
             }
@@ -385,12 +387,12 @@ class Event
 
             $this->options['tickets'] = array();
             if ($_EV_CONF['enable_rsvp']) {
-                $this->options['use_rsvp'] = (int)$row['use_rsvp'];
-                $this->options['max_rsvp'] = (int)$row['max_rsvp'];
+                $this->options['use_rsvp'] = isset($row['use_rsvp']) ? (int)$row['use_rsvp'] : 0;
+                $this->options['max_rsvp'] = isset($row['max_rsvp']) ? (int)$row['max_rsvp'] : 0;
                 $this->options['rsvp_waitlist'] = isset($row['rsvp_waitlist']) ? 1 : 0;
-                $this->options['rsvp_cutoff'] = (int)$row['rsvp_cutoff'];
+                $this->options['rsvp_cutoff'] = isset($row['rsvp_cutoff']) ? (int)$row['rsvp_cutoff'] : 0;
                 if ($this->options['max_rsvp'] < 0) $this->options['max_rsvp'] = 0;
-                $this->options['max_user_rsvp'] = (int)$row['max_user_rsvp'];
+                $this->options['max_user_rsvp'] = isset($row['max_user_rsvp']) ? (int)$row['max_user_rsvp'] : 0;
                 if (!isset($row['tickets']) || !is_array($row['tickets'])) {
                     // if no ticket specified but rsvp is ensabled, make sure
                     // the general admission ticket is set for free
@@ -404,7 +406,7 @@ class Event
                         'fee' => $tick_fee,
                     );
                 }
-                $this->options['rsvp_print'] = $row['rsvp_print'];
+                $this->options['rsvp_print'] = isset($row['rsvp_print']) ? $row['rsvp_print'] : 0;
             } else {
                 $this->options['use_rsvp'] = 0;
                 $this->options['max_rsvp'] = 0;
@@ -413,7 +415,7 @@ class Event
                 $this->options['max_user_rsvp'] = 1;
                 $this->options['rsvp_print'] = 0;
             }
-            $this->tzid = isset($row['tz_local']) ? 'local' : $row['tzid'];
+            $this->tzid = isset($row['tz_local']) ? 'local' : isset($row['tzid']) ? $row['tzid'] : 'local';
         }
     }
 
@@ -711,15 +713,12 @@ class Event
 
 
     /**
-     *  Delete the current event record and all repeats.
-     */
-    public function Delete($eid = '')
+    *   Delete the current event record and all repeats.
+    */
+    public static function Delete($eid)
     {
         global $_TABLES, $_PP_CONF;
 
-        if ($eid == '' && is_object($this)) {
-            $eid = $this->id;
-        }
         if ($eid == '')
             return false;
 
@@ -729,12 +728,12 @@ class Event
         if (!$res || DB_numRows($res) != 1)
             return false;
 
-        DB_delete($_TABLES['evlist_events'], 'id', $eid);
-        DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
-        DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $eid);
         DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
         DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
         DB_delete($_TABLES['evlist_tickets'], 'ev_id', $eid);
+        DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $eid);
+        DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
+        DB_delete($_TABLES['evlist_events'], 'id', $eid);
         PLG_itemDeleted($eid, 'evlist');
         return true;
     }
@@ -1186,7 +1185,7 @@ class Event
                 // Check enabled tickets. Ticket type 1 enabled by default
                 if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
                     $checked = 'checked="checked"';
-                    if (isset($this->options['tickets'])) {
+                    if (isset($this->options['tickets'][$tick_id])) {
                         $fee = (float)$this->options['tickets'][$tick_id]['fee'];
                     } else {
                         $fee = 0;

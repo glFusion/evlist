@@ -873,7 +873,7 @@ $expected = array(
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
     'tickreset_x', 'tickdelete_x', 'exporttickets',
-    'import_csv', 'import_cal', 'import_csv',
+    'import_csv', 'import_cal',
     // Views to display
     'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
     'import', 'edit', 'editcat', 'editticket', 'tickettypes',

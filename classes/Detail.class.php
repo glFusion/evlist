@@ -165,8 +165,8 @@ class Detail
                 $this->$field = $row[$field];
             }
         }
-        $this->lat = $row['lat'];
-        $this->lng = $row['lng'];
+        $this->lat = isset($row['lat']) ? $row['lat'] : 0;
+        $this->lng = isset($row['lng']) ? $row['lng'] : 0;
     }
 
 
@@ -212,7 +212,6 @@ class Detail
         if (is_array($A)) {
             $this->SetVars($A);
         }
-
         $this->isNew = $this->det_id > 0 ? false : true;
 
         // If integrating with the Locator plugin, try to get and save

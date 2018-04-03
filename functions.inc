@@ -2364,11 +2364,12 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
         Evlist\Cache::set($key, $events, 'evlist_events');
     }
 
-    // Now, get Meetup events
-    if ($_EV_CONF['meetup_enabled']) {
-        EVLIST_getMeetupEvents($start, $end, $opts, $events);
+    // Add the Meetup and Birthday events, if no category is selected.
+    // These event types don't get a category assigned.
+    if (!isset($opts['cat']) || $opts['cat'] == 0) {
+        EVLIST_getMeetupEvents($start, $end, $events);
+        EVLIST_getBirthdays($start, $end, $events);
     }
-    EVLIST_getBirthdays($start, $end, $events);
     return $events;
 }
 
@@ -2380,24 +2381,23 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 *
 *   @param  string  $start      Starting date (YYYY-MM-DD)
 *   @param  string  $end        Ending date (YYYY-MM-DD)
-*   @param  array   $opts       Options passed to caller
 *   @param  array   &$events    Existing array of events
 *   @return none
 */
-function EVLIST_getMeetupEvents($start='', $end='', $opts, &$events)
+function EVLIST_getMeetupEvents($start='', $end='', &$events)
 {
     global $_EV_CONF, $_CONF;
 
-    // Skip meetup events if certain options are set, such as
-    // a specific category.
-    if (isset($opts['cat']) && $opts['cat'] > 0) return array();
+    $Cal = Evlist\Calendar::getInstance(-1);
+    // Check that meetup events and the meetup calendar are enabled
+    if ($_EV_CONF['meetup_enabled'] == 0 || $Cal->cal_status == 0) return;
 
     // Create a unique key for the query for cache identification
     $key = $start . '-' . $end;
     $key = md5($key);
     $M = new Evlist\evMeetup($key);
     $Mevents = $M->getEvents($start, $end);
-    $Cal = Evlist\Calendar::getInstance(-1);
+
     foreach ($Mevents as $ev_date=>$ev_events) {
         foreach ($ev_events as $event) {
             // Format the meetup.com date information into the expected layout
@@ -2593,7 +2593,8 @@ function EVLIST_getBirthdays($start, $end, &$events)
 {
     global $_CONF, $_EV_CONF, $LANG_EVLIST;
 
-    if (!$_EV_CONF['birthdays_enabled']) return;
+    $Cal = Evlist\Calendar::getInstance(-2);
+    if ($Cal === NULL || $Cal->cal_status == 0) return;
 
     $args = array(1 => array(
         'start' => $start,
@@ -2601,8 +2602,6 @@ function EVLIST_getBirthdays($start, $end, &$events)
     ));
     $birthdays = PLG_callFunctionForOnePlugin('plugin_getBirthdays_birthdays', $args);
     if (empty($birthdays)) return;  // Could be empty, not an error
-
-    $Cal = \Evlist\Calendar::getInstance(-2);
 
     foreach ($birthdays as $ev_date=>$uids) {
         if ($ev_date < $start || $ev_date > $end) continue;

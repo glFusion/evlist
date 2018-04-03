@@ -295,6 +295,7 @@ function EVLIST_admin_list_events()
     USES_lib_admin();
     EVLIST_setReturn('adminevents');
 
+    $cal_id = isset($_REQUEST['cal_id']) ? (int)$_REQUEST['cal_id'] : 0;
     $retval = '';
 
     $header_arr = array(
@@ -338,6 +339,14 @@ function EVLIST_admin_list_events()
             LEFT JOIN {$_TABLES['evlist_detail']} det
                 ON det.ev_id = ev.id
             WHERE ev.det_id = det.det_id ";
+    if ($cal_id != 0) {
+        $sql .= "AND cal_id = $cal_id";
+    }
+
+    $filter = $LANG_EVLIST['calendar']
+        . ': <select name="cal_id" onchange="this.form.submit()">'
+        . '<option value="0">' . $LANG_EVLIST['all_calendars'] . '</option>'
+        . Evlist\Calendar::getSelectionList($cal_id) . '</select>';
 
     $query_arr = array('table' => 'users',
             'sql' => $sql,
@@ -346,7 +355,7 @@ function EVLIST_admin_list_events()
     );
 
     $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField', $header_arr, $text_arr,
-                            $query_arr, $defsort_arr);
+                            $query_arr, $defsort_arr, $filter);
     return $retval;
 }
 

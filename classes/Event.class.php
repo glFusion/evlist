@@ -1101,14 +1101,8 @@ class Event
         $start2 = EVLIST_TimeSelect('start2', $this->time_start2);
         $end1 = EVLIST_TimeSelect('end1', $this->time_end1);
         $end2 = EVLIST_TimeSelect('end2', $this->time_end2);
-        $cal_where = 'cal_status = 1';
-        if (!plugin_ismoderator_evlist()) {
-            $cal_where .= COM_getPermSQL('AND', 0, 3);
-        }
-        $cal_select = COM_optionList($_TABLES['evlist_calendars'],
-            'cal_id,cal_name', $this->cal_id, 1, $cal_where);
+        $cal_select = Calendar::getSelectionList($this->cal_id, true, 3);
 
-        USES_class_navbar();
         $navbar = new \navbar;
         $cnt = 0;
         foreach ($tabs as $id) {

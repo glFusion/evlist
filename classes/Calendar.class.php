@@ -25,29 +25,35 @@ class Calendar
     *   Constructor
     *   Create an empty calendar object, or read an existing one
     *
-    *   @param  integer $cal_id     Calendar ID to read
+    *   @param  mixed   $calendar   Calendar ID to read, or array of info
     */
-    public function __construct($cal_id = 0)
+    public function __construct($calendar = 0)
     {
         global $_EV_CONF, $_USER;
 
-        $this->cal_id = $cal_id;
-        $this->isNew = true;
-        $this->fgcolor = '';
-        $this->bgcolor = '';
-        $this->cal_name = '';
-        $this->perm_owner   = $_EV_CONF['default_permissions'][0];
-        $this->perm_group   = $_EV_CONF['default_permissions'][1];
-        $this->perm_members = $_EV_CONF['default_permissions'][2];
-        $this->perm_anon    = $_EV_CONF['default_permissions'][3];
-        $this->owner_id     = $_USER['uid'];
-        $this->group_id     = 13;
-        $this->cal_status   = 1;
-        $this->cal_ena_ical = 1;
-
-        if ($this->cal_id != 0) {
+        if (is_array($calendar)) {
+            // Already have values from the DB
+            $this->setVars($calendar, true);
+        } elseif ($calendar != 0) {
+            // Have a calendar ID to read
+            $this->cal_id = $calendar;
             if ($this->Read())
                 $this->isNew = false;
+        } else {
+            // Default, create an empty object
+            $this->cal_id = 0;
+            $this->isNew = true;
+            $this->fgcolor = '';
+            $this->bgcolor = '';
+            $this->cal_name = '';
+            $this->perm_owner   = $_EV_CONF['default_permissions'][0];
+            $this->perm_group   = $_EV_CONF['default_permissions'][1];
+            $this->perm_members = $_EV_CONF['default_permissions'][2];
+            $this->perm_anon    = $_EV_CONF['default_permissions'][3];
+            $this->owner_id     = $_USER['uid'];
+            $this->group_id     = 13;
+            $this->cal_status   = 1;
+            $this->cal_ena_ical = 1;
         }
     }
 
@@ -61,11 +67,8 @@ class Calendar
     */
     public static function getInstance($cal_id)
     {
-        static $cals = array();
-        if (!array_key_exists($cal_id, $cals)) {
-            $cals[$cal_id] = new self($cal_id);
-        }
-        return $cals[$cal_id];
+        $Cals = self::getAll();
+        return isset($Cals[$cal_id]) ? $Cals[$cal_id] : NULL;
     }
 
 
@@ -410,6 +413,78 @@ class Calendar
             return false;
         }
     }
+
+
+    /**
+    *   Get the options for a calendar selection list.
+    *   Leverages self::getAll() to re-use the database query.
+    *
+    *   @param  integer $selected   ID of selected calendar
+    *   @param  boolean $enabled    True to show only enabled calendars
+    *   @return string      Option tags
+    */
+    public static function getSelectionList($selected = 0, $enabled = false, $access = 0)
+    {
+        $retval = '';
+        $cals = self::getAll();
+        foreach ($cals as $cal_id=>$cal) {
+            // Skip disabled calendars if enabled flag is set
+            if ($enabled && $cal->cal_status == 0) continue;
+            // Check access if acces level is set
+            if ($access > 0 && !self::hasAccess($cal_id, $access)) continue;
+
+            $sel = $cal_id == $selected ? EVSELECTED : '';
+            $retval .= '<option ' . $sel . ' value="' . $cal_id . '">' .
+                        $cal->cal_name . '</option>' . LB;
+        }
+        return $retval;
+    }
+
+
+    /**
+    *   Get all calendars.
+    *
+    *   $param  boolean $enabled    True to get only enabled calendars
+    *   return  array       Array of calendar objects
+    */
+    public static function getAll()
+    {
+        global $_TABLES;
+        static $cals = NULL;
+
+        if ($cals === NULL) {
+            $cals = array();
+            $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
+                    ORDER BY cal_name ASC";
+            $res = DB_query($sql);
+            while ($A = DB_fetchArray($res, false)) {
+                $cals[$A['cal_id']] = new self($A);
+            }
+        }
+        return $cals;
+    }
+
+
+    /**
+    *   Determine whether the current user has access to this event
+    *
+    *   @param  integer $level  Access level required
+    *   @return boolean         True = has sufficieng access, False = not
+    */
+    public static function hasAccess($cal_id, $level=2)
+    {
+        // Admin & editor has all rights
+        if (plugin_ismoderator_evlist()) return true;
+
+        $Cal = self::getInstance($cal_id);
+        if ($Cal === NULL || $Cal->cal_status == 0) return false;
+
+        $access = SEC_hasAccess($Cal->owner_id, $Cal->group_id,
+                    $Cal->perm_owner, $Cal->perm_group,
+                    $Cal->perm_members, $Cal->perm_anon);
+        return $access >= $level ? true : false;
+    }
+
 }
 
 ?>

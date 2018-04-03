@@ -209,10 +209,7 @@ class View
         ) );
 
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
-        $T->set_var('cal_select', COM_optionList($_TABLES['evlist_calendars'],
-                    'cal_id,cal_name', $cal_selected, 1,
-                    '1=1 '. COM_getPermSQL('AND'))
-        );
+        $T->set_var('cal_select', Calendar::getSelectionList($cal_selected, true, 2));
 
         if (isset($_GET['range']) && !empty($_GET['range'])) {
             $T->set_var('range_url', 'range=' . $_GET['range']);

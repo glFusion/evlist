@@ -48,6 +48,18 @@ class Cache
 
 
     /**
+    *   Delete a single item by key
+    *
+    *   @param  string  $key    Key to delete
+    */
+    public static function delete($key)
+    {
+        if (version_compare(GVERSION, '1.8.0', '<')) return;
+        \glFusion\Cache::getInstance()->delete(self::_makeKey($key));
+    }
+
+
+    /**
     *   Completely clear the cache.
     *   Called after upgrade.
     *   Entries matching all tags, including default tag, are removed.
@@ -59,7 +71,9 @@ class Cache
         global $_TABLES;
 
         if (version_compare(GVERSION, '1.8.0', '<')) {
-            DB_query("TRUNCATE {$_TABLES['evlist_cache']}");
+            if (empty($tag)) {
+                DB_query("TRUNCATE {$_TABLES['evlist_cache']}");
+            }
         } else {
             $tags = array(self::$tag);
             if (!empty($tag)) {

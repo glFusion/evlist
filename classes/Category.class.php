@@ -228,6 +228,7 @@ class Category
         if (DB_error()) {
             return $oldvalue;
         } else {
+            Cache::clear('events');
             return $newvalue;
         }
     }

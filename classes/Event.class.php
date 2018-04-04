@@ -162,11 +162,27 @@ class Event
     }
 
 
-    public static function getInstance($ev_id)
+    /**
+    *   Get an instance of an event.
+    *
+    *   @param  string  $ev_id      Event ID
+    *   @param  integer $det_id     Optional specific detail record ID
+    *   @return object              Event object
+    */
+    public static function getInstance($ev_id, $det_id = 0)
     {
         static $records = array();
         if (!array_key_exists($ev_id, $records)) {
-            $records[$ev_id] = new self($ev_id);
+            $key = 'event_' . $ev_id . '_' . $det_id;
+            $records[$ev_id] = Cache::get($key);
+            if ($records[$ev_id] === NULL) {
+                $records[$ev_id] = new self($ev_id, $det_id);
+                $tags = array(
+                    'events',
+                    'event_' . $ev_id,
+                );
+                Cache::set($key, $records[$ev_id], $tags);
+            }
         }
         return $records[$ev_id];
     }
@@ -310,8 +326,8 @@ class Event
                 $row['postmode'] == 'html' ? 'html' : 'plaintext';
         $this->enable_reminders = isset($row['enable_reminders']) &&
                 $row['enable_reminders'] == 1 ? 1 : 0;
-        $this->owner_id = $row['owner_id'];
-        $this->group_id = $row['group_id'];
+        $this->owner_id = isset($row['owner_id']) ? $row['owner_id'] : 2;
+        $this->group_id = isset($row['group_id']) ? $row['group_id'] : 13;
         $this->enable_comments = isset($row['enable_comments']) ? $row['enable_comments'] : 0;
 
         if (isset($row['categories']) && is_array($row['categories'])) {
@@ -381,8 +397,8 @@ class Event
                 $this->perm_anon    = $perms[3];
             }
 
-            $this->owner_id = $row['owner_id'];
-            $this->group_id = $row['group_id'];
+            $this->owner_id = isset($row['owner_id']) ? $row['owner_id'] : 2;
+            $this->group_id = isset($row['group_id']) ? $row['group_id'] : 13;
             $this->options['contactlink'] = isset($row['contactlink']) ? 1 : 0;
 
             $this->options['tickets'] = array();
@@ -415,7 +431,13 @@ class Event
                 $this->options['max_user_rsvp'] = 1;
                 $this->options['rsvp_print'] = 0;
             }
-            $this->tzid = isset($row['tz_local']) ? 'local' : isset($row['tzid']) ? $row['tzid'] : 'local';
+            if (isset($row['tz_local'])) {
+                $this->tzid = 'local';
+            } elseif (isset($row['tzid'])) {
+                $this->tzid = $row['tzid'];
+            } else {
+                $this->tzid = 'local';
+            }
         }
     }
 
@@ -509,7 +531,7 @@ class Event
         // Now we can update our main record with the new info
         if (is_array($A)) {
             $this->SetVars($A);
-            $this->MakeRecData();
+            $this->MakeRecData($A);
         }
 
         /*if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
@@ -563,6 +585,7 @@ class Event
                     DB_query("DELETE FROM {$_TABLES['evlist_detail']}
                             WHERE ev_id = '{$this->id}'
                             AND det_id <> '{$this->det_id}'");
+                    Cache::clear(array('detail', 'event_' . $this->id));
                     // This function sets the rec_data value.
                     if (!$this->UpdateRepeats()) {
                         return $this->PrintErrors();
@@ -580,6 +603,7 @@ class Event
                             rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
                             rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end')
                         WHERE rp_ev_id = '{$this->id}'";
+                    Cache::clear('repeats', 'event_' . $this->id);
                     DB_query($sql, 1);
                 }
             }
@@ -677,6 +701,7 @@ class Event
         $sql = $sql1 . $fld_sql . $sql2;
         //echo $sql;die;
         DB_query($sql, 1);
+        Cache::clear(array('events', 'event_' . $this->id));
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
         } elseif ($this->table == 'evlist_submissions' &&
@@ -703,7 +728,7 @@ class Event
         if (empty($this->Errors)) {
             if ($this->table = 'evlist_events') {
                 PLG_itemSaved($this->id, 'evlist');
-                Cache::clear();
+                Cache::clear('events');
             }
             return '';
         } else {
@@ -966,7 +991,7 @@ class Event
                 'rem_status_checked' => $this->enable_reminders == 1 ?
                         EVCHECKED : '',
                 'commentsupport' => $_EV_CONF['commentsupport'],
-                'ena_cmt_' . $this->enable_comments => EVSELECTED,
+                'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
                         EVLIST_GetOptions($LANG_EVLIST['rec_formats'], isset($this->rec_data['type']) ? $this->rec_data['type'] : ''),
                 'recurring_weekday_options' => EVLIST_GetOptions(\Date_Calc::getWeekDays(), $recweekday, 1),
@@ -1184,7 +1209,7 @@ class Event
             foreach ($TickTypes as $tick_id=>$tick_obj) {
                 // Check enabled tickets. Ticket type 1 enabled by default
                 if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
-                    $checked = EVCHECKED;
+                    $checked = 'checked="checked"';
                     if (isset($this->options['tickets'][$tick_id])) {
                         $fee = (float)$this->options['tickets'][$tick_id]['fee'];
                     } else {
@@ -1229,7 +1254,7 @@ class Event
                 'rsvp_waitlist' => $this->options['rsvp_waitlist'],
                 'tick_opts'     => $tick_opts,
                 'rsvp_print'    => $rsvp_print,
-                $rsvp_print_chk => EVCHECKED,
+                $rsvp_print_chk => 'checked="checked"',
             ) );
 
         }   // if rsvp_enabled
@@ -1385,6 +1410,7 @@ class Event
             COM_errorLog("Event::_toggle SQL Error: $sql");
             return $oldvalue;
         } else {
+            Cache::clear('events');
             return $newvalue;
         }
     }
@@ -1486,6 +1512,7 @@ class Event
 
         // Delete all existing instances
         DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);
+        Cache::clear('repeats', 'event_' . $this->id);
 
         $i = 0;
         foreach($days as $event) {
@@ -1767,6 +1794,8 @@ class Event
             if (\Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
                 $this->rec_data['stop'] = $A['stopdate'];
             }
+        } else {
+            $this->rec_data['stop'] = EV_MAX_DATE;
         }
 
         switch ($this->rec_data['type']) {

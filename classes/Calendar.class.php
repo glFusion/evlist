@@ -284,6 +284,9 @@ class Calendar
         DB_query($sql, 1);
         if (!DB_error()) {
             $this->cal_id = DB_insertId();
+            if (version_compare(GVERSION, '1.8.0', '>=')) {
+                Cache::clear('calendars');
+            }
             return true;
         } else {
             return false;
@@ -392,6 +395,8 @@ class Calendar
             COM_errorLog("SQL Error: $sql");
             return $oldvalue;
         } else {
+            Cache::clear('calendars');
+            Cache::clear('events');
             return $newvalue;
         }
     }
@@ -452,13 +457,20 @@ class Calendar
         global $_TABLES;
         static $cals = NULL;
 
+        // First check if the calendars have been read already
         if ($cals === NULL) {
-            $cals = array();
-            $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
-                    ORDER BY cal_name ASC";
-            $res = DB_query($sql);
-            while ($A = DB_fetchArray($res, false)) {
-                $cals[$A['cal_id']] = new self($A);
+            // Then check the cache
+            $cals = Cache::get('calendars');
+            if ($cals === NULL) {
+                // Still nothing? Then read from the DB
+                $cals = array();
+                $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
+                        ORDER BY cal_name ASC";
+                $res = DB_query($sql);
+                while ($A = DB_fetchArray($res, false)) {
+                    $cals[$A['cal_id']] = new self($A);
+                }
+                Cache::set('calendars', $cals, 'calendars');
             }
         }
         return $cals;

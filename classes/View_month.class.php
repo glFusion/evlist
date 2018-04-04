@@ -150,14 +150,9 @@ class View_month extends View
                         $tz = $event['tzid'] == 'local' ? $_USER['tzid'] : $event['tzid'];
                         $s_dt = new \Date($event['rp_date_start'] . ' ' . $event['rp_time_start1'], $tz);
                         $ev_hover = $s_dt->format($_CONF['timeonly'], true);
-                        //$ev_hover = date($_CONF['timeonly'],
-                        //strtotime($event['rp_date_start'] . ' ' . $event['rp_time_start1']) );
                         if ($event['split'] == 1 && !empty($event['rp_time_start2']) ) {
                             $e_dt = new \Date($event['rp_date_start'] . ' ' . $event['rp_time_start2'], $tz);
                             $ev_hover .= ' &amp; ' . $e_dt->format($_CONF['timeonly'], false);
-                                //date($_CONF['timeonly'],
-                                //strtotime($event['rp_date_start'] . ' ' .
-                                //$event['rp_time_start2']) );
                         }
                         if ($event['tzid'] != 'local') $ev_hover .= ' ' . $s_dt->format('T', true);
                         $ev_hover .= ' - ';

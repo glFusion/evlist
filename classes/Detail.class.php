@@ -76,11 +76,26 @@ class Detail
     }
 
 
+    /**
+    *   Get an instance of an event's detail record.
+    *
+    *   @param  integer $det_id     Detail record ID
+    *   @return object              Detail object
+    */
     public static function getInstance($det_id)
     {
         static $records = array();
         if (!array_key_exists($det_id, $records)) {
-            $records[$det_id] = new self($det_id);
+            $key = 'detail_' . $det_id;
+            $records[$det_id] = Cache::get($key);
+            if ($records[$det_id] === NULL) {
+                $records[$det_id] = new self($det_id);
+            }
+            $tags = array(
+                'detail',
+                'event_' . $records[$det_id]->ev_id,
+            );
+            Cache::set($key, $records[$det_id], $tags);
         }
         return $records[$det_id];
     }

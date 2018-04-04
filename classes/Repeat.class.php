@@ -83,7 +83,17 @@ class Repeat
     {
         static $repeats = array();
         if (!isset($repeats[$rp_id])) {
-            $repeats[$rp_id] = new self($rp_id);
+            $key = 'repeat_' . $rp_id;
+            $repeats[$rp_id] = Cache::get($key);
+            if ($repeats[$rp_id] === NULL) {
+                $repeats[$rp_id] = new self($rp_id);
+                $tags = array(
+                    'events',
+                    'repeats',
+                    'event_' . $repeats[$rp_id]->rp_ev_id,
+                );
+                Cache::set($key, $repeats[$rp_id], $tags);
+            }
         }
         return $repeats[$rp_id];
     }
@@ -259,7 +269,7 @@ class Repeat
             // This is used by Reminders so make sure it's set:
             $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
 
-            $this->Event = new Event($this->ev_id, $this->det_id);
+            $this->Event = Event::getInstance($this->ev_id, $this->det_id);
             $this->tzid = $this->Event->tzid;
             return true;
         }

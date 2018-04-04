@@ -405,7 +405,7 @@ default:
         break;
     }
     if (!empty($rp_id)) {
-        $Rep = new Evlist\Repeat($rp_id);
+        $Rep = Evlist\Repeat::getInstance($rp_id);
         $pagetitle = COM_stripslashes($Rep->Event->Detail->title);
         if ($view == 'print') {
             $template = 'print';

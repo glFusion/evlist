@@ -348,6 +348,8 @@ $_EV_UPGRADE = array(
         (-2, 'Birthdays', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2)",
     "ALTER TABLE {$_TABLES['evlist_tickets']}
         ADD waitlist tinyint(1) unsigned not null default 0",
+    "ALTER TABLE {$_TABLES['evlist_events']}
+        CHANGE cal_id cal_id int(10) not null DEFAULT 1",
     ),
 );
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];

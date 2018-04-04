@@ -68,9 +68,10 @@ class View_list extends View
         ) );
 
         $page = empty($_GET['page']) ? 1 : (int)$_GET['page'];
-        $opts = array('cat'=>$this->cat,
-                'page'=>$page,
-                'cal'=>$this->cal,
+        $opts = array(
+                'cat'   => $this->cat,
+                'page'  => $page,
+                'cal'   => $this->cal,
             );
         switch ($this->range) {
         case 1:         // past
@@ -136,21 +137,24 @@ class View_list extends View
 
                     // Prepare the link to the event, internal for internal
                     // events, new window for meetup events
-                    if ($A['cal_id'] > 0) {
+                    $url = '';
+                    $url_attr = array();
+                    switch ($A['cal_id']) {
+                    case -1:
+                        if (!empty($A['url'])) {
+                            // This is a meetup event with a URL
+                            $url = COM_buildURL($A['url']);
+                            $url_attr = array('target' => '_blank');
+                        }
+                        break;
+                    default:
                         $url = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                             $A['rp_id'] . $andcat);
                         $url_attr = array();
-                    } elseif (!empty($A['url'])) {
-                        // This is a meetup event with a URL
-                        $url = COM_buildURL($A['url']);
-                        $url_attr = array('target' => '_blank');
                     }
                     $title = COM_stripslashes($A['title']);
                     if (!empty($url)) {
                         $titlelink = COM_createLink($title, $url, $url_attr);
-                    } elseif ($A['cal_id'] == -2) {
-                        $titlelink = sprintf($LANG_EVLIST['hover_birthday'], $title);
-                        $A['summary'] = '';
                     } else {
                         $titlelink = $A['title'];
                     }

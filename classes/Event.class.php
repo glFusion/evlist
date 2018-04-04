@@ -387,7 +387,7 @@ class Event
                 $this->time_end2 = NULL;
             }
 
-            if (isset($_POST['perm_owner'])) {
+            if (isset($row['perm_owner'])) {
                 $perms = SEC_getPermissionValues($row['perm_owner'],
                     $row['perm_group'], $row['perm_members'],
                     $row['perm_anon']);

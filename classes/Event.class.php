@@ -312,7 +312,7 @@ class Event
                 $row['enable_reminders'] == 1 ? 1 : 0;
         $this->owner_id = $row['owner_id'];
         $this->group_id = $row['group_id'];
-        $this->enable_comments = isset($row['enable_comments']) ? 1 : 0;
+        $this->enable_comments = isset($row['enable_comments']) ? $row['enable_comments'] : 0;
 
         if (isset($row['categories']) && is_array($row['categories'])) {
             $this->categories = $row['categories'];
@@ -966,7 +966,7 @@ class Event
                 'rem_status_checked' => $this->enable_reminders == 1 ?
                         EVCHECKED : '',
                 'commentsupport' => $_EV_CONF['commentsupport'],
-                'ena_cmt_' . $this->enable_comments => 'selected="selected"',
+                'ena_cmt_' . $this->enable_comments => EVSELECTED,
                 'recurring_format_options' =>
                         EVLIST_GetOptions($LANG_EVLIST['rec_formats'], isset($this->rec_data['type']) ? $this->rec_data['type'] : ''),
                 'recurring_weekday_options' => EVLIST_GetOptions(\Date_Calc::getWeekDays(), $recweekday, 1),
@@ -1184,7 +1184,7 @@ class Event
             foreach ($TickTypes as $tick_id=>$tick_obj) {
                 // Check enabled tickets. Ticket type 1 enabled by default
                 if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
-                    $checked = 'checked="checked"';
+                    $checked = EVCHECKED;
                     if (isset($this->options['tickets'][$tick_id])) {
                         $fee = (float)$this->options['tickets'][$tick_id]['fee'];
                     } else {
@@ -1229,7 +1229,7 @@ class Event
                 'rsvp_waitlist' => $this->options['rsvp_waitlist'],
                 'tick_opts'     => $tick_opts,
                 'rsvp_print'    => $rsvp_print,
-                $rsvp_print_chk => 'checked="checked"',
+                $rsvp_print_chk => EVCHECKED,
             ) );
 
         }   // if rsvp_enabled

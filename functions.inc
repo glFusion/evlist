@@ -1220,6 +1220,18 @@ function plugin_itemdeleted_evlist($id, $type)
         plugin_enablestatechange_evlist(false);
         DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
     }
+    $ev_id = "_{$type}_";
+    if ($id == '*') {
+        // A plugin is deleted or disabled, disable any related events.
+        $ev_id = DB_escapeString($ev_id);
+        DB_query("UPDATE {$_TABLES['evlist_events']}
+                SET enabled = 0
+                WHERE id LIKE '{$ev_id}%'");
+    } else {
+        // A single item deleted, actually delete it.
+        $ev_id .= $id;
+        Evlist\Event::Delete($ev_id);
+    }
 }
 
 
@@ -2128,6 +2140,68 @@ function plugin_supportadblock_evlist()
 
 
 /**
+*   Get event information from other plugins when an item is saved.
+*
+*   @param  string  $id     Item ID
+*   @param  string  $type   Item Type
+*   @param  string  $old_id Original ID in case of ID change
+*/
+function plugin_itemsaved_evlist($id, $type, $old_id = '')
+{
+    global $_TABLES;
+
+    $info = PLG_getItemInfo(
+        $type, $id,
+        'id,is_event,year,month,day,description,group_id,recur_type,recur_interval'
+    );
+    if (!is_array($info) || count($info) == 0) return;  // No data received
+    if (!$info['is_event'] ||
+            $info['month'] === NULL || $info['day'] === NULL
+    ) return;   // invalid data, not an event
+
+    $cals = array(
+        'birthdays' => -2,
+    );
+    $cal_id = isset($cals[$type]) ? $cals[$type] : 1;   // set calendar id
+    if ($info['year'] === NULL) $year = 2016;
+
+    $ev_id = "_{$type}_{$id}";
+    $Ev = Evlist\Event::getInstance($ev_id);
+    // Set variables to simulate a form submission
+    $A = array(
+        'eid' => $ev_id,
+        'owner_id' => 2,
+        'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
+        'cal_id' => $cal_id,
+        'title' => $info['description'],
+        'summary' => $info['description'],
+        'full_description' => '',
+        'url' => '',
+        'status' => '1',
+        'enable_comments' => '-1',
+        'newcat' => '',
+        'date_start1' => sprintf('2016-%02d-%02d', $info['month'], $info['day']),
+        'date_end1' => sprintf('2016-%02d-%02d', $info['month'], $info['day']),
+        'tz_local' => 'on',
+        'allday' => '1',
+        'recurring' => $info['recur_type'] > 0 ? '1' : '0',
+        'format' => $info['recur_type'] !== NULL ? $info['recur_type'] : 0,
+        'stopdate' => '',
+        'skipnext' => '0',
+        'weekday' => '1',
+        'rec_freq' => $info['recur_interval'],
+        'show_upcoming' => '1',
+        'use_rsvp' => '0',
+        'perm_owner' => array ( 0 => '3', ),
+        'perm_group' => array ( 0 => '2', ),
+        'perm_members' => array ( 0 => '0', ),
+        'perm_anon' => array ( 0 => '0', ),
+    );
+    $Ev->Save($A, 'evlist_events');
+}
+
+
+/**
 *   Check that the currently installed version matches the code version.
 *   This is to disable functions that might not work due to a mismatch.
 *   Just check the major.minor.revision values.  Any fourth element is ignored.
@@ -2198,7 +2272,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             $value = DB_escapeString($value);
             switch ($key) {
             case 'cal':
-                if ($value > 0)
+                if ($value != 0)
                     $opt_where .= ' AND cal.cal_id = ' . (int)$value;
                 break;
             case 'eid':
@@ -2328,18 +2402,20 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 {
     global $_EV_CONF, $_USER;
 
-
     $sql = EVLIST_getEvents_sql($start, $end, $opts);
+    //echo $sql;die;
     $key = md5($sql);
-    $events = Evlist\Cache::get($key, 'evlist_events');
+    $events = Evlist\Cache::get($key, 'events');
 
     if (is_null($events)) {     // not found in cache, read from DB
         $events = array();
         $result = DB_query($sql, 1);
         if ($result && !DB_error()) {
             USES_lglib_class_datecalc();
-            while ($A = DB_fetchArray($result, false)) {
-                $events[$A['rp_date_start']] = array();
+            while ($A = DB_fetchArray($result, false))  {
+                if (!isset($events[$A['rp_date_start']])) {
+                    $events[$A['rp_date_start']] = array();
+                }
                 // Set a valid foreground and background color
                 if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
                 if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
@@ -2361,14 +2437,22 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 }
             }   // while
         }
-        Evlist\Cache::set($key, $events, 'evlist_events');
+        Evlist\Cache::set($key, $events, 'events');
     }
 
     // Add the Meetup and Birthday events, if no category is selected.
     // These event types don't get a category assigned.
     if (!isset($opts['cat']) || $opts['cat'] == 0) {
-        EVLIST_getMeetupEvents($start, $end, $events);
-        EVLIST_getBirthdays($start, $end, $events);
+        // First have to get the starting and ending dates from the results
+        // if this is a list since Meetups and Birthdays don't use ranges.
+        if (isset($opts['page']) && !empty($events)) {
+           $start = array_keys($events)[0];
+           $end = array_keys($events)[count($events)-1];
+        }
+        if (!isset($opts['cal']) || $opts['cal'] == -1) {
+            EVLIST_getMeetupEvents($start, $end, $events);
+        }
+        //EVLIST_getBirthdays($start, $end, $events);
     }
     return $events;
 }

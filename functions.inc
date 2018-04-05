@@ -1223,10 +1223,11 @@ function plugin_itemdeleted_evlist($id, $type)
     $ev_id = "_{$type}_";
     if ($id == '*') {
         // A plugin is deleted or disabled, disable any related events.
-        $ev_id = DB_escapeString($ev_id);
+        // Experimental, not yet supported
+        /*$ev_id = DB_escapeString($ev_id);
         DB_query("UPDATE {$_TABLES['evlist_events']}
                 SET enabled = 0
-                WHERE id LIKE '{$ev_id}%'");
+                WHERE id LIKE '{$ev_id}%'");*/
     } else {
         // A single item deleted, actually delete it.
         $ev_id .= $id;
@@ -2673,7 +2674,7 @@ function EVLIST_getIcon($name, $style='info')
 *   @param  string  $end        Ending date
 *   @param  array   &$events    Events array to update
 */
-function EVLIST_getBirthdays($start, $end, &$events)
+function X_EVLIST_getBirthdays($start, $end, &$events)
 {
     global $_CONF, $_EV_CONF, $LANG_EVLIST;
 

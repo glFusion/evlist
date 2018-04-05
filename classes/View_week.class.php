@@ -160,8 +160,8 @@ class View_week extends View
 
                 $T->set_var(array(
                     'event_times'   => $event_time,
-                    'event_title'   => htmlspecialchars($A['title']),
-                    'event_summary' => htmlspecialchars($A['summary']),
+                    'event_title'   => $A['title'],
+                    'event_summary' => $A['summary'],
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
                     'delete_imagelink' => EVLIST_deleteImageLink($A, SEC_createToken()),
@@ -177,7 +177,6 @@ class View_week extends View
                 case -2:
                     $T->set_var('icon', 'birthday-cake');
                     $T->set_var('bgcolor', $A['bgcolor']);
-                    $T->set_var('hover', sprintf($LANG_EVLIST['hover_birthday'], $A['summary']));
                     $T->parse('event', 'birthday', false);
                     break;
                 default:

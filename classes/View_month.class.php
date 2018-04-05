@@ -189,7 +189,6 @@ class View_month extends View
                     case -2:
                         $T->set_var(array(
                             'icon'  => 'birthday-cake',
-                            'ev_hover' => sprintf($LANG_EVLIST['hover_birthday'], $event['summary']),
                             'ev_url' => '',
                         ) );
                         $dayentries .= $T->parse('output', 'birthday_event', true);

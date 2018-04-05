@@ -371,7 +371,6 @@ You may either move existing events to a new calendar, or delete those events.',
 'print'         => 'Print',
 'balance_due'   => 'Balance Due',
 'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
-'hover_birthday' => '%s&apos;s Birthday',
 'sample'        => 'Sample',
 );
 

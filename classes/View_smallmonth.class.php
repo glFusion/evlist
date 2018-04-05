@@ -105,11 +105,7 @@ class View_smallmonth extends View
                             if ($event['tzid'] != 'local') $popup .= ' ' . $dt->format('T');
                             $popup .= ': ';
                         }
-                        if ($event['cal_id'] == -2) {
-                            $popup .= sprintf($LANG_EVLIST['hover_birthday'], $event['title']);
-                        } else {
-                            $popup .= htmlentities($event['title']);    
-                        }
+                        $popup .= htmlentities($event['title']);    
                     }
                     $T->set_var('popup', $popup);
                 } else {

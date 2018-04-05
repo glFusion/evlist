@@ -95,7 +95,6 @@ class View_day extends View
                     break;
                 case -2:
                     $T->set_var('icon', 'birthday-cake');
-                    $T->set_var('ev_hover', sprintf($LANG_EVLIST['hover_birthday'], $A['summary']));
                     $T->parse('allday_events', 'birthday', true);
                     break;
                 default:

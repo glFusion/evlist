@@ -37,9 +37,9 @@
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.3
+*   @version    1.4.5
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -1220,17 +1220,9 @@ function plugin_itemdeleted_evlist($id, $type)
         plugin_enablestatechange_evlist(false);
         DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
     }
-    $ev_id = "_{$type}_";
     if ($id == '*') {
-        // A plugin is deleted or disabled, disable any related events.
-        // Experimental, not yet supported
-        /*$ev_id = DB_escapeString($ev_id);
-        DB_query("UPDATE {$_TABLES['evlist_events']}
-                SET enabled = 0
-                WHERE id LIKE '{$ev_id}%'");*/
-    } else {
-        // A single item deleted, actually delete it.
-        $ev_id .= $id;
+        // Delete a single event related to a plugin item that was deleted
+        $ev_id = "_{$type}_{$id}";
         Evlist\Event::Delete($ev_id);
     }
 }
@@ -2142,6 +2134,7 @@ function plugin_supportadblock_evlist()
 
 /**
 *   Get event information from other plugins when an item is saved.
+*   Recurring, single-day events are supported.
 *
 *   @param  string  $id     Item ID
 *   @param  string  $type   Item Type
@@ -2149,24 +2142,29 @@ function plugin_supportadblock_evlist()
 */
 function plugin_itemsaved_evlist($id, $type, $old_id = '')
 {
-    global $_TABLES;
+    global $_EV_CONF;
 
     $info = PLG_getItemInfo(
         $type, $id,
-        'id,is_event,year,month,day,description,group_id,recur_type,recur_interval'
+        'id,is_event,year,date,year,month,day,description,group_id,recur_type,recur_interval'
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
-    if (!$info['is_event'] ||
-            $info['month'] === NULL || $info['day'] === NULL
-    ) return;   // invalid data, not an event
+    if (!$info['is_event']) return;   // not an event
+    if (!$info['year']) $info['year'] = $_EV_CONF['_now']->format('Y');
+    if ($info['date']) {
+        $date = $info['date'];
+    } else {
+        if (!$info['month'] || !$info['day']) return;   // Need something for date
+        $date = sprintf('%d-%02d-%02d', $info['year'], $info['month'], $info['day']);
+    }
 
+    // Map plugins to calendar IDs. Ideally this would somehow come from the DB.
     $cals = array(
         'birthdays' => -2,
     );
     $cal_id = isset($cals[$type]) ? $cals[$type] : 1;   // set calendar id
-    if ($info['year'] === NULL) $year = 2016;
 
-    $ev_id = "_{$type}_{$id}";
+    $ev_id = "_{$type}_{$id}";      // Event ID is "_plugin_itemid"
     $Ev = Evlist\Event::getInstance($ev_id);
     // Set variables to simulate a form submission
     $A = array(
@@ -2181,8 +2179,8 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'status' => '1',
         'enable_comments' => '-1',
         'newcat' => '',
-        'date_start1' => sprintf('2016-%02d-%02d', $info['month'], $info['day']),
-        'date_end1' => sprintf('2016-%02d-%02d', $info['month'], $info['day']),
+        'date_start1' => $date,
+        'date_end1' => $date,
         'tz_local' => 'on',
         'allday' => '1',
         'recurring' => $info['recur_type'] > 0 ? '1' : '0',

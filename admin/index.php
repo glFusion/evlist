@@ -584,9 +584,13 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
                     $del_icon = $icon_arr['delete'];
                 }
             }
+            $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
+            if (isset($_REQUEST['cal_id'])) {
+                $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
+            }
             $retval = COM_createLink(
                     $del_icon,
-                    EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'],
+                    $url,
                     array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
                         'title' => $LANG_ADMIN['delete'],
                     )
@@ -719,6 +723,12 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
                         'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');"
                     )
                 );
+            }
+            break;
+        case 'cal_name':
+            $retval = $fieldvalue;
+            if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
+                $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
             }
             break;
         default:

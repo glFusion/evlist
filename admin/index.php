@@ -323,12 +323,16 @@ function EVLIST_admin_list_events()
     );
 
     $defsort_arr = array('field' => 'date_start1', 'direction' => 'DESC');
-
+    $options = array(
+                'chkdelete' => 'true',
+                'chkfield' => 'id',
+                'chkname' => 'delevent',
+    );
     $text_arr = array('has_menu'     => true,
                       'has_extras'   => true,
                       'title'        => $LANG_EVLIST['pi_title'].': ' .
                                         $LANG_EVLIST['events'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?cal_id=' . $cal_id,
                       'help_url'     => ''
     );
 
@@ -355,7 +359,7 @@ function EVLIST_admin_list_events()
     );
 
     $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField', $header_arr, $text_arr,
-                            $query_arr, $defsort_arr, $filter);
+                    $query_arr, $defsort_arr, $filter, '', $options);
     return $retval;
 }
 
@@ -884,6 +888,7 @@ $expected = array(
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
     'tickreset_x', 'tickdelete_x', 'exporttickets',
     'import_csv', 'import_cal',
+    'delbutton_x',
     // Views to display
     'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
     'import', 'edit', 'editcat', 'editticket', 'tickettypes',
@@ -1005,6 +1010,15 @@ case 'delcat':
         Evlist\Category::Delete($cat_id);
     }
     $view = 'categories';
+    break;
+
+case 'delbutton_x':
+    if (isset($_POST['delevent']) && is_array($_POST['delevent'])) {
+        foreach ($_POST['delevent'] as $eid) {
+            Evlist\Event::Delete($eid);
+        }
+    }
+    $view = 'events';
     break;
 
 case 'delevent':

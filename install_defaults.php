@@ -88,7 +88,10 @@ $CONF_EVLIST_DEFAULT = array(
     'meetup_enabled'    => 0,   // 1 to enable meetup event inclusion
     'commentsupport'    => 1,   // 1 = yes, 0 = no
     'ticket_format'     => 'EV%s',  // Ticket number format
-    'birthdays_enabled' => 0,   // Show birthdays, if birthday plugin is available
+    'pi_cal_map'        => array(
+        'meetup'    => '-1',
+        'birthdays' => '-2',
+    ),
 );
 
 /**
@@ -197,8 +200,11 @@ function plugin_initconfig_evlist()
                 30, 10, 0, 50, true, 'evlist');
         $c->add('use_weather', $CONF_EVLIST_DEFAULT['use_weather'], 'select',
                 30, 10, 0, 60, true, 'evlist');
-        $c->add('birthdays_enabled', $_CONF_EVLIST_DEFAULT['birthdays_enabled'], 'select',
-                30, 10, 0, 70, true, 'evlist');
+
+        $c->add('ev_integ_other', NULL, 'fieldset', 30, 20, NULL, 0, true, 'evlist');
+        $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*text',
+                30, 20, 0, 10, true, 'evlist');
+
      }
 
     return true;

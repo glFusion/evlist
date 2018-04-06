@@ -299,8 +299,9 @@ function evlist_upgrade()
         case '1.4.3':
         case '1.4.4':
             $currentVersion = '1.4.5';
-            $c->add('birthdays_enabled', $_CONF_EVLIST_DEFAULT['birthdays_enabled'], 'select',
-                    30, 10, 0, 70, true, 'evlist');
+            $c->add('ev_integ_other', NULL, 'fieldset', 30, 20, NULL, 0, true, 'evlist');
+            $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*text',
+                30, 20, 0, 10, true, 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
      }

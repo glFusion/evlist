@@ -184,6 +184,8 @@ class Calendar
             $this->perm_members = $A['perm_members'];
             $this->perm_anon    = $A['perm_anon'];
         } else {
+            if (isset($A['fg_inherit'])) $this->fgcolor = '';
+            if (isset($A['bg_inherit'])) $this->bgcolor = '';
             $perms = SEC_getPermissionValues($_POST['perm_owner'],
                 $_POST['perm_group'], $_POST['perm_members'],
                 $_POST['perm_anon']);
@@ -236,6 +238,8 @@ class Calendar
                     'bg_color'  => $this->bgcolor,
                     'sample_id' => 'sample',
                 )),
+            'fg_inherit_chk' => $this->fgcolor == '' ? EVCHECKED : '',
+            'bg_inherit_chk' => $this->bgcolor == '' ? EVCHECKED : '',
             'icon'          => $this->cal_icon,
         ) );
 

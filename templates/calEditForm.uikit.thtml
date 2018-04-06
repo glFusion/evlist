@@ -60,10 +60,13 @@ $(document).ready(function() {
         <label for="fld_fgcolor">{$LANG_EVLIST['foreground']}: </label>
         <input name="fgcolor" type="text" id="fld_fgcolor" size="7" maxlength="7" 
             value="{fgcolor}" style="background:{fgcolor}" /> 
-        </span>
+        <input name="fg_inherit" type="checkbox" value="1" {fg_inherit_chk} /> {$LANG_EVLIST['inherit']}
+        <br />
         <label for="bgcolor">{$LANG_EVLIST['background']}: </label>
         <input name="bgcolor" type="text" id="fld_bgcolor" size="7" maxlength="7" 
             value="{bgcolor}" style="background:{bgcolor}" /> 
+        <input name="bg_inherit" type="checkbox" value="1" {bg_inherit_chk} /> {$LANG_EVLIST['inherit']}
+        <br />
       &nbsp;&nbsp;&nbsp;<span id="sample" style="background-color:{bgcolor};color:{fgcolor};">{$LANG_EVLIST['sample']}</span>
         </span>
       </div>

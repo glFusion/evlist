@@ -4,6 +4,9 @@
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">
 {!endif}
+{!if icon}
+    <i class="uk-icon uk-icon-{icon}"></i>
+{!endif}
     <a class="cal-event" style="color:{fgcolor};" href="{site_url}/evlist/event.php?view=instance&eid={event_id}">
     {event_title}</a>
 {!if bgcolor}

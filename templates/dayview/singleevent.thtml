@@ -1,14 +1,12 @@
 {# begin {templatelocation} #}
 <div class="show_cal{cal_id}" style="display:{show};">
-{!if is_meetup}
-{!elseif is_birthday}
-  <i class="uk-icon uk-icon-birthday-cake"></i>&nbsp;
-{!else}
   {delete_imagelink}&nbsp;
-{!endif}
   {event_time} <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{event_summary}">
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">
+{!endif}
+{!if icon}
+  <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
 {!endif}
 {!if is_meetup}
     <a class="cal-event" href="{ev_url}" target="_blank">

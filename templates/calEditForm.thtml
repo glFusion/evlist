@@ -74,6 +74,8 @@ window.addEvent('domready', function() {
   </table>
   <p>
     <input type="hidden" name="owner_id" value="{owner_id}" />
+{# Icon not supported in non-uikit layout #}
+    <input type="hidden" name="cal_icon" value="" />
     {!if can_delete}
     <div style="float:right;">
       <input type="submit" name="deletecal" value="{$LANG_ADMIN['delete']}" />

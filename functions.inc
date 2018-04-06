@@ -2155,11 +2155,8 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         $date = sprintf('%d-%02d-%02d', $info['year'], $info['month'], $info['day']);
     }
 
-    // Map plugins to calendar IDs. Ideally this would somehow come from the DB.
-    $cals = array(
-        'birthdays' => -2,
-    );
-    $cal_id = isset($cals[$type]) ? $cals[$type] : 1;   // set calendar id
+    // Set calendar id based on config, default to "1"
+    $Cal = Evlist\Calendar::getMapped($type);
 
     $ev_id = "_{$type}_{$id}";      // Event ID is "_plugin_itemid"
     $Ev = Evlist\Event::getInstance($ev_id);
@@ -2168,7 +2165,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'eid' => $ev_id,
         'owner_id' => $info['owner_id'] ? $info['owner_id'] : 2,
         'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
-        'cal_id' => $cal_id,
+        'cal_id' => $Cal->cal_id,
         'title' => $info['title'],
         'summary' => $info['description'] ? $info['description'] : $info['title'],
         'full_description' => '',
@@ -2472,7 +2469,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
            $start = array_keys($events)[0];
            $end = array_keys($events)[count($events)-1];
         }
-        if (!isset($opts['cal']) || $opts['cal'] == -1) {
+        if (!isset($opts['cal']) || $opts['cal'] == -1 || $opts['cal'] == 0) {
             EVLIST_getMeetupEvents($start, $end, $events);
         }
         //EVLIST_getBirthdays($start, $end, $events);
@@ -2495,7 +2492,7 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
 {
     global $_EV_CONF, $_CONF;
 
-    $Cal = Evlist\Calendar::getInstance(-1);
+    $Cal = Evlist\Calendar::getMapped('meetup');
     // Check that meetup events and the meetup calendar are enabled
     if ($_EV_CONF['meetup_enabled'] == 0 || $Cal->cal_status == 0) return;
 
@@ -2536,6 +2533,7 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
                 'fgcolor' => $Cal->fgcolor,
                 'bgcolor' => $Cal->bgcolor,
                 'tzid' => $event->timezone,
+                'cal_icon' => $Cal->cal_icon,
             );
         }
     }

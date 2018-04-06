@@ -153,6 +153,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `perm_group` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '2',
+  `cal_icon` varchar(40) default '',
   PRIMARY KEY (`cal_id`)
 ) ENGINE=MyISAM";
 
@@ -342,10 +343,11 @@ $_EV_UPGRADE = array(
     ),
 '1.4.5' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']}
-        CHANGE cal_id cal_id int(11) not null auto_increment",
+        CHANGE cal_id cal_id int(11) not null auto_increment,
+        ADD cal_icon varchar(40) default ''",
     "INSERT INTO {$_TABLES['evlist_calendars']} VALUES
-        (-1, 'Meetup Events', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2),
-        (-2, 'Birthdays', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2)",
+        (-1, 'Meetup Events', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2, ''),
+        (-2, 'Birthdays', 1, 0, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2, 'birthday-cake')",
     "ALTER TABLE {$_TABLES['evlist_tickets']}
         ADD waitlist tinyint(1) unsigned not null default 0",
     "ALTER TABLE {$_TABLES['evlist_events']}

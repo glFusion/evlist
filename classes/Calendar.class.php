@@ -43,8 +43,8 @@ class Calendar
             // Default, create an empty object
             $this->cal_id = 0;
             $this->isNew = true;
-            $this->fgcolor = '';
-            $this->bgcolor = '';
+            $this->fgcolor = '#000000';
+            $this->bgcolor = '#FFFFFF';
             $this->cal_name = '';
             $this->perm_owner   = $_EV_CONF['default_permissions'][0];
             $this->perm_group   = $_EV_CONF['default_permissions'][1];
@@ -54,6 +54,7 @@ class Calendar
             $this->group_id     = 13;
             $this->cal_status   = 1;
             $this->cal_ena_ical = 1;
+            $this->cal_icon     = '';
         }
     }
 
@@ -122,6 +123,7 @@ class Calendar
         case 'cal_name':
         case 'fgcolor':
         case 'bgcolor':
+        case 'cal_icon':
             $this->properties[$key] = trim($value);
             break;
         }
@@ -158,7 +160,7 @@ class Calendar
 
         // These fields come in the same way from DB or form
         $fields = array('cal_name', 'fgcolor', 'bgcolor',
-            'owner_id', 'group_id');
+            'owner_id', 'group_id', 'cal_icon');
         foreach ($fields as $field) {
             if (isset($A[$field]))
                 $this->$field = $A[$field];
@@ -234,6 +236,7 @@ class Calendar
                     'bg_color'  => $this->bgcolor,
                     'sample_id' => 'sample',
                 )),
+            'icon'          => $this->cal_icon,
         ) );
 
         $T->parse('output','modify');
@@ -269,7 +272,8 @@ class Calendar
             perm_members = '{$this->perm_members}',
             perm_anon = '{$this->perm_anon}',
             owner_id = '{$this->owner_id}',
-            group_id = '{$this->group_id}' ";
+            group_id = '{$this->group_id}',
+            cal_icon = '" . DB_escapeString($this->cal_icon) . "' ";
 
         if ($this->isNew) {
             $sql = "INSERT INTO {$_TABLES['evlist_calendars']} SET
@@ -495,6 +499,37 @@ class Calendar
                     $Cal->perm_owner, $Cal->perm_group,
                     $Cal->perm_members, $Cal->perm_anon);
         return $access >= $level ? true : false;
+    }
+
+
+    /**
+    *   Get the calendar that's mapped to a plugin name.
+    *   Returns the calendar object. If no mapping exists, or the mapping
+    *   refers to a non-existent calendar, then the default calendar object
+    *   is returned.
+    *
+    *   @param  string  $pi_name    Plugin or calendar name
+    *   @return object      Calendar object
+    */
+    public static function getMapped($pi_name)
+    {
+        global $_EV_CONF;
+
+        // Check for a configured calendar mapped to this plugin name.
+        // Default to "1" if none.
+        if (isset($_EV_CONF['pi_cal_map'][$pi_name])) {
+            $cal_id = (int)$_EV_CONF['pi_cal_map'][$pi_name];
+        } else {
+            $cal_id = 1;        // default
+        }
+
+        // Read the calendar to verify that it actually exists.
+        // Return the default calendar if it doesn't.
+        $Cal = self::getInstance($cal_id);
+        if (!$Cal) {
+            $Cal = self::getInstance(1);
+        }
+        return $Cal;
     }
 
 }

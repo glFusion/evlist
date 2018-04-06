@@ -1,6 +1,7 @@
 # evList plugin for glFusion - Changelog
 ## v1.4.5
 Unreleased
+- Added plugin->calendar mapping in the configuration (Integration section)
 - Add multiple event deletion
 - Add icons to calendars
 - Add waitlist status to ticket table, update when tickets are removed

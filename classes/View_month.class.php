@@ -177,6 +177,7 @@ class View_month extends View
                         'bgcolor'   => $event['bgcolor'],
                         'pi_url'    => EVLIST_URL,
                         'show'      => $this->getCalShowPref($event['cal_id']) ? '' : 'none',
+                        'icon'      => $event['cal_icon'],
                     ) );
                     switch ($event['cal_id']) {
                     case -1:
@@ -186,13 +187,13 @@ class View_month extends View
                         ) );
                         $dayentries .= $T->parse('output', 'allday_event', true);
                         break;
-                    case -2:
+                    /*case -2:
                         $T->set_var(array(
-                            'icon'  => 'birthday-cake',
+                            //'icon'  => 'birthday-cake',
                             'ev_url' => '',
                         ) );
                         $dayentries .= $T->parse('output', 'birthday_event', true);
-                        break;
+                        break;*/
                     default:
                         if ($event['allday'] == 1) {
                             $dayentries .= $T->parse('output', 'allday_event', true);

@@ -376,6 +376,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'balance_due'   => 'Balance Due',
 'instr_import_cal' => 'Import calendar events from the glFusion Calendar plugin into Evlist. This function should normally be used only once, but events with the same event ID are not imported to guard against duplicates.',
 'sample'        => 'Sample',
+'icon'          => 'Icon',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -391,6 +392,14 @@ $LANG_EVLIST_HELP = array(
 'startdt' => 'Enter the start date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the starting time by using the dropdown selections.',
 'enddt' => 'Enter the ending date either by entering the text as a SQL-formatted date (YYYY-MM-DD), or by clicking the calendar icon and browsing to the date. Select the ending time by using the dropdown selections.',
 'timezone' => 'If the &quot;local timezone&quot; checkbox is unchecked, you can select a timezone for this event which will be displayed next to the date/time information. If the local timezone is checked then no timezone will be shown; this is the same as previous versions of evList.',
+'cal_name' => 'Enter a name for this calendar. Names should be unique.',
+'cal_colors' => 'Select the foreground and background colors used to display events for this calendar within calendar views',
+'cal_icon' => 'Enter the name of a UIKit icon to be shown with events in this calendar. Enter only the icon name, e.g. &quot;circle&quot;',
+'cal_enabled' => 'Check to enable this calendar. Disabled calendars will not show in views nor in the event submittion form.',
+'cal_ical_ena' => 'Check to allow ICal subscriptions to this calendar.',
+'owner' => 'Select the owner for this item.',
+'group' => 'Select the group associated with this item',
+'perms' => 'Set the permissions for this item.',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';
@@ -442,7 +451,6 @@ $LANG_confignames['evlist'] = array(
     'meetup_enabled'        => 'Enable Meetup.com integration?',
     'commentsupport'        => 'Enable Comments?',
     'ticket_format'         => 'Ticket Format String',
-    'birthdays_enabled'     => 'Show birthdays from the Birthdays plugin?',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',

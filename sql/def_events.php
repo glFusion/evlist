@@ -82,7 +82,7 @@ $DEFVALUES['evlist_calendars'] = "INSERT INTO {$_TABLES['evlist_calendars']}
     VALUES
         (1, 'Events', 1, '#990000', '#ffccff', 2, 13, 3, 3, 2, 2),
         (-1, 'Meetup Events', 1, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2),
-        (-2, 'Birthdays', 1, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2)
+        (-2, 'Birthdays', 1, '#ffffff', '#000000', 2, 13, 3, 3, 2, 2, 'birthday-cake')
     ";
     
 $DEFVALUES['evlist_repeat'] = "INSERT INTO `{$_TABLES['evlist_repeat']}`

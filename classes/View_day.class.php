@@ -88,15 +88,16 @@ class View_day extends View
                     'cal_id'        => $A['cal_id'],
                     'br'            => $i < $alldaycount ? '<br />' : '',
                     'show'      => self::getCalShowPref($A['cal_id']) ? '' : 'none',
+                    'icon'      => $A['cal_icon'],
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
                     $T->parse('allday_events', 'meetup', true);
                     break;
-                case -2:
+                /*case -2:
                     $T->set_var('icon', 'birthday-cake');
                     $T->parse('allday_events', 'birthday', true);
-                    break;
+                    break;*/
                 default:
                     $T->parse('allday_events', 'event', true);
                     break;

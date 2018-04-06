@@ -168,17 +168,18 @@ class View_week extends View
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
                     'show'      => $this->getCalShowPref($A['cal_id']) ? '' : 'none',
+                    'icon'      => $A['cal_icon'],
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
                     $T->set_var(array('ev_url', $A['url']));
                     $T->parse('event', 'meetup', false);
                     break;
-                case -2:
+                /*case -2:
                     $T->set_var('icon', 'birthday-cake');
                     $T->set_var('bgcolor', $A['bgcolor']);
                     $T->parse('event', 'birthday', false);
-                    break;
+                    break;*/
                 default:
                     $T->set_var('bgcolor', '');
                     $T->parse('event', 'event', false);

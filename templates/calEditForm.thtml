@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<script type="text/javascript" 
+<script type="text/javascript"
     src="{site_url}/evlist/js/colorpicker.js">
 </script>
 <script type="text/javascript">
@@ -21,7 +21,7 @@ window.addEvent('domready', function() {
         <b>{$LANG_EVLIST['cal_name']}:</b>
       </td>
       <td>
-        <input required type="text" id="cal_name" class="fValidate['required']" 
+        <input required type="text" id="cal_name" class="fValidate['required']"
             name="cal_name" length="50" size="20" value="{cal_name}" />
       </td>
     </tr>
@@ -30,13 +30,20 @@ window.addEvent('domready', function() {
       <td><b>{$LANG_EVLIST['colors']}: </b></td>
       <td>
         <label for="fgcolor">{$LANG_EVLIST['foreground']}: </label>
-        <input name="fgcolor" type="text" id="fld_fgcolor" size="7" maxlength="7" 
-            value="{fgcolor}" style="background:{fgcolor}" /> 
+        <input name="fgcolor" type="text" id="fld_fgcolor" size="7" maxlength="7"
+            value="{fgcolor}" style="background:{fgcolor}" />
         </span>
         <label for="bgcolor">{$LANG_EVLIST['background']}: </label>
-        <input name="bgcolor" type="text" id="fld_bgcolor" size="7" maxlength="7" 
-            value="{bgcolor}" style="background:{bgcolor}" /> 
+        <input name="bgcolor" type="text" id="fld_bgcolor" size="7" maxlength="7"
+            value="{bgcolor}" style="background:{bgcolor}" />
         </span>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>{$LANG_EVLIST['icon']}:</b></td>
+      <td>
+        <input type="text" size="40" maxlength="40" name="cal_icon" value="{icon}" />
       </td>
     </tr>
 
@@ -74,8 +81,6 @@ window.addEvent('domready', function() {
   </table>
   <p>
     <input type="hidden" name="owner_id" value="{owner_id}" />
-{# Icon not supported in non-uikit layout #}
-    <input type="hidden" name="cal_icon" value="" />
     {!if can_delete}
     <div style="float:right;">
       <input type="submit" name="deletecal" value="{$LANG_ADMIN['delete']}" />
@@ -84,7 +89,7 @@ window.addEvent('domready', function() {
     <input type="hidden" name="cal_id" value="{cal_id}" />
     <input type="submit" name="savecal" value="{$LANG_ADMIN['save']}" />
     <input type="reset" value="{$LANG_EVLIST['reset']}" />
-    <input type="reset" value="{$LANG_ADMIN['cancel']}" name="cancel" 
+    <input type="reset" value="{$LANG_ADMIN['cancel']}" name="cancel"
         onclick="javascript: document.location.href='{cancel_url}'" />
   </p>
   <hr />

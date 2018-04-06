@@ -6,7 +6,7 @@
   <span style="color:#000;background-color:{bgcolor};">
 {!endif}
 {!if icon}
-  <i class="uk-icon uk-icon-{icon}"></i>&nbsp;
+  <i class="{icon}"></i>&nbsp;
 {!endif}
 {!if is_meetup}
     <a class="cal-event" href="{ev_url}" target="_blank">

@@ -177,7 +177,7 @@ class View_month extends View
                         'bgcolor'   => $event['bgcolor'],
                         'pi_url'    => EVLIST_URL,
                         'show'      => $this->getCalShowPref($event['cal_id']) ? '' : 'none',
-                        'icon'      => $event['cal_icon'],
+                        'icon'      => EVLIST_getIcon($event['cal_icon']),
                     ) );
                     switch ($event['cal_id']) {
                     case -1:

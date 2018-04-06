@@ -1,4 +1,7 @@
 {# begin {templatelocation} #}
+{!if icon}
+    <i class="{icon}"></i>
+{!endif}
   {event_time} <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{event_summary}">
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">

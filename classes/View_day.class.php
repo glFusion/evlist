@@ -88,7 +88,7 @@ class View_day extends View
                     'cal_id'        => $A['cal_id'],
                     'br'            => $i < $alldaycount ? '<br />' : '',
                     'show'      => self::getCalShowPref($A['cal_id']) ? '' : 'none',
-                    'icon'      => $A['cal_icon'],
+                    'icon'      => EVLIST_getIcon($A['cal_icon']),
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
@@ -144,7 +144,6 @@ class View_day extends View
 
                 // Show the timezone abbr. if not "user local"
                 if ($A['data']['tzid'] != 'local') $end_time .= ' (' . $e_dt->format('T', true) . ')';
-
                 $T->set_var(array(
                     'delete_imagelink'  => EVLIST_deleteImageLink($A['data'], $token),
                     'eid'               => $A['data']['rp_ev_id'],
@@ -156,6 +155,7 @@ class View_day extends View
                     'cal_id'        => $A['data']['cal_id'],
                     'event_time'    => $start_time . ' - ' . $end_time,
                     'show'      => self::getCalShowPref($A['data']['cal_id']) ? '' : 'none',
+                    'icon'      => EVLIST_getIcon($A['data']['cal_icon']),
                 ) );
                 // Only evlist and meetup events are hourly, birthdays are
                 // handled as allday events above.

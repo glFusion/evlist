@@ -2677,10 +2677,11 @@ function EVLIST_getReturn()
 *   @param  string  $style  Style name from local CSS
 *   @return string      Class names for icon
 */
-function EVLIST_getIcon($name, $style='info')
+function EVLIST_getIcon($name, $style='')
 {
     global $_EV_CONF;
 
+    if ($name == '') return '';
     if ($style != '')
         $style = ' ev-icon-' . $style;
     return $_EV_CONF['_iconset'] . '-' . $name . $style;

@@ -2,7 +2,7 @@
 <div class="monthview_allday show_cal{cal_id} event" 
     style="background-color:{bgcolor};display:{show}">
 {!if icon}
-  <i class="uk-icon uk-icon-{icon}"></i>
+  <i class="{icon}"></i>
 {!endif}
 {!if is_meetup}
   <a href="{ev_url}" target="_blank"

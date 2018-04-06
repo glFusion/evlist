@@ -744,10 +744,6 @@ function EVLIST_cb_content($format)
             } else {
                 $full_dscp = $A['full_description'];
             }
-            if ($A['cal_id'] == -2) {
-                $full_dscp= sprintf($LANG_EVLIST['hover_birthday'], $A['summary']);
-                $summary = $full_dscp;
-            }
 
             $T->set_var(array(
                 'cssid'     => $cssid,
@@ -2146,7 +2142,8 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
 
     $info = PLG_getItemInfo(
         $type, $id,
-        'id,is_event,year,date,year,month,day,description,group_id,recur_type,recur_interval'
+        'id,is_event,date,year,month,day,title,description,owner_id,group_id,recur_type,recur_interval,' .
+        'time_start,time_end'
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
     if (!$info['is_event']) return;   // not an event
@@ -2169,11 +2166,11 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     // Set variables to simulate a form submission
     $A = array(
         'eid' => $ev_id,
-        'owner_id' => 2,
+        'owner_id' => $info['owner_id'] ? $info['owner_id'] : 2,
         'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
         'cal_id' => $cal_id,
-        'title' => $info['description'],
-        'summary' => $info['description'],
+        'title' => $info['title'],
+        'summary' => $info['description'] ? $info['description'] : $info['title'],
         'full_description' => '',
         'url' => '',
         'status' => '1',
@@ -2182,7 +2179,6 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'date_start1' => $date,
         'date_end1' => $date,
         'tz_local' => 'on',
-        'allday' => '1',
         'recurring' => $info['recur_type'] > 0 ? '1' : '0',
         'format' => $info['recur_type'] !== NULL ? $info['recur_type'] : 0,
         'stopdate' => '',
@@ -2196,6 +2192,34 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'perm_members' => array ( 0 => '0', ),
         'perm_anon' => array ( 0 => '0', ),
     );
+    if ($info['time_start'] && $info['time_end']) {
+        // This is a timed event if both start and end times are given.
+        // Convert to the same 12-hour variables as the submisison form.
+        $A['allday'] = 0;
+        list($s_hour, $s_min) = explode(':', $info['time_start']);
+        list($e_hour, $e_min) = explode(':', $info['time_end']);
+        if ($s_hour > 11) {
+            $s_hour -= 12;
+            $s_ampm = 'pm';
+        } else {
+            $s_ampm = 'am';
+        }
+        if ($e_hour > 11) {
+            $e_hour -= 12;
+            $e_ampm = 'pm';
+        } else {
+            $e_ampm = 'am';
+        }
+        $A['starthour1'] = $s_hour;
+        $A['startminute1'] = $s_min;
+        $A['start_ampm'] = $s_ampm;
+        $A['endhour1'] = $e_hour;
+        $A['endminute1'] = $e_min;
+        $A['end_ampm'] = $e_ampm;
+    } else {
+        // No times specified = all-day event
+        $A['allday'] = 1;
+    }
     $Ev->Save($A, 'evlist_events');
 }
 

@@ -568,6 +568,8 @@ function EVLIST_do_set_version($ver)
         COM_errorLog("Error updating the {$_EV_CONF['pi_display_name']} Plugin version",1);
         return false;
     } else {
+        $_PLUGIN_INFO[$_EV_CONF['pi_name']]['pi_version'] = $ver;
+        $_PLUGIN_INFO[$_EV_CONF['pi_name']][1] = $ver;
         return true;
     }
 }

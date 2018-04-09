@@ -240,7 +240,8 @@ class Calendar
                 )),
             'fg_inherit_chk' => $this->fgcolor == '' ? EVCHECKED : '',
             'bg_inherit_chk' => $this->bgcolor == '' ? EVCHECKED : '',
-            'icon'          => $this->cal_icon,
+            'icon'              => $this->cal_icon,
+            'disp_icon'          => EVLIST_getIcon($this->cal_icon),
         ) );
 
         $T->parse('output','modify');

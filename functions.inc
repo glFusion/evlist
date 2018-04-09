@@ -87,7 +87,7 @@ if ($_CONF['loginrequired'] == 1) {
 // Mark whether this is a uikit theme. Save to global conf var
 // so it's available where needed.
 $_EV_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
-$_EV_CONF['_iconset'] = $_EV_CONF['_is_uikit'] ? 'uk-icon' : 'fa fa';
+$_EV_CONF['_iconset'] = $_EV_CONF['_is_uikit'] ? 'uk-icon uk-icon' : 'fa fa';
 
 if (empty($_EV_CONF['meetup_gid']) || empty($_EV_CONF['meetup_key'])) {
     $_EV_CONF['meetup_enabled'] = 0;
@@ -1217,6 +1217,8 @@ function plugin_itemdeleted_evlist($id, $type)
         DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
     }
     if ($id == '*') {
+        // TODO: Delete all calendar items for a plugin?
+    } else {
         // Delete a single event related to a plugin item that was deleted
         $ev_id = "_{$type}_{$id}";
         Evlist\Event::Delete($ev_id);

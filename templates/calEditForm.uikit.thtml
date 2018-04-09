@@ -78,6 +78,9 @@ $(document).ready(function() {
       </label>
       <div class="uk-form-controls">
         <input type="text" size="40" maxlength="40" name="cal_icon" value="{icon}" />
+{!if disp_icon}
+        <i class="{disp_icon}"></i>
+{!endif}
       </div>
     </div>
 

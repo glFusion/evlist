@@ -72,7 +72,7 @@ class Cache
 
         if (version_compare(GVERSION, '1.8.0', '<')) {
             if (empty($tag)) {
-                DB_query("TRUNCATE {$_TABLES['evlist_cache']}");
+                DB_query("TRUNCATE {$_TABLES['evlist_cache']}", 1);
             }
         } else {
             $tags = array(self::$tag);

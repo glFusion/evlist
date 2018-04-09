@@ -165,7 +165,7 @@ function evlist_upgrade($ignore_errors = false)
         case '1.3.1':
             $currentVersion = '1.3.2';
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;;
-       
+
             // Change the recurring interval type to an array to support
             // multiple occurrences per month for DOM-type events
             $sql = "SELECT id, rec_data
@@ -279,7 +279,7 @@ function evlist_upgrade($ignore_errors = false)
 
             // This column should have been there from the beginning, but on
             // at least one site it was missing. Add it here, but ignore any
-            // SQL error since it's probably already there. 
+            // SQL error since it's probably already there.
             DB_query("ALTER TABLE {$_TABLES['evlist_remlookup']}
                 ADD date_start int(10) unsigned AFTER rp_id", 1);
 
@@ -535,9 +535,11 @@ function EVLIST_do_upgrade_sql($version='', $ignore_errors = false)
     foreach($_EV_UPGRADE[$version] as $sql) {
         COM_errorLOG("{$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
         DB_query($sql, '1');
-        if (!$ignore_errors && DB_error()) {
+        if (DB_error()) {
             COM_errorLog("SQL Error during {$_EV_CONF['pi_name']} Plugin update", 1);
-            return false;
+            if (!$ignore_errors) {
+                return false;
+            }
         }
     }
     return true;

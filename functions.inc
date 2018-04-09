@@ -2150,7 +2150,10 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
     if (!$info['is_event']) return;   // not an event
-    if (!$info['title']) return;        // Must have a title
+    if (!$info['title'])  {
+        COM_errorLog(__FUNCTION__ . ": Event $id from $type must have a title");
+        return;        // Must have a title
+    }
     if (!$info['year']) $info['year'] = $_EV_CONF['_now']->format('Y');
     if ($info['date']) {
         $date = $info['date'];

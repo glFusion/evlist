@@ -1,12 +1,13 @@
 # evList plugin for glFusion - Changelog
 ## v1.4.5
 Unreleased
+- Supports calls to PLG_itemSaved() to allow plugins to submit and update events.
 - Added plugin->calendar mapping in the configuration (Integration section)
 - Add multiple event deletion
 - Add icons to calendars
 - Add waitlist status to ticket table, update when tickets are removed
 - Save calendar display checkbox changes in session variable
-- Use the common colorpicker from LGLIB
+- Use the common colorpicker from LGLIB (requires LGLIB 1.0.6+)
 - Integration with the Birthdays plugin
 - Fix error when re-editing a new event due to an error
 - E_ALL fixes

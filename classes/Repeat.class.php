@@ -360,12 +360,12 @@ class Repeat
             return false;
         }
 
-        DB_delete($_TABLES['evlist_repeat'], 'rp_id', $this->rp_id);
-
         // If we have our own detail record, then delete it also
         if ($this->det_id != $this->Event->det_id)
             $this->Event->Detail->Delete();
 
+        DB_delete($_TABLES['evlist_repeat'], 'rp_id', $this->rp_id);
+        Cache::clear();
         return true;
     }
 
@@ -588,7 +588,7 @@ class Repeat
         $outputHandle->AddMeta('property', 'og:description', $this->Event->Detail->summary, HEADER_PRIO_NORMAL);
 
         // Show the user comments. Moderators and event owners can delete comments
-        if (plugin_commentsupport_evlist() && $this->Event->enable_comments < 2) {
+        if (plugin_commentsupport_evlist() && $this->Event->enable_comments > -1) {
             $T->set_var('usercomments',
                 CMT_userComments($this->rp_id, $this->Event->Detail->title, 'evlist',
                     $cmtorder, $cmtmode, 0, 1, false,

@@ -2144,11 +2144,13 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
 
     $info = PLG_getItemInfo(
         $type, $id,
-        'id,is_event,date,year,month,day,title,description,owner_id,group_id,recur_type,recur_interval,' .
-        'time_start,time_end'
+        'id,is_event,date,year,month,day,title,summary,description,' .
+        'owner_id,group_id,recur_type,recur_interval,url,' .
+        'time_start,time_end,enable_comments'
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
     if (!$info['is_event']) return;   // not an event
+    if (!$info['title']) return;        // Must have a title
     if (!$info['year']) $info['year'] = $_EV_CONF['_now']->format('Y');
     if ($info['date']) {
         $date = $info['date'];
@@ -2156,6 +2158,8 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         if (!$info['month'] || !$info['day']) return;   // Need something for date
         $date = sprintf('%d-%02d-%02d', $info['year'], $info['month'], $info['day']);
     }
+    $summary = $info['summary'] ? $info['summary'] : $info['title'];
+    $full_dscp = $info['description'] ? $info['description'] : $summary;
 
     // Set calendar id based on config, default to "1"
     $Cal = Evlist\Calendar::getMapped($type);
@@ -2169,11 +2173,11 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
         'cal_id' => $Cal->cal_id,
         'title' => $info['title'],
-        'summary' => $info['description'] ? $info['description'] : $info['title'],
-        'full_description' => '',
-        'url' => '',
+        'summary' => $summary,
+        'full_description' => $full_dscp,
+        'url' => $info['url'] ? $info['url'] : '',
         'status' => '1',
-        'enable_comments' => '-1',
+        'enable_comments' => $info['enable_comments'] ? (int)$info['enable_comments'] : -1,
         'newcat' => '',
         'date_start1' => $date,
         'date_end1' => $date,

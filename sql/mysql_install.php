@@ -62,7 +62,7 @@ $event_table =
   `perm_anon` tinyint(1) DEFAULT NULL,
   `det_id` int(10) NOT NULL,
   `show_upcoming` tinyint(1) NOT NULL DEFAULT '1',
-  `cal_id` int(10) unsigned NOT NULL DEFAULT '1',
+  `cal_id` int(11) NOT NULL DEFAULT '1',
   `options` varchar(255),
   `tzid` varchar(125) NOT NULL DEFAULT 'local',
   PRIMARY KEY (`id`)
@@ -153,7 +153,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `perm_group` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '2',
-  `cal_icon` varchar(40) default '',
+  `cal_icon` varchar(40) DEFAULT '',
   PRIMARY KEY (`cal_id`)
 ) ENGINE=MyISAM";
 

@@ -17,7 +17,7 @@
     <td class="" style="padding-left:6px; height:20px;">
         <b>
 {!if is_birthday}
-        <span data-uk-tooltip title="{full_dscp}">{title}</span>
+        {title}
 {!elseif is_meetup}
         <a data-uk-tooltip class="gl_mootip" title="{summary}::{startdate}"
             href="{ev_url}" target="_blank">{title}</a>

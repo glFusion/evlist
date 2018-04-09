@@ -61,10 +61,10 @@ $c = config::get_instance();
 *
 *   @return boolean     True on success, False on failure
 */
-function evlist_upgrade()
+function evlist_upgrade($ignore_errors = false)
 {
     global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c,
-        $_CONF_EVLIST_DEFAULT, $_PLUGIN_INFO;
+        $CONF_EVLIST_DEFAULT, $_PLUGIN_INFO;
 
     if (isset($_PLUGIN_INFO[$_EV_CONF['pi_name']])) {
         if (is_array($_PLUGIN_INFO[$_EV_CONF['pi_name']])) {
@@ -302,7 +302,7 @@ function evlist_upgrade()
             $c->add('ev_integ_other', NULL, 'fieldset', 30, 20, NULL, 0, true, 'evlist');
             $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*text',
                 30, 20, 0, 10, true, 'evlist');
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+            if (!EVLIST_do_upgrade_sql($currentVersion, $ignore_errors)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
      }
 
@@ -523,7 +523,7 @@ function evlist_upgrade_1_3_0()
 *   @param  string  $version    Version being upgraded TO
 *   @return boolean             True on success, False after a failure
 */
-function EVLIST_do_upgrade_sql($version='')
+function EVLIST_do_upgrade_sql($version='', $ignore_errors = false)
 {
     global $_TABLES, $_EV_CONF, $_EV_UPGRADE;
 
@@ -535,7 +535,7 @@ function EVLIST_do_upgrade_sql($version='')
     foreach($_EV_UPGRADE[$version] as $sql) {
         COM_errorLOG("{$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
         DB_query($sql, '1');
-        if (DB_error()) {
+        if (!$ignore_errors && DB_error()) {
             COM_errorLog("SQL Error during {$_EV_CONF['pi_name']} Plugin update", 1);
             return false;
         }

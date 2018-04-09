@@ -748,8 +748,9 @@ class Event
             return false;
 
         // Make sure the current user has access to delete this event
-        $res = DB_query("SELECT id FROM {$_TABLES['evlist_events']}
-                WHERE id='$eid' " . COM_getPermSQL('AND', 0, 3));
+        $sql = "SELECT id FROM {$_TABLES['evlist_events']}
+                WHERE id='$eid' " . COM_getPermSQL('AND', 0, 3);
+        $res = DB_query($sql);
         if (!$res || DB_numRows($res) != 1)
             return false;
 
@@ -760,6 +761,7 @@ class Event
         DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
         DB_delete($_TABLES['evlist_events'], 'id', $eid);
         PLG_itemDeleted($eid, 'evlist');
+        Cache::clear();
         return true;
     }
 

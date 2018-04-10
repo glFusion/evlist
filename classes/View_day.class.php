@@ -63,8 +63,6 @@ class View_day extends View
             'column'    => 'column.thtml',
             'event'     => 'singleevent.thtml',
             'dayview'   => $tpl . '.thtml',
-            'birthday'  => 'birthday.thtml',
-            'meetup'    => 'meetup.thtml',
         ) );
         $events = EVLIST_getEvents($today_sql, $today_sql,
                 array('cat'=>$this->cat, 'cal'=>$this->cal));
@@ -92,16 +90,13 @@ class View_day extends View
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
-                    $T->parse('allday_events', 'meetup', true);
+                    $T->set_var('ev_url', $A['url']);
                     break;
-                /*case -2:
-                    $T->set_var('icon', 'birthday-cake');
-                    $T->parse('allday_events', 'birthday', true);
-                    break;*/
                 default:
-                    $T->parse('allday_events', 'event', true);
+                    $T->clear_var('ev_url');
                     break;
                 }
+                $T->parse('allday_events', 'event', true);
                 next($allday);
             }
         } else {
@@ -160,12 +155,9 @@ class View_day extends View
                 // Only evlist and meetup events are hourly, birthdays are
                 // handled as allday events above.
                 if ($A['data']['cal_id'] == -1) {
-                    $T->set_var(array(
-                        'is_meetup' => 'true',
-                        'ev_url' => $A['data']['url'],
-                    ) );
+                    $T->set_var('ev_url', $A['data']['url']);
                 } else {
-                    $T->clear_var('is_meetup');
+                    $T->clear_var('ev_url');
                 }
 
                 if ($j < $numevents) {
@@ -241,7 +233,6 @@ class View_day extends View
                 // with json encoding.
                 unset($A['rec_data']);
                 unset($A['options']);
-
                 if ($A['cal_name'] != 'meetup' &&
                     ( $A['allday'] == 1 ||
                     ( ($A['rp_date_start'] < $this->today_sql) &&

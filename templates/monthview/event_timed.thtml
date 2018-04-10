@@ -3,7 +3,12 @@
 {!if icon}
   <i class="{icon}"></i>
 {!endif}
-  <a href="{pi_url}/event.php?view=instance&eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}"
-    data-uk-tooltip={cls:'evTooltip'} title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
+  <a style-"color:{fgcolor};" title="{ev_hover}" data-uk-tooltip={cls:'evTooltipo'}
+{!if ev_url}
+  href="{ev_url}" target="_blank"
+{!else}
+  href="{pi_url}/event.php?view=instance&eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}"
+{!endif}
+>{ev_title}</a>
 </div>
 {# end {templatelocation} #}

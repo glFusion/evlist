@@ -585,7 +585,6 @@ class Event
                     DB_query("DELETE FROM {$_TABLES['evlist_detail']}
                             WHERE ev_id = '{$this->id}'
                             AND det_id <> '{$this->det_id}'");
-                    Cache::clear(array('detail', 'event_' . $this->id));
                     // This function sets the rec_data value.
                     if (!$this->UpdateRepeats()) {
                         return $this->PrintErrors();
@@ -603,7 +602,6 @@ class Event
                             rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
                             rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end')
                         WHERE rp_ev_id = '{$this->id}'";
-                    Cache::clear('repeats', 'event_' . $this->id);
                     DB_query($sql, 1);
                 }
             }
@@ -701,7 +699,6 @@ class Event
         $sql = $sql1 . $fld_sql . $sql2;
         //echo $sql;die;
         DB_query($sql, 1);
-        Cache::clear(array('events', 'event_' . $this->id));
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
         } elseif ($this->table == 'evlist_submissions' &&

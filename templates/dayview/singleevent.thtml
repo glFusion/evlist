@@ -8,12 +8,13 @@
 {!if icon}
   <i class="{icon}"></i>&nbsp;
 {!endif}
-{!if is_meetup}
-    <a class="cal-event" href="{ev_url}" target="_blank">
+    <a class="cal-event" style="color:{fgcolor};"
+{!if ev_url}
+     href="{ev_url}" target="_blank"
 {!else}
-    <a class="cal-event" style="color:{fgcolor};" href="{site_url}/evlist/event.php?view=instance&eid={rp_id}">
+    href="{site_url}/evlist/event.php?view=instance&eid={rp_id}"
 {!endif}
-    {event_title}</a>
+    >{event_title}</a>
   </span>{br}
 {!if bgcolor}
   </span>

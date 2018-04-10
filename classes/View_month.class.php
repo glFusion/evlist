@@ -79,7 +79,6 @@ class View_month extends View
             'monthview'  => $tpl . '.thtml',
             'allday_event' => 'event_allday.thtml',
             'timed_event' => 'event_timed.thtml',
-            'birthday_event' => 'birthday.thtml',
         ) );
 
         foreach ($daynames as $key=>$dayname) {
@@ -159,7 +158,6 @@ class View_month extends View
                     } else {
                         $ev_hover = '';
                     }
-
                     // All events show the summary or title, if available
                     if (!empty($summary)) {
                         $ev_hover .= $summary;
@@ -181,20 +179,11 @@ class View_month extends View
                     ) );
                     switch ($event['cal_id']) {
                     case -1:
-                        $T->set_var(array(
-                            'is_meetup' => 'true',
-                            'ev_url' => $event['url'],
-                        ) );
-                        $dayentries .= $T->parse('output', 'allday_event', true);
+                        $T->set_var('ev_url', $event['url']);
+                        $dayentries .= $T->parse('output', 'timed_event', true);
                         break;
-                    /*case -2:
-                        $T->set_var(array(
-                            //'icon'  => 'birthday-cake',
-                            'ev_url' => '',
-                        ) );
-                        $dayentries .= $T->parse('output', 'birthday_event', true);
-                        break;*/
                     default:
+                        $T->clear_var('ev_url');
                         if ($event['allday'] == 1) {
                             $dayentries .= $T->parse('output', 'allday_event', true);
                         } else {
@@ -202,7 +191,6 @@ class View_month extends View
                         }
                         break;
                     }
-
                 }
 
                 // Now set the vars for the entire day block

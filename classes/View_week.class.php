@@ -65,8 +65,6 @@ class View_week extends View
         $tpl = $this->getTemplate();
         $T->set_file(array(
             'week'      => $tpl . '.thtml',
-            'meetup'    => 'meetup.thtml',
-            'birthday'  => 'birthday.thtml',
             'event'     => 'event.thtml',
         ) );
 
@@ -172,19 +170,14 @@ class View_week extends View
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
-                    $T->set_var(array('ev_url', $A['url']));
-                    $T->parse('event', 'meetup', false);
+                    $T->set_var('ev_url', $A['url']);
                     break;
-                /*case -2:
-                    $T->set_var('icon', 'birthday-cake');
-                    $T->set_var('bgcolor', $A['bgcolor']);
-                    $T->parse('event', 'birthday', false);
-                    break;*/
                 default:
+                    $T->clear_var('ev_url');
                     $T->set_var('bgcolor', '');
-                    $T->parse('event', 'event', false);
                     break;
                 }
+                $T->parse('event', 'event', false);
                 $T->parse('eBlk', 'eventBlock', true);
             }
             $T->parse('dBlk', 'dayBlock', true);

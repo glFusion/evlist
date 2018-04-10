@@ -1,9 +1,9 @@
 {# begin {templatelocation} #}
 <div class="monthview_timed show_cal{cal_id} event" style="display:{show};">
 {!if icon}
-  <i class="{icon}"></i>
+  <i style="color:{fgcolor}" class="{icon}"></i>
 {!endif}
-  <a style-"color:{fgcolor};" title="{ev_hover}" data-uk-tooltip={cls:'evTooltipo'}
+  <a style="color:{fgcolor};" title="{ev_hover}" data-uk-tooltip={cls:'evTooltip'}
 {!if ev_url}
   href="{ev_url}" target="_blank"
 {!else}

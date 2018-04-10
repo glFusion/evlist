@@ -162,7 +162,6 @@ class View_week extends View
                     'event_summary' => $A['summary'],
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
-                    'delete_imagelink' => EVLIST_deleteImageLink($A, SEC_createToken()),
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
                     'show'      => $this->getCalShowPref($A['cal_id']) ? '' : 'none',

@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
-  {delete_imagelink}&nbsp;{event_times}
   <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{event_summary}">
+  {event_times}
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">
 {!endif}

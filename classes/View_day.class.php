@@ -76,7 +76,6 @@ class View_day extends View
                 $this->addCalUsed($A);
 
                 $T->set_var(array(
-                    'delete_imagelink'  => EVLIST_deleteImageLink($A, $token),
                     'event_time'        => $LANG_EVLIST['allday'],
                     'rp_id'             => $A['rp_id'],
                     'event_title'       => stripslashes($A['title']),
@@ -140,7 +139,6 @@ class View_day extends View
                 // Show the timezone abbr. if not "user local"
                 if ($A['data']['tzid'] != 'local') $end_time .= ' (' . $e_dt->format('T', true) . ')';
                 $T->set_var(array(
-                    'delete_imagelink'  => EVLIST_deleteImageLink($A['data'], $token),
                     'eid'               => $A['data']['rp_ev_id'],
                     'rp_id'             => $A['data']['rp_id'],
                     'event_title'       => stripslashes($A['data']['title']),

@@ -1,6 +1,5 @@
 {# begin {templatelocation} #}
 <div class="show_cal{cal_id}" style="display:{show};">
-  {delete_imagelink}&nbsp;
   {event_time} <span data-uk-tooltip="{cls:'evTooltip'}" class="gl_mootip" title="{event_summary}">
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">

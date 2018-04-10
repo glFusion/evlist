@@ -164,7 +164,7 @@ class View_week extends View
                     'cal_id'        => $A['cal_id'],
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
-                    'show'      => $this->getCalShowPref($A['cal_id']) ? '' : 'none',
+                    'show'      => $this->getCalShowPref($A['cal_id']) ? 'block' : 'none',
                     'icon'      => EVLIST_getIcon($A['cal_icon']),
                 ) );
                 switch ($A['cal_id']) {

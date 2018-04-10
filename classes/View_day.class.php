@@ -84,7 +84,7 @@ class View_day extends View
                     'fgcolor'       => $A['fgcolor'],
                     'cal_id'        => $A['cal_id'],
                     'br'            => $i < $alldaycount ? '<br />' : '',
-                    'show'      => self::getCalShowPref($A['cal_id']) ? '' : 'none',
+                    'show'      => self::getCalShowPref($A['cal_id']) ? 'block' : 'none',
                     'icon'      => EVLIST_getIcon($A['cal_icon']),
                 ) );
                 switch ($A['cal_id']) {
@@ -147,7 +147,7 @@ class View_day extends View
                     'bgcolor'       => '',
                     'cal_id'        => $A['data']['cal_id'],
                     'event_time'    => $start_time . ' - ' . $end_time,
-                    'show'      => self::getCalShowPref($A['data']['cal_id']) ? '' : 'none',
+                    'show'      => self::getCalShowPref($A['data']['cal_id']) ? 'block' : 'none',
                     'icon'      => EVLIST_getIcon($A['data']['cal_icon']),
                 ) );
                 // Only evlist and meetup events are hourly, birthdays are

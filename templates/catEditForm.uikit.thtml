@@ -20,7 +20,7 @@
     <button type="reset" class="uk-button" value="{$LANG_EVLIST['reset']}">{$LANG_EVLIST['reset']}</button>
     <button type="reset" class="uk-button uk-button-primary" value="{$LANG_ADMIN['cancel']}" name="cancel" 
         onclick="javascript: document.location.href='{cancel_url}'">{$LANG_ADMIN['cancel']}</button>
-    <button type="submit" class="floatright uk-button uk-button-danger" name="delcat" value="{$LANG_ADMIN['delete']}">{$LANG_ADMIN['delete']}</button>
+    <button type="submit" class="uk-button uk-button-danger" name="delcat" value="{$LANG_ADMIN['delete']}">{$LANG_ADMIN['delete']}</button>
   </div
 </form>
 {# end {templatelocation} #}

@@ -4,16 +4,16 @@
 {!if bgcolor}
   <span style="color:#000;background-color:{bgcolor};">
 {!endif}
+    <a class="cal-event" style="color:{fgcolor};"
+{!if ev_url}
+    href="{ev_url}" target="_blank">
+{!else}
+    href="{site_url}/evlist/event.php?view=instance&eid={event_id}">
+{!endif}
 {!if icon}
     <i class="{icon}"></i>
 {!endif}
-    <a class="cal-event" style="color:{fgcolor};"
-{!if ev_url}
-    href="{ev_url}" target="_blank"
-{!else}
-    href="{site_url}/evlist/event.php?view=instance&eid={event_id}"
-{!endif}
-    >{event_title}</a>
+    {event_title}</a>
 {!if bgcolor}
   </span>
 {!endif}

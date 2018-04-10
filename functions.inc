@@ -2543,6 +2543,7 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
                 'bgcolor' => $Cal->bgcolor,
                 'tzid' => $event->timezone,
                 'cal_icon' => $Cal->cal_icon,
+                'allday' => 0,      // Meetup events are always timed
             );
         }
     }

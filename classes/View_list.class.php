@@ -172,15 +172,18 @@ class View_list extends View
                         $A['rp_id'] . $andcat);
                     $morelink = '<a href="' . $morelink . '">' .
                         $LANG_EVLIST['read_more'] . '</a>';*/
-                    $contactlink = '';
-                    if (empty($A['email'])) {
-                        if (isset($A['owner_id'])) {
-                            $contactlink = $_CONF['site_url'] . '/profiles.php?uid=' .
-                                $A['owner_id'];
+                    if (isset($A['options']['contactlink']) && $A['options']['contactlink']) {
+                        if (empty($A['email'])) {
+                            if (isset($A['owner_id'])) {
+                                $contactlink = $_CONF['site_url'] . '/profiles.php?uid=' .
+                                    $A['owner_id'];
+                            }
+                        } else {
+                            $contactlink = 'mailto:' .
+                                    EVLIST_obfuscate($A['email']);
                         }
                     } else {
-                        $contactlink = 'mailto:' .
-                                EVLIST_obfuscate($A['email']);
+                        $contactlink = '';
                     }
                     $T->set_var(array(
                         'title' => $titlelink,
@@ -197,7 +200,6 @@ class View_list extends View
                         'cal_fgcolor' => $A['fgcolor'],
                         'cal_bgcolor' => $A['bgcolor'],
                     ) );
-
                     $T->parse('event_item','item', true);
                 }
             }

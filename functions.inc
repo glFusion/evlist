@@ -2445,6 +2445,8 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 if (!isset($events[$A['rp_date_start']])) {
                     $events[$A['rp_date_start']] = array();
                 }
+                $A['options'] = @unserialize($A['options']);
+                $A['rec_data'] = @unserialize($A['rec_data']);
                 // Set a valid foreground and background color
                 if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
                 if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';

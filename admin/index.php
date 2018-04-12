@@ -730,10 +730,12 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
             }
             break;
         case 'cal_name':
-            $retval = $fieldvalue;
+            $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
+                ';">' . $fieldvalue;
             if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
                 $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
             }
+            $retval .= '</span>';
             break;
         default:
             $retval = $fieldvalue;

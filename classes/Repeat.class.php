@@ -486,10 +486,11 @@ class Repeat
         // new browser window.
         $url = $this->Event->Detail->url;
         if (!empty($url)) {
+            $url = str_replace('%site_url%', $_CONF['site_url'], $url);
             if (strncasecmp($_CONF['site_url'], $url, strlen($_CONF['site_url']))) {
                 $target = 'target="_blank"';
             } else {
-                $target = '';
+                $target = '';       // Internal url
             }
             $more_info_link = sprintf($LANG_EVLIST['click_here'], $url, $target);
         } else {

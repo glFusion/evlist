@@ -66,7 +66,8 @@ function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
     $range = (int)$range;
     $cal = (int)$cal;
     $limit = (int)$_EV_CONF['limit_list'];
-    if ($limit < 1) return '';
+    $retval = '';
+    if ($limit < 1) return $retval;
 
     $base_url = EVLIST_URL.
         "/index.php?cat=$cat&amp;cal=$cal&amp;range=$range&amp;view=list";

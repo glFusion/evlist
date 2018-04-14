@@ -63,7 +63,7 @@ USES_evlist_functions();
 /*
 *   MAIN
 */
-COM_setArgNames(array('view','cat'));
+COM_setArgNames(array('view','cat', 'id'));
 if (isset($_GET['view'])) {
     $view = COM_applyFilter($_GET['view']);
 } elseif (isset($_POST['view'])) {

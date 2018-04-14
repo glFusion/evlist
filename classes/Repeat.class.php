@@ -788,8 +788,8 @@ class Repeat
             for ($i = 0; $i < $catcount; $i++) {
                 $catname = str_replace(' ', '&nbsp;', $cats[$i]['name']);
                 $catlinks[] = '<a href="' .
-                COM_buildURL(EVLIST_URL . '/index.php?view=list' . $andrange .
-                '&cat=' . $cats[$i]['id']) .
+                EVLIST_URL . '/index.php?view=list' . $andrange .
+                '&cat=' . $cats[$i]['id'] .
                 '">' . $catname . '</a>&nbsp;';
             }
             $catlink = implode(' | ', $catlinks);

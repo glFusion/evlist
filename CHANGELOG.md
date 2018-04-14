@@ -1,6 +1,6 @@
 # evList plugin for glFusion - Changelog
 ## v1.4.5
-Unreleased
+Release 2018-04-12
 - Allow &quot;%site_url%&quot; in event URL to reference the site base URL.
 - Supports calls to PLG_itemSaved() to allow plugins to submit and update events.
 - Added plugin->calendar mapping in the configuration (Integration section)

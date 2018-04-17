@@ -66,9 +66,9 @@ $_EV_CONF['_today_ts'] = $_EV_CONF['_now']->toUnix();
 
 // Check the version of the locator plugin and reset the use_locator
 // config value if it's inadequate.
-if ($_EV_CONF['use_locator'] == 1) {
+if (isset($_EV_CONF) && $_EV_CONF['use_locator'] == 1) {
     if (!isset($_PLUGIN_INFO['locator']) ||
-        !COM_checkVersion($_PLUGIN_INFO['locator'], $EV_CONF['min_locator_ver'])) {
+        !COM_checkVersion($_PLUGIN_INFO['locator']['pi_version'], $_EV_CONF['min_locator_ver'])) {
         $_EV_CONF['use_locator'] = 0;
     }
 }

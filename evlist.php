@@ -95,7 +95,6 @@ define('EV_USER_CAN_ADD',   1);
 define('EV_ANON_CAN_ADD',   2);
 
 $_EV_CONF['min_locator_ver'] = '1.0.3'; // minimum locator version required
-$_EV_CONF['min_lglib_ver'] = '0.0.7';   // minimum lglib version required
 $_EV_CONF['max_repeats'] = 1000;    // Max repeats created for events
 
 ?>

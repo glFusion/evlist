@@ -2701,60 +2701,6 @@ function EVLIST_getIcon($name, $style='')
 
 
 /**
-*   Get member birthdays if the Birthdays plugin is enabled.
-*
-*   @param  string  $start      Start date
-*   @param  string  $end        Ending date
-*   @param  array   &$events    Events array to update
-*/
-function X_EVLIST_getBirthdays($start, $end, &$events)
-{
-    global $_CONF, $_EV_CONF, $LANG_EVLIST;
-
-    $Cal = Evlist\Calendar::getInstance(-2);
-    if ($Cal === NULL || $Cal->cal_status == 0) return;
-
-    $args = array(1 => array(
-        'start' => $start,
-        'end' => $end,
-    ));
-    $birthdays = PLG_callFunctionForOnePlugin('plugin_getBirthdays_birthdays', $args);
-    if (empty($birthdays)) return;  // Could be empty, not an error
-
-    foreach ($birthdays as $ev_date=>$uids) {
-        if ($ev_date < $start || $ev_date > $end) continue;
-        foreach ($uids as $uid) {
-            $dscp = COM_getDisplayName($uid);
-            if (!isset($events[$ev_date])) $events[$ev_date] = array();
-            $events[$ev_date][] = array(
-                'cal_name' => $Cal->cal_name,
-                'cal_ena_ical' => 0,
-                'cal_id' => $Cal->cal_id,
-                'rp_id' => '',
-                'rp_ev_id' => '',
-                'rp_date_start' => $ev_date,
-                'rp_date_end' => $ev_date,
-                'rp_time_start1' => '',
-                'rp_time_end1' => '',
-                'title' => $dscp,
-                'summary' => $dscp,
-                'full_description' => sprintf($LANG_EVLIST['hover_birthday'], $dscp),
-                'url' => '',
-                'show_upcoming' => 0,
-                'fgcolor' => $Cal->fgcolor,
-                'bgcolor' => $Cal->bgcolor,
-                'tzid' => $_CONF['timezone'],
-                'allday' => 1,
-            );
-        }
-    }
-    if (!empty($birthdays)) {
-        ksort($events);
-    }
-}
-
-
-/**
 *   Log activity to a plugin-specific log file
 *
 *   @param string $logentry Text to log

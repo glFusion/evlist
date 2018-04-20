@@ -136,6 +136,7 @@ spl_autoload_register(function($class)
         }
     }
 });
+use LGLib\Date_Calc;
 
 function USES_evlist_functions()
 {    require_once __DIR__ . '/evlist_functions.inc.php'; }
@@ -619,7 +620,6 @@ function EVLIST_cb_content($format)
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
     USES_evlist_functions();
-    USES_lglib_class_datecalc();
 
     $retval = '';
     // Retrieve Centerblock Settings
@@ -2272,8 +2272,6 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 {
     global $_TABLES, $_EV_CONF, $_CONF, $_USER;
 
-    USES_lglib_class_datecalc();
-
     if ($start == '') $start = $_EV_CONF['_today'];
     if ($end == '') $end = $start;
 
@@ -2440,7 +2438,6 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
         $events = array();
         $result = DB_query($sql, 1);
         if ($result && !DB_error()) {
-            USES_lglib_class_datecalc();
             while ($A = DB_fetchArray($result, false))  {
                 if (!isset($events[$A['rp_date_start']])) {
                     $events[$A['rp_date_start']] = array();

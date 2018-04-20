@@ -12,6 +12,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Create a list of events
@@ -80,15 +81,15 @@ class View_list extends View
             $opts['order'] = 'DESC';
             break;
         case 3:         //this week
-            $start = \Date_Calc::beginOfWeek();
-            $end = \Date_Calc::endOfWeek();
+            $start = Date_Calc::beginOfWeek();
+            $end = Date_Calc::endOfWeek();
             break;
         case 4:         //this month
-            $start = \Date_Calc::beginOfMonth();
-            $year = \Date_Calc::getYear();
-            $month = \Date_Calc::getMonth();
-            $day = \Date_Calc::daysInMonth($month, $year);
-            $end = \Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
+            $start = Date_Calc::beginOfMonth();
+            $year = Date_Calc::getYear();
+            $month = Date_Calc::getMonth();
+            $day = Date_Calc::daysInMonth($month, $year);
+            $end = Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
             break;
         case 2:         //upcoming
         default:

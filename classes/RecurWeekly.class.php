@@ -11,6 +11,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Class to handle weekly recurrences.
@@ -36,7 +37,7 @@ class RecurWeekly extends Recur
         // Start by reducing the starting date by one day. Then the for
         // loop can handle all the events.
         list($y, $m, $d) = explode('-', $occurrence);
-        $occurrence = \Date_Calc::prevDay($d, $m, $y);
+        $occurrence = Date_Calc::prevDay($d, $m, $y);
         $count = 1;
         while ($occurrence <= $this->event->rec_data['stop'] &&
                     $occurrence >= '1971-01-01' &&
@@ -45,7 +46,7 @@ class RecurWeekly extends Recur
             foreach ($days_on as $dow) {
 
                 list($y, $m, $d) = explode('-', $occurrence);
-                $occurrence = \Date_Calc::nextDayOfWeek($dow-1, $d, $m, $y);
+                $occurrence = Date_Calc::nextDayOfWeek($dow-1, $d, $m, $y);
 
                 // Stop when we hit the stop date
                 if ($occurrence > $this->event->rec_data['stop']) break;
@@ -59,7 +60,7 @@ class RecurWeekly extends Recur
 
             if ($this->freq > 1) {
                 // Get the beginning of this week, and add $freq weeks to it
-                $occurrence = \Date_Calc::beginOfWeek($d + (7 * $this->freq), $m, $y);
+                $occurrence = Date_Calc::beginOfWeek($d + (7 * $this->freq), $m, $y);
             }
 
         }   // while not at stop date

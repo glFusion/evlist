@@ -17,6 +17,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Class for event recurrence calculations.
@@ -65,7 +66,7 @@ class Recur
             list($syear, $smonth, $sday) = explode('-', $this->dt_start);
             list($eyear, $emonth, $eday) = explode('-', $this->dt_end);
             // Need to get the number of days the event lasts
-            $this->duration = \Date_Calc::dateDiff($eday, $emonth, $eyear,
+            $this->duration = Date_Calc::dateDiff($eday, $emonth, $eyear,
                         $sday, $smonth,$syear);
         } else {
             $this->duration = 0;      // single day event
@@ -109,11 +110,11 @@ class Recur
             // Split out the components of the new working date.
             list($y, $m, $d) = explode('-', $occurrence);
 
-            $dow = \Date_Calc::dayOfWeek($d, $m, $y);
+            $dow = Date_Calc::dayOfWeek($d, $m, $y);
             if ($dow == 6 || $dow == 0) {
                 if ($this->skip == 2) {
                     // Skip to the next weekday
-                    $occurrence = \Date_Calc::nextWeekday($d, $m, $y);
+                    $occurrence = Date_Calc::nextWeekday($d, $m, $y);
                 } elseif ($dow == 0) {
                     // Skip must = 1, so just jump to the next occurrence.
                     $occurrence = $this->incrementDate($d, $m, $y);
@@ -142,7 +143,7 @@ class Recur
         //  actual date in case it's rescheduled due to a weekend.
         //  Keeping the occurrence is based on (1), scheduling the next
         //  occurrence is based on (0).
-        $thedate = \Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
+        $thedate = Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
         $occurrence = array($thedate, $thedate);
 
         // Get any occurrences before our stop.  Keep these.

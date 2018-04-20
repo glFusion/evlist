@@ -12,9 +12,9 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 USES_evlist_functions();
-USES_lglib_class_datecalc();
 date_default_timezone_set('UTC');
 
 /**
@@ -334,9 +334,9 @@ class View
             if ($this->month == 0) $this->month = $A['date'][1];
             if ($this->day == 0) $this->day = $A['date'][2];
         } else {
-            if ($this->year == 0) $this->year = \Date_Calc::getYear();
-            if ($this->month == 0) $this->month = \Date_Calc::getMonth();
-            if ($this->day == 0) $this->day = \Date_Calc::getDay();
+            if ($this->year == 0) $this->year = Date_Calc::getYear();
+            if ($this->month == 0) $this->month = Date_Calc::getMonth();
+            if ($this->day == 0) $this->day = Date_Calc::getDay();
         }
         SESS_setVar('evlist.current', array(
             'view' => $this->type,

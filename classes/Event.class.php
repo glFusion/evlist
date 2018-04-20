@@ -12,7 +12,7 @@
 */
 namespace Evlist;
 
-USES_lglib_class_datecalc();
+use LGLib\Date_Calc;
 USES_evlist_functions();
 
 /**
@@ -993,7 +993,7 @@ class Event
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
                         EVLIST_GetOptions($LANG_EVLIST['rec_formats'], isset($this->rec_data['type']) ? $this->rec_data['type'] : ''),
-                'recurring_weekday_options' => EVLIST_GetOptions(\Date_Calc::getWeekDays(), $recweekday, 1),
+                'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
                 'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
@@ -1083,7 +1083,7 @@ class Event
             list($endmonth1, $endday1, $endyear1,
                     $endhour1, $endminute1) =
                     $this->DateParts($this->date_end1, $this->time_end1);
-            $days_interval = \Date_Calc::dateDiff(
+            $days_interval = Date_Calc::dateDiff(
                     $endday1, $endmonth1, $endyear1,
                     $startday1, $startmonth1, $startyear1);
         } else {
@@ -1790,7 +1790,7 @@ class Event
         // Validate the user-supplied stopdate
         if (!empty($A['stopdate'])) {
             list($stop_y, $stop_m, $stop_d) = explode('-', $A['stopdate']);
-            if (\Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
+            if (Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
                 $this->rec_data['stop'] = $A['stopdate'];
             }
         } else {

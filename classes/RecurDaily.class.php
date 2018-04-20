@@ -11,6 +11,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Class to handle daily recurrences.

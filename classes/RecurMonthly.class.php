@@ -11,6 +11,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Class to handle monthly recurrences.
@@ -41,7 +42,7 @@ class RecurMonthly extends Recur
                     //$occurrence >= '1971-01-01' &&
                     $count < $_EV_CONF['max_repeats']) {
 
-            $lastday = \Date_Calc::daysInMonth($m, $y); // last day in month
+            $lastday = Date_Calc::daysInMonth($m, $y); // last day in month
 
             foreach ($days_on as $dom) {
 
@@ -94,11 +95,11 @@ class RecurMonthly extends Recur
             // Split out the components of the new working date.
             list($y, $m, $d) = explode('-', $occurrence);
 
-            $dow = \Date_Calc::dayOfWeek($d, $m, $y);
+            $dow = Date_Calc::dayOfWeek($d, $m, $y);
             if ($dow == 6 || $dow == 0) {
                 if ($this->skip == 2) {
                     // Skip to the next weekday
-                    $occurrence = \Date_Calc::nextWeekday($d, $m, $y);
+                    $occurrence = Date_Calc::nextWeekday($d, $m, $y);
                 } else {
                     // Monthly recurrences are on specific dates, so don't
                     // just skip to the next one- return NULL so the

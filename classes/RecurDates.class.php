@@ -11,6 +11,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Class for events recurring by user-specified dates.
@@ -25,7 +26,7 @@ class RecurDates extends Recur
 
         foreach($this->event->rec_data['custom'] as $occurrence) {
             list($y, $m, $d) = explode('-', $occurrence);
-            if (\Date_Calc::isValidDate($d, $m, $y)) {
+            if (Date_Calc::isValidDate($d, $m, $y)) {
                 $this->storeEvent($occurrence);
             }
         }

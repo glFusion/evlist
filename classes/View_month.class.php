@@ -12,6 +12,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Display a monthly calendar
@@ -50,7 +51,7 @@ class View_month extends View
         $retval = '';
 
         // Get all the dates in the month
-        $calendarView = \Date_Calc::getCalendarMonth($this->month, $this->year, '%Y-%m-%d');
+        $calendarView = Date_Calc::getCalendarMonth($this->month, $this->year, '%Y-%m-%d');
 
         $x = count($calendarView) - 1;
         $y = count($calendarView[$x]) - 1;
@@ -86,7 +87,7 @@ class View_month extends View
         }
 
         list($y, $m, $d) = explode('-', $starting_date);
-        $weekOfYear = \Date_Calc::weekOfYear($d, $m, $y);
+        $weekOfYear = Date_Calc::weekOfYear($d, $m, $y);
 
         $T->set_block('monthview', 'weekBlock', 'wBlock');
         foreach ($calendarView as $weeknum => $weekdata) {

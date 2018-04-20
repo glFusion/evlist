@@ -11,6 +11,7 @@
 *   @filesource
 */
 namespace Evlist;
+use LGLib\Date_Calc;
 
 /**
 *   Class for handling recurrence by day of month.
@@ -47,7 +48,7 @@ class RecurDOM extends Recur
 
             foreach ($intervalA as $interval) {
 
-                $occurrence = \Date_Calc::NWeekdayOfMonth(
+                $occurrence = Date_Calc::NWeekdayOfMonth(
                             (int)$interval, $datecalc_weekday,
                             $m, $y, '%Y-%m-%d'
                 );
@@ -59,7 +60,7 @@ class RecurDOM extends Recur
                 // for the last (5th) week, then re-adjust to use the 4th week.
                 // If we already have a 4th, this will just overwrite it
                 if ($occurrence == -1 && $interval == 5) {
-                    $occurrence = \Date_Calc::NWeekdayOfMonth(
+                    $occurrence = Date_Calc::NWeekdayOfMonth(
                                 4, $datecalc_weekday,
                                 $m, $y, '%Y-%m-%d');
                 }

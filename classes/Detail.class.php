@@ -92,6 +92,7 @@ class Detail
                 $records[$det_id] = new self($det_id);
             }
             $tags = array(
+                'events',
                 'detail',
                 'event_' . $records[$det_id]->ev_id,
             );

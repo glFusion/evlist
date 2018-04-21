@@ -437,7 +437,7 @@ class Calendar
     *   @param  boolean $enabled    True to show only enabled calendars
     *   @return string      Option tags
     */
-    public static function getSelectionList($selected = 0, $enabled = false, $access = 0)
+    public static function optionList($selected = 0, $enabled = true, $access = 0)
     {
         $retval = '';
         $cals = self::getAll();

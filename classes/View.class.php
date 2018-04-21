@@ -165,8 +165,7 @@ class View
         $T = new \Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('header', 'calendar_header.thtml');
 
-        $type_options = COM_optionList($_TABLES['evlist_categories'],
-            'id,name', $this->cat, 1, 'status=1');
+        $cat_options = Category::optionList($this->cat);
         $range_options = EVLIST_GetOptions($LANG_EVLIST['ranges'], $this->range);
 
         // Figure out the add event link, depending on the view.
@@ -195,7 +194,7 @@ class View
             'thisview'  => $this->type,
             'add_event_link' => $add_event_link,
             'add_event_text' => $LANG_EVLIST['add_event'],
-            'event_type_select' => $type_options,
+            'event_type_select' => $cat_options,
             'range_options' => $range_options,
             'action_url'    => EVLIST_URL . '/index.php',
             //'view'      => $this->view,
@@ -209,7 +208,7 @@ class View
         ) );
 
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
-        $T->set_var('cal_select', Calendar::getSelectionList($cal_selected, true, 2));
+        $T->set_var('cal_select', Calendar::optionList($cal_selected, true, 2));
 
         if (isset($_GET['range']) && !empty($_GET['range'])) {
             $T->set_var('range_url', 'range=' . $_GET['range']);

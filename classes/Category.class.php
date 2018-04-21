@@ -36,7 +36,10 @@ class Category
         $this->cat_status   = 1;
         $this->isNew = true;
 
-        if ($this->cat_id > 0) {
+        if (is_array($cat_id)) {
+            $this->SetVars($cat_id);
+            $this->isNew = false;
+        } else if ($this->cat_id > 0) {
             $this->Read($this->cat_id);
         }
     }
@@ -181,6 +184,7 @@ class Category
         DB_query($sql, 1);
         if (!DB_error()) {
             if ($this->isNew) $this->cat_id = DB_insertId();
+            Cache::clear('categories');
             return true;
         } else {
             return false;
@@ -189,21 +193,18 @@ class Category
 
 
     /**
-    *   Deletes the current calendar.
-    *   Deletes all events, detail and repeats associated with this calendar,
-    *   or moves them to a different calendar if specified.
+    *   Deletes the current category. Also deletes any lookup records.
     *
-    *   @param  integer $newcal ID of new calendar to use for events, etc.
+    *   @param  integer $cat_id Category to delete
     */
-    public function Delete($cat_id=0)
+    public static function Delete($cat_id=0)
     {
         global $_TABLES;
 
         $cat_id = (int)$cat_id;
-        if ($cat_id == 0 && is_object($this)) {
-            $cat_id = $this->cat_if;
-        }
         DB_delete($_TABLES['evlist_categories'], 'id', $cat_id);
+        DB_delete($_TABLES['evlist_lookup'], 'cid', $cat_id);
+        Cache::clear('categories');
     }
 
 
@@ -228,9 +229,67 @@ class Category
         if (DB_error()) {
             return $oldvalue;
         } else {
-            Cache::clear('events');
+            Cache::clear('categories');
             return $newvalue;
         }
+    }
+
+
+    /**
+    *   Get all categories from the lookup table.
+    *
+    *   $param  boolean $enabled    True to get only enabled calendars
+    *   return  array       Array of calendar objects
+    */
+    public static function getAll()
+    {
+        global $_TABLES;
+        static $cats = NULL;
+
+        // First check if the calendars have been read already
+        if ($cats === NULL) {
+            // Then check the cache
+            $cats = Cache::get('categories');
+            if ($cats === NULL) {
+                // Still nothing? Then read from the DB
+                $cats = array();
+                $sql = "SELECT * FROM {$_TABLES['evlist_categories']}
+                        ORDER BY id ASC";
+                $res = DB_query($sql);
+                while ($A = DB_fetchArray($res, false)) {
+                    $cats[$A['id']] = new self($A);
+                }
+                Cache::set('categories', $cats, 'categories');
+            }
+        }
+        return $cats;
+    }
+
+
+    /**
+    *   Get an instance of a category.
+    *   Saves objects in a static variable to minimize DB lookups
+    *
+    *   @param  integer $id     Category ID
+    *   @return object          Category object
+    */
+    public static function getInstance($id)
+    {
+        $Cats = self::getAll();
+        return isset($Cats[$id]) ? $Cats[$id] : NULL;
+    }
+
+
+    public static function optionList($selected = 0)
+    {
+        $Cats = self::getAll();
+        $retval = '';
+        foreach ($Cats as $Cat) {
+            if (!$Cat->cat_status) continue;
+            $sel = $selected == $Cat->cat_id ? 'selected="selected"' : '';
+            $retval .= "<option value=\"{$Cat->cat_id}\" $sel>{$Cat->cat_name}</option>" . LB;
+        }
+        return $retval;
     }
 
 }

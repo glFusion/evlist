@@ -1124,7 +1124,7 @@ class Event
         $start2 = EVLIST_TimeSelect('start2', $this->time_start2);
         $end1 = EVLIST_TimeSelect('end1', $this->time_end1);
         $end2 = EVLIST_TimeSelect('end2', $this->time_end2);
-        $cal_select = Calendar::getSelectionList($this->cal_id, true, 3);
+        $cal_select = Calendar::optionList($this->cal_id, true, 3);
 
         $navbar = new \navbar;
         $cnt = 0;
@@ -1611,17 +1611,21 @@ class Event
     {
         global $_TABLES;
 
-        $retval = array();
         $sql = "SELECT tc.id, tc.name
-                FROM {$_TABLES['evlist_categories']} tc
-                LEFT JOIN {$_TABLES['evlist_lookup']} tl
+                FROM {$_TABLES['evlist_lookup']} tl
+                LEFT JOIN {$_TABLES['evlist_categories']} tc
                 ON tc.id = tl.cid
                 WHERE tl.eid = '{$this->id}'
-                AND tl.status = '1'";
+                AND tc.status = '1'";
         //echo $sql;die;
-        $cresult = DB_query($sql, 1);
-        while ($C = DB_fetchArray($cresult, false)) {
-            $retval[] = $C;
+        $key = 'categories_ev_' . $this->id;
+        $retval = Cache::get($key);
+        if ($retval === NULL) {
+            $res = DB_query($sql, 1);
+            while ($A = DB_fetchArray($res, false)) {
+                $retval[] = $A;
+            }
+            Cache::set($key, $retval, 'categories');
         }
         return $retval;
     }

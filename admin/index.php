@@ -350,7 +350,7 @@ function EVLIST_admin_list_events()
     $filter = $LANG_EVLIST['calendar']
         . ': <select name="cal_id" onchange="this.form.submit()">'
         . '<option value="0">' . $LANG_EVLIST['all_calendars'] . '</option>'
-        . Evlist\Calendar::getSelectionList($cal_id) . '</select>';
+        . Evlist\Calendar::optionList($cal_id) . '</select>';
 
     $query_arr = array('table' => 'users',
             'sql' => $sql,

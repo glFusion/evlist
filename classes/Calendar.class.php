@@ -294,7 +294,7 @@ class Calendar
         if (!DB_error()) {
             $this->cal_id = DB_insertId();
             if (version_compare(GVERSION, '1.8.0', '>=')) {
-                Cache::clear('calendars');
+                Cache::clear();
             }
             return true;
         } else {

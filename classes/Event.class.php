@@ -1621,6 +1621,7 @@ class Event
         $key = 'categories_ev_' . $this->id;
         $retval = Cache::get($key);
         if ($retval === NULL) {
+            $retval = array();
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 $retval[] = $A;
@@ -1658,7 +1659,6 @@ class Event
                 $id = DB_insertId();
             }
         }
-
         return $id;
     }
 
@@ -1669,6 +1669,7 @@ class Event
     *   if any have changed.
     *   Uses the old_schedule variable, which must be set first.
     *
+    *   @uses   self::_arrayDiffAssocRecursive()
     *   @param  array   $A  Array of values (e.g. $_POST)
     *   @return boolean     True if an update is needed, false if not
     */
@@ -1740,6 +1741,7 @@ class Event
     *   Recursively check two arrays for differences.
     *   From http://nl3.php.net/manual/en/function.array-diff-assoc.php#73972
     *
+    *   @see    self::NeedRepeatUpdate()
     *   @param  array   $array1     First array
     *   @param  array   $array2     Second array
     *   @return mixed       Array of differences, or 0 if none.
@@ -1881,7 +1883,6 @@ class Event
             else
                 $freq_str = $interval_txt;
         }
-
         return $freq_str;
     }
 

@@ -32,17 +32,9 @@ require_once EVLIST_PI_PATH . '/upgrade.php';   // needed for set_version()
 CACHE_clear();
 Evlist\Cache::clear();
 
-function EVLIST_dvlp_145()
-{
-    global $_EV_CONF;
-
-    $_EV_CONF['pi_version'] = '1.4.4';
-    EVLIST_do_set_version('1.4.4');
-    plugin_upgrade_evlist(true);
-}
-
-// Call the function for the currently-installed codebase
-EVLIST_dvlp_145();
+$_EV_CONF['pi_version'] = '1.4.5';
+EVLIST_do_set_version($_EV_CONF['pi_version']);
+plugin_upgrade_evlist(true);
 
 // need to clear the template cache so do it here
 CACHE_clear();

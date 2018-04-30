@@ -627,7 +627,12 @@ function EVLIST_admin_list_calendars()
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_EVLIST['id'],
+        array('text'    => $LANG_EVLIST['orderby'],
+                'field' => 'orderby',
+                'sort'  => true,
+                'align' => 'center',
+            ),
+         array(  'text'  => $LANG_EVLIST['id'],
                 'field' => 'cal_id',
                 'sort'  => true,
             ),
@@ -647,7 +652,7 @@ function EVLIST_admin_list_calendars()
             ),
     );
 
-    $defsort_arr = array('field' => 'cal_name', 'direction' => 'ASC');
+    $defsort_arr = array('field' => 'orderby', 'direction' => 'ASC');
 
     $text_arr = array('has_menu'     => false,
                       'has_extras'   => false,
@@ -698,6 +703,14 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
                 $retval .= $icon_arr['edit'];
             }
             $retval .= '</a>';
+            break;
+        case 'orderby':
+            $retval = COM_createLink('<i class="uk-icon uk-icon-arrow-up"></i>',
+                EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
+                ) .
+                COM_createLink('<i class="uk-icon uk-icon-arrow-down"></i>',
+                EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
+                );
             break;
         case 'cal_status':
             if ($fieldvalue == '1') {
@@ -889,7 +902,7 @@ $expected = array(
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
     'tickreset_x', 'tickdelete_x', 'exporttickets',
-    'import_csv', 'import_cal',
+    'import_csv', 'import_cal', 'movecal',
     'delbutton_x',
     // Views to display
     'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
@@ -1115,6 +1128,11 @@ case 'exporttickets':
     } else {
         $content .= 'Function not available';
     }
+    break;
+
+case 'movecal':
+    Evlist\Calendar::moveRow($_GET['id'], $actionval);
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php?view=calendars');
     break;
 
 default:

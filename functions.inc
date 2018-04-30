@@ -184,11 +184,11 @@ function plugin_autouninstall_evlist()
 *
 *   @return mixed   True for success, False or error message number otherwise
 */
-function plugin_upgrade_evlist()
+function plugin_upgrade_evlist($ignore_errors=false)
 {
     if (@file_exists(__DIR__ . '/upgrade.php')) {
         require_once __DIR__ . '/upgrade.php';
-        return evlist_upgrade();
+        return evlist_upgrade($ignore_errors);
     } else {
         // upgrades are done by the install script - return a generic error
         COM_errorLog("evList plugin upgrade function not implemented");
@@ -2291,7 +2291,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     $grp_by = 'rep.rp_id';
     $limit = 0;
     $page = 0;
-    $cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
+    $cat_status = '';
+    $cat_join = '';
+    //$cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
     // default date range for fixed calendars, "upcoming" may be different
     $dt_sql = "rep.rp_start <= '$end' AND rep.rp_end >= '$start'";
     if (is_array($opts) && !empty($opts)) {
@@ -2313,8 +2315,10 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                 break;
             case 'cat':
                 if ($value > 0) {
-                    $opt_select .= ', cat.name AS cat_name';
+                    //$opt_select .= ', cat.name AS cat_name';
                     $cat_status = " AND l.cid = '$value' AND cat.status = 1";
+                    $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
+                                "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
                 }
                 break;
             case 'limit':
@@ -2379,10 +2383,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                 ON det.det_id = rep.rp_det_id
             LEFT JOIN {$_TABLES['evlist_calendars']} cal
                 ON cal.cal_id = ev.cal_id
-            LEFT JOIN {$_TABLES['evlist_lookup']} l
-                ON l.eid = ev.id
-            LEFT JOIN {$_TABLES['evlist_categories']} cat
-                ON cat.id = l.cid
+            $cat_join
             WHERE ev.status = 1
             AND ($dt_sql)
             AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
@@ -2432,7 +2433,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
     $sql = EVLIST_getEvents_sql($start, $end, $opts);
     //echo $sql;die;
     $key = md5($sql);
-    $events = Evlist\Cache::get($key, 'events');
+    $events = Evlist\Cache::get($key);
 
     if (is_null($events)) {     // not found in cache, read from DB
         $events = array();
@@ -2480,7 +2481,6 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
         if (!isset($opts['cal']) || $opts['cal'] == -1 || $opts['cal'] == 0) {
             EVLIST_getMeetupEvents($start, $end, $events);
         }
-        //EVLIST_getBirthdays($start, $end, $events);
     }
     return $events;
 }

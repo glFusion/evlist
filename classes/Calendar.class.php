@@ -3,9 +3,9 @@
 *   Class to manage calendars
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.3
+*   @version    1.4.6
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -55,6 +55,7 @@ class Calendar
             $this->cal_status   = 1;
             $this->cal_ena_ical = 1;
             $this->cal_icon     = '';
+            $this->orderby      = 9999;
         }
     }
 
@@ -112,6 +113,7 @@ class Calendar
         case 'perm_anon':
         case 'owner_id':
         case 'group_id':
+        case 'orderby':
             $this->properties[$key] = (int)$value;
             break;
 
@@ -177,7 +179,7 @@ class Calendar
         } else {
             $this->cal_ena_ical = 0;
         }
-
+        $this->orderby = isset($A['orderby']) ? $A['orderby'] : 0;
         if ($fromDB) {
             $this->perm_owner   = $A['perm_owner'];
             $this->perm_group   = $A['perm_group'];
@@ -213,6 +215,15 @@ class Calendar
             $T->set_file('modify', 'calEditForm.thtml');
         }
 
+        // Create the calendar selection. Include all calendars except the
+        // current one.
+        $cals = self::getAll();
+        $orderby_sel = '';
+        foreach ($cals as $C) {
+            if ($C->cal_id == $this->cal_id) continue;
+            $sel = ($C->orderby == $this->orderby - 10) ? 'selected="selected"' : '';
+            $orderby_sel .= '<option value="' . $C->orderby . '"' . $sel . '>' . $C->cal_name . '</option>' . LB;
+        }
         $T->set_var(array(
             'cal_id'        => $this->cal_id,
             'cal_name'      => $this->cal_name,
@@ -242,6 +253,8 @@ class Calendar
             'bg_inherit_chk' => $this->bgcolor == '' ? EVCHECKED : '',
             'icon'              => $this->cal_icon,
             'disp_icon'          => EVLIST_getIcon($this->cal_icon),
+            'orderby_sel'   => $orderby_sel,
+            'orderby'       => $this->orderby,
         ) );
 
         $T->parse('output','modify');
@@ -267,6 +280,10 @@ class Calendar
             $this->isNew = true;
         }
 
+        if (isset($_POST['old_orderby']) && $_POST['old_orderby'] != $this->orderby) {
+            $this->orderby += 5;
+        }
+
         $fld_sql = "cal_name = '" . DB_escapeString($this->cal_name) ."',
             fgcolor = '" . DB_escapeString($this->fgcolor) . "',
             bgcolor = '" . DB_escapeString($this->bgcolor) . "',
@@ -278,7 +295,8 @@ class Calendar
             perm_anon = '{$this->perm_anon}',
             owner_id = '{$this->owner_id}',
             group_id = '{$this->group_id}',
-            cal_icon = '" . DB_escapeString($this->cal_icon) . "' ";
+            cal_icon = '" . DB_escapeString($this->cal_icon) . "',
+            orderby = '{$this->orderby}'";
 
         if ($this->isNew) {
             $sql = "INSERT INTO {$_TABLES['evlist_calendars']} SET
@@ -293,7 +311,15 @@ class Calendar
         DB_query($sql, 1);
         if (!DB_error()) {
             $this->cal_id = DB_insertId();
+            // Saving from a form, add 5 to the orderby value so it goes between
+            // existing calendars. First check if the order was changed.
+            if (isset($_POST['old_orderby']) && $_POST['old_orderby'] != $this->orderby) {
+                self::reOrder();
+            }
+
             if (version_compare(GVERSION, '1.8.0', '>=')) {
+                // Clear the entire Evlist cache since calendar names, etc.
+                // are cached with events.
                 Cache::clear();
             }
             return true;
@@ -474,7 +500,7 @@ class Calendar
                 // Still nothing? Then read from the DB
                 $cals = array();
                 $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
-                        ORDER BY cal_name ASC";
+                        ORDER BY orderby ASC";
                 $res = DB_query($sql);
                 while ($A = DB_fetchArray($res, false)) {
                     $cals[$A['cal_id']] = new self($A);
@@ -535,6 +561,77 @@ class Calendar
             $Cal = self::getInstance(1);
         }
         return $Cal;
+    }
+
+
+    /**
+    *   Reorder all calendars.
+    *   The "orderby" field can be overridden during upgrades to set a good
+    *   default order.
+    *   Clears the cache if any positions were changed.
+    *
+    *   @param  string  $orderby_fld    Field name for ordering
+    */
+    public static function reOrder($orderby_fld = 'orderby')
+    {
+        global $_TABLES;
+
+        $orderby_fld = DB_escapeString($orderby_fld);
+        $sql = "SELECT cal_id, orderby
+                FROM {$_TABLES['evlist_calendars']}
+                ORDER BY `$orderby_fld` ASC;";
+        $result = DB_query($sql);
+
+        $order = 10;
+        $stepNumber = 10;
+        $clear_cache = false;
+        while ($A = DB_fetchArray($result, false)) {
+            if ($A['orderby'] != $order) {  // only update incorrect ones
+                $clear_cache = true;
+                $sql = "UPDATE {$_TABLES['evlist_calendars']}
+                    SET orderby = '$order'
+                    WHERE cal_id = '" . (int)$A['cal_id'] . "'";
+                DB_query($sql);
+            }
+            $order += $stepNumber;
+        }
+        if ($clear_cache) {
+            Cache::clear('calendars');
+        }
+    }
+
+
+    /**
+    *   Move a calendar up or down the admin list.
+    *
+    *   @param  string  $id     Calendar ID
+    *   @param  string  $where  Direction to move (up or down)
+    */
+    public static function moveRow($id, $where)
+    {
+        global $_TABLES;
+
+        switch ($where) {
+        case 'up':
+            $oper = '-';
+            break;
+        case 'down':
+            $oper = '+';
+            break;
+        default:
+            $oper = '';
+            break;
+        }
+
+        if (!empty($oper)) {
+            $id = (int)$id;
+            $sql = "UPDATE {$_TABLES['evlist_calendars']}
+                    SET orderby = orderby $oper 11
+                    WHERE cal_id = '$id'";
+            //echo $sql;die;
+            DB_query($sql);
+            self::reOrder();
+        }
     }
 
 }

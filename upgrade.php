@@ -304,6 +304,13 @@ function evlist_upgrade($ignore_errors = false)
                 30, 20, 0, 10, true, 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion, $ignore_errors)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
+
+        case '1.4.5':
+            $currentVersion = '1.4.6';
+            if (!EVLIST_do_upgrade_sql($currentVersion, $ignore_errors)) return false;
+            // Order the calendars, initially by name;
+            Evlist\Calendar::reOrder('cal_name');
+            if (!EVLIST_do_set_version($currentVersion)) return false;
      }
 
     if (!COM_checkVersion($currentVersion, $installed_ver)) {

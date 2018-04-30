@@ -1,4 +1,9 @@
 # evList plugin for glFusion - Changelog
+
+## v1.4.6
+Release TBD
+- Add orderby field to calendars to control order in selection lists.
+
 ## v1.4.5
 Release 2018-04-14
 - Allow &quot;%site_url%&quot; in event URL to reference the site base URL.

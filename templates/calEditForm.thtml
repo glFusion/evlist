@@ -58,6 +58,17 @@ window.addEvent('domready', function() {
     </tr>
 
     <tr>
+      <td><b>{$LANG_EVLIST['show_after']}: </b></td>
+      <td>
+        <input type="hidden" name="old_orderby" value="{orderby}" />
+        <select name="orderby">
+          <option value="0">-- {$LANG_EVLIST['first']} --</option>
+          {orderby_sel}
+        </select>
+      </td>
+    </tr>
+
+    <tr>
       <td><b>{$LANG_EVLIST['ical_enabled']}: </b></td>
       <td><input type="checkbox" name="cal_ena_ical" value="1" {ical_chk} />
     </tr>

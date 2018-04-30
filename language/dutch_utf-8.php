@@ -374,6 +374,9 @@ You may either move existing events to a new calendar, or delete those events.',
 'sample'        => 'Sample',
 'icon'          => 'Icon',
 'inherit'       => 'Inherit',
+'orderby'       => 'Order',
+'show_after'    => 'Show After',
+'first'         => 'First',
 );
 
 $LANG_EVLIST_HELP = array(

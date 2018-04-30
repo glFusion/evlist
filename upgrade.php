@@ -312,7 +312,6 @@ function evlist_upgrade($ignore_errors = false)
             Evlist\Calendar::reOrder('cal_name');
             if (!EVLIST_do_set_version($currentVersion)) return false;
      }
-
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
         if (!EVLIST_do_set_version($installed_ver)) return false;
     }
@@ -563,7 +562,7 @@ function EVLIST_do_upgrade_sql($version='', $ignore_errors = false)
 */
 function EVLIST_do_set_version($ver)
 {
-    global $_TABLES, $_EV_CONF;
+    global $_TABLES, $_EV_CONF, $_PLUGIN_INFO;;
 
     // now update the current version number.
     $sql = "UPDATE {$_TABLES['plugins']} SET
@@ -571,7 +570,7 @@ function EVLIST_do_set_version($ver)
             pi_gl_version = '{$_EV_CONF['gl_version']}',
             pi_homepage = '{$_EV_CONF['pi_url']}'
         WHERE pi_name = '{$_EV_CONF['pi_name']}'";
-
+    //COM_errorLog($sql);
     $res = DB_query($sql, 1);
     if (DB_error()) {
         COM_errorLog("Error updating the {$_EV_CONF['pi_display_name']} Plugin version",1);
@@ -579,6 +578,7 @@ function EVLIST_do_set_version($ver)
     } else {
         $_PLUGIN_INFO[$_EV_CONF['pi_name']]['pi_version'] = $ver;
         $_PLUGIN_INFO[$_EV_CONF['pi_name']][1] = $ver;
+        $_EV_CONF['pi_version'] = $ver;
         return true;
     }
 }

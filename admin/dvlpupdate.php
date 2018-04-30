@@ -9,7 +9,7 @@
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.5
+*   @version    1.4.6
 *   @since      1.4.5
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
@@ -32,9 +32,10 @@ require_once EVLIST_PI_PATH . '/upgrade.php';   // needed for set_version()
 CACHE_clear();
 Evlist\Cache::clear();
 
-$_EV_CONF['pi_version'] = '1.4.5';
+$ver = '1.4.5';
 EVLIST_do_set_version($_EV_CONF['pi_version']);
 plugin_upgrade_evlist(true);
+EVLIST_do_set_version('1.4.6');
 
 // need to clear the template cache so do it here
 CACHE_clear();

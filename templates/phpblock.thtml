@@ -3,7 +3,7 @@
 <div class="evlist_blk_day">
 <h3>{start_date}</h3>
   <!-- BEGIN blkItem -->
-  <a class="gl_mootip tooltip" title="{tooltip}"
+  <a class="tooltip" title="{tooltip}"
 {!if url_target}
     target="{url_target}"
 {!endif}

@@ -19,7 +19,7 @@
 {!if is_birthday}
         {title}
 {!elseif is_meetup}
-        <a data-uk-tooltip class="gl_mootip" title="{summary}::{startdate}"
+        <a data-uk-tooltip title="{summary}::{startdate}"
             href="{ev_url}" target="_blank">{title}</a>
 {!else}
         <a data-uk-tooltip title="{summary}::{startdate}"

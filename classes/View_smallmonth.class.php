@@ -91,7 +91,7 @@ class View_smallmonth extends View
                     // Create the tooltip hover text
                     $daylinkclass = $dayclass == 'off' ?
                                 'nolink-events' : 'day-events';
-                    $dayspanclass='tooltip gl_mootip';
+                    $dayspanclass='tooltip';
                     foreach ($events[$daydata] as $event) {
                         $tz = $event['tzid'] == 'local' ? $_USER['tzid'] : $event['tzid'];
                         // Show event titles on different lines if more than one

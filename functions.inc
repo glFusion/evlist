@@ -1159,7 +1159,6 @@ function plugin_itemlist_evlist()
         $plugin->addsubmissionheading($LANG_EVLIST['title']);
         $plugin->addsubmissionheading($LANG_EVLIST['start_date']);
         $plugin->addsubmissionheading($LANG_EVLIST['start_time']);
-
         return $plugin;
     }
 }

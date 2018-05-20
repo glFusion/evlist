@@ -260,8 +260,9 @@ function XXEVLIST_getDayViewData($events, $today = '')
 * @return   string          link or empty string
 * @TODO         This needs to bring up the javascript menu to delete the
 *               event or just an instance
+*   @deprecated
 */
-function EVLIST_deleteImageLink($A, $token)
+function X_EVLIST_deleteImageLink($A, $token)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST;
 
@@ -276,10 +277,9 @@ function EVLIST_deleteImageLink($A, $token)
             src=\"{$_CONF['layout_url']}/images/admin/delete.png\"
             alt=\"{$LANG_ADMIN['delete']}\"
             title=\"{$LANG_ADMIN['delete']}\"
-            width=\"14\" height=\"14\"
-            class=\"gl_mootip\"> ";
+            width=\"14\" height=\"14\"";
 
-            $retval = COM_createLink($img, EVLIST_URL .
+        $retval = COM_createLink($img, EVLIST_URL .
                     '/event.php?delrepeat=x&amp;rp_id=' . $A['rp_id'] . '&amp;'
                     . CSRF_TOKEN . '=' . $token,
                 array('onclick'=>
@@ -503,7 +503,6 @@ function EVLIST_adminRSVP($rp_id)
         'chkactions' => '<input data-uk-tooltip name="tickdelete" type="image" src="'
             . $_CONF['layout_url'] . '/images/admin/delete.' . $_IMAGE_TYPE
             . '" style="vertical-align:text-bottom;" title="' . $LANG_ADMIN['delete']
-            . '" class="gl_mootip"'
             . ' onclick="return confirm(\'' . $LANG_EVLIST['conf_del_item']
             . '\');" />&nbsp;'
             . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
@@ -512,7 +511,6 @@ function EVLIST_adminRSVP($rp_id)
             . $_CONF['site_url'] . '/evlist/images/reset.png'
             . '" style="vertical-align:text-bottom;" title="'
             . $LANG_EVLIST['reset_usage']
-            . '" class="gl_mootip"'
             . ' onclick="return confirm(\'' . $LANG_EVLIST['conf_reset']
             . '\');" />&nbsp;' . $LANG_EVLIST['reset_usage']
             . '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',

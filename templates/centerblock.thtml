@@ -25,6 +25,7 @@
         <a data-uk-tooltip title="{summary}::{startdate}"
             href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
 {!endif}
+        </b>
     </td>
     <td class="pluginLinks" style="padding-left:6px; height:20px;">
         {summary}

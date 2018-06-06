@@ -686,7 +686,7 @@ class Ticket
 
         $vars = array('ev_id', 'uid');
         $vals = array($ev_id, $uid);
-        if ($rp > 0) {
+        if ($rp_id > 0) {
             $vars[] = 'rp_id';
             $vals[] = $rp_id;
         }

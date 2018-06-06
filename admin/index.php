@@ -629,20 +629,20 @@ function EVLIST_admin_list_calendars()
             ),
         array('text'    => $LANG_EVLIST['orderby'],
                 'field' => 'orderby',
-                'sort'  => true,
+                'sort'  => false,
                 'align' => 'center',
             ),
          array(  'text'  => $LANG_EVLIST['id'],
                 'field' => 'cal_id',
-                'sort'  => true,
+                'sort'  => false,
             ),
         array(  'text'  => $LANG_EVLIST['title'],
                 'field' => 'cal_name',
-                'sort'  => true,
+                'sort'  => false,
             ),
         array(  'text'  => $LANG_EVLIST['enabled'],
                 'field' => 'cal_status',
-                'sort'  => true,
+                'sort'  => false,
                 'align' => 'center',
             ),
         array(  'text'  => $LANG_ADMIN['delete'],
@@ -670,7 +670,6 @@ function EVLIST_admin_list_calendars()
             'sql' => $sql,
             'query_fields' => array('id', 'cal_name',),
     );
-
 
     $retval .= ADMIN_list('evlist', 'EVLIST_admin_field_calendars',
                 $header_arr, $text_arr, $query_arr, $defsort_arr);

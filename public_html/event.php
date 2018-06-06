@@ -406,6 +406,10 @@ default:
     }
     if (!empty($rp_id)) {
         $Rep = Evlist\Repeat::getInstance($rp_id);
+        if (!$Rep->Event->hasAccess(2)) {
+            echo COM_refresh(EVLIST_URL . '/index.php');
+            exit;
+        }
         $pagetitle = COM_stripslashes($Rep->Event->Detail->title);
         if ($view == 'print') {
             $template = 'print';

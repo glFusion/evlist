@@ -1594,11 +1594,15 @@ class Event
         if ($this->isAdmin)
             return true;
 
-        $access = SEC_hasAccess($this->owner_id, $this->group_id,
+        $ev_access = SEC_hasAccess($this->owner_id, $this->group_id,
                     $this->perm_owner, $this->perm_group,
                     $this->perm_members, $this->perm_anon);
+        $cal_access = SEC_hasAccess($this->Calendar->owner_id,
+                    $this->Calendar->group_id,
+                    $this->Calendar->perm_owner, $this->Calendar->perm_group,
+                    $this->Calendar->perm_members, $this->Calendar->perm_anon);
 
-        return $access >= $level ? true : false;
+        return ($ev_access >= $level && $cal_access >= $level) ? true : false;
     }
 
 

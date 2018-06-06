@@ -4,7 +4,8 @@
 Release TBD
 - Add orderby field to calendars to control order in selection lists.
 - Fix search results not excluding by calendar status or permissions.
-- Consider calendar perms in Event::hasAccess()
+- Consider calendar perms in Event::hasAccess().
+- Request perms in plugin_itemsaved, calculate based on owner/group if not supplied.
 
 ## v1.4.5
 Release 2018-04-14

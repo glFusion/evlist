@@ -2147,7 +2147,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         $type, $id,
         'id,is_event,date,year,month,day,title,summary,description,' .
         'owner_id,group_id,recur_type,recur_interval,url,' .
-        'time_start,time_end,enable_comments'
+        'time_start,time_end,enable_comments,perms'
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
     if (!$info['is_event']) return;   // not an event
@@ -2164,7 +2164,22 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     }
     $summary = $info['summary'] ? $info['summary'] : $info['title'];
     $full_dscp = $info['description'] ? $info['description'] : $summary;
-
+    if ($info['group_id'] === NULL) $info['group_id'] = 13;
+    if ($info['owner_id'] === NULL) $info['owner_id'] = 2;
+    if ($info['perms'] === NULL || !is_array($info['perms'])) {
+        $info['perms'] = array();
+        $info['perms']['perm_owner'] = 3;
+        $info['perms']['perm_group'] = 2;
+        $info['perms']['perm_members'] = 0;
+        $info['perms']['perm_anon'] = 0;
+        switch ($info['group_id']) {
+        case 1:         // Anonymous
+            $info['perms']['perm_anon'] = 2;
+        case 13:
+            $info['perms']['perm_members'] = 2;
+            break;
+        }
+    }
     // Set calendar id based on config, default to "1"
     $Cal = Evlist\Calendar::getMapped($type);
 
@@ -2194,10 +2209,10 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'rec_freq' => $info['recur_interval'],
         'show_upcoming' => '1',
         'use_rsvp' => '0',
-        'perm_owner' => array ( 0 => '3', ),
-        'perm_group' => array ( 0 => '2', ),
-        'perm_members' => array ( 0 => '0', ),
-        'perm_anon' => array ( 0 => '0', ),
+        'perm_owner' => array ( 0 => $info['perms']['perm_owner'] ),
+        'perm_group' => array ( 0 => $info['perms']['perm_group'] ),
+        'perm_members' => array ( 0 => $info['perms']['perm_members'] ),
+        'perm_anon' => array ( 0 => $info['perms']['perm_anon'] ),
     );
     if ($info['time_start'] && $info['time_end']) {
         // This is a timed event if both start and end times are given.

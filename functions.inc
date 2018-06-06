@@ -1980,7 +1980,7 @@ function plugin_loadlanguage_evlist($requested='')
 */
 function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
 {
-    global $_TABLES, $_CONF, $LANG_PP;
+    global $_TABLES, $_CONF;
 
     $properties = explode(',', $what);
     $fields = array();
@@ -2034,21 +2034,23 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             LEFT JOIN {$_TABLES['evlist_detail']} d
                 ON d.ev_id = e.id
             LEFT JOIN {$_TABLES['evlist_repeat']} r
-                ON r.rp_ev_id = e.id";
+                ON r.rp_ev_id = e.id
+            LEFT JOIN {$_TABLES['evlist_calendars']} c
+                ON c.cal_id = e.cal_id";
     if ($id == '*') {
-        if ( $buildingSearchIndex ) {
-            $today = date('Y-m-d');
-            $where = ' WHERE status = 1 ';
-        } else {
-            $where = ' WHERE 1=1 ';
-        }
+        $where = ' WHERE 1 = 1 ';
     } else {
-        $where = " WHERE (e.id = '" . DB_escapeString($id) . "')";
+        $where = " WHERE (e.id = '" . DB_escapeString($id) . "') ";
     }
+    $where .= ' AND e.status = 1 AND c.cal_status = 1 ';
     if ($uid > 0) {
-        $where .= COM_getPermSQL('AND');
+        $permsql = COM_getPermSql('AND', $uid, 2, 'e')
+                 . COM_getPermSql('AND', $uid, 2, 'c');
+    } else {
+        $permsql = COM_getPermSql('AND', 0, 2, 'e') . COM_getPermSql('AND', 0, 2, 'c');
     }
-    $sql .= $where . ' GROUP BY e.id';
+    $sql .= $where . ' ' . $permsql . ' GROUP BY e.id';
+    //echo $sql;die;
     $res = DB_query($sql);
 
     $props = array();

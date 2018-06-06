@@ -3,6 +3,7 @@
 ## v1.4.6
 Release TBD
 - Add orderby field to calendars to control order in selection lists.
+- Fix search results not excluding by calendar status or permissions.
 
 ## v1.4.5
 Release 2018-04-14

@@ -154,7 +154,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `cal_icon` varchar(40) DEFAULT '',
-  `orderby` int(5) unsigned NOT NULL DEFAULT 9999,
+  `orderby` int(5) NOT NULL DEFAULT 9999,
   PRIMARY KEY (`cal_id`)
 ) ENGINE=MyISAM";
 
@@ -356,7 +356,7 @@ $_EV_UPGRADE = array(
     ),
 '1.4.6' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']}
-        ADD `orderby` int(5) unsigned NOT NULL DEFAULT 9999",
+        ADD `orderby` int(5) NOT NULL DEFAULT 9999",
     ),
 );
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];

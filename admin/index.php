@@ -166,7 +166,7 @@ function EVLIST_adminlist_categories()
             'query_fields' => array('name'),
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_cat',
+    $retval .= ADMIN_list('evlist_cat_admin', 'EVLIST_admin_getListField_cat',
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -222,7 +222,7 @@ function EVLIST_adminlist_tickettypes()
             'query_fields' => array('description'),
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickettypes',
+    $retval .= ADMIN_list('evlist_tickettype_admin', 'EVLIST_admin_getListField_tickettypes',
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -277,7 +277,7 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
             'query_fields' => array(),
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField_tickets',
+    $retval .= ADMIN_list('evlist_ticket_admin', 'EVLIST_admin_getListField_tickets',
             $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }
@@ -358,7 +358,7 @@ function EVLIST_admin_list_events()
             'full_description', 'location', 'date_start1', 'status')
     );
 
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_getListField', $header_arr, $text_arr,
+    $retval .= ADMIN_list('evlist_event_admin', 'EVLIST_admin_getListField', $header_arr, $text_arr,
                     $query_arr, $defsort_arr, $filter, '', $options);
     return $retval;
 }
@@ -653,7 +653,6 @@ function EVLIST_admin_list_calendars()
     );
 
     $defsort_arr = array('field' => 'orderby', 'direction' => 'ASC');
-
     $text_arr = array('has_menu'     => false,
                       'has_extras'   => false,
                       'title'        => $LANG_EVLIST['pi_title'].': ' .
@@ -661,17 +660,12 @@ function EVLIST_admin_list_calendars()
                       'form_url'     => EVLIST_ADMIN_URL . '/index.php?view=calendars',
                       'help_url'     => ''
     );
-
-    $sql = "SELECT *
-            FROM {$_TABLES['evlist_calendars']}
-            WHERE 1=1 ";
-
+    $sql = "SELECT * FROM {$_TABLES['evlist_calendars']} WHERE 1=1 ";
     $query_arr = array('table' => 'evlist_calendars',
             'sql' => $sql,
             'query_fields' => array('id', 'cal_name',),
     );
-
-    $retval .= ADMIN_list('evlist', 'EVLIST_admin_field_calendars',
+    $retval .= ADMIN_list('evlist_cal_admin', 'EVLIST_admin_field_calendars',
                 $header_arr, $text_arr, $query_arr, $defsort_arr);
     return $retval;
 }

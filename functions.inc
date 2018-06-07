@@ -415,15 +415,10 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     }
 
     $query = DB_escapeString(htmlspecialchars(trim($query)));
-
-    if (plugin_isadmin_evlist()) {
-        $permSQL = '';
-    } else {
-        $permSQL = COM_getPermSQL('AND');
-    }
+    $permSQL= COM_getPermSql('AND', 0, 2, 'e') . COM_getPermSql('AND', 0, 2, 'c');
 
     $url = '/evlist/event.php?view=x&eid=';
-    //$q = '&query=' . urlencode($query);
+    $q = '&query=' . urlencode($query);
     $sql = "SELECT e.id, d.title, d.summary as description,
                 UNIX_TIMESTAMP(r.rp_date_start) AS date,
                 e.hits, e.owner_id AS uid, gl.username,
@@ -431,6 +426,8 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
             FROM {$_TABLES['evlist_detail']} d
             LEFT JOIN {$_TABLES['evlist_events']} e
                 ON d.ev_id = e.id
+            LEFT JOIN {$_TABLES['evlist_calendars']} c
+                ON c.cal_id = e.cal_id
             LEFT JOIN {$_TABLES['evlist_repeat']} r
                 ON e.id = r.rp_ev_id
             LEFT JOIN {$_TABLES['users']} gl

@@ -2,6 +2,7 @@
 
 ## v1.4.6
 Release TBD
+- Update service functions for compatibility with Paypal 0.6.0
 - Add orderby field to calendars to control order in selection lists.
 - Fix search results not excluding by calendar status or permissions.
 - Consider calendar perms in Event::hasAccess().

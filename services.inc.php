@@ -96,7 +96,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
     $paypal_data = EV_getVar($args, 'ipn_data', 'array');
     $item_id = EV_getVar($item, 'item_id');
     $item_id = explode(':', $item_id);
-    $quantity = EV_gerVar($item, 'quantity', 'int');
+    $quantity = EV_getVar($item, 'quantity', 'int');
 
     // Must have an item ID following the plugin name
     if (!is_array($item_id) || !isset($item_id[1]))

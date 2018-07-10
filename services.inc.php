@@ -31,17 +31,18 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
 
     $retval = PLG_RET_OK;
 
+    $item = EV_getVar($args, 'item_id', 'array');
+    $product_id = $item[0];
+    $item_id = isset($item[1]) ? $item[1] : '';
+
     // Create a return array with values to be populated later.
     // The actual paypal product ID is evlist:type:id
-    if (!is_array($args) || !isset($args[2])) return $output;
-    $output = array('product_id' => implode(':', $args),
+    if (empty($item_id)) return PLG_RET_ERROR;
+    $output = array('product_id' => $product_id . ':' . $item_id,
             'name' => 'Unknown',
             'short_description' => 'Unknown Evlist Item',
             'price' => '0.00',
     );
-
-    $product_id = $args[1];
-    $item_id = $args[2];
 
     switch ($product_id) {
     case 'eventfee':
@@ -91,17 +92,19 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
 {
     global $_TABLES, $LANG_PHOTO, $_CONF;
 
-    $item = $args['item'];
-    $paypal_data = $args['ipn_data'];
-    $item_id = explode(':', $item['item_id']);
-    $quantity = (int)$item['quantity'];
+    $item = EV_getVar($args, 'item', 'array');
+    $paypal_data = EV_getVar($args, 'ipn_data', 'array');
+    $item_id = EV_getVar($item, 'item_id');
+    $item_id = explode(':', $item_id);
+    $quantity = EV_gerVar($item, 'quantity', 'int');
 
     // Must have an item ID following the plugin name
     if (!is_array($item_id) || !isset($item_id[1]))
         return PLG_RET_ERROR;
 
     // Initialize the output array
-    $output = array('product_id' => $item['item_id'],
+    $output = array(
+            'product_id' => $item['item_id'],
             'name' => $item['name'],
             'short_description' => $item['name'],
             'price' => (float)$item['price'],
@@ -110,11 +113,8 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
             'file' => '',
     );
 
-    // User ID is provided in the 'custom' field, so make sure it's numeric.
-    if (is_numeric($paypal_data['custom']['uid']))
-        $uid = (int)$paypal_data['custom']['uid'];
-    else
-        $uid = 1;
+    $custom = EV_getVar($paypal_data, 'custom', 'array');
+    $uid = EV_getVar($custom, 'uid', 'int', 1);
 
     // Initialize an array of payment info to log
     $pmt_info = array(

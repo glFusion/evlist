@@ -937,7 +937,7 @@ class Repeat
         }
 
         if ($fee > 0) {
-            // add tickes to the shopping cart. Tickets will be flagged
+            // add tickets to the shopping cart. Tickets will be flagged
             // as unpaid.
             $this->AddToCart($tick_type, $num_attendees);
             COM_setMsg($LANG_EVLIST['messages']['24']);

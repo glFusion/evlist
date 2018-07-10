@@ -2711,6 +2711,49 @@ function EVLIST_getIcon($name, $style='')
 
 
 /**
+*   Get an array variable, first checking whether it's set
+*
+*   @param  array   $A          Array where var should be
+*   @param  string  $varname    Name of array element
+*   @param  string  $type       Type of return value
+*   @param  mixed   $default    Default value, if any
+*   @return     Array element or NULL, cast to $type
+*/
+function EV_getVar($A, $varname, $type = 'string', $default = NULL)
+{
+    if (!isset($A[$varname])) {
+        return $default;
+    } else {
+        $val = $A[$varname];
+    }
+    switch ($type) {
+    case 'int':
+    case 'integer':
+        return (int)$val;
+        break;
+    case 'bool':
+        return (bool)$val;
+        break;
+    case 'float':
+        return (float)$val;
+        break;
+    case 'array':
+        if ($val === NULL) {
+            $val = array();
+        } elseif (!is_array($val)) {
+            $val = array($val);
+        }
+        return $val;
+        break;
+    case 'string':
+    default:
+        return (string)$val;
+        break;
+    }
+}
+
+
+/**
 *   Log activity to a plugin-specific log file
 *
 *   @param string $logentry Text to log

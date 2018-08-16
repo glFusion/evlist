@@ -3,9 +3,9 @@
 *   Class to retrieve events from meetup.com
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2016 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.3
+*   @version    1.4.6
 *   @since      1.4.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
@@ -70,6 +70,8 @@ class evMeetup
     *   Checks the cache table first for a recent entry.  If not found,
     *   get information from meetup.com
     *
+    *   @param  string  $start  Starting Date
+    *   @param  string  $end    Ending Date
     *   @return array   Array of event information
     */
     public function getEvents($start='', $end='')
@@ -101,6 +103,11 @@ class evMeetup
                 $events = @json_decode($A['data']);
                 return $events;
             }
+        }
+
+        // Curl support is required
+        if (!in_array('curl', get_loaded_extensions())) {
+            return $events;
         }
 
         // Try to get new data from the provider

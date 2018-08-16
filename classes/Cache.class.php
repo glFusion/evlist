@@ -19,6 +19,7 @@ namespace Evlist;
 */
 class Cache
 {
+    const MIN_GVERSION = '2.0.0';
     private static $tag = 'evlist'; // fallback tag
 
     /**
@@ -32,7 +33,7 @@ class Cache
     {
         global $_EV_CONF;
 
-        if (version_compare(GVERSION, '1.8.0', '<')) return NULL;
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return NULL;
 
         $cache_secs = (int)$_EV_CONF['meetup_cache_minutes'] * 60;
         if ($cache_secs < 600) $cache_secs = 1800;
@@ -54,7 +55,7 @@ class Cache
     */
     public static function delete($key)
     {
-        if (version_compare(GVERSION, '1.8.0', '<')) return;
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return;
         \glFusion\Cache::getInstance()->delete(self::_makeKey($key));
     }
 
@@ -70,7 +71,7 @@ class Cache
     {
         global $_TABLES;
 
-        if (version_compare(GVERSION, '1.8.0', '<')) {
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
             if (empty($tag)) {
                 DB_query("TRUNCATE {$_TABLES['evlist_cache']}", 1);
             }
@@ -110,7 +111,7 @@ class Cache
     {
         global $_EV_CONF;
 
-        if (version_compare(GVERSION, '1.8.0', '<')) {
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
             if ($tag == 'evlist_meetup') {
                 $retval = array();
                 $cache_mins = (int)$_EV_CONF['meetup_cache_minutes'];

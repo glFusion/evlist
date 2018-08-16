@@ -27,8 +27,6 @@ if (!defined ('GVERSION')) {
 */
 function service_productinfo_evlist($args, &$output, &$svc_msg)
 {
-    global $_TABLES, $_CONF, $LANG_EVLIET;
-
     $retval = PLG_RET_OK;
 
     $item = EV_getVar($args, 'item_id', 'array');
@@ -38,10 +36,11 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
     // Create a return array with values to be populated later.
     // The actual paypal product ID is evlist:type:id
     if (empty($item_id)) return PLG_RET_ERROR;
-    $output = array('product_id' => $product_id . ':' . $item_id,
-            'name' => 'Unknown',
-            'short_description' => 'Unknown Evlist Item',
-            'price' => '0.00',
+    $output = array(
+        'product_id' => 'evlist:' . $product_id . ':' . $item_id,
+        'name' => 'Unknown',
+        'short_description' => 'Unknown Evlist Item',
+        'price' => '0.00',
     );
 
     switch ($product_id) {
@@ -166,22 +165,8 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
         } else {
             EVLIST_Log("$quantity tickets paid for user $uid, event $ev_id/$rp_id");
         }
-        /*$tick = new evTicket();
-        $tick->ev_id = $ev_id;
-        $tick->tic_type = $tick_type;
-        $tick->fee = $ev_fee;
-        $tick->uid = $uid;
-        $tick->paid = $tick->fee;
-        //foreach ($repeats as $save_rp_id) {
-            $tick->rp_id = $rp_id;
-            $tick->Save();
-        //}
-        //$tick_id = evTicket::Create($ev_id, $rp_id, $tick_type, $ev_fee, $uid);
-        //evTicket::AddPayment($tick_id, $ev_fee);
-        */
         break;
     }
-
     return PLG_RET_OK;
 }
 

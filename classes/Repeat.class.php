@@ -724,7 +724,7 @@ class Repeat
                 if (!empty($loc)) {
                     // Location info was found, get the weather
                     LGLIB_invokeService('weather', 'embed',
-                            array('loc' => $loc), $weather, $svc_msg);
+                        array('loc' => $loc), $weather, $svc_msg);
                     if (!empty($weather)) {
                         // Weather info was found
                         $T->set_var('weather', $weather);

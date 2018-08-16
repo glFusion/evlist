@@ -3,7 +3,7 @@
 *   Class to manage events for the EvList plugin
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
 *   @package    evlist
 *   @version    1.4.3
 *   @license    http://opensource.org/licenses/gpl-2.0.php

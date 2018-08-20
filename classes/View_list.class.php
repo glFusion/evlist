@@ -167,7 +167,7 @@ class View_list extends View
                         $datesummary = $d->format($_CONF['date'], true);
                     } else {
                         $datesummary = sprintf($LANG_EVLIST['event_begins'],
-                            $d->format($_CONF['date'], true) . ' ' . $d->format($_CONF['timeonly'], true));
+                            $d->format($_CONF['dateonly'], true) . ' ' . $d->format($_CONF['timeonly'], true));
                     }
                     /*$morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
                         $A['rp_id'] . $andcat);

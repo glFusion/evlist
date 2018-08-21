@@ -400,6 +400,7 @@ $LANG_EVLIST_HELP = array(
 'owner' => 'Select the owner for this item.',
 'group' => 'Select the group associated with this item',
 'perms' => 'Set the permissions for this item.',
+'event_pass' => 'Checked if this ticket type is a full event pass.',
 );
 
 // Localization of the Admin Configuration UI

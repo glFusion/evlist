@@ -124,7 +124,7 @@ function EVLIST_adminHeader($page)
 */
 function EVLIST_adminlist_categories()
 {
-    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
     EVLIST_setReturn('admincategories');
@@ -179,7 +179,7 @@ function EVLIST_adminlist_categories()
 */
 function EVLIST_adminlist_tickettypes()
 {
-    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_EVLIST_HELP, $LANG_ADMIN;
 
     USES_lib_admin();
     EVLIST_setReturn('admintickettypes');
@@ -187,21 +187,41 @@ function EVLIST_adminlist_tickettypes()
     $retval = '';
 
     $header_arr = array(
-        array('text' => $LANG_EVLIST['edit'],
-                'field' => 'edit', 'sort' => false,
-                'align' => 'center',
+        array(
+            'text' => $LANG_EVLIST['edit'],
+            'field' => 'edit',
+            'sort' => false,
+            'align' => 'center',
         ),
-        array('text' => $LANG_EVLIST['id'],
-                'field' => 'id', 'sort' => true),
-        array('text' => $LANG_EVLIST['description'],
-                'field' => 'description', 'sort' => true),
-        array('text' => $LANG_EVLIST['enabled'],
-                'field' => 'enabled', 'sort' => false),
-        array('text' => $LANG_EVLIST['event_pass'],
-                'field' => 'event_pass', 'sort' => false),
-        array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false,
-                'align' => 'center',
+        array(
+            'text' => $LANG_EVLIST['id'],
+            'field' => 'id',
+            'sort' => true,
+        ),
+        array(
+            'text' => $LANG_EVLIST['description'],
+            'field' => 'description',
+            'sort' => true,
+        ),
+        array(
+            'text' => $LANG_EVLIST['enabled'],
+            'field' => 'enabled',
+            'sort' => false,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_EVLIST['event_pass'] .
+                ' <i class="tooltip uk-icon uk-icon-question-circle" title="' .
+                $LANG_EVLIST_HELP['event_pass'] . '"></i>',
+            'field' => 'event_pass',
+            'sort' => false,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_ADMIN['delete'],
+            'field' => 'delete',
+            'sort' => false,
+           'align' => 'center',
         ),
     );
 
@@ -235,7 +255,7 @@ function EVLIST_adminlist_tickettypes()
 */
 function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
 {
-    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
     EVLIST_setReturn('admintickets');
@@ -290,7 +310,7 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
 */
 function EVLIST_admin_list_events()
 {
-    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
     EVLIST_setReturn('adminevents');
@@ -434,45 +454,53 @@ function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
 */
 function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_EV_CONF;
 
     $retval = '';
     switch($fieldname) {
-        case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL .
+    case 'edit':
+        $retval = '<a href="' . EVLIST_ADMIN_URL .
                 '/index.php?editticket=' . $A['id'].
-                '" title="' . $LANG_ADMIN['edit'] . '" />' .
-                $icon_arr['edit'] . '</a>';
-            break;
-        case 'enabled':
-        case 'event_pass':
-            if ($fieldvalue == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval = "<input type=\"checkbox\" $switch value=\"1\"
+                '" title="' . $LANG_ADMIN['edit'] . '" />';
+        if ($_EV_CONF['_is_uikit']) {
+            $retval .= '<i class="uk-icon-edit"></i>';
+        } else {
+            $retval .= $icon_arr['edit'];
+        }
+        $retval .= '</a>';
+        break;
+
+    case 'enabled':
+    case 'event_pass':
+        if ($fieldvalue == '1') {
+            $switch = EVCHECKED;
+            $enabled = 1;
+        } else {
+            $switch = '';
+            $enabled = 0;
+        }
+        $retval = "<input type=\"checkbox\" $switch value=\"1\"
                 name=\"cat_check\"
                 id=\"tog{$fieldname}{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"{$fieldname}\",".
                 "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
-            break;
-        case 'delete':
-            if (!Evlist\TicketType::isUsed($A['id'])) {
-                $retval = COM_createLink(
-                    $icon_arr['delete'],
-                    EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
-                    array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                        'title' => $LANG_ADMIN['delete'],
-                    )
-                );
-            }
-            break;
-        default:
-            $retval = $fieldvalue;
-            break;
+        break;
+
+    case 'delete':
+        if (!Evlist\TicketType::isUsed($A['id'])) {
+            $retval = COM_createLink(
+                $icon_arr['delete'],
+                EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
+                array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                    'title' => $LANG_ADMIN['delete'],
+                )
+            );
+        }
+        break;
+
+    default:
+        $retval = $fieldvalue;
+        break;
     }
     return $retval;
 }
@@ -615,7 +643,7 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 */
 function EVLIST_admin_list_calendars()
 {
-    global $_CONF, $_TABLES, $_IMAGE_TYPE, $LANG_EVLIST, $LANG_ADMIN;
+    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
 
     USES_lib_admin();
 

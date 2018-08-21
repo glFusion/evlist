@@ -151,12 +151,10 @@ class TicketType
             'event_pass_chk'    => $this->event_pass == 1 ? EVCHECKED : '',
             'enabled_chk'       => $this->enabled == 1 ? EVCHECKED : '',
             'doc_url'           => EVLIST_getDocURL('tickettype.html'),
-            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         $T->parse('output','modify');
-        $display .= $T->finish($T->get_var('output'));
-        return $display;
+        return $T->finish($T->get_var('output'));
     }
 
 

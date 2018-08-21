@@ -411,6 +411,7 @@ $LANG_EVLIST_HELP = array(
 'owner' => 'Select the owner for this item.',
 'group' => 'Select the group associated with this item',
 'perms' => 'Set the permissions for this item.',
+'event_pass' => 'Checked if this ticket type is a full event pass.',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";

@@ -163,16 +163,6 @@ class View_list extends View
                     $summary = PLG_replaceTags(COM_stripslashes($A['summary']));
                     $tz = $A['tzid'] == 'local' ? $_USER['tzid'] : $A['tzid'];
                     $d = new \Date($A['rp_date_start'] . ' ' . $A['rp_time_start1'], $tz);
-                    if (isset($A['allday']) && $A['allday']) {
-                        $datesummary = $d->format($_CONF['date'], true);
-                    } else {
-                        $datesummary = sprintf($LANG_EVLIST['event_begins'],
-                            $d->format($_CONF['dateonly'], true) . ' ' . $d->format($_CONF['timeonly'], true));
-                    }
-                    /*$morelink = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
-                        $A['rp_id'] . $andcat);
-                    $morelink = '<a href="' . $morelink . '">' .
-                        $LANG_EVLIST['read_more'] . '</a>';*/
                     if (isset($A['options']['contactlink']) && $A['options']['contactlink']) {
                         if (empty($A['email'])) {
                             if (isset($A['owner_id'])) {
@@ -188,7 +178,9 @@ class View_list extends View
                     }
                     $T->set_var(array(
                         'title' => $titlelink,
-                        'date_summary' => $datesummary,
+                        'allday' => isset($A['allday']) && $A['allday'],
+                        'st_date' => $d->format($_CONF['dateonly'], true),
+                        'st_time' => $d->format($_CONF['timeonly'], true),
                         'summary' => $summary,
                         //'more_link' => $morelink,
                         'contact_link' => $contactlink,

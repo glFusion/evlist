@@ -2,6 +2,7 @@
 
 ## v1.4.6
 Release TBD
+- Leverage list item template to correctly show event date and time in lists
 - Use calendar selector for plugin->calendar mapping config
 - Cleanly abort evMeetup::getEvents() if Curl support is mising
 - Update service functions for compatibility with Paypal 0.6.0

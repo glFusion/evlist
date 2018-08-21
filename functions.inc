@@ -1579,6 +1579,21 @@ function plugin_configmanager_select_topic_centerblock_evlist()
 
 
 /**
+*   Select the calendar to use for plugin-supplied events.
+*
+*   @return array   $cal_id => $cal_name
+*/
+function plugin_configmanager_select_pi_cal_map_evlist($idx = NULL)
+{
+    $A = array();
+    foreach (\Evlist\Calendar::getAll() as $cal) {
+        $A[$cal->cal_name] = $cal->cal_id;
+    }
+    return $A;
+}
+
+
+/**
 *   Return information for an event
 *
 *   @param  string  $id         Event instance (repeat) ID

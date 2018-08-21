@@ -34,7 +34,7 @@
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
 *   @package    evlist
-*   @version    1.3.0
+*   @version    1.4.6
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -202,9 +202,8 @@ function plugin_initconfig_evlist()
                 30, 10, 0, 60, true, 'evlist');
 
         $c->add('ev_integ_other', NULL, 'fieldset', 30, 20, NULL, 0, true, 'evlist');
-        $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*text',
+        $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*select',
                 30, 20, 0, 10, true, 'evlist');
-
      }
 
     return true;

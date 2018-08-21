@@ -357,6 +357,8 @@ $_EV_UPGRADE = array(
 '1.4.6' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']}
         ADD `orderby` int(5) NOT NULL DEFAULT 9999",
+    "UPDATE {$_TABLES['conf_values']} SET type = '*select'
+        WHERE group_name = 'evlist' AND name = 'pi_cal_map'",
     ),
 );
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];

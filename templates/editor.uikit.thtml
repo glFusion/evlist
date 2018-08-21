@@ -1,4 +1,6 @@
 {# begin {templatelocation} #}
+<script src="{site_url}/javascript/addons/datetime/jquery.datetimepicker.full.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{site_url}/javascript/addons/datetime/jquery.datetimepicker.min.css" />
 {!if show_htmleditor}
 {wysiwyg}
 {!endif}
@@ -315,7 +317,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="cal_id">
           {$LANG_EVLIST['calendar']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['calendar']}"></i>
+          <span id="cal_id" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
         {!if cal_name}
@@ -331,7 +333,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="title">
           {$LANG_EVLIST['event_title']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_title']}"></i>
+          <span id="title" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <input required type="text" name="title" class="required"
@@ -344,7 +346,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="summary">
           {$LANG_EVLIST['event_summary']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_summary']}"></i>
+          <span id="summary" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <textarea name="summary" id="summary"
@@ -355,7 +357,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="description">
           {$LANG_EVLIST['full_desc']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_dscp']}"></i>
+          <span id="hlp_dscp" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <textarea name="full_description" id="description" class="uk-form-width-large" style="width:100%"
@@ -378,7 +380,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row">
         <label class="uk-form-label" for="url">{$LANG_EVLIST['url']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_url']}"></i>
+          <span id="hlp_url" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <input type="text" name="url" id="url" style="width:50%"
@@ -388,7 +390,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row">
         <label class="uk-form-label" for="status">{$LANG_EVLIST['enabled']}
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ev_enabled']}"></i>
+          <span id="hlp_enabled" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" name="status" value="1" id="status" {status_checked} />
@@ -399,7 +401,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <label class="uk-form-label" for="enable_reminders">
           {$LANG_EVLIST['enable_reminders_q']}
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ena_reminders']}"></i>
+          <span id="hlp_reminders" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} />
@@ -410,7 +412,7 @@ function toggleRSVPdetail(val)
       {!if commentsupport}
       <div class="uk-form-row">
         <label for="enable_comments" class="uk-form-label">{$LANG_EVLIST['enable_comments']}
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['ena_comments']}"></i>
+          <span id="hlp_comments" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <select name="enable_comments">
@@ -427,7 +429,7 @@ function toggleRSVPdetail(val)
     {!if category_section}
     <fieldset class="evForm">
       <legend>{$LANG_EVLIST['categories']}
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['sel_categories']}"></i>
+          <span id="hlp_categories" class="tooltip_cfg tooltipstered"></span>
       </legend>
       <span><strong>{$LANG_EVLIST['add_to_cats']}</strong>.</span>
       <br />
@@ -461,12 +463,11 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_startdate1">
           {$LANG_EVLIST['start_date']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['startdt']}"></i>
+          <span id="hlp_date_start" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
-          <i class="uk-icon uk-icon-calendar" id="startdt1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
           <input type="text" name="date_start1" id="f_startdate1"
-              size="10" value="{startdate1}"
+              size="10" value="{startdate1}" data-uk-datepicker
               onchange="checkDate1();" />
         {# <div id="d_startdate1" style="float:left;width:10em;">{d_startdate1}</div> #}
         &nbsp;&nbsp;
@@ -487,11 +488,10 @@ function toggleRSVPdetail(val)
       <div style="uk-form-row">
         <label class="uk-form-label" for="f_enddate1">
           {$LANG_EVLIST['end_date']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['enddt']}"></i>
+          <span id="hlp_date_end" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
-          <i class="uk-icon uk-icon-calendar" id="enddate1_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
-          <input type="text" name="date_end1" id="f_enddate1"
+          <input type="text" name="date_end1" id="f_enddate1" data-uk-datepicker
             size="10" value="{enddate1}" onchange="checkDate2();" />
           &nbsp;&nbsp;
 
@@ -511,7 +511,7 @@ function toggleRSVPdetail(val)
 
       <div class="uk-form-row" id="timezone">
         <label for="tzid" class="uk-form-label">{$LANG_EVLIST['timezone']}:
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['timezone']}"></i>
+          <span id="hlp_tzid" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
           <input type="checkbox" id="tz_local" name="tz_local" onclick="showhide_tzselect(this)" {tz_islocal}>&nbsp;{$LANG_EVLIST['tz_local']}<br />
@@ -521,7 +521,7 @@ function toggleRSVPdetail(val)
       <div class="uk-form-row">
         <span {split_show} id="div0">
           {$LANG_EVLIST['split_q']}
-          <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_EVLIST_HELP['split']}"></i>
+          <span id="hlp_split" class="tooltip_cfg tooltipstered"></span>
           <input type="checkbox" name="split" value="1"
                 id="split" {split_checked} onclick="showhideallday()" />
           &nbsp;&nbsp;
@@ -529,7 +529,7 @@ function toggleRSVPdetail(val)
 
         <span {allday_show} id="div1">
           {$LANG_EVLIST['allday']}
-          <span id="allday_doc" class="tooltip_cfg tooltipstered"></span>
+          <span id="hlp_allday" class="tooltip_cfg tooltipstered"></span>
           <input type="checkbox" name="allday" value="1"
             id="allday" {allday_checked} onclick="chk_allday()" />
         </span>
@@ -588,13 +588,8 @@ function toggleRSVPdetail(val)
             <label for="f_stopdate" style="width:50%;text-align:left;">
               {dailystop_label}:
             </label>
-            <input type="text" name="stopdate" id="f_stopdate"
+            <input type="text" name="stopdate" id="f_stopdate" data-uk-datepicker
                 size="10" value="{stopdate}" />
-            {# <div id="d_stopdate" style="float:left;width:10em;">{d_stopdate}&nbsp;
-            </div> #}
-            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
-                id="stopdate_trigger" class="evDatePicker"
-                />
           </p>
 
           <div {monthday_sel_show} id="monthday_sel">
@@ -701,11 +696,11 @@ function toggleRSVPdetail(val)
           <p {format6show} id="format6">
             <label for="custom" style="width:90%;text-align:left;">
               {custom_label} {$LANG_EVLIST['recur_cust_ignoredates']}:
-            <img src="{site_url}/images/datepicker.jpg" alt="Date Picker"
-                id="custom_trigger" class="evDatePicker" />
+            <!--<i class="uk-icon uk-icon-calendar" id="custom_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>-->
+            <i class="uk-icon uk-icon-calendar" id="custom_trigger" title="{$LANG_EVLIST['click_for_datepicker']}" data-uk-tooltip></i>
             </label>
             <br />
-            <input type="text" name="custom" id="custom" size=""
+            <input type="text" name="custom" id="custom" size="80"
                 maxlength="255" value="{custom_val}" />
             <br />
             <span class="evFieldNote">{$LANG_EVLIST['recur_cust_format']}</span>
@@ -1073,7 +1068,7 @@ function toggleRSVPdetail(val)
     }
 {!if recur_section}
     // Update the custom recurring date field.
-    function updatecustom(cal)
+/*    function updatecustom(cal)
     {
         var el = document.getElementById("custom");
         var d = cal.date;
@@ -1087,9 +1082,10 @@ function toggleRSVPdetail(val)
         }
         return true;
     }
+*/
 
     // Date picker for custom recurring dates
-    Calendar.setup({
+/*    Calendar.setup({
         inputField  :   "custom",
         ifFormat    :   fld_format,
         showsTime   :   false,
@@ -1099,7 +1095,7 @@ function toggleRSVPdetail(val)
         onSelect    :   updatecustom,
         button      :   "custom_trigger"
     });
-
+*/
 
     // Date picker for custom recurring dates
     Calendar.setup({
@@ -1128,7 +1124,7 @@ for (i = 0; i < el.length; i++) {
   }
 }
 
-var ConfigDocUrl = '{help_url}';
+var ConfigDocUrl = "{doc_url}";
 $(document).ready(function() {
     $('.tooltip_cfg').tooltipster({
         contentAsHTML: true,
@@ -1137,7 +1133,6 @@ $(document).ready(function() {
         iconDesktop: true,
         iconTouch: true,
         functionBefore: function(origin, continueTooltip) {
-            continueTooltip();
             var attrHref = ConfigDocUrl;
             var ajobj = $(this);
             $.get(attrHref, function(data) {
@@ -1149,6 +1144,7 @@ $(document).ready(function() {
                     origin.tooltipster('content', 'No Help Text Found');
                     console.log('Unable to find help text for desc_%s',confVar);
                 }
+                continueTooltip();
             });
         }
     });
@@ -1162,6 +1158,22 @@ $(document).ready(function() {
 {!endif}
     showhide_tzselect(document.getElementById("tz_local"));
     chk_allday();
+});
+jQuery('#custom_trigger').datetimepicker({
+  timepicker:false,
+  format:"Y-m-d",
+  closeOnDateSelect: true,
+  closeOnWithoutClick: false,
+  onChangeDateTime:function(dp,$input){
+    var el = document.getElementById("custom");
+    var d = $input.val();
+    if (el.value == "") {
+        el.value = $input.val();
+    } else {
+        el.value += "," + $input.val();
+    }
+    return true;
+  }
 });
 
 </script>

@@ -378,6 +378,7 @@ class Ticket
         global $_CONF, $_USER, $LANG_EVLIST, $_PLUGINS;
 
         $Event = new Event($ev_id);
+        $rsvp_print = EV_getVar($Event->options, 'rsvp_print', 'integer');
 
         // Verify that the current user is an admin or event owner to print
         // all tickets, otherwise only print the user's tickets.
@@ -393,7 +394,7 @@ class Ticket
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
         // the lglib version during installation
-        if (empty($tickets) || !in_array('lglib', $_PLUGINS)) {
+        if ($rsvp_print == 0 || empty($tickets) || !in_array('lglib', $_PLUGINS)) {
             return "There are no tickets available to print";
         }
         USES_lglib_class_fpdf();
@@ -412,6 +413,9 @@ class Ticket
         foreach ($tickets as $tic_id=>$ticket) {
             // Don't print waitlisted tickets
             if ($ticket->waitlist == 1) continue;
+
+            // Don't print unpaid tickets if not allowed
+            if ($rsvp_print == 1 && $ticket->paid < $ticket->fee) continue;
 
             if (!isset($tick_types[$ticket->tic_type])) {
                 $tick_types[$ticket->tic_type] = new TicketType($ticket->tic_type);

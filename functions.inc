@@ -417,19 +417,17 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $query = DB_escapeString(htmlspecialchars(trim($query)));
     $permSQL= COM_getPermSql('AND', 0, 2, 'e') . COM_getPermSql('AND', 0, 2, 'c');
 
-    $url = '/evlist/event.php?view=x&eid=';
+    $url = '/evlist/event.php?view=event&eid=';
     $q = '&query=' . urlencode($query);
     $sql = "SELECT e.id, d.title, d.summary as description,
-                UNIX_TIMESTAMP(r.rp_date_start) AS date,
+                UNIX_TIMESTAMP(e.date_start1) AS date,
                 e.hits, e.owner_id AS uid, gl.username,
-                CONCAT('$url',r.rp_id,'$q') AS url
+                CONCAT('$url',e.id,'$q') AS url
             FROM {$_TABLES['evlist_detail']} d
             LEFT JOIN {$_TABLES['evlist_events']} e
                 ON d.ev_id = e.id
             LEFT JOIN {$_TABLES['evlist_calendars']} c
                 ON c.cal_id = e.cal_id
-            LEFT JOIN {$_TABLES['evlist_repeat']} r
-                ON e.id = r.rp_ev_id
             LEFT JOIN {$_TABLES['users']} gl
                 ON e.owner_id = gl.uid
             WHERE (e.status='1')
@@ -441,7 +439,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $search = new SearchCriteria('evlist', 'evList');
     $columns = array('d.title', 'd.summary', 'd.full_description',
                     'd.location', 'd.contact');
-    $sql .= $search->getDateRangeSQL('AND', 'UNIX_TIMESTAMP(r.rp_date_start)',
+    $sql .= $search->getDateRangeSQL('AND', 'UNIX_TIMESTAMP(e.date_start1)',
                     $datestart, $dateend);
     list($sql,$ftsql) = $search->buildSearchSQL($keyType, $query,
                     $columns, $sql);

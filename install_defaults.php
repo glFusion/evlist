@@ -45,54 +45,488 @@ if (!defined ('GVERSION')) {
 }
 
 /**
-*   @global array   $CONF_EVLIST_DEFAULT
+*   @global array   $evlistConfigData
 *   evList default settings
-*
-*   Initial Installation Defaults used when loading the online configuration
-*   records. These settings are only used during the initial installation
-*   and not referenced any more once the plugin is installed
 */
+global $evlistConfigData;
+$evlistConfigData = array(
+    array(
+        'name' => 'sg_main',
+        'default_value' => NULL,
+        'type' => 'subgroup',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'fs_main',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'allow_anon_view',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'can_add',
+        'default_value' => EV_USER_CAN_ADD,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'allow_html',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'enable_categories',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 40,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'event_passing',
+        'default_value' => 2,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 6,
+        'sort' => 50,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'reminder_speedlimit',
+        'default_value' => '30',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 60,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'post_speedlimit',
+        'default_value' => $_CONF['speedlimit'],
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 70,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'enable_reminders',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 80,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'reminder_days',
+        'default_value' => 1,
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 90,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'commentsupport',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 100,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'default_permissions',
+        'default_value' => array (3, 2, 2, 2),
+        'type' => '@select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 12,
+        'sort' => 110,
+        'set' => true,
+        'group' => 'evlist',
+    ),
 
-global $CONF_EVLIST_DEFAULT;
-$CONF_EVLIST_DEFAULT = array(
-    'allow_anon_view'   => 1,    // allow anonymous to view calendars
-// Which users can add events: 1 = users, 2 = anon, 3 = both
-    'can_add'           => EV_USER_CAN_ADD,
-    'allow_html'        => 1,    // allow html in posts
-    'usermenu_option'   => 1,   // add to the glfusion user menu
-    'enable_menuitem'   => 1,   // add to the glfusion main menu
-    'enable_categories' => 1,   // enable event categories
-    'enable_centerblock' => 0,  // set as centerblock
-    'pos_centerblock'   => 2,   // centerblock position
-    'topic_centerblock' => 'home',  // centerblock topic
-    'range_centerblock' => 2,   // event range for centerblock
-    'limit_list'        => 10,  // number of events shown in list view
-    'limit_block'       => 5,   // number of events shown in upcoming block
-    'limit_summary'     => 128, // number of characters in summaries
-    'enable_reminders'  => 1,   // enable email reminders
-    'event_passing'     => 2,   // when has an event passed
-    'default_permissions' => array (3, 2, 2, 2),
-    'reminder_speedlimit' => 30,    // max frequency for reminder submissions
-    'post_speedlimit'   => $_CONF['speedlimit'],    // max freq. for posts
-    'reminder_days'     => 1,   // min number of days for reminders
-    'displayblocks'     => 1,   // display glfusion blocks
-    'default_view'      => 'month',
-    'max_upcoming_days' => 90,  // max days in future for list and block
-    'use_locator'       => 0,   // integrate with locater plugin
-    'use_weather'       => 0,   // integrate with westher plugin
-    'enable_rsvp'       => 0,   // 0=false, 1=default no, 2=default yes
-    'rsvp_print'        => 0,   // 0=false, 1=default no, 2=default yes paid, 3=default yes all
-    'meetup_key'        => '',  // Meetup API key
-    'meetup_gid'        => array(),  // Meetup group IDs
-    'meetup_cache_minutes' => 30,
-    'meetup_enabled'    => 0,   // 1 to enable meetup event inclusion
-    'commentsupport'    => 1,   // 1 = yes, 0 = no
-    'ticket_format'     => 'EV%s',  // Ticket number format
-    'pi_cal_map'        => array(
-        'meetup'    => '-1',
-        'birthdays' => '-2',
+    // GUI settings
+    array(
+        'name' => 'fs_gui',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'enable_menuitem',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 2,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'usermenu_option',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 2,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'displayblocks',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 13,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'limit_list',
+        'default_value' => '10',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 0,
+        'sort' => 40,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'limit_block',
+        'default_value' => '5',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 0,
+        'sort' => 50,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'default_view',
+        'default_value' => 'month',
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 14,
+        'sort' => 60,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'max_upcoming_days',
+        'default_value' => '90',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 0,
+        'sort' => 70,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+
+    // Centerblock settings
+    array(
+        'name' => 'fs_centerblock',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'enable_centerblock',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 2,
+        'sort' => 60,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'pos_centerbloxk',
+        'default_value' => 'home',
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 0,     // uses helper function
+        'sort' => 70,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'topic_centerbloxk',
+        'default_value' => 'home',
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 0,     // uses helper function
+        'sort' => 80,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'range_centerbloxk',
+        'default_value' => 2,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 8,
+        'sort' => 90,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'limit_summary',
+        'default_value' => '128',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 0,
+        'sort' => 100,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+
+    // Subgroup: RSVP
+    array(
+        'name' => 'sg_rsvp',
+        'default_value' => NULL,
+        'type' => 'subgroup',
+        'subgroup' => 10,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'fs_rsvp',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 10,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'enable_rsvp',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 10,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'rsvp_print',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 10,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'ticket_format',
+        'default_value' => 'EV%s',
+        'type' => 'text',
+        'subgroup' => 10,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+
+    // Subgroup: External integrations
+    array(
+        'name' => 'sg_integ',
+        'default_value' => NULL,
+        'type' => 'subgroup',
+        'subgroup' => 20,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    // Fieldset: Meetup Integration
+    array(
+        'name' => 'fs_integ_meetup',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 20,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'meetup_enabled',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 20,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'meetup_key',
+        'default_value' => '',
+        'type' => 'text',
+        'subgroup' => 20,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'meetup_gid',
+        'default_value' => array(),
+        'type' => '%text',
+        'subgroup' => 20,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'meetup_cache_minutes',
+        'default_value' => '30',
+        'type' => 'text',
+        'subgroup' => 20,
+        'fieldset' => 0,
+        'selection_array' => 2,
+        'sort' => 40,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    // Fieldset: Other Integrations
+    array(
+        'name' => 'fs_integ_other',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 20,
+        'fieldset' => 10,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'use_locator',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 20,
+        'fieldset' => 10,
+        'selection_array' => 2,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'use_weather',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 20,
+        'fieldset' => 10,
+        'selection_array' => 2,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'evlist',
+    ),
+    array(
+        'name' => 'pi_cal_map',
+        'default_value' => array(
+            'meetup'    => '-1',
+            'birthdays' => '-2',
+        ),
+        'type' => '*text',
+        'subgroup' => 20,
+        'fieldset' => 10,
+        'selection_array' => 2,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'evlist',
     ),
 );
+
 
 /**
 * Initialize evList plugin configuration
@@ -104,108 +538,30 @@ $CONF_EVLIST_DEFAULT = array(
 * @return   boolean     true: success; false: an error occurred
 *
 */
-function plugin_initconfig_evlist()
+function plugin_initconfig_evlist($group_id = 0)
 {
-    global $_EV_CONF, $CONF_EVLIST_DEFAULT;
+    global $evlistConfigData;
 
-    if (is_array($_EV_CONF) && (count($_EV_CONF) > 1)) {
-        $CONF_EVLIST_DEFAULT = array_merge($CONF_EVLIST_DEFAULT, $_EV_CONF);
-    }
     $c = config::get_instance();
     if (!$c->group_exists('evlist')) {
-
-        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true, 'evlist');
-        $c->add('ev_access', NULL, 'fieldset', 0, 0, NULL, 0, true, 'evlist');
-
-        $c->add('allow_anon_view',$CONF_EVLIST_DEFAULT['allow_anon_view'], 'select',
-                0, 0, 0, 10, true, 'evlist');
-        $c->add('can_add',$CONF_EVLIST_DEFAULT['can_add'], 'select',
-                0, 0, 15, 20, true, 'evlist');
-        $c->add('allow_html',$CONF_EVLIST_DEFAULT['allow_html'], 'select',
-                0, 0, 0, 40, true, 'evlist');
-        $c->add('enable_menuitem',$CONF_EVLIST_DEFAULT['enable_menuitem'], 'select',
-                0, 0, 0, 50, true, 'evlist');
-        $c->add('enable_categories',$CONF_EVLIST_DEFAULT['enable_categories'], 'select',
-                0, 0, 0, 55, true, 'evlist');
-        $c->add('reminder_speedlimit',$CONF_EVLIST_DEFAULT['reminder_speedlimit'], 'text',
-                0, 0, NULL, 60, true, 'evlist');
-        $c->add('post_speedlimit',$CONF_EVLIST_DEFAULT['post_speedlimit'], 'text',
-                0, 0, NULL, 70, true, 'evlist');
-        $c->add('enable_reminders',$CONF_EVLIST_DEFAULT['enable_reminders'], 'select',
-                0, 0, 0, 80, true, 'evlist');
-        $c->add('reminder_days',$CONF_EVLIST_DEFAULT['reminder_days'], 'text',
-                0, 0, NULL, 90, true, 'evlist');
-        $c->add('commentsupport',$CONF_EVLIST_DEFAULT['commentsupport'], 'select',
-                0, 0, 0, 100, true, 'evlist');
-
-        $c->add('ev_gui', NULL, 'fieldset', 0, 1, NULL, 0, true, 'evlist');
-        $c->add('enable_menuitem',$CONF_EVLIST_DEFAULT['enable_menuitem'], 'select',
-                0, 1, 0, 10, true, 'evlist');
-        $c->add('usermenu_option',$CONF_EVLIST_DEFAULT['usermenu_option'], 'select',
-                0, 1, 2, 20, true, 'evlist');
-        $c->add('displayblocks',$CONF_EVLIST_DEFAULT['displayblocks'], 'select',
-                0, 1, 13, 25, true, 'evlist');
-        $c->add('event_passing',$CONF_EVLIST_DEFAULT['event_passing'], 'select',
-                0, 1, 6, 60, true, 'evlist');
-        $c->add('limit_list',$CONF_EVLIST_DEFAULT['limit_list'], 'text',
-                0, 1, 0, 70, true, 'evlist');
-        $c->add('limit_block',$CONF_EVLIST_DEFAULT['limit_block'], 'text',
-                0, 1, 0, 80, true, 'evlist');
-        $c->add('default_view', $CONF_EVLIST_DEFAULT['default_view'], 'select',
-                0, 1, 14, 90, true, 'evlist');
-        $c->add('max_upcoming_days', $CONF_EVLIST_DEFAULT['max_upcoming_days'], 'text',
-                0, 1, 0, 100, true, 'evlist');
-
-        $c->add('ev_centerblock', NULL, 'fieldset', 0, 2, NULL, 0, true,
-                'evlist');
-        $c->add('enable_centerblock',$CONF_EVLIST_DEFAULT['enable_centerblock'], 'select',
-                0, 2, 9, 10, true, 'evlist');
-        $c->add('pos_centerblock',$CONF_EVLIST_DEFAULT['pos_centerblock'], 'select',
-                0, 2, 7, 20, true, 'evlist');
-        $c->add('topic_centerblock',$CONF_EVLIST_DEFAULT['topic_centerblock'], 'select',
-                0, 2, NULL, 30, true, 'evlist');
-        $c->add('range_centerblock',$CONF_EVLIST_DEFAULT['range_centerblock'], 'select',
-                0, 2, 8, 40, true, 'evlist');
-        $c->add('limit_block',$CONF_EVLIST_DEFAULT['limit_block'], 'text',
-                0, 2, 0, 50, true, 'evlist');
-        $c->add('limit_summary',$CONF_EVLIST_DEFAULT['limit_summary'], 'text',
-                0, 2, 0, 60, true, 'evlist');
-
-        $c->add('ev_permissions', NULL, 'fieldset', 0, 3, NULL, 0, true,
-                'evlist');
-        $c->add('default_permissions', $CONF_EVLIST_DEFAULT['default_permissions'],
-                '@select', 0, 3, 12, 10, true, 'evlist');
-
-        $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
-        $c->add('ev_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
-        $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                20, 10, 0, 10, true, 'evlist');
-        $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
-                20, 10, 17, 20, true, 'evlist');
-        $c->add('ticket_format',$CONF_EVLIST_DEFAULT['ticket_format'], 'text',
-                20, 10, 0, 30, true, 'evlist');
-
-        // External integrations
-        $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
-        $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
-        $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
-                30, 10, 0, 10, true, 'evlist');
-        $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
-                30, 10, 0, 20, true, 'evlist');
-        $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], '%text',
-                30, 10, 0, 30, true, 'evlist');
-        $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
-                30, 10, 0, 40, true, 'evlist');
-        $c->add('use_locator', $CONF_EVLIST_DEFAULT['use_locator'], 'select',
-                30, 10, 0, 50, true, 'evlist');
-        $c->add('use_weather', $CONF_EVLIST_DEFAULT['use_weather'], 'select',
-                30, 10, 0, 60, true, 'evlist');
-
-        $c->add('ev_integ_other', NULL, 'fieldset', 30, 20, NULL, 0, true, 'evlist');
-        $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*select',
-                30, 20, 0, 10, true, 'evlist');
-     }
-
+        USES_lib_install();
+        foreach ($evlistConfigData AS $cfgItem) {
+            _addConfigItem($cfgItem);
+        }
+    }
     return true;
 }
+
+
+/**
+ * Sync the configuration in the DB to the above configs
+ */
+function plugin_updateconfig_evlist()
+{
+    global $evlistConfigData;
+
+    USES_lib_install();
+    _update_config('evlist', $evlistConfigData);
+}
+
 ?>

@@ -51,10 +51,7 @@ if (!defined ('GVERSION')) {
 }
 
 global $_DB_dbms, $c, $_CONF, $CONF_EVLIST_DEFAULT;
-require_once __DIR__ . "/sql/{$_DB_dbms}_install.php";
-require_once $_CONF['path'] . 'system/classes/config.class.php';
-require_once __DIR__ . '/install_defaults.php';
-$c = config::get_instance();
+require_once __DIR__ . "/sql/mysql_install.php";
 
 /**
 *   Upgrade the evList plugin
@@ -127,9 +124,6 @@ function evlist_upgrade($ignore_errors = false)
             DB_query("DROP TABLE {$_TABLES['evlist_settings']}",1);
             DB_query("UPDATE {$_TABLES['plugins']} SET pi_version = '1.1.4.fusion', pi_gl_version='1.1.0',pi_homepage='http://www.glfusion.org' WHERE pi_name = '$pi_name'");
         case '1.1.4.fusion' :
-            $c->add('enable_reminders',1, 'select',0, 0, 0, 80, true, 'evlist');
-            $c->add('reminder_days',7, 'text',0, 0, NULL, 90, true, 'evlist');
-
             DB_query("ALTER TABLE {$_TABLES['evlist_remlookup']}
                 ADD uid MEDIUMINT(8) NOT NULL default '1' AFTER timestamp");
 
@@ -140,7 +134,6 @@ function evlist_upgrade($ignore_errors = false)
         case '1.2.3' :
         case '1.2.4' :
         case '1.2.5' :
-            $c->add('displayblocks',0, 'select',0, 1, 13, 25, true, 'evlist');
             // no db or config changes
             DB_query("UPDATE {$_TABLES['groups']} SET grp_gl_core=2 WHERE grp_name='evList Admin'",1);
             DB_query("INSERT INTO {$_TABLES['blocks']} (
@@ -211,36 +204,12 @@ function evlist_upgrade($ignore_errors = false)
         case '1.3.6':
             $currentVersion = '1.3.7';
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-
-            // Remove date and time formats, global configs are used instead.
-            $c->del('week_begins', 'evlist');
-            $c->del('date_format', 'evlist');
-            $c->del('time_format', 'evlist');
-            $c->add('cal_tmpl', 'html', 'select',
-                    0, 1, 16, 130, true, 'evlist');
-            $c->add('sg_rsvp', NULL, 'subgroup', 20, 0, NULL, 0, true, 'evlist');
-            $c->add('fs_rsvp', NULL, 'fieldset', 20, 10, NULL, 0, true, 'evlist');
-            $c->add('enable_rsvp',$CONF_EVLIST_DEFAULT['enable_rsvp'], 'select',
-                    20, 10, 0, 10, true, 'evlist');
-            $c->add('rsvp_print',$CONF_EVLIST_DEFAULT['rsvp_print'], 'select',
-                    20, 10, 17, 20, true, 'evlist');
-
             if (!EVLIST_do_set_version($currentVersion)) return false;
 
         case '1.3.7':
         case '1.3.8':
         case '1.3.9':
             $currentVersion = '1.4.0';
-            $c->add('sg_integ', NULL, 'subgroup', 30, 0, NULL, 0, true, 'evlist');
-            $c->add('ev_integ_meetup', NULL, 'fieldset', 30, 10, NULL, 0, true, 'evlist');
-            $c->add('meetup_enabled',$CONF_EVLIST_DEFAULT['meetup_enabled'], 'select',
-                    30, 10, 0, 10, true, 'evlist');
-            $c->add('meetup_key',$CONF_EVLIST_DEFAULT['meetup_key'], 'text',
-                    30, 10, 0, 20, true, 'evlist');
-            $c->add('meetup_gid',$CONF_EVLIST_DEFAULT['meetup_gid'], 'text',
-                    30, 10, 0, 30, true, 'evlist');
-            $c->add('meetup_cache_minutes',$CONF_EVLIST_DEFAULT['meetup_cache_minutes'], 'text',
-                    30, 10, 0, 40, true, 'evlist');
 
             // SQL includes moving configuration items under the new sg_integ group,
             // so execute it last.
@@ -249,8 +218,6 @@ function evlist_upgrade($ignore_errors = false)
 
         case '1.4.0':
             $currentVersion = '1.4.1';
-            $c->add('commentsupport',$CONF_EVLIST_DEFAULT['commentsupport'], 'select',
-                0, 0, 0, 100, true, 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
 
@@ -262,8 +229,6 @@ function evlist_upgrade($ignore_errors = false)
         case '1.4.2':
             $currentVersion = '1.4.3';
             $c->del('cal_tmpl', 'evlist');
-            $c->add('ticket_format',$CONF_EVLIST_DEFAULT['ticket_format'],
-                'text', 20, 10, 0, 30, true, 'evlist');
             if (!empty($_EV_CONF['meetup_gid'])) {
                 // Changing meetup_gid type to array, first get the current
                 // value and convert it.
@@ -299,9 +264,6 @@ function evlist_upgrade($ignore_errors = false)
         case '1.4.3':
         case '1.4.4':
             $currentVersion = '1.4.5';
-            $c->add('ev_integ_other', NULL, 'fieldset', 30, 20, NULL, 0, true, 'evlist');
-            $c->add('pi_cal_map', $CONF_EVLIST_DEFAULT['pi_cal_map'], '*text',
-                30, 20, 0, 10, true, 'evlist');
             if (!EVLIST_do_upgrade_sql($currentVersion, $ignore_errors)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
 
@@ -315,6 +277,9 @@ function evlist_upgrade($ignore_errors = false)
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
         if (!EVLIST_do_set_version($installed_ver)) return false;
     }
+    include_once 'install_defaults.php';
+    plugin_updateconfig_evlist();
+
     EVLIST_remove_old_files();
     CTL_clearCache();
     Evlist\Cache::clear();

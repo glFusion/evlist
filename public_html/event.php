@@ -406,7 +406,7 @@ default:
     }
     if (!empty($rp_id)) {
         $Rep = Evlist\Repeat::getInstance($rp_id);
-        if (!$Rep->Event->hasAccess(2)) {
+        if ($Rep->rp_id == 0 || ($Rep->ev_id > 0 && !$Rep->Event->hasAccess(2))) {
             echo COM_refresh(EVLIST_URL . '/index.php');
             exit;
         }

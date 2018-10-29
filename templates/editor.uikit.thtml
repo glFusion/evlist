@@ -472,6 +472,8 @@ function toggleRSVPdetail(val)
         {# <div id="d_startdate1" style="float:left;width:10em;">{d_startdate1}</div> #}
         &nbsp;&nbsp;
         <span id="starttime1" {starttime1_show}>
+          <input type="text" name="time_start1" size="10" value="{time_start1}" data-uk-timepicker="{format:'{hour_mode}h'}" />
+{!if 0}
         <select name="starthour1" id="starthour1">
           <option value="">--</option>
           {start_hour_options1}
@@ -481,6 +483,7 @@ function toggleRSVPdetail(val)
           {start_minute_options1}
         </select>
         {startdate1_ampm}
+{!endif}
         </span>
         </div>
       </div>
@@ -496,6 +499,8 @@ function toggleRSVPdetail(val)
           &nbsp;&nbsp;
 
           <span id="endtime1" {endtime1_show}>
+          <input type="text" name="time_end1" size="10" value="{time_end1}" data-uk-timepicker="{format:'{hour_mode}h'}" />
+{!if 0}
           <select name="endhour1" id="endhour1">
             <option value="">--</option>
             {end_hour_options1}
@@ -505,6 +510,7 @@ function toggleRSVPdetail(val)
             {end_minute_options1}
           </select>
           {enddate1_ampm}
+{!endif}
           </span>
         </div>
       </div>
@@ -539,6 +545,8 @@ function toggleRSVPdetail(val)
           <label for="starthour2">
             {$LANG_EVLIST['start_time']}:
           </label>
+          <input type="text" name="time_start2" size="10" value="{time_start2}" data-uk-timepicker="{format:'{hour_mode}h'}" />
+{!if 0}
           <select name="starthour2" id="starthour2">
             <option value="">--</option>
             {start_hour_options2}
@@ -548,10 +556,13 @@ function toggleRSVPdetail(val)
             {start_minute_options2}
           </select>
           {startdate2_ampm}
+{!endif}
           <br /><br />
           <label for="endtime2">
             {$LANG_EVLIST['end_time']}:
           </label>
+          <input type="text" name="time_end2" size="10" value="{time_end2}" data-uk-timepicker="{format:'hour_modeh'}" />
+{!if 0}
           <select id="endtime2" name="endhour2">
             <option value="">--</option>
             {end_hour_options2}
@@ -561,6 +572,7 @@ function toggleRSVPdetail(val)
             {end_minute_options2}
           </select>
           {enddate2_ampm}
+{!endif}
         </p>
 
       </div>
@@ -991,7 +1003,7 @@ function toggleRSVPdetail(val)
 </div>
 
 <script type="text/javascript">
-    Calendar.setup({
+/*    Calendar.setup({
         inputField  :   "f_startdate1",
         //displayArea :   "d_startdate1",
         //daFormat    :   disp_format,
@@ -1012,7 +1024,7 @@ function toggleRSVPdetail(val)
 //        eventName   :   "focus",
         //onUpdate    :   calcdate2,
         button      :   "enddate1_trigger"
-    });
+    });*/
 
     function calcdate(cal)
     {

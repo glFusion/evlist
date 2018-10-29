@@ -147,6 +147,27 @@ function EVLIST_12to24($hour, $ampm='')
 
 
 /**
+ * Get the 12-hour string from a 24-hour time value.
+ * The returned value is actually the 24-hour format depending on $_CONF.
+ * Used to set the times for the event entry form. Time displays are controlled
+ * by the global locale configuration.
+ *
+ * @param   string  $time_str   24-hour time string, e.g. "14:30"
+ * @return  string      12-hour string, e.g. "02:30 PM"
+ */
+function EVLIST_24to12($time_str)
+{
+    global $_CONF;
+
+    if ($_CONF['hour_mode'] == '12') {
+        return date("h:i A", strtotime($time_str));
+    } else {
+        return $time_str;
+    }
+}
+
+
+/**
 *   Organizes events by hour, and separates all-day events.
 *
 *   @deprecated

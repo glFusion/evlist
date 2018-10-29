@@ -1375,7 +1375,6 @@ function EVLIST_formattedTime($timestamp)
     } else {
         $retval = date($_CONF['timeonly'], $timestamp);
     }
-
     return $retval;
 }
 
@@ -2248,6 +2247,8 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         $A['endhour1'] = $e_hour;
         $A['endminute1'] = $e_min;
         $A['end_ampm'] = $e_ampm;
+        $A['time_start1'] = $info['time_start'];
+        $A['time_end1'] = $info['time_end'];
     } else {
         // No times specified = all-day event
         $A['allday'] = 1;

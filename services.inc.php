@@ -221,4 +221,36 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
     return PLG_RET_OK;
 }
 
+
+/**
+ * Set text information to be included with the purchase notification.
+ * Expected args: array(
+ *      'item_id' => array(
+ *          0 => 'eventfee'
+ *          1 => eventid/x/repeat_id
+ *      ),
+ *      'mods' => array(
+ *          'uid' => user_id
+ *      )
+ *  )
+ *
+ * @param   array   $args       Array of item information
+ * @param   array   &$output    Return array
+ * @param   string  &$svc_msg   Unused
+ * @return  integer     Return value
+ */
+function service_emailReceiptInfo_evlist($args, &$output, &$svc_msg)
+{
+    if (!isset($args['item_id'][0])) {
+        return '';
+    }
+
+    $item_type = $args['item_id'][0];
+    $item_num = $args['item_id'][1];
+    $item_parts = explode('/', $item_num);
+
+    $url = EVLIST_URL . '/event.php?view=instance&eid=' . $item_parts[2];
+    $output = 'You can print your tickets at <a href="' . $url . '">' . $url . '</a>.';
+}
+
 ?>

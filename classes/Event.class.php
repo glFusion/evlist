@@ -21,6 +21,13 @@ USES_evlist_functions();
  */
 class Event
 {
+    const MIN_DATETIME  = '1970-01-01 00:00:00';
+    const MAX_DATETIME  = '2037-12-31 23:59:59';
+    const MIN_DATE      = '1970-01-01';
+    const MAX_DATE      = '2037-12-31';
+    const MIN_TIME      = '00:00:00';
+    const MAX_TIME      = '23:59:59';
+
     /** Property fields.  Accessed via Set() and Get()
     *   @var array */
     var $properties = array();
@@ -238,9 +245,12 @@ class Event
 
         case 'time_start1':
         case 'time_start2':
+            $this->properties[$var] = empty($value) ? self::MIN_TIME : trim($value);
+            break;
+
         case 'time_end1':
         case 'time_end2':
-            $this->properties[$var] = empty($value) ? '00:00:00' : trim($value);
+            $this->properties[$var] = empty($value) ? self::MAX_TIME : trim($value);
             break;
 
         case 'status':
@@ -360,28 +370,32 @@ class Event
             $this->id = isset($row['eid']) ? $row['eid'] : '';
             // Ignore time entries & set to all day if flagged as such
             if (isset($row['allday']) && $row['allday'] == '1') {
-                $this->time_start1 = '00:00:00';
-                $this->time_end1 = '23:59:59';
+                $this->time_start1 = self::MIN_TIME;
+                $this->time_end1 = self::MAX_TIME;
             } else {
-                $start_ampm = isset($row['start1_ampm']) ? $row['start1_ampm'] : '';
+                $this->time_start1  = date('H:i', strtotime($row['time_start1']));
+                $this->time_end1    = date('H:i', strtotime($row['time_end1']));
+                /*$start_ampm = isset($row['start1_ampm']) ? $row['start1_ampm'] : '';
                 $end_ampm = isset($row['end1_ampm']) ? $row['end1_ampm'] : '';
                 $tmp = EVLIST_12to24($row['starthour1'], $start_ampm);
                 $this->time_start1 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute1']);
                 $tmp = EVLIST_12to24($row['endhour1'], $end_ampm);
                 $this->time_end1 = sprintf('%02d:%02d:00',
-                    $tmp, $row['endminute1']);
+                    $tmp, $row['endminute1']);*/
             }
 
             // If split, record second time/date values.
             // Splits don't support allday events
             if ($this->split == 1) {
-                $tmp = EVLIST_12to24($row['starthour2'], $row['start2_ampm']);
+                $this->time_start2  = date('H:i', strtotime($row['time_start2']));
+                $this->time_end2    = date('H:i', strtotime($row['time_end2']));
+                /*$tmp = EVLIST_12to24($row['starthour2'], $row['start2_ampm']);
                 $this->time_start2 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute2']);
                 $tmp = EVLIST_12to24($row['endhour2'], $row['end2_ampm']);
                 $this->time_end2 = sprintf('%02d:%02d:00',
-                    $tmp, $row['endminute2']);
+                    $tmp, $row['endminute2']);*/
             } else {
                 $this->time_start2 = NULL;
                 $this->time_end2 = NULL;
@@ -533,7 +547,6 @@ class Event
             $this->SetVars($A);
             $this->MakeRecData($A);
         }
-
         /*if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
             $this->isNew = false;
         }*/
@@ -560,7 +573,6 @@ class Event
             if (!$this->isValidRecord()) {
                 return $this->PrintErrors();
             }
-
             // Delete the category lookups
             DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
 
@@ -607,9 +619,7 @@ class Event
             }
 
         } else {
-
             // New event
-
             if (!$this->isAdmin) {
                 // Override any submitted permissions if user is not an admin
                 $this->perm_owner = $_EV_CONF['default_permissions'][0];
@@ -1125,7 +1135,6 @@ class Event
         $end1 = EVLIST_TimeSelect('end1', $this->time_end1);
         $end2 = EVLIST_TimeSelect('end2', $this->time_end2);
         $cal_select = Calendar::optionList($this->cal_id, true, 3);
-
         $navbar = new \navbar;
         $cnt = 0;
         foreach ($tabs as $id) {
@@ -1133,6 +1142,7 @@ class Event
             $cnt++;
         }
         $navbar->set_selected($LANG_EVLIST['ev_info']);
+
         $T->set_var(array(
             'is_admin'      => $this->isAdmin,
             'action_url'    => $action_url,
@@ -1159,6 +1169,12 @@ class Event
             'enddate1'      => $this->date_end1,
             'd_startdate1'  => EVLIST_formattedDate($this->date_start1),
             'd_enddate1'    => EVLIST_formattedDate($this->date_end1),
+            // Don't need seconds in the time boxes
+            'hour_mode'     => $_CONF['hour_mode'],
+            'time_start1'   => EVLIST_24to12($this->time_start1),
+            'time_end1'     => EVLIST_24to12($this->time_end1),
+            'time_start2'   => EVLIST_24to12($this->time_start2),
+            'time_end2'     => EVLIST_24to12($this->time_end2),
             'start_hour_options1'   => $start1['hour'],
             'start_minute_options1' => $start1['minute'],
             'startdate1_ampm'       => $start1['ampm'],
@@ -1177,7 +1193,6 @@ class Event
             'saveaction'    => $saveaction,
             'delaction'     => $delaction,
             'owner_id'      => $this->owner_id,
-            'hour_mode'     => $_CONF['hour_mode'],
             'days_interval' => $days_interval,
             'display_format' => $_CONF['shortdate'],
             'ts_start'      => strtotime($this->date_start1),
@@ -1690,8 +1705,8 @@ class Event
         if ($this->old_schedule['time_end1'] != $this->time_end1)
             return true;
 
-        if ($this->time_start2 == '') $this->time_start2 = '00:00:00';
-        if ($this->time_end2 == '') $this->time_end2 = '00:00:00';
+        if ($this->time_start2 == '') $this->time_start2 = self::MIN_TIME;
+        if ($this->time_end2 == '') $this->time_end2 = self::MAX_TIME;
 
         // Checking split times, this should cover the split checkbox also
         if ($this->old_schedule['time_start2'] != $this->time_start2)

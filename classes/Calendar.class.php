@@ -316,11 +316,9 @@ class Calendar
             if (isset($_POST['old_orderby']) && $_POST['old_orderby'] != $this->orderby) {
                 self::reOrder();
             }
-
-            if (version_compare(GVERSION, '1.8.0', '>=')) {
-                // Clear the entire Evlist cache since calendar names, etc.
-                // are cached with events.
-                Cache::clear();
+            if (!$this->isNew) {
+                // Clear the cache if updating an existing calendar
+                Cache::clear('calendars');
             }
             return true;
         } else {
@@ -350,7 +348,7 @@ class Calendar
         if ($newcal != 0) {
             // Make sure the new calendar exists
             if (DB_count($_TABLES['evlist_calendars'], 'cal_id', $newcal) != 1) {
-            return false;
+                return false;
             }
 
             // Update all the existing events with the new calendar ID
@@ -358,9 +356,7 @@ class Calendar
                     SET cal_id = '$newcal'
                     WHERE cal_id='{$this->cal_id}'";
             DB_query($sql, 1);
-
         } else {
-
             // Not changing to a new calendar, delete all events for this one
             $sql = "SELECT id FROM {$_TABLES['evlist_events']}
                     WHERE cal_id = '{$this->cal_id}'";
@@ -372,6 +368,7 @@ class Calendar
             }
         }
         DB_delete($_TABLES['evlist_calendars'], 'cal_id', $this->cal_id);
+        Cache::clear();     // Just clear all cache items
     }
 
 
@@ -490,23 +487,18 @@ class Calendar
     public static function getAll()
     {
         global $_TABLES;
-        static $cals = NULL;
 
-        // First check if the calendars have been read already
+        $cals = Cache::get('calendars');
         if ($cals === NULL) {
-            // Then check the cache
-            $cals = Cache::get('calendars');
-            if ($cals === NULL) {
                 // Still nothing? Then read from the DB
-                $cals = array();
-                $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
-                        ORDER BY orderby ASC";
-                $res = DB_query($sql);
-                while ($A = DB_fetchArray($res, false)) {
-                    $cals[$A['cal_id']] = new self($A);
-                }
-                Cache::set('calendars', $cals, 'calendars');
+            $cals = array();
+            $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
+                    ORDER BY orderby ASC";
+            $res = DB_query($sql);
+            while ($A = DB_fetchArray($res, false)) {
+                $cals[$A['cal_id']] = new self($A);
             }
+            Cache::set('calendars', $cals, 'calendars');
         }
         return $cals;
     }

@@ -131,8 +131,8 @@
   {map}
   <div id="directions">
     <form action="http://maps.google.com/maps" method="GET" target="_blank">
-      <input onfocus="this.value='';" type="text" size="40" maxlength="40"
-        name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
+      <input type="text" size="40" maxlength="128"
+        name="saddr" id="saddr" placeholder="{$LANG_GEO['start_addr']}" />
 {!if is_uikit}
       <input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
 {!else}

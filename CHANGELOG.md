@@ -2,6 +2,7 @@
 
 ## v1.4.6
 Release TBD
+- Provide location address to Locator plugin
 - Leverage list item template to correctly show event date and time in lists
 - Use calendar selector for plugin->calendar mapping config
 - Cleanly abort evMeetup::getEvents() if Curl support is mising

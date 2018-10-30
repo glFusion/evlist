@@ -299,7 +299,35 @@ class Detail
         $this->det_id = 0;
         return true;
     }
-        
+
+
+    /**
+     * Get a formatted address for display.
+     * Example: My Location
+     *          1234 Main Street.
+     *          Los Angeles, CA, USA, 90021
+     *
+     *  @return string  HTML-formatted address
+     */
+    public function formatAddress()
+    {
+        $retval = array();
+        if ($this->location != '') $retval[] = htmlspecialchars($this->location);
+        if ($this->street != '') $retval[] = htmlspecialchars($this->street);
+        $region = array();
+        foreach (array('city', 'province', 'country', 'postal') as $fld) {
+            if ($this->$fld != '') $region[] = htmlspecialchars($this->$fld);
+        }
+        if (!empty($region)) {
+            $retval[] = implode(', ', $region);
+        }
+        if (!empty($retval)) {
+            return implode('<br />', $retval);
+        } else {
+            return '';
+        }
+    }
+
 }   // class Detail
 
 

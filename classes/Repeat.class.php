@@ -735,9 +735,12 @@ class Repeat
 
         // Get a map from the Locator plugin, if configured and available
         if ($_EV_CONF['use_locator'] == 1 && !empty($lat) && !empty($lng)) {
-            $status = LGLIB_invokeService('locator', 'getMap',
-                    array('lat' => $lat, 'lng' => $lng),
-                    $map, $svc_msg);
+            $args = array(
+                'lat'   => $lat,
+                'lng'   => $lng,
+                'text'  => $this->Event->Detail->formatAddress(),
+            );
+            $status = LGLIB_invokeService('locator', 'getMap', $args, $map, $svc_msg);
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'map'   => $map,

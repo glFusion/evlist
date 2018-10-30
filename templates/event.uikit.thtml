@@ -130,7 +130,7 @@
 <div id="evlistMapOuter">
   {map}
   <div id="directions">
-    <form action="http://maps.google.com/maps" method="GET" target="_blank">
+    <form action="https://maps.google.com/maps" method="GET" target="_blank">
       <input type="text" size="40" maxlength="128"
         name="saddr" id="saddr" placeholder="{$LANG_GEO['start_addr']}" />
 {!if is_uikit}

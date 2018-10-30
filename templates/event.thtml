@@ -101,7 +101,7 @@
 <div id="evlistMapOuter">
   {map}
   <div id="directions">
-    <form action="http://maps.google.com/maps" method="GET" target="_blank">
+    <form action="https://maps.google.com/maps" method="GET" target="_blank">
       <input onfocus="this.value='';" type="text" size="40" maxlength="40"
         name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
       <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>

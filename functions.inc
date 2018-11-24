@@ -1,4 +1,17 @@
 <?php
+/**
+ * glFusion API functions for the EvList plugin.
+ *
+ * @author      Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     1.4.5
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
+
 // +--------------------------------------------------------------------------+
 // | evList A calendar solution for glFusion                                  |
 // +--------------------------------------------------------------------------+
@@ -31,20 +44,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
 // |                                                                          |
 // +--------------------------------------------------------------------------+
-
-/**
-*   glFusion API functions for the EvList plugin
-*
-*   @author     Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.5
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
-
 
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
@@ -126,26 +125,45 @@ if ($_EV_CONF['enable_rsvp']) {
     include_once __DIR__ . '/services.inc.php';
 }
 
-spl_autoload_register(function($class)
+spl_autoload_register(function ($class)
 {
-    if (strpos($class, 'Evlist\\') === 0) {
-        $class = str_replace('Evlist\\', '', $class);
-        $path = __DIR__ . '/classes/' . $class . '.class.php';
-        if (file_exists($path)) {
-            include $path;
-        }
+    // project-specific namespace prefix
+    $prefix = 'Evlist\\';
+
+    // does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+
+    // base directory for the namespace prefix
+    $base_dir = __DIR__ . '/classes/';
+
+    // get the relative class name
+    $relative_class = substr($class, $len);
+
+    // replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
+
+    // if the file exists, require it
+    if (file_exists($file)) {
+        require $file;
     }
 });
+
 use LGLib\Date_Calc;
 
 function USES_evlist_functions()
 {    require_once __DIR__ . '/evlist_functions.inc.php'; }
 
 /**
-*   Return the current code (not necessarily installed) version
-*
-*   @return string      Current version
-*/
+ * Return the current code (not necessarily installed) version.
+ *
+ * @return  string  Current version
+ */
 function plugin_chkVersion_evlist()
 {
     global $_EV_CONF;
@@ -154,10 +172,10 @@ function plugin_chkVersion_evlist()
 
 
 /**
-*   Automatic plugin removal
-*
-*   @return array   Array of data items to be removed
-*/
+ * Automatic plugin removal.
+ *
+ * @return  array   Array of data items to be removed
+ */
 function plugin_autouninstall_evlist()
 {
     $out = array (
@@ -180,10 +198,10 @@ function plugin_autouninstall_evlist()
 
 
 /**
-*   Upgrade the plugin
-*
-*   @return mixed   True for success, False or error message number otherwise
-*/
+ * Upgrade the plugin.
+ *
+ * @return  mixed   True for success, False or error message number otherwise
+ */
 function plugin_upgrade_evlist($ignore_errors=false)
 {
     if (@file_exists(__DIR__ . '/upgrade.php')) {
@@ -198,10 +216,10 @@ function plugin_upgrade_evlist($ignore_errors=false)
 
 
 /**
-*   Get the icon and link for this plugin's Command and Control entry
-*
-*   @return array   Array of items
-*/
+ * Get the icon and link for this plugin's Command and Control entry.
+ *
+ * @return  array   Array of items
+ */
 function plugin_cclabel_evlist()
 {
     global $LANG_EVLIST;
@@ -219,10 +237,10 @@ function plugin_cclabel_evlist()
 
 
 /**
-*   Get this plugin's link for the Admins Only menu
-*
-*   @return array   Array of name, link, no. of events
-*/
+ * Get this plugin's link for the Admins Only menu.
+ *
+ * @return  array   Array of name, link, no. of events
+ */
 function plugin_getadminoption_evlist()
 {
     global $_TABLES, $LANG_EVLIST;

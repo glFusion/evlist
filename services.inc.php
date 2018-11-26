@@ -1,16 +1,16 @@
 <?php
 /**
-*   Web service functions for the EvList plugin.
-*   Handles ticket purchases.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015-2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.6
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Web service functions for the EvList plugin.
+ * Handles ticket purchases.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.6
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own!');
@@ -18,13 +18,13 @@ if (!defined ('GVERSION')) {
 
 
 /**
-*   Get information about a specific item.
-*
-*   @param  array   $args       Item Info (pi_name, item_type, item_id)
-*   @param  array   &$output    Array of output data
-*   @param  string  &$svc_msg   Unused
-*   @return integer     Return value
-*/
+ * Get information about a specific item.
+ *
+ * @param   array   $args       Item Info (pi_name, item_type, item_id)
+ * @param   array   &$output    Array of output data
+ * @param   string  &$svc_msg   Unused
+ * @return  integer     Return value
+ */
 function service_productinfo_evlist($args, &$output, &$svc_msg)
 {
     $retval = PLG_RET_OK;
@@ -80,13 +80,13 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
 
 
 /**
-*   Handle the purchase of a product via IPN message.
-*
-*   @param  array   $args       Array of item and IPN data
-*   @param  array   &$output    Return array
-*   @param  string  &$svc_msg   Unused
-*   @return integer     Return value
-*/
+ * Handle the purchase of a product via IPN message.
+ *
+ * @param   array   $args       Array of item and IPN data
+ * @param   array   &$output    Return array
+ * @param   string  &$svc_msg   Unused
+ * @return  integer     Return value
+ */
 function service_handlePurchase_evlist($args, &$output, &$svc_msg)
 {
     global $_TABLES, $LANG_PHOTO, $_CONF;
@@ -172,13 +172,13 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
 
 
 /**
-*   Handle a product refund
-*
-*   @param  array   $args       Array of item and IPN data
-*   @param  array   &$output    Return array
-*   @param  string  &$svc_msg   Unused
-*   @return integer     Return value
-*/
+ * Handle a product refund.
+ *
+ * @param  array   $args       Array of item and IPN data
+ * @param  array   &$output    Return array
+ * @param  string  &$svc_msg   Unused
+ * @return integer     Return value
+ */
 function service_handleRefund_evlist($args, &$output, &$svc_msg)
 {
     global $_TABLES;
@@ -224,7 +224,7 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
 
 /**
  * Set text information to be included with the purchase notification.
- * Expected args: array(
+ * Expected args: ```array(
  *      'item_id' => array(
  *          0 => 'eventfee'
  *          1 => eventid/x/repeat_id
@@ -232,7 +232,7 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
  *      'mods' => array(
  *          'uid' => user_id
  *      )
- *  )
+ *  )```
  *
  * @param   array   $args       Array of item information
  * @param   array   &$output    Return array

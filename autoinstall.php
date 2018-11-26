@@ -1,4 +1,16 @@
 <?php
+/**
+ * Automatic installation of the evList plugin.
+ *
+ * @author      Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 // +--------------------------------------------------------------------------+
 // | evList A calendar solution for glFusion                                  |
 // +--------------------------------------------------------------------------+
@@ -26,25 +38,19 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
 // |                                                                          |
 // +--------------------------------------------------------------------------+
-/**
-*   Automatic installation of the evList plugin
-*   @package    evlist
-*/
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-global $_DB_dbms;
-
 /** Include plugin-required files */
 require_once __DIR__ . '/evlist.php';
-require_once __DIR__ . '/sql/'.$_DB_dbms.'_install.php';
+require_once __DIR__ . '/sql/mysql_install.php';
 require_once __DIR__ . '/sql/def_events.php';
 
-// +--------------------------------------------------------------------------+
-// | Plugin installation options                                              |
-// +--------------------------------------------------------------------------+
-
+/**
+ * Plugin installation options.
+ * @var array
+ */
 $INSTALL_plugin['evlist'] = array(
     'installer' => array('type' => 'installer',
                     'version' => '1', 
@@ -166,11 +172,11 @@ $INSTALL_plugin['evlist'] = array(
 );
 
 /**
-*   Puts the datastructures for this plugin into the glFusion database
-*   Note: Corresponding uninstall routine is in functions.inc
-*
-*   @return   boolean True if successful False otherwise
-*/
+ * Puts the datastructures for this plugin into the glFusion database.
+ * Note: Corresponding uninstall routine is in functions.inc.
+ *
+ * @return  boolean     True if successful False otherwise
+ */
 function plugin_install_evlist()
 {
     global $INSTALL_plugin, $_EV_CONF, $_TABLES;
@@ -185,17 +191,16 @@ function plugin_install_evlist()
     if ($ret > 0) {
         return false;
     }
-
     return true;
 }
 
 
 /**
-* Loads the configuration records for the Online Config Manager
-*
-* @return   boolean     true = proceed with install, false = an error occured
-*
-*/
+ * Loads the configuration records for the Online Config Manager.
+ *
+ * @return  boolean     true = proceed with install, false = an error occured
+ *
+ */
 function plugin_load_configuration_evlist()
 {
     require_once __DIR__ . '/install_defaults.php';

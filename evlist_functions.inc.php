@@ -1,4 +1,16 @@
 <?php
+/**
+ * Plugin-specific functions for the EvList plugin
+ *
+ * @author      Lee P. Garner <lee@leegarner.com
+ * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.5
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 // +--------------------------------------------------------------------------+
 // | evList A calendar solution for glFusion                                  |
 // +--------------------------------------------------------------------------+
@@ -32,30 +44,18 @@
 // |                                                                          |
 // +--------------------------------------------------------------------------+
 
-/**
-*   Plugin-specific functions for the EvList plugin
-*
-*   @author     Lee P. Garner <lee@leegarner.com
-*   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.5
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
-
 
 /**
-*   Get the Google-style page navigation for the list display
-*
-*   @param  string  $start  Starting date
-*   @param  string  $end    Ending date
-*   @param  integer $cat    Category ID (optional)
-*   @param  integer $page   Current page number
-*   @param  integer $range  Range being displayed (upcoming, past, etc)
-*   @return string          HTML for page navigation
-*/
+ * Get the Google-style page navigation for the list display.
+ *
+ * @param   string  $start  Starting date
+ * @param   string  $end    Ending date
+ * @param   integer $cat    Category ID (optional)
+ * @param   integer $page   Current page number
+ * @param   integer $range  Range being displayed (upcoming, past, etc)
+ * @param   integer $cal    ID of calendar being shown
+ * @return  string          HTML for page navigation
+ */
 function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
 {
     global $_TABLES, $_EV_CONF;
@@ -78,13 +78,12 @@ function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
 
 
 /**
-*   Get an array of option lists for year, month, day, etc.
-*
-*   @param  string  $prefix     Prefix to use for ampm variable name
-*   @param  string  $curdate    SQL-formatted date to use as default
-*   @param  string  $curtime    SQL-formatted time to use as default
-*   @return array               Array of option lists, indexed by type
-*/
+ * Get an array of option lists for year, month, day, etc.
+ *
+ * @param   string  $prefix     Prefix to use for ampm variable name
+ * @param   string  $curtime    SQL-formatted time to use as default
+ * @return  array               Array of option lists, indexed by type
+ */
 function EVLIST_TimeSelect($prefix, $curtime = '')
 {
     global $_CONF;
@@ -121,15 +120,15 @@ function EVLIST_TimeSelect($prefix, $curtime = '')
 
 
 /**
-*   Convert the hour from 12-hour time to 24-hour.
-*   This is meant to convert incoming values from forms to 24-hour format.  If
-*   the site uses 24-hour time, the form values should already be that way
-*   (and there will be no am/pm indicator), so the hour is returned unchanged.
-*
-*   @param  integer $hour   Hour to check (0 - 23)
-*   @param  string  $ampm   Either 'am' or 'pm'
-*   @return integer         Hour after switching it to 24-hour time.
-*/
+ * Convert the hour from 12-hour time to 24-hour.
+ * This is meant to convert incoming values from forms to 24-hour format. If
+ * the site uses 24-hour time, the form values should already be that way
+ * (and there will be no am/pm indicator), so the hour is returned unchanged.
+ *
+ * @param   integer $hour   Hour to check (0 - 23)
+ * @param   string  $ampm   Either 'am' or 'pm'
+ * @return  integer         Hour after switching it to 24-hour time.
+ */
 function EVLIST_12to24($hour, $ampm='')
 {
     global $_CONF;
@@ -168,13 +167,13 @@ function EVLIST_24to12($time_str)
 
 
 /**
-*   Organizes events by hour, and separates all-day events.
-*
-*   @deprecated
-*   @param  array   $events     Array of all events
-*   @param  string  $today      Current date, YYYY-MM-DD.  Optional.
-*   @return array               Array of 2 arrays, allday and hourly
-*/
+ * Organizes events by hour, and separates all-day events.
+ *
+ * @deprecated
+ * @param   array   $events     Array of all events
+ * @param   string  $today      Current date, YYYY-MM-DD.  Optional.
+ * @return  array               Array of 2 arrays, allday and hourly
+ */
 function XXEVLIST_getDayViewData($events, $today = '')
 {
     global $_CONF, $_EV_CONF;
@@ -271,18 +270,18 @@ function XXEVLIST_getDayViewData($events, $today = '')
 
 
 /**
-* Return link to "delete event" image
-*
-* Note: Personal events can be deleted if the current user is the owner of the
-*       calendar and has _read_ access to them.
-*
-* @param    array   $A      event permissions and id
-* @param    string  $token  security token
-* @return   string          link or empty string
-* @TODO         This needs to bring up the javascript menu to delete the
-*               event or just an instance
-*   @deprecated
-*/
+ * Return link to "delete event" image.
+ *
+ * Note: Personal events can be deleted if the current user is the owner of the
+ *       calendar and has _read_ access to them.
+ *
+ * @param   array   $A      event permissions and id
+ * @param   string  $token  security token
+ * @return  string          link or empty string
+ * @todo    This needs to bring up the javascript menu to delete the
+ *          event or just an instance
+ * @deprecated
+ */
 function X_EVLIST_deleteImageLink($A, $token)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST;
@@ -314,13 +313,13 @@ function X_EVLIST_deleteImageLink($A, $token)
 
 
 /**
-*   Display a formatted error message.
-*
-*   @param  string  $msg    Error message to display
-*   @param  string  $type   Type of message, used for style and header
-*   @param  string  $header Optional header text.
-*   @return string      Formatted error message
-*/
+ * Display a formatted error message.
+ *
+ * @param   string  $msg    Error message to display
+ * @param   string  $type   Type of message, used for style and header
+ * @param   string  $header Optional header text.
+ * @return  string      Formatted error message
+ */
 function EVLIST_alertMessage($msg = '', $type = '', $header = '')
 {
     global $LANG_EVLIST;
@@ -333,15 +332,15 @@ function EVLIST_alertMessage($msg = '', $type = '', $header = '')
 
 
 /**
-*   Get the options for a select list.
-*   Similar to COM_optionList, but expects a value=>name array of
-*   elements, which will typically be from a language array.
-*
-*   @param  array   $options    value=>description array of elements
-*   @param  mixed   $selected   Optional value to preselect
-*   @param  integer $bias       Amount to add to each value
-*   @return string          HTML for <option></option> elements
-*/
+ * Get the options for a select list.
+ * Similar to COM_optionList, but expects a value=>name array of
+ * elements, which will typically be from a language array.
+ *
+ * @param   array   $options    value=>description array of elements
+ * @param   mixed   $selected   Optional value to preselect
+ * @param   integer $bias       Amount to add to each value
+ * @return  string          HTML for <option></option> elements
+ */
 function EVLIST_GetOptions($options, $selected = '', $bias=0)
 {
     if (!is_array($options)) return '';
@@ -362,10 +361,10 @@ function EVLIST_GetOptions($options, $selected = '', $bias=0)
 
 
 /**
-*   Get the RSS feed links only
-*
-*   @return array   Array of links & titles
-*/
+ * Get the RSS feed links only.
+ *
+ * @return  array   Array of links & titles
+ */
 function EVLIST_getFeedLinks()
 {
     global $_EV_CONF, $_TABLES;
@@ -394,12 +393,12 @@ function EVLIST_getFeedLinks()
 
 
 /**
-*   Get the feed subscription urls & icons.
-*   This returns a ready-to-display set of icons for visitors
-*   to subscribe to RSS feeds
-*
-*   @return string  HTML for icons
-*/
+ * Get the feed subscription urls & icons.
+ * This returns a ready-to-display set of icons for visitors
+ * to subscribe to RSS feeds
+ *
+ * @return  string  HTML for icons
+ */
 function EVLIST_getFeedIcons()
 {
     global $_CONF, $_EV_CONF, $_TABLES;
@@ -433,24 +432,16 @@ function EVLIST_getFeedIcons()
 
 
 /**
-*   Administer user registrations.
-*   This will appear in the admin area for administrators, and as part of
-*   the event detail for event owners.  Owners can delete registrations.
-*
-*   @param  integer $rp_id      Repeat ID being viewed or checked
-*   @return string              HTML for admin list
-*/
+ * Administer user registrations.
+ * This will appear in the admin area for administrators, and as part of
+ * the event detail for event owners.  Owners can delete registrations.
+ *
+ * @param   integer $rp_id  Repeat ID being viewed or checked
+ * @return  string          HTML for admin list
+ */
 function EVLIST_adminRSVP($rp_id)
 {
     global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_IMAGE_TYPE;
-/*
-+-------------------+----------+-------------------+-------+-------+-------+-----+------+------+
-| tic_id            | tic_type | ev_id             | rp_id | fee   | paid  | uid | used | dt   |
-+-------------------+----------+-------------------+-------+-------+-------+-----+------+------+
-| 20150209083155975 |        1 | 20150209081055236 |  7552 | 15.00 | 15.00 |   3 |    0 |    0 |
-+-------------------+----------+-------------------+-------+-------+-------+-----+------+------+
-1 row in set (0.00 sec)
-*/
     USES_lib_admin();
     $Ev = new Evlist\Repeat($rp_id);
     if ($Ev->rp_id == 0) return '';
@@ -548,14 +539,14 @@ function EVLIST_adminRSVP($rp_id)
 
 
 /**
-*   Display fields for the RSVP admin list
-*
-*   @param  string  $fieldname      Name of field
-*   @param  mixed   $fieldvalue     Value of field
-*   @param  array   $A              Array of all fields ($name=>$value)
-*   @param  array   $icon_arr       Handy array of icon images
-*   @return string                  Field value formatted for display
-*/
+ * Display fields for the RSVP admin list.
+ *
+ * @param   string  $fieldname      Name of field
+ * @param   mixed   $fieldvalue     Value of field
+ * @param   array   $A              Array of all fields ($name=>$value)
+ * @param   array   $icon_arr       Handy array of icon images
+ * @return  string                  Field value formatted for display
+ */
 function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
@@ -600,12 +591,12 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
 
 
 /**
-*   Get the day names for a week based on week start day of Sun or Mon.
-*   Used to create calendar headers for weekly, monthly and yearly views.
-*
-*   @param  integer $letters    Optional number of letters to return
-*   @return array       Array of day names for a week, 0-indexed
-*/
+ * Get the day names for a week based on week start day of Sun or Mon.
+ * Used to create calendar headers for weekly, monthly and yearly views.
+ *
+ * @param   integer $letters    Optional number of letters to return
+ * @return  array       Array of day names for a week, 0-indexed
+ */
 function EVLIST_getDayNames($letters = 0)
 {
     global $_CONF, $LANG_WEEK;
@@ -630,12 +621,12 @@ function EVLIST_getDayNames($letters = 0)
 
 
 /**
-*   Convert a latitude or longitude to a string based on the configured separators.
-*
-*   @param  float   $val    Value to convert
-*   @param  boolean $us     True to force US formatting, False for locale-based
-*   @return string      Formatted numeric string
-*/
+ * Convert a latitude or longitude to a string based on the configured separators.
+ *
+ * @param   float   $val    Value to convert
+ * @param   boolean $us     True to force US formatting, False for locale-based
+ * @return  string      Formatted numeric string
+ */
 function EVLIST_coord2str($val, $us = false)
 {
     if (!is_numeric($val)) return '';

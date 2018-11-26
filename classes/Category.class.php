@@ -151,16 +151,18 @@ class Category
 
 
     /**
-    *   Insert or update a calendar.
-    *
-    *   @param array    $A  Array of data to save, typically from form
-    */
+     * Insert or update a category record.
+     *
+     * @param   array   $A  Array of data to save, typically from form
+     * @return  integer     Category ID, 0 on failure.
+     */
     public function Save($A=array())
     {
         global $_TABLES, $_EV_CONF;
 
-        if (is_array($A) && !empty($A))
+        if (is_array($A) && !empty($A)) {
             $this->SetVars($A);
+        }
 
         if ($this->cat_id > 0) {
             $this->isNew = false;
@@ -172,6 +174,12 @@ class Category
             status = '{$this->cat_status}'";
 
         if ($this->isNew) {
+            // If adding a record, make sure it doesn't already exist.
+            // If it does, just return the existing ID.
+            $id = self::Exists($this->cat_name);
+            if ($id > 0) {
+                return $id;
+            }
             $sql = "INSERT INTO {$_TABLES['evlist_categories']} SET
                     $fld_sql";
         } else {
@@ -185,9 +193,9 @@ class Category
         if (!DB_error()) {
             if ($this->isNew) $this->cat_id = DB_insertId();
             Cache::clear('categories');
-            return true;
+            return $this->cat_id;
         } else {
-            return false;
+            return 0;
         }
     }   // function Save()
 
@@ -280,6 +288,12 @@ class Category
     }
 
 
+    /**
+     * Create the option variables for a dropdown selection list.
+     *
+     * @param   integer $selected   Selected item
+     * @return  string      HTML for option list
+     */
     public static function optionList($selected = 0)
     {
         $Cats = self::getAll();
@@ -290,6 +304,23 @@ class Category
             $retval .= "<option value=\"{$Cat->cat_id}\" $sel>{$Cat->cat_name}</option>" . LB;
         }
         return $retval;
+    }
+
+
+    /**
+     * Check if a category exists by name.
+     * Used to ensure duplicate categories aren't created.
+     *
+     * @param   string  $cat_name   Category name
+     * @return  integer     ID of record, 0 if it doesn't exist
+     */
+    public static function Exists($cat_name)
+    {
+        global $_TABLES;
+
+        $id = (int)DB_getItem($_TABLES['evlist_categories'], 'id',
+            "name = '" . DB_escapeString($cat_name) . "'");
+        return $id;
     }
 
 }

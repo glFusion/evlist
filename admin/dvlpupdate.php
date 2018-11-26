@@ -1,20 +1,20 @@
 <?php
 /**
-*   Apply updates to Evlist during development.
-*   Calls evlist_upgrade() with "ignore_errors" set so repeated SQL statements
-*   won't cause functions to abort.
-*
-*   Only updates from the previous released version.
-*
-*   @author     Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.6
-*   @since      1.4.5
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ *   Apply updates to Evlist during development.
+ *   Calls evlist_upgrade() with "ignore_errors" set so repeated SQL statements
+ *   won't cause functions to abort.
+ *
+ *   Only updates from the previous released version.
+ *
+ *   @author     Mark R. Evans mark AT glfusion DOT org
+ *   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ *   @package    evlist
+ *   @version    v1.4.6
+ *   @since      v1.4.5
+ *   @license    http://opensource.org/licenses/gpl-2.0.php
+ *               GNU Public License v2 or later
+ *   @filesource
+ */
 
 require_once '../../../lib-common.php';
 if (!SEC_inGroup('Root')) {

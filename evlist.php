@@ -1,4 +1,16 @@
 <?php
+/**
+ * Table and variable definitions for the Evlist plugin for glFusion.
+ *
+ * @author     Mark R. Evans mark AT glfusion DOT org
+ * @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
+ * @package    evlist
+ * @version    v1.4.6
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 // +--------------------------------------------------------------------------+
 // | evList A calendar solution for glFusion                                  |
 // +--------------------------------------------------------------------------+
@@ -27,18 +39,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
 // |                                                                          |
 // +--------------------------------------------------------------------------+
-/**
-*   Table and variable definitions for the Evlist plugin for glFusion
-*
-*   @author     Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.6
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
 
 // this file can't be used on its own
 if (!defined ('GVERSION')) {

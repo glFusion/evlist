@@ -6,7 +6,7 @@
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
  * @copyright   Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     1.4.5
+ * @version     v1.4.5
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -259,10 +259,10 @@ function plugin_getadminoption_evlist()
 
 
 /**
-*   Get the menu entry for the user option menu
-*
-*   @return mixed   Array of menu parts, or NULL
-*/
+ * Get the menu entry for the user option menu.
+ *
+ * @return  mixed   Array of menu parts, or NULL
+ */
 function plugin_getuseroption_evlist()
 {
     global $_EV_CONF, $LANG_EVLIST, $_TABLES, $_USER;
@@ -298,10 +298,10 @@ function plugin_getuseroption_evlist()
 
 
 /**
-*   Get the menu entry for the main plugins menu
-*
-*   @return array   Menu entry items
-*/
+ * Get the menu entry for the main plugins menu.
+ *
+ * @return  array   Menu entry items
+ */
 function plugin_getmenuitems_evlist()
 {
     global $_EV_CONF, $LANG_EVLIST;
@@ -402,10 +402,10 @@ function plugin_statssummary_evlist()
 
 
 /**
-*   Return the name to show in the advanced search as the "type"
-*
-*   @return string      String to display in the search type selection
-*/
+ * Return the name to show in the advanced search as the "type".
+ *
+ * @return  string      String to display in the search type selection
+ */
 function plugin_searchtypes_evlist()
 {
     global $_EV_CONF, $LANG_EVLIST;
@@ -419,10 +419,10 @@ function plugin_searchtypes_evlist()
 
 
 /**
-*   Set up the search for this plugin
-*
-*   @return mixed       SearchCriteria object, or NULL if not allowed
-*/
+ * Set up the search for this plugin.
+ *
+ * @return mixed       SearchCriteria object, or NULL if not allowed
+ */
 function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $topic, $type, $author, $keyType, $page, $perpage
 ) {
@@ -471,13 +471,13 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
 
 
 /**
-*   Handle autotags
-*
-*   @param  string  $op         Requested operation (tagname or parse)
-*   @param  string  $content    HTML content
-*   @param  string  $autotag    Contents of autotag
-*   @return string              Modified HTML $content
-*/
+ * Handle autotags.
+ *
+ * @param   string  $op         Requested operation (tagname or parse)
+ * @param   string  $content    HTML content
+ * @param   string  $autotag    Contents of autotag
+ * @return  string              Modified HTML $content
+ */
 function plugin_autotags_evlist($op, $content = '', $autotag = '')
 {
     global $_CONF, $_TABLES;
@@ -503,10 +503,10 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
 
 
 /**
-*   Get plugin-specific javascript.
-*
-*   @return array   Array of javascript paths
-*/
+ * Get plugin-specific javascript.
+ *
+ * @return  array   Array of javascript paths
+ */
 function plugin_getheaderjs_evlist()
 {
     global $_CONF;
@@ -522,12 +522,12 @@ function plugin_getheaderjs_evlist()
 
 
 /**
-*   Get plugin-specific CSS files.
-*   Look first in the layout directory, then in the plugin's custom directory,
-*   and finally take the default for the plugin.
-*
-*   @return array   Array of file paths.
-*/
+ * Get plugin-specific CSS files.
+ * Look first in the layout directory, then in the plugin's custom directory,
+ * and finally take the default for the plugin.
+ *
+ * @return  array   Array of file paths.
+ */
 function plugin_getheadercss_evlist()
 {
     global $_CONF;
@@ -560,14 +560,14 @@ function plugin_getheadercss_evlist()
 
 
 /**
-*   Create the centerblock.
-*
-*   @uses   EVLIST_cb_content()
-*   @param  string  $where  Position (top, etc.)
-*   @param  string  $page   Page currently being displayed
-*   @param  string  $topic  Topic currently being displayed
-*   @return string          HTML for centerblock
-*/
+ * Create the centerblock.
+ *
+ * @uses    EVLIST_cb_content()
+ * @param   string  $where  Position (top, etc.)
+ * @param   string  $page   Page currently being displayed
+ * @param   string  $topic  Topic currently being displayed
+ * @return  string          HTML for centerblock
+ */
 function plugin_centerblock_evlist($where, $page, $topic = '')
 {
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
@@ -623,11 +623,11 @@ function plugin_centerblock_evlist($where, $page, $topic = '')
 
 
 /**
-*   Get the content for a table- or story-formatted centerblock
-*
-*   @param  integer $format     Centerblock type, 1=table,2=story
-*   @return string      HTML for centerblock section
-*/
+ * Get the content for a table- or story-formatted centerblock.
+ *
+ * @param   integer $format     Centerblock type, 1=table,2=story
+ * @return  string      HTML for centerblock section
+ */
 function EVLIST_cb_content($format)
 {
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
@@ -806,10 +806,10 @@ function EVLIST_cb_content($format)
 
 
 /**
-*   Change ownership of user events when the user is deleted.
-*
-*   @param  integer $uid    ID of user being deleted
-*/
+ * Change ownership of user events when the user is deleted.
+ *
+ * @param   integer $uid    ID of user being deleted
+ */
 function plugin_user_delete_evlist($uid)
 {
     global $_TABLES;
@@ -821,11 +821,11 @@ function plugin_user_delete_evlist($uid)
 
 
 /**
-*   Support merging local accounts into remote accounts
-*
-*   @param  integer $origUID    Original (remote) user ID
-*   @param  integer $destUID    Merged (local) user ID
-*/
+ * Support merging local accounts into remote accounts.
+ *
+ * @param   integer $origUID    Original (remote) user ID
+ * @param   integer $destUID    Merged (local) user ID
+ */
 function plugin_user_move_evlist($origUID, $destUID)
 {
     global $_TABLES;
@@ -845,10 +845,10 @@ function plugin_user_move_evlist($origUID, $destUID)
 
 
 /**
-*   Get the plugin's icon
-*
-*   @return string  URL to icon image
-*/
+ * Get the plugin's icon
+ *
+ * @return  string  URL to icon image
+ */
 function plugin_geticon_evlist()
 {
     return EVLIST_URL . '/images/evList.png';
@@ -856,11 +856,11 @@ function plugin_geticon_evlist()
 
 
 /**
-*   Get the names of RSS feeds that are provided.
-*   For evList this is a list of topics
-*
-*   @return array   Array of ID=>Name pairs
-*/
+ * Get the names of RSS feeds that are provided.
+ * For evList this is a list of topics
+ *
+ * @return  array   Array of ID=>Name pairs
+ */
 function plugin_getfeednames_evlist()
 {
     global $_TABLES, $LANG_EVLIST;
@@ -881,14 +881,14 @@ function plugin_getfeednames_evlist()
 
 
 /**
-*   Get content for the syndication feeds.
-*
-*   @param  string  $feed       Feed ID to get
-*   @param  string  $link       Pointer to header link value
-*   @param  array   $update_data    Pointer to array of updated item IDs
-*   @param  string  $feedType   Feed type (RSS, ICS, etc.) We only do ICS.
-*   @return array               Array of event data
-*/
+ * Get content for the syndication feeds.
+ *
+ * @param   string  $feed       Feed ID to get
+ * @param   string  $link       Pointer to header link value
+ * @param   array   $update_data    Pointer to array of updated item IDs
+ * @param   string  $feedType   Feed type (RSS, ICS, etc.) We only do ICS.
+ * @return  array               Array of event data
+ */
 function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
 {
     global $_CONF, $_EV_CONF, $_TABLES, $LANG_EVLIST;
@@ -976,14 +976,14 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
 
 
 /**
-*   Checks to see if the RSS feed is up-to-date
-*
-*   @param  integer $feed   Feed ID from the RSS configuration
-*   @param  integer $topic  Topic ID being requested
-*   @param  string  $update_data    Comma-separated string of current item IDs
-*   @param  integer $limit  Configured limit on item count for this feed
-*   @return boolean         True if feed needs updating, False otherwise
-*/
+ * Checks to see if the RSS feed is up-to-date.
+ *
+ * @param   integer $feed   Feed ID from the RSS configuration
+ * @param   integer $topic  Topic ID being requested
+ * @param   string  $update_data    Comma-separated string of current item IDs
+ * @param   integer $limit  Configured limit on item count for this feed
+ * @return  boolean         True if feed needs updating, False otherwise
+ */
 function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 {
     global $_EV_CONF;;
@@ -1009,9 +1009,9 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 
 
 /**
-*   Run scheduled tasks for the plugin.
-*   - Send event reminders
-*/
+ * Run scheduled tasks for the plugin.
+ * - Send event reminders
+ */
 function plugin_runScheduledTask_evlist()
 {
     if (!EVLIST_isCurrentVersion()) return;
@@ -1026,10 +1026,10 @@ function plugin_runScheduledTask_evlist()
 
 
 /**
-*   Get the number of submissions awaiting moderation
-*
-*   @return integer     Number of submissions in queue
-*/
+ * Get the number of submissions awaiting moderation.
+ *
+ * @return  integer     Number of submissions in queue
+ */
 function plugin_submissioncount_evlist()
 {
     global $_TABLES;
@@ -1039,11 +1039,11 @@ function plugin_submissioncount_evlist()
 
 
 /**
-*   Additional activity when a submission is approved.
-*   The event data will have been copied from the submission table already.
-*
-8   @param  string  $eid    Event ID being approved
-*/
+ * Additional activity when a submission is approved.
+ * The event data will have been copied from the submission table already.
+ *
+ * @param   string  $eid    Event ID being approved
+ */
 function plugin_moderationapprove_evlist($eid)
 {
     global $_TABLES;
@@ -1065,12 +1065,12 @@ function plugin_moderationapprove_evlist($eid)
 
 
 /**
-*   Additional activity when a submission is deleted by the moderator.
-*   The record will be deleted from the submission table by the core.
-*   Repeats haven't been created yet.
-*
-*   @param  string  $eid    Event ID being deleted
-*/
+ * Additional activity when a submission is deleted by the moderator.
+ * The record will be deleted from the submission table by the core.
+ * Repeats haven't been created yet.
+ *
+ * @param   string  $eid    Event ID being deleted
+ */
 function plugin_moderationdelete_evlist($eid)
 {
     global $_TABLES;
@@ -1082,6 +1082,11 @@ function plugin_moderationdelete_evlist($eid)
 }
 
 
+/**
+ * Get the values to move from submissions to main table upon approval.
+ *
+ * @return  array   Array of (key field, main table, data fields, submission table)
+ */
 function plugin_moderationvalues_evlist()
 {
     global $_TABLES;
@@ -1101,12 +1106,12 @@ function plugin_moderationvalues_evlist()
 
 
 /**
-*   Determine if the current user has the "submit" privilege
-*
-*   @see    SEC_hasRights()
-*   @see    plugin_ismoderator_evlist()
-*   @return boolean     True if the user has access, False if not
-*/
+ * Determine if the current user has the "submit" privilege.
+ *
+ * @see     SEC_hasRights()
+ * @uses    plugin_ismoderator_evlist()
+ * @return  boolean     True if the user has access, False if not
+ */
 function plugin_issubmitter_evlist()
 {
     static $retval = NULL;
@@ -1123,11 +1128,11 @@ function plugin_issubmitter_evlist()
 
 
 /**
-*   Determine if the current user is a plugin admin
-*
-*   @see    plugin_ismoderator_evlist()
-*   @return boolean     True if the current user is an admin, False if not
-*/
+ * Determine if the current user is a plugin admin.
+ *
+ * @uses    plugin_ismoderator_evlist()
+ * @return  boolean     True if the current user is an admin, False if not
+ */
 function plugin_isadmin_evlist()
 {
     static $isadmin = NULL;
@@ -1139,11 +1144,11 @@ function plugin_isadmin_evlist()
 
 
 /**
-*   Determine if the current user is a plugin moderator
-*   Currently the permission is the same, so just call isadmin function
-*
-*   @see SEC_hasRights()
-*/
+ * Determine if the current user is a plugin moderator.
+ * Currently the permission is the same, so just call isadmin function.
+ *
+ * @uses    plugin_isadmin_evlist()
+ */
 function plugin_ismoderator_evlist()
 {
     return plugin_isadmin_evlist();
@@ -1151,10 +1156,10 @@ function plugin_ismoderator_evlist()
 
 
 /**
-*   Get a list of items to be moderated
-*
-*   @return object  Plugin object containg item data
-*/
+ * Get a list of items to be moderated.
+ *
+ * @return  object  Plugin object containg item data
+ */
 function plugin_itemlist_evlist()
 {
     global $_TABLES, $LANG_EVLIST;
@@ -1178,12 +1183,12 @@ function plugin_itemlist_evlist()
 
 
 /**
-*   Perform actions needed when the plubin is enabled or disabled.
-*   Enables or disables syndication, and turns off PHP blocks if disabling.
-*   Blocks must be turned on manually.
-*
-*   @param  boolean $enable True if plugin is now enabled, False if disabled.
-*/
+ * Perform actions needed when the plubin is enabled or disabled.
+ * Enables or disables syndication, and turns off PHP blocks if disabling.
+ * Blocks must be turned on manually.
+ *
+ * @param   boolean $enable True if plugin is now enabled, False if disabled.
+ */
 function plugin_enablestatechange_evlist($enable)
 {
     global $_TABLES, $_PLUGINS;
@@ -1214,11 +1219,11 @@ function plugin_enablestatechange_evlist($enable)
 
 
 /**
-*   Receives notification of anothe plugin's deletion
-*
-*   @param  mixed   $id     Item ID
-*   @param  string  $type   Plugin Name
-*/
+ * Receives notification of anothe plugin's deletion.
+ *
+ * @param   mixed   $id     Item ID
+ * @param   string  $type   Plugin Name
+ */
 function plugin_itemdeleted_evlist($id, $type)
 {
     global $_TABLES;
@@ -1239,13 +1244,12 @@ function plugin_itemdeleted_evlist($id, $type)
 
 
 /**
-* Get a list (actually an array) of all groups this group belongs to.
-*
-* @param   basegroup   int     id of group
-* @return              array   array of all groups 'basegroup' belongs to
-*
-*/
-function EV_getGroupList ($basegroup)
+ *  Get a list (actually an array) of all groups this group belongs to.
+ *
+ *  @param   basegroup   int     id of group
+ *  @return              array   array of all groups 'basegroup' belongs to
+ */
+function EV_getGroupList($basegroup)
 {
     global $_TABLES;
 
@@ -1276,10 +1280,10 @@ function EV_getGroupList ($basegroup)
 
 
 /**
-*   Add a hit to an event
-*
-*   @param  string  $eid    Event ID
-*/
+ * Add a hit to an event.
+ *
+ * @param   string  $eid    Event ID
+ */
 function evlist_hit($eid)
 {
     global $_TABLES;
@@ -1291,12 +1295,12 @@ function evlist_hit($eid)
 
 
 /**
-*   Get the links to categories related to a specific event
-*
-*   @param  string  $eid    Event ID
-*   @param  string  $andrange   Range to pass wo url TODO: required?
-*   @return string      HTML for category inls
-*/
+ * Get the links to categories related to a specific event.
+ *
+ * @param   string  $eid    Event ID
+ * @param   string  $andrange   Range to pass wo url TODO: required?
+ * @return  string      HTML for category inls
+ */
 function EVLIST_getCatLinks($eid, $andrange = '')
 {
     global $_TABLES, $_CONF;
@@ -1328,6 +1332,12 @@ function EVLIST_getCatLinks($eid, $andrange = '')
 }
 
 
+/**
+ * Get the options for a category selection list.
+ *
+ * @param   integer $selected   Selected category ID
+ * @return  string      HTML for select options.
+ */
 function evlist_getCategoryOptions($selected) {
 
     global $_TABLES;
@@ -1349,12 +1359,12 @@ function evlist_getCategoryOptions($selected) {
 
 
 /**
-*   Returns a formatted date given a timestamp.
-*   Converts the timestamp parameter to an actual timestamp if non-numeric
-*
-*   @param  mixed   $timestamp  Timestamp to return as formatted.
-*   @return string      Formatted date
-*/
+ * Returns a formatted date given a timestamp.
+ * Converts the timestamp parameter to an actual timestamp if non-numeric
+ *
+ * @param   mixed   $timestamp  Timestamp to return as formatted.
+ * @return  string      Formatted date
+ */
 function EVLIST_formattedDate($timestamp)
 {
     global $_CONF;
@@ -1373,13 +1383,13 @@ function EVLIST_formattedDate($timestamp)
 
 
 /**
-*   Returns a formatted time given a timestamp.
-*   Converts the timestamp parameter to an actual timestamp if non-numeric
-*   Uses the global time format configuration
-*
-*   @param  mixed   $timestamp  Timestamp to return as formatted.
-*   @return string      Formatted date
-*/
+ * Returns a formatted time given a timestamp.
+ * Converts the timestamp parameter to an actual timestamp if non-numeric
+ * Uses the global time format configuration
+ *
+ * @param   mixed   $timestamp  Timestamp to return as formatted.
+ * @return  string      Formatted date
+ */
 function EVLIST_formattedTime($timestamp)
 {
     global $_CONF, $_EV_CONF;
@@ -1398,11 +1408,11 @@ function EVLIST_formattedTime($timestamp)
 
 
 /**
-*   Create an obfuscated version of a string for display.
-*
-*   @param  string  $str    String to obfuscate
-*   @return string          Obfuscated versiona
-*/
+ * Create an obfuscated version of a string for display.
+ *
+ * @param   string  $str    String to obfuscate
+ * @return  string          Obfuscated versiona
+ */
 function EVLIST_obfuscate($str)
 {
     $retval = '';
@@ -1415,14 +1425,14 @@ function EVLIST_obfuscate($str)
 
 
 /**
-*   Create the "Upcoming Events" block.
-*   Some things are hard-coded and should be moved to configuation items:
-*       - The string length for displayed items, currently 96
-*
-*   @param  array   $A      Array of block info
-*   @param  string  $catcal Category or calendar id, e.g. "cat:2" or "cat:2:cal:3"
-*   @return string  HTML for the block, empty if no qualifying events
-*/
+ * Create the "Upcoming Events" block.
+ * Some things are hard-coded and should be moved to configuation items:
+ * - The string length for displayed items, currently 96
+ *
+ * @param  array   $A      Array of block info
+ * @param  string  $catcal Category or calendar id, e.g. "cat:2" or "cat:2:cal:3"
+ * @return string  HTML for the block, empty if no qualifying events
+ */
 function phpblock_evlist_upcoming($A='', $catcal='')
 {
     global $_EV_CONF, $_CONF;
@@ -1559,10 +1569,10 @@ function phpblock_evlist_upcoming($A='', $catcal='')
 
 
 /**
-*   Helper function: Provide topic dropdown for plugin config
-*
-*   @return array   Array of topic_name => topic_id pairs
-*/
+ * Helper function: Provide topic dropdown for plugin config.
+ *
+ * @return  array   Array of topic_name => topic_id pairs
+ */
 function plugin_configmanager_select_topic_centerblock_evlist()
 {
 
@@ -1594,10 +1604,10 @@ function plugin_configmanager_select_topic_centerblock_evlist()
 
 
 /**
-*   Select the calendar to use for plugin-supplied events.
-*
-*   @return array   $cal_id => $cal_name
-*/
+ * Select the calendar to use for plugin-supplied events.
+ *
+ * @return  array   $cal_id => $cal_name
+ */
 function plugin_configmanager_select_pi_cal_map_evlist($idx = NULL)
 {
     $A = array();
@@ -1609,14 +1619,15 @@ function plugin_configmanager_select_pi_cal_map_evlist($idx = NULL)
 
 
 /**
-*   Return information for an event
-*
-*   @param  string  $id         Event instance (repeat) ID
-*   @param  string  $what       comma-separated list of properties
-*   @param  int     $uid        user ID or 0 = current user
-*   @param  array   $options    (reserved for future extensions)
-*   @return mixed         string or array of strings with the information
-*/
+ * Return information for an event.
+ *
+ * @deprecated
+ * @param   string  $id         Event instance (repeat) ID
+ * @param   string  $what       comma-separated list of properties
+ * @param   int     $uid        user ID or 0 = current user
+ * @param   array   $options    (reserved for future extensions)
+ * @return  mixed         string or array of strings with the information
+ */
 function Xplugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 {
     global $_CONF, $_TABLES, $LANG_EVLIST;
@@ -1683,10 +1694,10 @@ function Xplugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
 
 
 /**
-*   Check to see if this Plugin uses comments
-*
-*   @return   boolean true or false
-*/
+ * Check to see if this Plugin uses comments.
+ *
+ * @return  boolean true or false
+ */
 function plugin_commentsupport_evlist()
 {
     global $_EV_CONF;
@@ -1695,17 +1706,17 @@ function plugin_commentsupport_evlist()
 
 
 /**
-*   Save a comment.
-*   Saves the comment, updates the comment counter in the ad record,
-*   and notifies the ad owner that a new comment has been posted.
-*
-*   @param   string  $title  comment title
-*   @param   string  $comment comment text
-*   @param   string  $id     Item id to which $comment belongs
-*   @param   int     $pid    comment parent
-*   @param   string  $postmode 'html' or 'text'
-*   @return  mixed   false for failure, HTML string (redirect?) for success
-*/
+ * Save a comment.
+ * Saves the comment, updates the comment counter in the ad record,
+ * and notifies the ad owner that a new comment has been posted.
+ *
+ * @param   string  $title  comment title
+ * @param   string  $comment comment text
+ * @param   string  $id     Item id to which $comment belongs
+ * @param   int     $pid    comment parent
+ * @param   string  $postmode 'html' or 'text'
+ * @return  mixed   false for failure, HTML string (redirect?) for success
+ */
 function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
 {
     global $LANG03;
@@ -1731,13 +1742,13 @@ function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
 
 
 /**
-*   Plugin API to delete a comment
-*   Moderators and event owners can delete comments.
-*
-*   @param  integer $cid    Comment to be deleted
-*   @param  string  $id     Item id to which $cid belongs
-*   @return mixed   false for failure, HTML string (redirect?) for success
-*/
+ * Plugin API to delete a comment.
+ * Moderators and event owners can delete comments.
+ *
+ * @param   integer $cid    Comment to be deleted
+ * @param   string  $id     Item id to which $cid belongs
+ * @return  mixed   false for failure, HTML string (redirect?) for success
+ */
 function plugin_deletecomment_evlist($cid,$id)
 {
     //USES_class_evlist_repeat();
@@ -1758,10 +1769,10 @@ function plugin_deletecomment_evlist($cid,$id)
 
 
 /**
-*   Get the plugin base URL and item ID key
-*
-*   @return array   (url, 'eid')
-*/
+ * Get the plugin base URL and item ID key.
+ *
+ * @return  array   (url, 'eid')
+ */
 function plugin_getcommenturlid_evlist() {
     $retval = array(
         EVLIST_URL . '/event.php',
@@ -1772,17 +1783,17 @@ function plugin_getcommenturlid_evlist() {
 
 
 /**
-*   How the plugin will display specific comments
-*
-*   @param   string  $id     Unique idenifier for item comment belongs to
-*   @param   int     $cid    Comment id to display
-*   @param   string  $title  Page/comment title
-*   @param   string  $order  'ASC' or 'DSC' or blank
-*   @param   string  $format 'threaded', 'nested', or 'flat'
-*   @param   int     $page   Page number of comments to display
-*   @param   boolean $view   True to view comment (by cid), false to display (by $pid)
-*   @return  mixed   results of calling the plugin_displaycomment_ function
-*/
+ * How the plugin will display specific comments.
+ *
+ * @param   string  $id     Unique idenifier for item comment belongs to
+ * @param   int     $cid    Comment id to display
+ * @param   string  $title  Page/comment title
+ * @param   string  $order  'ASC' or 'DSC' or blank
+ * @param   string  $format 'threaded', 'nested', or 'flat'
+ * @param   int     $page   Page number of comments to display
+ * @param   boolean $view   True to view comment (by cid), false to display (by $pid)
+ * @return  mixed   results of calling the plugin_displaycomment_ function
+ */
 function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page, $view)
 {
     global $LANG_ACCESS, $_USER;
@@ -1807,13 +1818,13 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
 }
 
 
-/*
-*   Return a link to the help element for this configuration option
-*
-*   @param  string  $element    Element being looked up
-*   @param  string  $doclang    Language
-*   @return array       Array (URL, window option)
-*/
+/**
+ * Return a link to the help element for this configuration option
+ *
+ * @param   string  $element    Element being looked up
+ * @param   string  $doclang    Language
+ * @return  array       Array (URL, window option)
+ */
 function plugin_getconfigelementhelp_evlist($element, $doclang )
 {
     if (version_compare(GVERSION, '1.6.0', '<')) {
@@ -1834,14 +1845,13 @@ function plugin_getconfigelementhelp_evlist($element, $doclang )
 
 
 /**
-*   Get the link to a documentation file.
-*
-*   Returns the URL to the file, or to the directory if no file requested.
-*
-*   @param  string  $file       HTML file
-*   @param  string  $doclang    Documentation language
-*   @return string              URL to document directory or file
-*/
+ * Get the link to a documentation file.
+ * Returns the URL to the file, or to the directory if no file requested.
+ *
+ * @param   string  $file       HTML file
+ * @param   string  $doclang    Documentation language
+ * @return  string              URL to document directory or file
+ */
 function EVLIST_getDocURL($file='', $doclang='english')
 {
     global $_CONF;
@@ -1866,13 +1876,13 @@ function EVLIST_getDocURL($file='', $doclang='english')
 
 
 /**
-*   Get the site header, with or without left blocks according to config.
-*
-*   @see    function COM_siteHeader()
-*   @param  string  $title  Optional text for the title bar
-*   @param  string  $meta   Optional additional meta text
-*   @return string          HTML for site header
-*/
+ * Get the site header, with or without left blocks according to config.
+ *
+ * @see     COM_siteHeader()
+ * @param   string  $title  Optional text for the title bar
+ * @param   string  $meta   Optional additional meta text
+ * @return  string          HTML for site header
+ */
 function EVLIST_siteHeader($title='', $meta='')
 {
     global $_EV_CONF;
@@ -1895,11 +1905,11 @@ function EVLIST_siteHeader($title='', $meta='')
 
 
 /**
-*   Get the site footer, with or without right blocks according to config.
-*
-*   @see    function COM_siteFooter()
-*   @return string      HTML for site footer
-*/
+ * Get the site footer, with or without right blocks according to config.
+ *
+ * @see     COM_siteFooter()
+ * @return  string      HTML for site footer
+ */
 function EVLIST_siteFooter()
 {
     global $_CONF, $_EV_CONF;
@@ -1922,44 +1932,46 @@ function EVLIST_siteFooter()
 
 
 /**
-*   Display a small month calendar in a block.
-*   Optional parameters allow for custom blocks to be created that display
-*   only one or a subset of calendar data
-*
-*   @uses   Evlist\View_smallmonth
-*   @param  array   $blk    Optional block data
-*   @param  string  $cal    Optional calendar ID
-*   @return string      HTML for the block contents
-*/
+ * Display a small month calendar in a block.
+ * Optional parameters allow for custom blocks to be created that display
+ * only one or a subset of calendar data
+ *
+ * @uses   Evlist\Views\smallmonthView
+ * @param  array   $blk    Optional block data
+ * @param  string  $cal    Optional calendar ID
+ * @return string      HTML for the block contents
+ */
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
     global $_EV_CONF;
 
     // PHP block calendar is always current, regardless of session vars
     list($y, $m, $d) = explode('-', $_EV_CONF['_today']);
-    $Cal = new Evlist\View_smallmonth($y, $m, $d, 0, $cal);
+    $Cal = Evlist\View::getView('smallmonth', $y, $m, $d, 0, $cal);
     return $Cal->Render();
 }
 
 
 /**
-*   Loads the language array.  If $requested is an array, the first valid
-*   language file is loaded.  If not, the $requested language file is loaded.
-*   If $requested doesn't refer to a vailid language, then $_CONF['language']
-*   is assumed.
-*
-*   After loading the base language file, the same filename is loaded from
-*   language/custom, if available.  The admin can override language strings
-*   by creating a language file in that directory.
-*
-*   By including the language file, this function reads the $LANG_EVLIST
-*   array. However, since it is not declared as global this does not override
-*   the global version.  This version is returned to be used in a different
-*   variable name.
-*
-*   @param  mixed   $requested  A single or array of language strings
-*   @return array       $LANG_EVLIST, the global language array for the plugin
-*/
+ * Loads the language array.
+ *
+ * If $requested is an array, the first valid language file is loaded.
+ * If not, the $requested language file is loaded.
+ * If $requested doesn't refer to a vailid language, then $_CONF['language']
+ * is assumed.
+ *
+ * After loading the base language file, the same filename is loaded from
+ * language/custom, if available.  The admin can override language strings
+ * by creating a language file in that directory.
+ *
+ * By including the language file, this function reads the $LANG_EVLIST
+ * array. However, since it is not declared as global this does not override
+ * the global version.  This version is returned to be used in a different
+ * variable name.
+ *
+ * @param   mixed   $requested  A single or array of language strings
+ * @return  array       $LANG_EVLIST, the global language array for the plugin
+ */
 function plugin_loadlanguage_evlist($requested='')
 {
     global $_CONF;
@@ -1997,14 +2009,14 @@ function plugin_loadlanguage_evlist($requested='')
 
 
 /**
-*   Provides the getItemInfo function for this plugin
-*
-*   @param  string  $id         Product ID
-*   @param  string  $fields     Comma-separated list of fields to return
-*   @param  integer $uid        User ID
-*   @param  array   $options    Not used
-*   @return array           Array of product information
-*/
+ * Provides the getItemInfo function for this plugin.
+ *
+ * @param   string  $id         Product ID
+ * @param   string  $fields     Comma-separated list of fields to return
+ * @param   integer $uid        User ID
+ * @param   array   $options    Not used
+ * @return  array           Array of product information
+ */
 function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
 {
     global $_TABLES, $_CONF;
@@ -2150,8 +2162,8 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
 
 
 /**
-*   Return the template names that support ad blocks
-*/
+ * Return the template names that support ad blocks.
+ */
 function plugin_supportadblock_evlist()
 {
     return array('evlist_event');
@@ -2159,13 +2171,13 @@ function plugin_supportadblock_evlist()
 
 
 /**
-*   Get event information from other plugins when an item is saved.
-*   Recurring, single-day events are supported.
-*
-*   @param  string  $id     Item ID
-*   @param  string  $type   Item Type
-*   @param  string  $old_id Original ID in case of ID change
-*/
+ * Get event information from other plugins when an item is saved.
+ * Recurring, single-day events are supported.
+ *
+ * @param   string  $id     Item ID
+ * @param   string  $type   Item Type
+ * @param   string  $old_id Original ID in case of ID change
+ */
 function plugin_itemsaved_evlist($id, $type, $old_id = '')
 {
     global $_EV_CONF;
@@ -2276,12 +2288,12 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
 
 
 /**
-*   Check that the currently installed version matches the code version.
-*   This is to disable functions that might not work due to a mismatch.
-*   Just check the major.minor.revision values.  Any fourth element is ignored.
-*
-*   @return boolean     True if current == installed version, False if not
-*/
+ * Check that the currently installed version matches the code version.
+ * This is to disable functions that might not work due to a mismatch.
+ * Just check the major.minor.revision values.  Any fourth element is ignored.
+ *
+ * @return  boolean     True if current == installed version, False if not
+ */
 function EVLIST_isCurrentVersion()
 {
     global $_EV_CONF, $_TABLES;
@@ -2298,21 +2310,21 @@ function EVLIST_isCurrentVersion()
 
 
 /**
-*   Create the SQL query to get all events that fall within a range.
-*
-*   The $opts array parameter is used to restrict the result set.
-*   The options currently available are:
-*       'cat'   int     Limit to this category ID
-*       'cal'   int     Limit to this calendar ID
-*       'show_upcoming' boolean     Whether this flag is set in the event
-*       'limit' int     Max number of results
-*       'page'  int     Page number, used in the limit clause if > 1
-*
-*   @param  string  $start  Starting date, YYYY-MM-DD
-*   @param  string  $end    Ending date, YYYY-MM-DD
-*   @param  array   $opts   Array of other options (name=>value)
-*   @return string          SQL query to retrieve events
-*/
+ * Create the SQL query to get all events that fall within a range.
+ *
+ * The $opts array parameter is used to restrict the result set.
+ * The options currently available are:
+ *      'cat'   int     Limit to this category ID
+ *      'cal'   int     Limit to this calendar ID
+ *      'show_upcoming' boolean     Whether this flag is set in the event
+ *      'limit' int     Max number of results
+ *      'page'  int     Page number, used in the limit clause if > 1
+ *
+ * @param  string  $start  Starting date, YYYY-MM-DD
+ * @param  string  $end    Ending date, YYYY-MM-DD
+ * @param  array   $opts   Array of other options (name=>value)
+ * @return string          SQL query to retrieve events
+ */
 function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 {
     global $_TABLES, $_EV_CONF, $_CONF, $_USER;
@@ -2454,23 +2466,23 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
 
 
 /**
-*   Get all events that fall within a range.
-*   This is in functions.inc so it can be used by the feed update
-*   functions without having to load evlist_functions.inc.php.
-*
-*   The $opts array parameter is used to restrict the result set.
-*   The options currently available are:
-*       'cat'   int     Limit to this category ID
-*       'cal'   int     Limit to this calendar ID
-*       'show_upcoming' boolean     Whether this flag is set in the event
-*       'limit' int     Max number of results
-*       'page'  int     Page number, used in the limit clause if > 1
-*
-*   @param  string  $start  Starting date, YYYY-MM-DD
-*   @param  string  $end    Ending date, YYYY-MM-DD
-*   @param  array   $opts   Array of other options (name=>value)
-*   @return array           Array of matching events, keyed by date
-*/
+ * Get all events that fall within a range.
+ * This is in functions.inc so it can be used by the feed update
+ * functions without having to load evlist_functions.inc.php.
+ *
+ * The $opts array parameter is used to restrict the result set.
+ * The options currently available are:
+ *      'cat'   int     Limit to this category ID
+ *      'cal'   int     Limit to this calendar ID
+ *      'show_upcoming' boolean     Whether this flag is set in the event
+ *      'limit' int     Max number of results
+ *      'page'  int     Page number, used in the limit clause if > 1
+ *
+ * @param  string  $start  Starting date, YYYY-MM-DD
+ * @param  string  $end    Ending date, YYYY-MM-DD
+ * @param  array   $opts   Array of other options (name=>value)
+ * @return array           Array of matching events, keyed by date
+ */
 function EVLIST_getEvents($start='', $end='', $opts=array())
 {
     global $_EV_CONF, $_USER;
@@ -2532,15 +2544,14 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 
 
 /**
-*   Get events from meetup.com API.
-*   Adds events to the $events array created by EVLIST_getEvents().
-*   Assigns calendar ID "-1" named "meetup" to all events.
-*
-*   @param  string  $start      Starting date (YYYY-MM-DD)
-*   @param  string  $end        Ending date (YYYY-MM-DD)
-*   @param  array   &$events    Existing array of events
-*   @return none
-*/
+ * Get events from meetup.com API.
+ * Adds events to the $events array created by EVLIST_getEvents().
+ * Assigns calendar ID "-1" named "meetup" to all events.
+ *
+ * @param   string  $start      Starting date (YYYY-MM-DD)
+ * @param   string  $end        Ending date (YYYY-MM-DD)
+ * @param   array   &$events    Existing array of events
+ */
 function EVLIST_getMeetupEvents($start='', $end='', &$events)
 {
     global $_EV_CONF, $_CONF;
@@ -2621,13 +2632,13 @@ function X_EVLIST_getEvents_json($start='', $end='', $opts=array())
 
 
 /**
-*   Replace quotes and apostrophes with HTML entities.
-*   This is to prevent quotes from corrupting the HTML display while allowing
-*   other HTML in event data to be displayed as such.
-*
-*   @param  string  $str    Original text
-*   @return string          Modified version
-*/
+ * Replace quotes and apostrophes with HTML entities.
+ * This is to prevent quotes from corrupting the HTML display while allowing
+ * other HTML in event data to be displayed as intended.
+ *
+ * @param   string  $str    Original text
+ * @return  string          Modified version
+ */
 function EVLIST_noquotes($str)
 {
     return str_replace(array('"'), array('&quot;'), $str);
@@ -2635,11 +2646,11 @@ function EVLIST_noquotes($str)
 
 
 /**
-*   Determine if the current user can submit an event.
-*   Checks config and logged-in status.
-*
-*   @return boolean     True if subbmission is allowed, False if not
-*/
+ * Determine if the current user can submit an event.
+ * Checks config and logged-in status.
+ *
+ * @return  boolean     True if subbmission is allowed, False if not
+ */
 function EVLIST_canSubmit()
 {
     global $_EV_CONF;
@@ -2666,10 +2677,10 @@ function EVLIST_canSubmit()
 // name is.
 
 /**
-*   Set the return url to be used after an action is completed
-*
-*   @param  string  $key    URL or key to the URL array (see EVLIST_getReturn())
-*/
+ * Set the return url to be used after an action is completed.
+ *
+ * @param   string  $key    URL or key to the URL array (see EVLIST_getReturn())
+ */
 function EVLIST_setReturn($key)
 {
     SESS_setVar('evlist_fromurl', $key);
@@ -2677,12 +2688,12 @@ function EVLIST_setReturn($key)
 
 
 /**
-*   Get the value of the return key, if set.
-*   Used to check if a return URL has been set so other actions can
-*   be taken if necessary.
-*
-*   @return mixed   URL, key, or zero if not set
-*/
+ * Get the value of the return key, if set.
+ * Used to check if a return URL has been set so other actions can
+ * be taken if necessary.
+ *
+ * @return  mixed   URL, key, or zero if not set
+ */
 function EVLIST_checkReturn()
 {
     return SESS_getVar('evlist_fromurl');
@@ -2690,14 +2701,14 @@ function EVLIST_checkReturn()
 
 
 /**
-*   Get the return URL set in the session variable.
-*   Returns either the URL associated with a key or the actual URL, depending
-*   on which is set. This function always returns a URL, so
-*   EVLIST_checkReturn should be used if you need to check for the existance
-*   of a return url.
-*
-*   @return string      URL associated with the key in the session var, or home
-*/
+ * Get the return URL set in the session variable.
+ * Returns either the URL associated with a key or the actual URL, depending
+ * on which is set. This function always returns a URL, so
+ * EVLIST_checkReturn should be used if you need to check for the existance
+ * of a return url.
+ *
+ * @return  string      URL associated with the key in the session var, or home
+ */
 function EVLIST_getReturn()
 {
     $urls = array(
@@ -2725,12 +2736,12 @@ function EVLIST_getReturn()
 
 
 /**
-*   Get an icon from the CSS icon set, either UIkit or FontAwesome
-*
-*   @param  string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
-*   @param  string  $style  Style name from local CSS
-*   @return string      Class names for icon
-*/
+ * Get an icon from the CSS icon set, either UIkit or FontAwesome.
+ *
+ * @param   string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
+ * @param   string  $style  Style name from local CSS
+ * @return  string      Class names for icon
+ */
 function EVLIST_getIcon($name, $style='')
 {
     global $_EV_CONF;
@@ -2743,14 +2754,14 @@ function EVLIST_getIcon($name, $style='')
 
 
 /**
-*   Get an array variable, first checking whether it's set
-*
-*   @param  array   $A          Array where var should be
-*   @param  string  $varname    Name of array element
-*   @param  string  $type       Type of return value
-*   @param  mixed   $default    Default value, if any
-*   @return     Array element or NULL, cast to $type
-*/
+ * Get an array variable, first checking whether it's set.
+ *
+ * @param   array   $A          Array where var should be
+ * @param   string  $varname    Name of array element
+ * @param   string  $type       Type of return value
+ * @param   mixed   $default    Default value, if any
+ * @return      Array element or NULL, cast to $type
+ */
 function EV_getVar($A, $varname, $type = 'string', $default = NULL)
 {
     if (!isset($A[$varname])) {
@@ -2786,10 +2797,10 @@ function EV_getVar($A, $varname, $type = 'string', $default = NULL)
 
 
 /**
-*   Log activity to a plugin-specific log file
-*
-*   @param string $logentry Text to log
-*/
+ * Log activity to a plugin-specific log file.
+ *
+ * @param   string  $logentry   Text to log
+ */
 function EVLIST_Log($logentry = '')
 {
     global $_CONF, $_USER, $LANG01;

@@ -1,4 +1,17 @@
 <?php
+/**
+ * Upgrade routines for the evList plugin.
+ *
+ * @author      Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
+
 // +--------------------------------------------------------------------------+
 // | evList A calendar solution for glFusion                                  |
 // +--------------------------------------------------------------------------+
@@ -31,19 +44,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
 // |                                                                          |
 // +--------------------------------------------------------------------------+
-/**
-*   Upgrade routines for the evList plugin
-*
-*   @author     Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
-
 
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
@@ -54,11 +54,12 @@ global $_DB_dbms, $c, $_CONF, $CONF_EVLIST_DEFAULT;
 require_once __DIR__ . "/sql/mysql_install.php";
 
 /**
-*   Upgrade the evList plugin
-*
-*   @return boolean     True on success, False on failure
-*/
-function evlist_upgrade($ignore_errors = false)
+ * Upgrade the evList plugin.
+ *
+ * @param   boolean $dvlp   True if this is a dvlupdate upgrade.
+ * @return  boolean     True on success, False on failure
+ */
+function evlist_upgrade($dvlp = false)
 {
     global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c,
         $CONF_EVLIST_DEFAULT, $_PLUGIN_INFO;
@@ -264,12 +265,12 @@ function evlist_upgrade($ignore_errors = false)
         case '1.4.3':
         case '1.4.4':
             $currentVersion = '1.4.5';
-            if (!EVLIST_do_upgrade_sql($currentVersion, $ignore_errors)) return false;
+            if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
             if (!EVLIST_do_set_version($currentVersion)) return false;
 
         case '1.4.5':
             $currentVersion = '1.4.6';
-            if (!EVLIST_do_upgrade_sql($currentVersion, $ignore_errors)) return false;
+            if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
             // Order the calendars, initially by name;
             Evlist\Calendar::reOrder('cal_name');
             if (!EVLIST_do_set_version($currentVersion)) return false;
@@ -289,12 +290,12 @@ function evlist_upgrade($ignore_errors = false)
 
 
 /**
-*   Upgrade to version 1.3.0
-*   Many changes in this version, so a function was created to
-*   hold them all.
-*
-*   @return boolean     True on success, False on failure
-*/
+ * Upgrade to version 1.3.0
+ * Many changes in this version, so a function was created to
+ * hold them all.
+ *
+ * @return  boolean     True on success, False on failure
+ */
 function evlist_upgrade_1_3_0()
 {
     global $_CONF, $_EV_CONF, $_TABLES, $_DB_dbms, $c, $CONF_EVLIST_DEFAULT;
@@ -494,7 +495,7 @@ function evlist_upgrade_1_3_0()
 *   @param  string  $version    Version being upgraded TO
 *   @return boolean             True on success, False after a failure
 */
-function EVLIST_do_upgrade_sql($version='', $ignore_errors = false)
+function EVLIST_do_upgrade_sql($version='', $dvlp = false)
 {
     global $_TABLES, $_EV_CONF, $_EV_UPGRADE;
 
@@ -508,7 +509,7 @@ function EVLIST_do_upgrade_sql($version='', $ignore_errors = false)
         DB_query($sql, '1');
         if (DB_error()) {
             COM_errorLog("SQL Error during {$_EV_CONF['pi_name']} Plugin update", 1);
-            if (!$ignore_errors) {
+            if (!$dvlp) {
                 return false;
             }
         }
@@ -518,13 +519,13 @@ function EVLIST_do_upgrade_sql($version='', $ignore_errors = false)
 
 
 /**
-*   Update the plugin version number in the database.
-*   Called at each version upgrade to keep up to date with
-*   successful upgrades.
-*
-*   @param  string  $ver    New version to set
-*   @return boolean         True on success, False on failure
-*/
+ * Update the plugin version number in the database.
+ * Called at each version upgrade to keep up to date with
+ * successful upgrades.
+ *
+ * @param   string  $ver    New version to set
+ * @return  boolean         True on success, False on failure
+ */
 function EVLIST_do_set_version($ver)
 {
     global $_TABLES, $_EV_CONF, $_PLUGIN_INFO;;
@@ -550,8 +551,8 @@ function EVLIST_do_set_version($ver)
 
 
 /**
-*   Remove deprecated files
-*/
+ * Remove deprecated files
+ */
 function EVLIST_remove_old_files()
 {
     global $_CONF;

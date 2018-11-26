@@ -141,7 +141,9 @@ case 'month':
 case 'year':
 case 'list':
     $V = Evlist\View::getView($view, $year, $month, $day, $category, $calendar);
-    $content .= $V->Render();
+    if ($V) {
+        $content .= $V->Render();
+    }
     break;
 
 case 'printtickets':

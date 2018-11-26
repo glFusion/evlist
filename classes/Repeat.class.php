@@ -784,7 +784,7 @@ class Repeat
             $andcat = '';
         }
 
-        $cats = $this->Event->GetCategories();
+        $cats = $this->Event->getCategories();
         $catcount = count($cats);
         if ($catcount > 0) {
             $catlinks = array();

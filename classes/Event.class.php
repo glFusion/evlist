@@ -340,13 +340,13 @@ class Event
         $this->group_id = isset($row['group_id']) ? $row['group_id'] : 13;
         $this->enable_comments = isset($row['enable_comments']) ? $row['enable_comments'] : 0;
 
-        if (isset($row['categories']) && is_array($row['categories'])) {
-            $this->categories = $row['categories'];
-        }
+
+        // Categores get added to the row during Read if from a DB, or as part
+        // of the posted form.
+        $this->categories = EV_getVar($row, 'categories', 'array', array());
 
         // Join or split the date values as needed
         if ($fromDB) {
-
             // dates are YYYY-MM-DD
             $this->id = isset($row['id']) ? $row['id'] : '';
             $this->rec_data = unserialize($row['rec_data']);
@@ -364,9 +364,7 @@ class Event
             $this->options = unserialize($row['options']);
             if (!$this->options) $this->options = array();
             $this->tzid = $row['tzid'];
-
         } else {        // Coming from the form
-
             $this->id = isset($row['eid']) ? $row['eid'] : '';
             // Ignore time entries & set to all day if flagged as such
             if (isset($row['allday']) && $row['allday'] == '1') {
@@ -546,7 +544,9 @@ class Event
         if (is_array($A)) {
             $this->SetVars($A);
             $this->MakeRecData($A);
+            DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
         }
+
         /*if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
             $this->isNew = false;
         }*/
@@ -666,7 +666,7 @@ class Event
         // First save the new category if one was submitted
         if (!is_array($this->categories)) $this->categories = array();
         if (isset($A['newcat']) && !empty($A['newcat'])) {
-            $newcat = $this->SaveCategory($A['newcat']);
+            $newcat = $this->saveCategory($A['newcat']);
             if ($newcat > 0) $this->categories[] = $newcat;
         }
         $tmp = array();
@@ -1622,62 +1622,44 @@ class Event
 
 
     /**
-    *   Get the categories currently tied to this event
-    *
-    *   @return array   Array of categories
-    */
-    public function GetCategories()
+     * Get the categories currently tied to this event.
+     * Uses Category::getAll() to leverage caching.
+     *
+     * @uses    Category::getall()
+     * @return  array   Array of (id, name)
+     */
+    public function getCategories()
     {
         global $_TABLES;
 
-        $sql = "SELECT tc.id, tc.name
-                FROM {$_TABLES['evlist_lookup']} tl
-                LEFT JOIN {$_TABLES['evlist_categories']} tc
-                ON tc.id = tl.cid
-                WHERE tl.eid = '{$this->id}'
-                AND tc.status = '1'";
-        //echo $sql;die;
-        $key = 'categories_ev_' . $this->id;
-        $retval = Cache::get($key);
-        if ($retval === NULL) {
-            $retval = array();
-            $res = DB_query($sql, 1);
-            while ($A = DB_fetchArray($res, false)) {
-                $retval[] = $A;
-            }
-            Cache::set($key, $retval, 'categories');
+        $retval = array();
+        if (!is_array($this->categories)) {
+            return $retval;
+        }
+        $Cats = Category::getAll();
+        foreach ($this->categories as $cat_id) {
+            $retval[] = array(
+                'id'    => $cat_id,
+                'name'  => $Cats[$cat_id]->cat_name,
+            );
         }
         return $retval;
     }
 
 
     /**
-    *   Save a new category submitted with the event.
-    *   Returns the ID of the newly-added category, or of the existing
-    *   catgory if $cat_name is a duplicate.
-    *
-    *   @param  string  $cat_name   New category name.
-    *   @return integer     ID of category
-    */
-    public function SaveCategory($cat_name)
+     * Save a new category submitted with the event.
+     * Returns the ID of the newly-added category, or of the existing
+     * catgory if $cat_name is a duplicate.
+     *
+     * @param   string  $cat_name   New category name.
+     * @return  integer     ID of category
+     */
+    public function saveCategory($cat_name)
     {
-        global $_TABLES;
-
-        $cat_name = DB_escapeString($cat_name);
-
-        // Make sure it's not a duplicate name.  While we're at it, get
-        // the category ID to return.
-        $id = DB_getItem($_TABLES['evlist_categories'], 'id',
-                "name='$cat_name'");
-        if (!$id) {
-            DB_query("INSERT INTO {$_TABLES['evlist_categories']}
-                    (name, status)
-                VALUES
-                    ('$cat_name', 1)");
-            if (!DB_error()) {
-                $id = DB_insertId();
-            }
-        }
+        $Cat = new Category();
+        $Cat->cat_name = $cat_name;
+        $id = $Cat->Save();
         return $id;
     }
 

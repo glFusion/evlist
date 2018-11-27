@@ -22,7 +22,7 @@ class Cache
 {
     /** Minimum glFusion version required for phpFastcache.
      * @constant */
-    const MIN_GVERSION = '2.1.0';
+    const MIN_GVERSION = '2.0.0';
 
     /** Tag to be added to every cached item to associate with the plugin.
      * @constant */

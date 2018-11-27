@@ -92,7 +92,7 @@ class evMeetup
             $sql = "SELECT * FROM {$_TABLES['evlist_cache']} WHERE
                     type = '{$key}' AND
                     ts > NOW() - INTERVAL {$cache_minutes} MINUTE LIMIT 1";
-            echo $sql;die;
+            //echo $sql;die;
             $res = DB_query($sql);
             if ($res && DB_numRows($res) == 1) {
                 $A = DB_fetchArray($res, false);

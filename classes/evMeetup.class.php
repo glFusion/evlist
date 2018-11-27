@@ -77,9 +77,10 @@ class evMeetup
     public function getEvents($start='', $end='')
     {
         global $_TABLES, $_EV_CONF, $_CONF;
+        static $have_curl = NULL;   // to check loaded extensions once
 
         $events = array();
-        if (version_compare(GVERSION, '1.8.0', '>=')) {
+        if (version_compare(GVERSION, Cache::MIN_GVERSION, '>=')) {
             $key = self::$tag . '_' . md5($start.'_'.$end);
             $A = Cache::get($key);
             if ($A !== NULL) {
@@ -87,26 +88,26 @@ class evMeetup
             }
         } else {
             $key = DB_escapeString($this->key);
+            $cache_minutes = (int)$_EV_CONF['meetup_cache_minutes'];
             $sql = "SELECT * FROM {$_TABLES['evlist_cache']} WHERE
-                    type = 'meetup' AND
-                    ts > NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE";
-            //echo $sql;die;
+                    type = '{$key}' AND
+                    ts > NOW() - INTERVAL {$cache_minutes} MINUTE LIMIT 1";
+            echo $sql;die;
             $res = DB_query($sql);
             if ($res && DB_numRows($res) == 1) {
                 $A = DB_fetchArray($res, false);
-            } else {
-                $A = array();
-            }
-
-            if (!empty($A)) {
                 // Got current cache data, return it
                 $events = @json_decode($A['data']);
                 return $events;
             }
         }
 
-        // Curl support is required
-        if (!in_array('curl', get_loaded_extensions())) {
+        // Curl support is required.
+        // If not present just return the empty array.
+        if ($have_curl === NULL) {
+            $have_curl = in_array('curl', get_loaded_extensions());
+        }
+        if (!$have_curl) {
             return $events;
         }
 
@@ -150,7 +151,7 @@ class evMeetup
         catch(\Exception $e) {
             COM_errorLog('EVLIST:' . $e->getMessage());
             if (!empty($A)) {
-            // Got old data from cache, better than nothing
+                // Got old data from cache, better than nothing
                 $events = @json_decode($A['data']);
             }
         }
@@ -159,22 +160,24 @@ class evMeetup
 
 
     /**
-    *   Update the cache
-    *
-    *   @param  mixed   $data   Data, typically an array
-    */
+     * Update the cache.
+     *
+     * @param   string  $key    Key value
+     * @param   mixed   $data   Data, typically an array
+     */
     public function updateCache($key, $data)
     {
         global $_TABLES, $_EV_CONF;
 
-        if (version_compare(GVERSION, '1.8.0', '<')) {
+        $cache_minutes = (int)$_EV_CONF['meetup_cache_minutes'];
+        if (version_compare(GVERSION, Cache::MIN_GVERSION, '<')) {
             $db_data = DB_escapeString(json_encode($data));
-            $key = DB_escapeString($this->key);
+            $key = DB_escapeString($key);
 
-            // Delete any stale entries and the current location to be replaced
-            // cache_minutes is already sanitized as an intgeger
+            // Delete any stale entries.
+            // cache_minutes is already sanitized as an integer.
             DB_query("DELETE FROM {$_TABLES['evlist_cache']}
-                WHERE ts < NOW() - INTERVAL {$_EV_CONF['meetup_cache_minutes']} MINUTE");
+                WHERE ts < NOW() - INTERVAL {$cache_minutes} MINUTE");
 
             // Insert the new record to be cached
             DB_query("INSERT INTO {$_TABLES['evlist_cache']}
@@ -182,7 +185,7 @@ class evMeetup
                 VALUES
                     ('$key', '$db_data')");
         } else {
-            Cache::set($key, $data, self::$tag);
+            Cache::set($key, $data, self::$tag, $cache_minuts * 60);
         }
     }
 

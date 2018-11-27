@@ -308,7 +308,7 @@ $evlistConfigData = array(
         'group' => 'evlist',
     ),
     array(
-        'name' => 'pos_centerbloxk',
+        'name' => 'pos_centerblock',
         'default_value' => 'home',
         'type' => 'select',
         'subgroup' => 0,
@@ -319,7 +319,7 @@ $evlistConfigData = array(
         'group' => 'evlist',
     ),
     array(
-        'name' => 'topic_centerbloxk',
+        'name' => 'topic_centerblock',
         'default_value' => 'home',
         'type' => 'select',
         'subgroup' => 0,
@@ -330,7 +330,7 @@ $evlistConfigData = array(
         'group' => 'evlist',
     ),
     array(
-        'name' => 'range_centerbloxk',
+        'name' => 'range_centerblock',
         'default_value' => 2,
         'type' => 'select',
         'subgroup' => 0,

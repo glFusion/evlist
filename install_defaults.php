@@ -62,7 +62,7 @@ $evlistConfigData = array(
         'group' => 'evlist',
     ),
     array(
-        'name' => 'fs_main',
+        'name' => 'ev_main',
         'default_value' => NULL,
         'type' => 'fieldset',
         'subgroup' => 0,
@@ -196,7 +196,7 @@ $evlistConfigData = array(
 
     // GUI settings
     array(
-        'name' => 'fs_gui',
+        'name' => 'ev_gui',
         'default_value' => NULL,
         'type' => 'fieldset',
         'subgroup' => 0,
@@ -286,7 +286,7 @@ $evlistConfigData = array(
 
     // Centerblock settings
     array(
-        'name' => 'fs_centerblock',
+        'name' => 'ev_centerblock',
         'default_value' => NULL,
         'type' => 'fieldset',
         'subgroup' => 0,
@@ -365,7 +365,7 @@ $evlistConfigData = array(
         'group' => 'evlist',
     ),
     array(
-        'name' => 'fs_rsvp',
+        'name' => 'ev_rsvp',
         'default_value' => NULL,
         'type' => 'fieldset',
         'subgroup' => 10,
@@ -423,7 +423,7 @@ $evlistConfigData = array(
     ),
     // Fieldset: Meetup Integration
     array(
-        'name' => 'fs_integ_meetup',
+        'name' => 'ev_integ_meetup',
         'default_value' => NULL,
         'type' => 'fieldset',
         'subgroup' => 20,
@@ -439,7 +439,7 @@ $evlistConfigData = array(
         'type' => 'select',
         'subgroup' => 20,
         'fieldset' => 0,
-        'selection_array' => 2,
+        'selection_array' => 1,
         'sort' => 10,
         'set' => true,
         'group' => 'evlist',
@@ -479,7 +479,7 @@ $evlistConfigData = array(
     ),
     // Fieldset: Other Integrations
     array(
-        'name' => 'fs_integ_other',
+        'name' => 'ev_integ_other',
         'default_value' => NULL,
         'type' => 'fieldset',
         'subgroup' => 20,

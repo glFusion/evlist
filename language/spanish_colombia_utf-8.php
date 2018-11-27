@@ -460,7 +460,7 @@ $LANG_configsubgroups['evlist'] = array(
     'sg_rsvp'               => 'RSVP/Ticketing',
 );
 $LANG_fs['evlist'] = array(
-    'ev_access'             => 'Access Control',
+    'ev_main'               => 'General Settings',
     'ev_gui'                => 'GUI Settings',
     'ev_centerblock'        => 'Centerblock Settings',
     'ev_permissions'        => 'Default Permissions',

@@ -465,7 +465,7 @@ $LANG_configsubgroups['evlist'] = array(
     'sg_integ'              => 'Integrations',
 );
 $LANG_fs['evlist'] = array(
-    'ev_access'             => 'General Settings',
+    'ev_main'               => 'General Settings',
     'ev_gui'                => 'GUI Settings',
     'ev_centerblock'        => 'Centerblock Settings',
     'ev_permissions'        => 'Default Permissions',

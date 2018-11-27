@@ -474,7 +474,7 @@ $LANG_configsubgroups[ 'evlist'] = array(
 );
 
 $LANG_fs[ 'evlist'] = array(
-'ev_access'             => "Contrôle d'accès",
+'ev_main'               => 'General Settings',
 'ev_gui'            => 'paramètres GUI',
 'ev_centerblock'        => 'Centerblock Settings',
 'ev_permissions'        => 'Les autorisations par défaut',

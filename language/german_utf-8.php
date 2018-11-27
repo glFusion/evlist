@@ -453,7 +453,7 @@ $LANG_configsubgroups['evlist'] = array(
     'sg_integ'              => 'Erweiterungen',
 );
 $LANG_fs['evlist'] = array(
-    'ev_access'             => 'Benutzer-Einstellungen',
+    'ev_main'               => 'General Settings',
     'ev_gui'                => 'Allgemeine-Einstellungen',
     'ev_centerblock'        => 'Zentrumsblock-Einstellungen',
     'ev_permissions'        => 'Standard-Berechtigungen',

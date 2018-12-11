@@ -50,7 +50,7 @@ class Cache
                 $tag = array($tag, self::TAG);
         }
         $key = self::_makeKey($key);
-        return \glFusion\Cache::getInstance()->set($key, $data, $tag, $ttl);
+        return \glFusion\Cache\Cache::getInstance()->set($key, $data, $tag, $ttl);
     }
 
 
@@ -65,7 +65,7 @@ class Cache
         // Fake return if caching is not supported
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return true;
 
-        return \glFusion\Cache::getInstance()->delete(self::_makeKey($key));
+        return \glFusion\Cache\Cache::getInstance()->delete(self::_makeKey($key));
     }
 
 
@@ -86,7 +86,7 @@ class Cache
             if (!is_array($tag)) $tag = array($tag);
             $tags = array_merge($tags, $tag);
         }
-        return \glFusion\Cache::getInstance()->deleteItemsByTagsAll($tags);
+        return \glFusion\Cache\Cache::getInstance()->deleteItemsByTagsAll($tags);
     }
 
 
@@ -99,7 +99,7 @@ class Cache
     private static function _makeKey($key)
     {
         return self::TAG . '_' . $key . '_' .
-            \glFusion\Cache::getInstance()->securityHash(true,true);
+            \glFusion\Cache\Cache::getInstance()->securityHash(true,true);
     }
 
 
@@ -117,8 +117,8 @@ class Cache
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return $retval;
 
         $key = self::_makeKey($key);
-        if (\glFusion\Cache::getInstance()->has($key)) {
-            $retval = \glFusion\Cache::getInstance()->get($key);
+        if (\glFusion\Cache\Cache::getInstance()->has($key)) {
+            $retval = \glFusion\Cache\Cache::getInstance()->get($key);
         }
         return $retval;
     }

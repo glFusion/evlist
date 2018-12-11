@@ -185,7 +185,7 @@ class evMeetup
                 VALUES
                     ('$key', '$db_data')");
         } else {
-            Cache::set($key, $data, self::$tag, $cache_minuts * 60);
+            Cache::set($key, $data, self::$tag, $cache_minutes * 60);
         }
     }
 

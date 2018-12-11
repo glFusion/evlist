@@ -1,16 +1,16 @@
 <?php
 /**
-*   View functions for the evList plugin.
-*   Creates daily, weekly, monthly and yearly calendar views
-*
-*   @author     Lee P. Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2017 Lee Garner <lee@leegarner.com
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * View functions for the evList plugin.
+ * Creates daily, weekly, monthly and yearly calendar views
+ *
+ * @author      Lee P. Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 use LGLib\Date_Calc;
 
@@ -18,37 +18,77 @@ USES_evlist_functions();
 date_default_timezone_set('UTC');
 
 /**
-*   Create a calendar view
-*   @class View
-*/
+ * Create a calendar view.
+ * @package evlist
+ */
 class View
 {
-    protected $year;        // Year of display
-    protected $month;       // Month of display
-    protected $day;         // Day of display
-    protected $cat;         // Category to display
-    protected $cal;         // Calendar to display
-    protected $opts;        // Misc. options
-    protected $cal_used = array();    // Array of calendars used in display
-    protected $range;       // Range selector (past, future, etc)
-    protected $today;       // Holder for today's date
-    protected $today_sql;   // Today's date in YYYY-MM-DD format. Used often.
-    protected $type;        // View type (month, year, etc)
-    protected $tpl_opt;     // 'print' to create a printable view
-    protected $inc_dt_sel= true;    // true to include date/range opts
+    /** Year of display.
+     * @var integer */
+    protected $year;
+
+    /** Month of display.
+     * @var integer */
+    protected $month;
+
+    /** Day of display.
+     * @var integer */
+    protected $day;
+
+    /** Category ID to display.
+     * @var integer */
+    protected $cat;
+
+    /** Number of calendar to display.
+     * @var integer */
+    protected $cal;
+
+    /** Miscelanneious options.
+     * @var array */
+    protected $opts;
+
+    /** Array of calendars used in display.
+     * Used to create the calendar selection.
+     * @var array */
+    protected $cal_used = array();
+
+    /** Range selector (past, future, etc).
+     * @var string */
+    protected $range;
+
+    /** Holder for today's date as a Date object.
+     * @var object */
+    protected $today;
+
+    /** Today's date in YYYY-MM-DD format. Used often.
+     * @var string */
+    protected $today_sql;
+
+    /** View type (month, year, etc).
+     * @var string */
+    protected $type;
+
+    /** Template option. `print` to create a printable view.
+     * @var string */
+    protected $tpl_opt;
+
+    /** True to include date/range opt.
+     * @var boolean */
+    protected $inc_dt_sel= true;
+
 
     /**
-    *   Get a calendar view object for the specifiec type.
-    *
-    *   @param  string  $type   Type of view (month, day, year, etc.)
-    *   @param  integer $year   Year for the view
-    *   @param  integer $month  Month for the view
-    *   @param  integer $day    Day for the view
-    *   @param  integer $cat    Category to view
-    *   @param  integer $cal    Calendar to view
-    *   @param  mixed   $opt    Additional view options
-    *   @return object          View object
-    */
+     * Get a calendar view object for the specifiec type.
+     *
+     * @param   string  $type   Type of view (month, day, year, etc.)
+     * @param   integer $year   Year for the view
+     * @param   integer $month  Month for the view
+     * @param   integer $day    Day for the view
+     * @param   integer $cat    Category to view
+     * @param   integer $cal    Calendar to view
+     * @param   mixed   $opt    Additional view options
+     * @return  object          View object
+     */
     public static function getView($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
         global $_EV_CONF;
@@ -77,29 +117,27 @@ class View
             $type = isset($_EV_CONF['default_view']) ?
                 $_EV_CONF['default_view'] : 'month';
         }
-        $class = "Evlist\\View_{$type}";
+        $class = __NAMESPACE__ . '\\Views\\' . $type . 'View';
         if (class_exists($class)) {
             $view = new $class($year, $month, $day, $cat, $cal, $opts);
             return $view;
-            //return $view->Render();
         } else {
             // last-ditch error if $type isn't valid
-            //return '<span class="alert">Failure loading calendar</span>';
             return NULL;
         }
     }
 
 
     /**
-    *   Set common values for all views
-    *
-    *   @param  integer $year   Year for the view
-    *   @param  integer $month  Month for the view
-    *   @param  integer $day    Day for the view
-    *   @param  integer $cat    Category to view
-    *   @param  integer $cal    Calendar to view
-    *   @param  mixed   $opts   Additional view options
-    */
+     * Set common values for all views.
+     *
+     * @param   integer $year   Year for the view
+     * @param   integer $month  Month for the view
+     * @param   integer $day    Day for the view
+     * @param   integer $cat    Category to view
+     * @param   integer $cal    Calendar to view
+     * @param   mixed   $opts   Additional view options
+     */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
         global $_EV_CONF;
@@ -117,10 +155,10 @@ class View
 
 
     /**
-    *   Set the 'print' value to be used in template selection
-    *
-    *   @param  boolean $on     True to use print template
-    */
+     * Set the 'print' value to be used in template selection.
+     *
+     * @param   boolean $on     True to use print template
+     */
     public function setPrint($on = true)
     {
         $this->tpl_opt = $on ? 'print' : '';
@@ -128,13 +166,13 @@ class View
 
 
     /**
-    *   Gets the name of the template file to use.
-    *   Creates a view based on $this->type . 'view', e.g. 'monthview'
-    *   unless overridden.
-    *
-    *   @param  string  $view   Optional override view
-    *   @return string          Template filename
-    */
+     * Gets the name of the template file to use.
+     * Creates a view based on $this->type . 'view', e.g. 'monthview'
+     * unless overridden.
+     *
+     * @param   string  $view   Optional override view
+     * @return  string          Template filename
+     */
     protected function getTemplate($view = '')
     {
         $tpl = $view == '' ? $this->type . 'view' : $view;
@@ -148,11 +186,11 @@ class View
 
 
     /**
-    *   Display the common header for all calendar views.
-    *
-    *   @lparam boolean $add_link   True to include a "Add Event" button
-    *   @return string          HTML for calendar header
-    */
+     * Display the common header for all calendar views.
+     *
+     * @param   boolean $add_link   True to include a "Add Event" button
+     * @return  string          HTML for calendar header
+     */
     public function Header($add_link = true)
     {
         global $_EV_CONF, $LANG_EVLIST, $LANG_MONTH, $_TABLES;
@@ -266,10 +304,10 @@ class View
 
 
     /**
-    *   Display the calendar footer
-    *
-    *   @return string  HTML for calendar footer
-    */
+     * Display the calendar footer.
+     *
+     * @return  string  HTML for calendar footer
+     */
     protected function Footer()
     {
         global $LANG_EVLIST, $_EV_CONF;
@@ -314,13 +352,13 @@ class View
 
 
     /**
-    *   Set the view information into a session variable.
-    *   Used to keep track of the last calendar viewed by a visitor so they
-    *   can be returned to the same view after viewing an event detail or
-    *   when returning to the site.
-    *
-    *   @uses   SESS_setVar()
-    */
+     * Set the view information into a session variable.
+     * Used to keep track of the last calendar viewed by a visitor so they
+     * can be returned to the same view after viewing an event detail or
+     * when returning to the site.
+     *
+     * @uses    SESS_setVar()
+     */
     protected function setSession()
     {
         // Only used to set the calendar view, no change when
@@ -345,12 +383,12 @@ class View
 
 
     /**
-    *   Get the day names for a week based on week start day of Sun or Mon.
-    *   Used to create calendar headers for weekly, monthly and yearly views.
-    *
-    *   @param  integer $letters    Optional number of letters to return
-    *   @return array       Array of day names for a week, 0-indexed
-    */
+     * Get the day names for a week based on week start day of Sun or Mon.
+     * Used to create calendar headers for weekly, monthly and yearly views.
+     *
+     * @param   integer $letters    Optional number of letters to return
+     * @return  array       Array of day names for a week, 0-indexed
+     */
     public static function DayNames($letters = 0)
     {
         global $_CONF, $LANG_WEEK;
@@ -377,13 +415,13 @@ class View
 
 
     /**
-    *   Return the raw content of the view.
-    *   This provides the actual calendar content to be used in calendar
-    *   web and print views and updated by Ajax. Each view type must provide
-    *   a version of this function.
-    *
-    *   @return string      HTML for calendar
-    */
+     * Return the raw content of the view.
+     * This provides the actual calendar content to be used in calendar
+     * web and print views and updated by Ajax. Each view type must provide
+     * a version of this function.
+     *
+     * @return  string      HTML for calendar
+     */
     public function Content()
     {
         return 'Not Implemented';
@@ -391,10 +429,10 @@ class View
 
 
     /**
-    *   Render a complete calendar page
-    *
-    *   @return string      HTML for calendar page
-    */
+     * Render a complete calendar page.
+     *
+     * @return  string      HTML for calendar page
+     */
     public function Render()
     {
         return $this->viewJSON();
@@ -402,12 +440,12 @@ class View
 
 
     /**
-    *   Prepare variables for view functions using JSON templates
-    *   Reads values from the session, if available. If no session present,
-    *   get values from parameters or current date
-    *
-    *   @return string      Complete HTML for requested calendar
-    */
+     * Prepare variables for view functions using JSON templates.
+     * Reads values from the session, if available. If no session present,
+     * get values from parameters or current date.
+     *
+     * @return  string      Complete HTML for requested calendar
+     */
     protected function viewJSON()
     {
         global $_EV_CONF;
@@ -430,11 +468,10 @@ class View
 
 
     /**
-    *   Create the calendar selection checkboxes to be shown in the javascript
-    *   dropdown.
-    *
-    *   @return string      Input elements for each available calendar
-    */
+     * Create the calendar selection checkboxes to be shown in the javascript dropdown.
+     *
+     * @return  string      Input elements for each available calendar
+     */
     protected function getCalCheckboxes()
     {
         global $_EV_CONF;
@@ -462,11 +499,11 @@ class View
 
 
     /**
-    *   Return the newline characters to use for the tooltips.
-    *   UIkit themes need <br />, Vintage only uses LB
-    *
-    *   @return string      Newline characters
-    */
+     * Return the newline characters to use for the tooltips.
+     * UIkit themes need <br />, Vintage only uses LB
+     *
+     * @return  string      Newline characters
+     */
     protected static function tooltip_newline()
     {
         global $_EV_CONF;
@@ -480,13 +517,13 @@ class View
 
 
     /**
-    *   Get the user preference whether to show a calendar.
-    *   This comes from the checkboxes that are saved to a
-    *   session var when checked or unchecked.
-    *
-    *   @param  integer $cal_id     ID of calendar to check
-    *   @return integer         1 to show calendar, 0 to hide
-    */
+     * Get the user preference whether to show a calendar.
+     * This comes from the checkboxes that are saved to a
+     * session var when checked or unchecked.
+     *
+     * @param   integer $cal_id     ID of calendar to check
+     * @return  integer         1 to show calendar, 0 to hide
+     */
     protected static function getCalShowPref($cal_id)
     {
         static $calprefs = NULL;
@@ -503,11 +540,11 @@ class View
 
 
     /**
-    *   Add calender info to the cal_used array.
-    *   Used later to build the calendar checkboxes and subscription links.
-    *
-    *   @param  array   $event  Array of event info
-    */
+     * Add calender info to the cal_used array.
+     * Used later to build the calendar checkboxes and subscription links.
+     *
+     * @param   array   $event  Array of event info
+     */
     protected function addCalUsed($event)
     {
         if (!isset($event['cal_id'])) return;   // invalid calendar info

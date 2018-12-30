@@ -515,7 +515,7 @@ function EVLIST_adminRSVP($rp_id)
         'chkactions' => '<input data-uk-tooltip name="tickdelete" type="image" src="'
             . $_CONF['layout_url'] . '/images/admin/delete.' . $_IMAGE_TYPE
             . '" style="vertical-align:text-bottom;" title="' . $LANG_ADMIN['delete']
-            . ' onclick="return confirm(\'' . $LANG_EVLIST['conf_del_item']
+            . '" onclick="return confirm(\'' . $LANG_EVLIST['conf_del_item']
             . '\');" />&nbsp;'
             . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
 
@@ -523,7 +523,7 @@ function EVLIST_adminRSVP($rp_id)
             . $_CONF['site_url'] . '/evlist/images/reset.png'
             . '" style="vertical-align:text-bottom;" title="'
             . $LANG_EVLIST['reset_usage']
-            . ' onclick="return confirm(\'' . $LANG_EVLIST['conf_reset']
+            . '" onclick="return confirm(\'' . $LANG_EVLIST['conf_reset']
             . '\');" />&nbsp;' . $LANG_EVLIST['reset_usage']
             . '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
     );

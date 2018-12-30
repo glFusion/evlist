@@ -120,11 +120,12 @@ class View
         $class = __NAMESPACE__ . '\\Views\\' . $type . 'View';
         if (class_exists($class)) {
             $view = new $class($year, $month, $day, $cat, $cal, $opts);
-            return $view;
         } else {
             // last-ditch error if $type isn't valid
-            return NULL;
+            COM_errorLog(__NAMESPACE__ . '\\' . __CLASS__ . '::' .__FUNCTION__ . "(): Unable to locate view  $class, using Month view");
+            $view = new \Evlist\Views\monthView();
         }
+        return $view;
     }
 
 

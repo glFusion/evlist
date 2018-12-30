@@ -658,7 +658,12 @@ class Ticket
     {
         if ($amount > 0) {
             $status = LGLIB_invokeService('paypal', 'formatAmount',
-                    array('amount' => $amount), $output, $msg);
+                array(
+                    'amount' => $amount,
+                    'symbol' => false,
+                ),
+                $output,
+                $msg);
             if ($status == PLG_RET_OK) {
                 $formatted = $output;
             } else {

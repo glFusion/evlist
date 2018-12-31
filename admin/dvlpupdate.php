@@ -32,10 +32,9 @@ require_once EVLIST_PI_PATH . '/upgrade.php';   // needed for set_version()
 CACHE_clear();
 Evlist\Cache::clear();
 
-$ver = '1.4.5';
-EVLIST_do_set_version($_EV_CONF['pi_version']);
+// Force the plugin version to the previous version and do the upgrade
+$_PLUGIN_INFO['evlist']['pi_version'] = '1.4.5';
 plugin_upgrade_evlist(true);
-EVLIST_do_set_version('1.4.6');
 
 // need to clear the template cache so do it here
 CACHE_clear();

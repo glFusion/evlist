@@ -375,6 +375,7 @@ $LANG_EVLIST = array(
 'orderby'       => 'Order',
 'show_after'    => 'Show After',
 'first'         => 'First',
+'ev_not_found'  => 'The requested event was not found.',
 );
 
 $LANG_EVLIST_HELP = array(

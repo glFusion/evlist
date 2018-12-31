@@ -406,7 +406,8 @@ default:
     }
     if (!empty($rp_id)) {
         $Rep = Evlist\Repeat::getInstance($rp_id);
-        if ($Rep->rp_id == 0 || ($Rep->ev_id > 0 && !$Rep->Event->hasAccess(2))) {
+        if ($Rep->rp_id == 0 || !$Rep->Event->hasAccess(2)) {
+            COM_setMsg($LANG_EVLIST['ev_not_found']);
             echo COM_refresh(EVLIST_URL . '/index.php');
             exit;
         }

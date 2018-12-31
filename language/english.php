@@ -381,6 +381,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'orderby'       => 'Order',
 'show_after'    => 'Show After',
 'first'         => 'First',
+'ev_not_found'  => 'The requested event was not found.',
 );
 
 $LANG_EVLIST_HELP = array(

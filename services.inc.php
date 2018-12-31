@@ -21,8 +21,8 @@ if (!defined ('GVERSION')) {
  * Get information about a specific item.
  *
  * @param   array   $args       Item Info (pi_name, item_type, item_id)
- * @param   array   &$output    Array of output data
- * @param   string  &$svc_msg   Unused
+ * @param   array   $output     Array of output data
+ * @param   string  $svc_msg    Unused
  * @return  integer     Return value
  */
 function service_productinfo_evlist($args, &$output, &$svc_msg)
@@ -83,8 +83,8 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
  * Handle the purchase of a product via IPN message.
  *
  * @param   array   $args       Array of item and IPN data
- * @param   array   &$output    Return array
- * @param   string  &$svc_msg   Unused
+ * @param   array   $output     Return array
+ * @param   string  $svc_msg    Unused
  * @return  integer     Return value
  */
 function service_handlePurchase_evlist($args, &$output, &$svc_msg)
@@ -174,9 +174,9 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
 /**
  * Handle a product refund.
  *
- * @param  array   $args       Array of item and IPN data
- * @param  array   &$output    Return array
- * @param  string  &$svc_msg   Unused
+ * @param  array   $args        Array of item and IPN data
+ * @param  array   $output      Return array
+ * @param  string  $svc_msg     Unused
  * @return integer     Return value
  */
 function service_handleRefund_evlist($args, &$output, &$svc_msg)
@@ -235,8 +235,8 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
  *  )```
  *
  * @param   array   $args       Array of item information
- * @param   array   &$output    Return array
- * @param   string  &$svc_msg   Unused
+ * @param   array   $output     Return array
+ * @param   string  $svc_msg    Unused
  * @return  integer     Return value
  */
 function service_emailReceiptInfo_evlist($args, &$output, &$svc_msg)

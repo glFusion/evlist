@@ -317,8 +317,10 @@ class Calendar
                 self::reOrder();
             }
             if (!$this->isNew) {
-                // Clear the cache if updating an existing calendar
+                // Clear the cache if updating an existing calendar.
+                // Clear events to force re-reading of permissions.
                 Cache::clear('calendars');
+                Cache::clear('events');
             }
             return true;
         } else {
@@ -453,13 +455,13 @@ class Calendar
 
 
     /**
-    *   Get the options for a calendar selection list.
-    *   Leverages self::getAll() to re-use the database query.
-    *
-    *   @param  integer $selected   ID of selected calendar
-    *   @param  boolean $enabled    True to show only enabled calendars
-    *   @return string      Option tags
-    */
+     * Get the options for a calendar selection list.
+     * Leverages self::getAll() to re-use the database query.
+     *
+     * @param   integer $selected   ID of selected calendar
+     * @param   boolean $enabled    True to show only enabled calendars
+     * @return  string      Option tags
+     */
     public static function optionList($selected = 0, $enabled = true, $access = 0)
     {
         $retval = '';
@@ -468,7 +470,7 @@ class Calendar
             // Skip disabled calendars if enabled flag is set
             if ($enabled && $cal->cal_status == 0) continue;
             // Check access if acces level is set
-            if ($access > 0 && !self::hasAccess($cal_id, $access)) continue;
+            if ($access > 0 && !$cal->hasAccess($access)) continue;
 
             $sel = $cal_id == $selected ? EVSELECTED : '';
             $retval .= '<option ' . $sel . ' value="' . $cal_id . '">' .
@@ -505,22 +507,21 @@ class Calendar
 
 
     /**
-    *   Determine whether the current user has access to this event
-    *
-    *   @param  integer $level  Access level required
-    *   @return boolean         True = has sufficieng access, False = not
-    */
-    public static function hasAccess($cal_id, $level=2)
+     * Public function to check access to this calendar.
+     *
+     * @param   integer $level  Access level required
+     * @return  boolean         True = has sufficieng access, False = not
+     */
+    public function hasAccess($level=2)
     {
         // Admin & editor has all rights
         if (plugin_ismoderator_evlist()) return true;
 
-        $Cal = self::getInstance($cal_id);
-        if ($Cal === NULL || $Cal->cal_status == 0) return false;
-
-        $access = SEC_hasAccess($Cal->owner_id, $Cal->group_id,
-                    $Cal->perm_owner, $Cal->perm_group,
-                    $Cal->perm_members, $Cal->perm_anon);
+        $access = SEC_hasAccess(
+            $this->owner_id, $this->group_id,
+            $this->perm_owner, $this->perm_group,
+            $this->perm_members, $this->perm_anon
+        );
         return $access >= $level ? true : false;
     }
 

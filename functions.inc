@@ -2206,15 +2206,16 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     if ($info['group_id'] === NULL) $info['group_id'] = 13;
     if ($info['owner_id'] === NULL) $info['owner_id'] = 2;
     if ($info['perms'] === NULL || !is_array($info['perms'])) {
-        $info['perms'] = array();
-        $info['perms']['perm_owner'] = 3;
-        $info['perms']['perm_group'] = 2;
-        $info['perms']['perm_members'] = 0;
-        $info['perms']['perm_anon'] = 0;
+        $info['perms'] = array(
+            'perm_owner'    => 3,
+            'perm_group'    => 2,
+            'perm_members'  => 0,
+            'perm_anon'     => 0,
+        );
         switch ($info['group_id']) {
-        case 1:         // Anonymous
+        case 1:         // Anonymous (include Logged-In)
             $info['perms']['perm_anon'] = 2;
-        case 13:
+        case 13:        // Logged-In Users
             $info['perms']['perm_members'] = 2;
             break;
         }

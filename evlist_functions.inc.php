@@ -441,9 +441,10 @@ function EVLIST_getFeedIcons()
  */
 function EVLIST_adminRSVP($rp_id)
 {
-    global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_IMAGE_TYPE;
+    global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
+
     USES_lib_admin();
-    $Ev = new Evlist\Repeat($rp_id);
+    $Ev = \Evlist\Repeat::getInstance($rp_id);
     if ($Ev->rp_id == 0) return '';
 
     $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
@@ -478,54 +479,69 @@ function EVLIST_adminRSVP($rp_id)
     );
 
     $header_arr = array(
-        array(  'text'  => $LANG_EVLIST['rsvp_date'],
-                'field' => 'dt',
-                'sort'  => true,
+        array(
+            'text'  => $LANG_EVLIST['rsvp_date'],
+            'field' => 'dt',
+            'sort'  => true,
         ),
-        array(  'text'  => $LANG_EVLIST['name'],
-                'field' => 'fullname',
-                'sort'  => false,
+        array(
+            'text'  => $LANG_EVLIST['name'],
+            'field' => 'fullname',
+            'sort'  => false,
         ),
-        array(  'text'  => $LANG_EVLIST['fee'],
-                'field' => 'fee',
-                'sort'  => false,
+        array(
+            'text'  => $LANG_EVLIST['fee'],
+            'field' => 'fee',
+            'sort'  => false,
         ),
-        array(  'text'  => $LANG_EVLIST['paid'],
-                'field' => 'paid',
-                'sort'  => false,
+        array(
+            'text'  => $LANG_EVLIST['paid'],
+            'field' => 'paid',
+            'sort'  => false,
         ),
-        array(  'text'  => $LANG_EVLIST['ticket_num'],
-                'field' => 'tic_id',
-                'sort'  => false,
+        array(
+            'text'  => $LANG_EVLIST['ticket_num'],
+            'field' => 'tic_id',
+            'sort'  => false,
         ),
-        array(  'text'  => $LANG_EVLIST['date_used'],
-                'field' => 'used',
-                'sort'  => false,
+        array(
+            'text'  => $LANG_EVLIST['date_used'],
+            'field' => 'used',
+            'sort'  => false,
         ),
-        array(  'text'  => $LANG_EVLIST['waitlisted'],
-                'field' => 'waitlist',
-                'sort'  => false,
+        array(
+            'text'  => $LANG_EVLIST['waitlisted'],
+            'field' => 'waitlist',
+            'sort'  => false,
         ),
     );
-
     $options_arr = array(
         'chkdelete' => true,
         'chkfield'  => 'tic_id',
         'chkname'   => 'delrsvp',
-        'chkactions' => '<input data-uk-tooltip name="tickdelete" type="image" src="'
-            . $_CONF['layout_url'] . '/images/admin/delete.' . $_IMAGE_TYPE
-            . '" style="vertical-align:text-bottom;" title="' . $LANG_ADMIN['delete']
-            . '" onclick="return confirm(\'' . $LANG_EVLIST['conf_del_item']
-            . '\');" />&nbsp;'
-            . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
-
-            '<input data-uk-tooltip name="tickreset" type="image" src="'
-            . $_CONF['site_url'] . '/evlist/images/reset.png'
-            . '" style="vertical-align:text-bottom;" title="'
-            . $LANG_EVLIST['reset_usage']
-            . '" onclick="return confirm(\'' . $LANG_EVLIST['conf_reset']
-            . '\');" />&nbsp;' . $LANG_EVLIST['reset_usage']
-            . '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
+        'chkactions' => COM_createLink(
+            $_EV_CONF['icons']['delete'],
+            '!#',
+            array(
+                'data-uk-tooltip' => '',
+                'name' => 'tickdelete',
+                'style' => '"vertical-align:text-bottom;',
+                'title' => $LANG_ADMIN['delete'],
+                'onclick' => "return confirm('{$LANG_EVLIST['conf_del_item']}');",
+            )
+        ) . '&nbsp;' . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
+        COM_createLink(
+            $_EV_CONF['icons']['reset'],
+            '!#',
+            array(
+                'data-uk-tooltip' => '',
+                'name' => 'tickreset',
+                'style' => '"vertical-align:text-bottom;',
+                'title' => $LANG_ADMIN['reset_usage'],
+                'onclick' => "return confirm('{$LANG_EVLIST['conf_reset']}');",
+            )
+        ) . '&nbsp;' . $LANG_EVLIST['reset_usage'] .
+        '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
     );
 
     $query_arr = array(

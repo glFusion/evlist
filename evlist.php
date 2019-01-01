@@ -97,4 +97,14 @@ define('EV_ANON_CAN_ADD',   2);
 $_EV_CONF['min_locator_ver'] = '1.0.3'; // minimum locator version required
 $_EV_CONF['max_repeats'] = 1000;    // Max repeats created for events
 
+// Define icons here. These can be overridden by redefining in a config.php file.
+$_EV_CONF['icons'] = array(
+    'delete'    => '<i class="uk-icon uk-icon-trash-o uk-text-danger"></i>',
+    'copy'      => '<i class="uk-icon-clone"></i>',
+    'edit'      => '<i class="uk-icon-edit"></i>',
+    'arrow-up'  => '<i class="uk-icon uk-icon-arrow-up"></i>',
+    'arrow-down'=> '<i class="uk-icon uk-icon-arrow-down"></i>',
+    'reset'     => '<i class="uk-icon uk-icon-refresh"></i>',
+);
+
 ?>

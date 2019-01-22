@@ -407,21 +407,18 @@ class Repeat
         //update hit count
         evlist_hit($this->ev_id);
 
-        // Print or other template modifier can be passed in. For display
-        // check if this is a uikit theme
+        // Print or other template modifier can be passed in.
         $template = 'event';
         if (!empty($tpl)) {
             $template .= '_' . $tpl;
-        } else {
-            $template .= $_EV_CONF['_is_uikit'] ? '.uikit' : '';
         }
         $T = new \Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
-                'event' => $template . '.thtml',
-                //'editlinks' => 'edit_links.thtml',
-                'datetime' => 'date_time.thtml',
-                'address' => 'address.thtml',
-                'contact' => 'contact.thtml',
+            'event' => $template . '.thtml',
+            //'editlinks' => 'edit_links.thtml',
+            'datetime' => 'date_time.thtml',
+            'address' => 'address.thtml',
+            'contact' => 'contact.thtml',
         ) );
 
         USES_lib_social();
@@ -573,8 +570,6 @@ class Repeat
             'show_tz'   => $this->tzid == 'local' ? '' : 'true',
             'timezone'  => $this->tzid,
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
-            'iconset'   => $_EV_CONF['_iconset'],
-            'is_uikit'  => $_EV_CONF['_is_uikit'],
             'social_icons'  => $ss,
         ) );
 

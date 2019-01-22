@@ -811,9 +811,10 @@ class Event
 
 
     /**
-     *  Creates the edit form
-     *  @param integer $id Optional ID, current record used if zero
-     *  @return string HTML for edit form
+     * Creates the edit form.
+     *
+     * @param   integer $id Optional ID, current record used if zero
+     * @return  string      HTML for edit form
      */
     public function Edit($eid = '', $rp_id = 0, $saveaction = '')
     {
@@ -846,11 +847,7 @@ class Event
         }
 
         $T = new \Template($_CONF['path'] . 'plugins/evlist/templates/');
-        if ($_EV_CONF['_is_uikit']) {
-            $T->set_file('editor', 'editor.uikit.thtml');
-        } else {
-            $T->set_file('editor', 'editor.thtml');
-        }
+        $T->set_file('editor', 'editor.thtml');
 
         // Set up the wysiwyg editor, if available
         switch (PLG_getEditorType()) {
@@ -1598,25 +1595,28 @@ class Event
 
 
     /**
-    *   Determine whether the current user has access to this event
-    *
-    *   @param  integer $level  Access level required
-    *   @return boolean         True = has sufficieng access, False = not
-    */
+     * Determine whether the current user has access to this event.
+     *
+     * @param   integer $level  Access level required
+     * @return  boolean         True = has sufficieng access, False = not
+     */
     public function hasAccess($level=3)
     {
         // Admin & editor has all rights
-        if ($this->isAdmin)
+        if ($this->isAdmin) {
             return true;
+        }
 
-        $ev_access = SEC_hasAccess($this->owner_id, $this->group_id,
-                    $this->perm_owner, $this->perm_group,
-                    $this->perm_members, $this->perm_anon);
-        $cal_access = SEC_hasAccess($this->Calendar->owner_id,
-                    $this->Calendar->group_id,
-                    $this->Calendar->perm_owner, $this->Calendar->perm_group,
-                    $this->Calendar->perm_members, $this->Calendar->perm_anon);
-
+        $ev_access = SEC_hasAccess(
+            $this->owner_id, $this->group_id,
+            $this->perm_owner, $this->perm_group,
+            $this->perm_members, $this->perm_anon
+        );
+        $cal_access = SEC_hasAccess(
+            $this->Calendar->owner_id, $this->Calendar->group_id,
+            $this->Calendar->perm_owner, $this->Calendar->perm_group,
+            $this->Calendar->perm_members, $this->Calendar->perm_anon
+        );
         return ($ev_access >= $level && $cal_access >= $level) ? true : false;
     }
 

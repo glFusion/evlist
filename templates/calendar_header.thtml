@@ -26,11 +26,7 @@
       {!if addlink_year}
       <input type="hidden" name="year" value="{addlink_year}" />
       {!endif}
-      {!if is_uikit}
       <input type="submit" name="edit" value="{add_event_text}" class="uk-button uk-button-success uk-button-small" />
-      {!else}
-      <input type="submit" name="edit" value="{add_event_text}" class="lgButton green" />
-      {!endif}
     </form>
   {!endif}
 </div>
@@ -38,7 +34,7 @@
 {!if include_selections}
 <div id="evlist_nav_left">
 <form action="{action_url}" method="get" name="hdrform" id="evlistHdrForm"
-    enctype="application/x-www-form-urlencoded">
+    enctype="application/x-www-form-urlencoded" class="uk-form uk-form-horizontal">
   <select name="cat" onchange="this.form.submit();">
     <option value="0">{$LANG_EVLIST['all_categories']}</option>
     {event_type_select}
@@ -64,12 +60,8 @@
     <select name="view">
         {view_select}
     </select>
-    {!if is_uikit}
-    <input type="submit" name="hdrsubmit" value="Jump" class="uk-button uk-button-primary uk-button-small" />
-    {!else}
-    <input type="submit" name="hdrsubmit" value="Jump" class="lgButton blue" />
-    {!endif}
-    <i class="{iconset}-calendar tooltip" title="{$LANG_EVLIST['click_for_datepicker']}" id="jumpdate_trigger"></i>
+    <button type="submit" name="hdrsubmit" class="uk-button uk-button-primary uk-button-small">{$LANG_EVLIST['jump']}</button>
+    <i class="uk-icon uk-icon-calendar tooltip" title="{$LANG_EVLIST['click_for_datepicker']}" id="jumpdate_trigger"></i>
     <input type="hidden" name="jumpdate" id="f_jumpdate"
         value="{curdate}" />
     <script type="text/javascript">
@@ -83,6 +75,7 @@
 {!if use_json}
                 ChangeDate(y, m, d, "{view}");
                 cal.hide();
+                cal.setDate(new Date(y, m-1, d));
 {!else}
                 window.location="{pi_url}/index.php?view={view}&year="+y+"&month="+m+"&day="+d;
 {!endif}

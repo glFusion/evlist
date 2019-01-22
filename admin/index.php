@@ -386,72 +386,69 @@ function EVLIST_admin_list_events()
 
 
 /**
-*   Return the display value for a category field
-*
-*   @param  string  $fieldname  Name of the field
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Name-value pairs for all fields
-*   @param  array   $icon_arr   Array of system icons
-*   @return string      HTML to display for the field
-*/
+ * Return the display value for a category field.
+ *
+ * @param   string  $fieldname  Name of the field
+ * @param   mixed   $fieldvalue Value of the field
+ * @param   array   $A          Name-value pairs for all fields
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string      HTML to display for the field
+ */
 function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
     $retval = '';
     switch($fieldname) {
-        case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL .
-                '/index.php?editcat=x&amp;id=' . $A['id'].
-                '" title="' . $LANG_ADMIN['edit'] . '">';
-            if ($_EV_CONF['_is_uikit']) {
-                $retval .= '<i class="uk-icon-edit"></i>';
-            } else {
-                $retval .= $icon_arr['edit'];
-            }
-            $retval .= '</a>';
-            break;
-        case 'status':
-            if ($A['status'] == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\"
+    case 'edit':
+        $retval = COM_createLink(
+            '<i class="uk-icon-edit"></i>',
+            EVLIST_ADMIN_URL . '/index.php?editcat=x&amp;id=' . $A['id'],
+            array(
+                'title' => $LANG_ADMIN['edit'],
+            )
+        );
+        break;
+    case 'status':
+        if ($A['status'] == '1') {
+            $switch = EVCHECKED;
+            $enabled = 1;
+        } else {
+            $switch = '';
+            $enabled = 0;
+        }
+        $retval .= "<input type=\"checkbox\" $switch value=\"1\"
                 name=\"cat_check\"
                 id=\"togenabled{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
                 '"category","'.EVLIST_ADMIN_URL."\");' />".LB;
-            break;
-        case 'delete':
-            $retval = COM_createLink(
-                    $icon_arr['delete'],
-                    EVLIST_ADMIN_URL. '/index.php?delcat=x&id=' . $A['id'],
-                    array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                        'title' => $LANG_ADMIN['delete'],
-                    )
-                );
-
         break;
-        default:
-            $retval = $fieldvalue;
-            break;
+    case 'delete':
+        $retval = COM_createLink(
+            $EV_CONF['icons']['delete'],
+            EVLIST_ADMIN_URL. '/index.php?delcat=x&id=' . $A['id'],
+            array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                'title' => $LANG_ADMIN['delete'],
+            )
+        );
+        break;
+    default:
+        $retval = $fieldvalue;
+        break;
     }
     return $retval;
 }
 
 
 /**
-*   Return the display value for a ticket type field
-*
-*   @param  string  $fieldname  Name of the field
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Name-value pairs for all fields
-*   @param  array   $icon_arr   Array of system icons
-*   @return string      HTML to display for the field
-*/
+ * Return the display value for a ticket type field.
+ *
+ * @param   string  $fieldname  Name of the field
+ * @param   mixed   $fieldvalue Value of the field
+ * @param   array   $A          Name-value pairs for all fields
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string      HTML to display for the field
+ */
 function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_EV_CONF;
@@ -459,15 +456,13 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
     $retval = '';
     switch($fieldname) {
     case 'edit':
-        $retval = '<a href="' . EVLIST_ADMIN_URL .
-                '/index.php?editticket=' . $A['id'].
-                '" title="' . $LANG_ADMIN['edit'] . '" />';
-        if ($_EV_CONF['_is_uikit']) {
-            $retval .= '<i class="uk-icon-edit"></i>';
-        } else {
-            $retval .= $icon_arr['edit'];
-        }
-        $retval .= '</a>';
+        $retval = COM_createLInk(
+            '<i class="uk-icon-edit"></i>',
+            EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['id'],
+            array(
+                'title' => $LANG_ADMIN['edit'],
+            )
+        );
         break;
 
     case 'enabled':
@@ -489,9 +484,10 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
     case 'delete':
         if (!Evlist\TicketType::isUsed($A['id'])) {
             $retval = COM_createLink(
-                $icon_arr['delete'],
+                $_EV_CONF['icons']['delete'],
                 EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
-                array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                array(
+                    'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                     'title' => $LANG_ADMIN['delete'],
                 )
             );
@@ -517,7 +513,7 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
 */
 function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES;
+    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
     switch($fieldname) {
     case 'event_pass':
@@ -529,10 +525,11 @@ function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_ar
         break;
     case 'delete':
         $retval = COM_createLink(
-            $icon_arr['delete'],
+            $_EV_CONF['icons']['delete'],
             EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
-            array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-            'title' => $LANG_ADMIN['delete'],
+            array(
+                'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                'title' => $LANG_ADMIN['delete'],
             )
         );
         break;
@@ -548,14 +545,14 @@ function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_ar
 
 
 /**
-*   Return the display value for an event field
-*
-*   @param  string  $fieldname  Name of the field
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Name-value pairs for all fields
-*   @param  array   $icon_arr   Array of system icons
-*   @return string      HTML to display for the field
-*/
+ * Return the display value for an event field.
+ *
+ * @param   string  $fieldname  Name of the field
+ * @param   mixed   $fieldvalue Value of the field
+ * @param   array   $A          Name-value pairs for all fields
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string      HTML to display for the field
+ */
 function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
@@ -564,73 +561,64 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
     $retval = '';
 
     switch($fieldname) {
-        case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL .
-                '/index.php?edit=event&amp;eid=' . $A['id'] .
-                '&from=admin" title="' . $LANG_EVLIST['edit_event'] . '">';
-            if ($_EV_CONF['_is_uikit']) {
-                $retval .= '<i class="uk-icon-edit"></i>';
-            } else {
-                $retval .= $icon_arr['edit'];
-            }
-            $retval .= '</a>';
-            break;
-        case 'copy':
-            $retval = '<a href="' . EVLIST_URL .
-                '/event.php?clone=x&amp;eid=' . $A['id'] .
-                '" title="' . $LANG_EVLIST['copy'] . '">';
-            if ($_EV_CONF['_is_uikit']) {
-                $retval .= '<i class="uk-icon-clone"></i>';
-            } else {
-                $retval .= $icon_arr['copy'];
-            }
-            $retval .= '</a>';
-            break;
-        case 'title':
-            $rp_id = Evlist\Repeat::getNearest($A['id']);
-            if ($rp_id) {
-                $retval = COM_createLink($fieldvalue, EVLIST_URL .
-                        '/event.php?eid=' . $rp_id);
-            } else {
-                $retval = $fieldvalue;
-            }
-            break;
-        case 'status':
-            if ($A['status'] == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
+    case 'edit':
+        $retval = COM_createLink(
+            $_EV_CONF['icons']['edit'],
+            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $A['id'] . '&from=admin',
+            array(
+                'title' => $LANG_EVLIST['edit_event'],
+            )
+        );
+        break;
+    case 'copy':
+        $retval = COM_createLink(
+            $_EV_CONF['icons']['copy'],
+            EVLIST_URL . '/event.php?clone=x&amp;eid=' . $A['id'],
+            array(
+                'title' => $LANG_EVLIST['copy'],
+            )
+        );
+        break;
+    case 'title':
+        $rp_id = Evlist\Repeat::getNearest($A['id']);
+        if ($rp_id) {
+            $retval = COM_createLink(
+                $fieldvalue, EVLIST_URL . '/event.php?eid=' . $rp_id
+            );
+        } else {
+            $retval = $fieldvalue;
+        }
+        break;
+    case 'status':
+        if ($A['status'] == '1') {
+            $switch = EVCHECKED;
+            $enabled = 1;
+        } else {
+            $switch = '';
+            $enabled = 0;
+        }
+        $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
                 id=\"event_{$A['id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
                 '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
-            break;
-        case 'delete':
-            if ($del_icon === NULL) {
-                if ($_EV_CONF['_is_uikit']) {
-                    $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
-                } else {
-                    $del_icon = $icon_arr['delete'];
-                }
-            }
-            $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
-            if (isset($_REQUEST['cal_id'])) {
-                $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
-            }
-            $retval = COM_createLink(
-                    $del_icon,
-                    $url,
-                    array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
-                        'title' => $LANG_ADMIN['delete'],
-                    )
-                );
-            break;
-        default:
-            $retval = $fieldvalue;
-            break;
+        break;
+    case 'delete':
+        $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
+        if (isset($_REQUEST['cal_id'])) {
+            $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
+        }
+        $retval = COM_createLink(
+            $_EV_CONF['icons']['delete'],
+            $url,
+            array(
+                'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
+                'title' => $LANG_ADMIN['delete'],
+            )
+        );
+        break;
+    default:
+        $retval = $fieldvalue;
+        break;
     }
     return $retval;
 }
@@ -700,80 +688,74 @@ function EVLIST_admin_list_calendars()
 
 
 /**
-*   Return the display value for a calendar field
-*
-*   @param  string  $fieldname  Name of the field
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Name-value pairs for all fields
-*   @param  array   $icon_arr   Array of system icons
-*   @return string      HTML to display for the field
-*/
+ * Return the display value for a calendar field.
+ *
+ * @param   string  $fieldname  Name of the field
+ * @param   mixed   $fieldvalue Value of the field
+ * @param   array   $A          Name-value pairs for all fields
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string      HTML to display for the field
+ */
 function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
 
     $retval = '';
     switch($fieldname) {
-        case 'edit':
-            $retval = '<a href="' . EVLIST_ADMIN_URL .
-                '/index.php?editcal=' . $A['cal_id'] .
-                '" title="' . $LANG_EVLIST['edit_calendar'] . '" />';
-            if ($_EV_CONF['_is_uikit']) {
-                $retval .= '<i class="uk-icon-edit"></i>';
-            } else {
-                $retval .= $icon_arr['edit'];
-            }
-            $retval .= '</a>';
-            break;
-        case 'orderby':
-            $retval = COM_createLink('<i class="uk-icon uk-icon-arrow-up"></i>',
-                EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
-                ) .
-                COM_createLink('<i class="uk-icon uk-icon-arrow-down"></i>',
-                EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
-                );
-            break;
-        case 'cal_status':
-            if ($fieldvalue == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\"
+    case 'edit':
+        $retval = COM_createLink(
+            $_EV_CONF['icons']['edit'],
+            EVLIST_ADMIN_URL . '/index.php?editcal=' . $A['cal_id'],
+            array(
+                'title' => $LANG_EVLIST['edit_calendar'],
+            )
+        );
+        break;
+    case 'orderby':
+        $retval = COM_createLink(
+            $_EV_CONF['icons']['arrow-up'],
+            EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id'],
+        );
+        $retval .= COM_createLink(
+            $_EV_CONF['icons']['arrow-down'],
+            EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
+        );
+        break;
+    case 'cal_status':
+        if ($fieldvalue == '1') {
+            $switch = EVCHECKED;
+            $enabled = 1;
+        } else {
+            $switch = '';
+            $enabled = 0;
+        }
+        $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\"
                 id=\"togenabled{$A['cal_id']}\"
                 onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
                 '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
-            break;
-        case 'delete':
-            if ($A['cal_id'] > 1) {
-                if ($_EV_CONF['_is_uikit']) {
-                    $del_icon = '<i class="uk-icon-trash ev-icon-danger"></i>';
-                } else {
-                    $del_icon = $icon_arr['delete'];
-                }
-                $retval = COM_createLink(
-                    $del_icon,
-                    EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' .
-                        $A['cal_id'],
-                    array(
-                        'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');"
-                    )
-                );
-            }
-            break;
-        case 'cal_name':
-            $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
-                ';">' . $fieldvalue;
-            if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
-                $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
-            }
-            $retval .= '</span>';
-            break;
-        default:
-            $retval = $fieldvalue;
-            break;
+        break;
+    case 'delete':
+        if ($A['cal_id'] > 1) {
+            $retval = COM_createLink(
+                $_EV_CONF['icons']['delete'],
+                EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . $A['cal_id'],
+                array(
+                    'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                )
+            );
+        }
+        break;
+    case 'cal_name':
+        $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
+            ';">' . $fieldvalue;
+        if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
+            $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
+        }
+        $retval .= '</span>';
+        break;
+    default:
+        $retval = $fieldvalue;
+        break;
     }
     return $retval;
 }
@@ -1225,20 +1207,10 @@ case 'rsvp':
 
 case 'import':
     $T = new Template(EVLIST_PI_PATH . '/templates/');
-    if ($_EV_CONF['_is_uikit']) {
-        $T->set_file(array(
-            'form'  => 'import.uikit.thtml',
-            'instr' => 'import_csv_instr.thtml',
-        ) );
-        $T->set_var('required', '<i class="uk-icon uk-icon-exclamation-triangle ev-icon-danger" data-uk-tooltip title="' .
-            $LANG_EVLIST['required'] . '"></i>');
-    } else {
-        $T->set_file(array(
-            'form'  => 'import.thtml',
-            'instr' => 'import_csv_instr.thtml',
-        ) );
-        $T->set_var('required', '<span class="required">' . $LANG_EVLIST['required'] . '</span>');
-    }
+    $T->set_file(array(
+        'form'  => 'import.thtml',
+        'instr' => 'import_csv_instr.thtml',
+    ) );
     $T->parse('import_csv_instr', 'instr');
     $T->parse('output', 'form');
     $content .= $T->finish($T->get_var('output'));

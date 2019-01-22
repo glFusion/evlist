@@ -3,7 +3,7 @@
 The import file must have the fields in the following order:</p>
 <p>
   <ol>
-    <li>{$LANG_EVLIST['start_date']} (YYYY-MM-DD) {required}</li>
+    <li>{$LANG_EVLIST['start_date']} (YYYY-MM-DD) <i class="uk-icon uk-icon-exclamation-triangle ev-icon-danger" data-uk-tooltip title="{$LANG_EVLIST['required']}"></i></li>
     <li>{$LANG_EVLIST['end_date']} (YYYY-MM-DD) {required}</li>
     <li>{$LANG_EVLIST['start_time']} ("00:00:00" for allday events) {required}</li>
     <li>{$LANG_EVLIST['end_time']} ("00:00:00" for allday events) {required}</li>

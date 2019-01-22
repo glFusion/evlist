@@ -1,8 +1,8 @@
 {# begin {templatelocation} #}
 <h2 class="evlist_header">
-  <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, 1, 'month');" href="#!"><i class="{iconset}-backward ev-icon-info"></i></a>
+  <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, 1, 'month');" href="#!"><i class="uk-icon uk-icon-backward ev-icon-info"></i></a>
   <span id="date_range">{thismonth_str}, {thisyear}</span>
-  <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#!"><i class="{iconset}-forward ev-icon-info"></i></a>
+  <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#!"><i class="uk-icon uk-icon-forward ev-icon-info"></i></a>
 </h2>
 {cal_checkboxes}
 <div id="calendar-wrap" style="clear:both;">
@@ -36,11 +36,7 @@
 <div id="evlistCalendarPrintLink">
   <p>
     <a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print">
-{!if is_uikit}
       <i class="uk-icon uk-icon-print"></i>
-{!else}
-      <img src="{layout_url}/images/print.png" alt="Print" width="16" height="16" />
-{!endif}
     </a>
   </p>
 </div>

@@ -123,28 +123,22 @@ class Category
 
 
     /**
-    *   Provide the form to create or edit a calendar
-    *
-    *   @return string  HTML for editing form
-    */
+     * Provide the form to create or edit a calendar.
+     *
+     * @return  string  HTML for editing form
+     */
     public function Edit()
     {
         global $_SYSTEM;
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
-        if ($_SYSTEM['disable_jquery_slimbox']) {
-            $T->set_file('modify', 'catEditForm.uikit.thtml');
-        } else {
-            $T->set_file('modify', 'catEditForm.thtml');
-        }
+        $T->set_file('modify', 'catEditForm.thtml');
         $T->set_var(array(
             'cat_id'        => $this->cat_id,
             'cat_name'      => $this->cat_name,
             'stat_chk'      => $this->cat_status == 1 ? EVCHECKED : '',
             'cancel_url'    => EVLIST_ADMIN_URL. '/index.php?categories=x',
-            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
-
         $T->parse('output','modify');
         return $T->finish($T->get_var('output'));
     }

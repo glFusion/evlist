@@ -131,20 +131,14 @@ class TicketType
 
 
     /**
-    *   Provide the form to create or edit a ticket type
-    *
-    *   @return string  HTML for editing form
-    */
+     * Provide the form to create or edit a ticket type.
+     *
+     * @return  string  HTML for editing form
+     */
     public function Edit()
     {
-        global $_EV_CONF;
-
         $T = new \Template(EVLIST_PI_PATH . '/templates');
-        if ($_EV_CONF['_is_uikit']) {
-            $T->set_file('modify', 'ticketForm.uikit.thtml');
-        } else {
-            $T->set_file('modify', 'ticketForm.thtml');
-        }
+        $T->set_file('modify', 'ticketForm.thtml');
         $T->set_var(array(
             'id'                => $this->id,
             'description'       => $this->description,

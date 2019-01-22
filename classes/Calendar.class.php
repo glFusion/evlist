@@ -209,11 +209,7 @@ class Calendar
         global $_EV_CONF, $_SYSTEM;
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
-        if ($_EV_CONF['_is_uikit']) {
-            $T->set_file('modify', 'calEditForm.uikit.thtml');
-        } else {
-            $T->set_file('modify', 'calEditForm.thtml');
-        }
+        $T->set_file('modify', 'calEditForm.thtml');
 
         // Create the calendar selection. Include all calendars except the
         // current one.

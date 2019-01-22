@@ -241,9 +241,7 @@ class View
             'urlfilt_cal' => (int)$this->cal,
             'urlfilt_cat' => (int)$this->cat,
             'use_json' => 'true',
-            'is_uikit' => $_EV_CONF['_is_uikit'],
             'view'  => $this->type,
-            'iconset'   => $_EV_CONF['_iconset'],
         ) );
 
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -343,8 +341,6 @@ class View
             'webcal_url'    => $webcal_url,
             'feed_links'    => $rss_links,
             'ical_links'    => $ical_links,
-            'is_uikit'  => $_EV_CONF['_is_uikit'] ? 'true' : '',
-            'iconset'   => $_EV_CONF['_iconset'],
         ) );
 
         $T->parse('output', 'calendar_footer');
@@ -452,7 +448,6 @@ class View
         global $_EV_CONF;
 
         $T = new \Template(EVLIST_PI_PATH . '/templates/');
-        //$T = new Template(EVLIST_PI_PATH . '/templates/' . $type . 'view');
         $T->set_file(array(
             'view'  => 'json_cal_wrapper.thtml',
         ) );
@@ -488,7 +483,6 @@ class View
                     'fgcolor'   => $cal['fgcolor'],
                     'key'       => $key,
                     'cal_name'  => $cal['cal_name'],
-                    'iconset'   => $_EV_CONF['_iconset'],
                     'chk'   => self::getCalShowPref($key) ? EVCHECKED : ''
                 ) );
                 $T->parse('item', 'cal_item', true);
@@ -508,12 +502,7 @@ class View
     protected static function tooltip_newline()
     {
         global $_EV_CONF;
-
-        if ($_EV_CONF['_is_uikit']) {
-            return '<br />' . LB;
-        } else {
-            return LB;
-        }
+        return '<br />' . LB;
     }
 
 

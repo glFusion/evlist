@@ -34,7 +34,7 @@ class monthView extends \Evlist\View
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
         $this->type = 'month';
-        parent::__construct($year, $month, 0, $cat, $cal, $opts);
+        parent::__construct($year, $month, $day, $cat, $cal, $opts);
     }
 
 
@@ -230,8 +230,6 @@ class monthView extends \Evlist\View
             'cal_checkboxes' => $this->getCalCheckboxes(),
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
-            'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
-            'iconset'       => $_EV_CONF['_iconset'],
         ) );
 
         $T->parse('output', 'monthview');

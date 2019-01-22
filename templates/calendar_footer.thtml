@@ -1,14 +1,14 @@
 {# begin {templatelocation} #}
 <div style="clear:both;">
   {!if feed_links}
-    <i class="{iconset}-rss"></i>
+    <i class="uk-icon uk-icon-rss"></i>
     RSS:&nbsp;
     {feed_links}
   {!endif}
 </div>
 {!if ical_links}
   <div style="clear:both;">
-    <i class="{iconset}-calendar"></i>
+    <i class="uk-icon uk-icon-calendar"></i>
     ICal:&nbsp;<a href="{webcal_url}/ical.php">{$LANG_EVLIST['all_calendars']}</a>&nbsp;&nbsp;
     {ical_links}
   </div>

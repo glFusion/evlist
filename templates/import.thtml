@@ -1,19 +1,22 @@
 {# begin {templatelocation} #}
-<span class="alert" style="text-align:center;"><b>Be sure to back up your database before importing!</b></span>
+<div class="uk-alert uk-alert-danger" style="text-align:center;"><b>Be sure to back up your database before importing!</b></div>
 <div style="display:block;float:left;width:50%;">
   <h2>Import from Calendar</h2>
-  <form action="{site_admin_url}/plugins/evlist/index.php" method="post" 
+  <form class="uk-form uk-form-horizontal" action="{site_admin_url}/plugins/evlist/index.php" method="post" 
     enctype="multipart/form-data">
-      <button type="submit" name="import_cal">{$LANG_EVLIST['import_calendar']}</button>
+    <div class="uk-form-row">
+      <button class="uk-button uk-button-primary" type="submit" name="import_cal">{$LANG_EVLIST['import_calendar']}</button>
+    </div>
   </form>
+  <p>{$LANG_EVLIST['instr_import_cal']}</p>
 </div>
 
 <div style="display:block;float:left;width:50%;">
   <h2>Batch Import of Events</h2>
-  <form action="{site_admin_url}/plugins/evlist/index.php" method="post" 
+  <form class="uk-form uk-form-horizontal" action="{site_admin_url}/plugins/evlist/index.php" method="post" 
     enctype="multipart/form-data">
-    <input type="file" dir="ltr" name="importfile" size="40" />
-    <button type="submit" name="import_csv">{$LANG_EVLIST['import_from_csv']}</button>
+        <input type="file" dir="ltr" name="importfile" size="40" />
+    <button class="uk-button uk-button-primary" type="submit" name="import_csv">{$LANG_EVLIST['import_from_csv']}</button>
   </form>
   {import_csv_instr}
 </div>

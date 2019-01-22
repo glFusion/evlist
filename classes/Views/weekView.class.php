@@ -200,7 +200,6 @@ class weekView extends \Evlist\View
             'year'          => $this->year,
             'month'         => $this->month,
             'day'           => $this->day,
-            'is_uikit'      => $_EV_CONF['_is_uikit'] ? 'true' : '',
         ) );
         $T->parse('output','week');
         return $T->finish($T->get_var('output'));

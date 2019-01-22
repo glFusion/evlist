@@ -2,6 +2,7 @@
 
 ## v1.4.6
 Release TBD
+- Retire support for non-UIkit themes
 - Clear category lookup cache when an event is updated.
 - Provide location address to Locator plugin
 - Leverage list item template to correctly show event date and time in lists
@@ -11,11 +12,11 @@ Release TBD
 - Add orderby field to calendars to control order in selection lists.
 - Fix search results not excluding by calendar status or permissions.
 - Consider calendar perms in Event::hasAccess().
-- Request perms in plugin_itemsaved, calculate based on owner/group if not supplied.
+- Request perms in `plugin_itemsaved`, calculate based on owner/group if not supplied.
 
 ## v1.4.5
 Release 2018-04-14
-- Allow &quot;%site_url%&quot; in event URL to reference the site base URL.
+- Allow `%site_url%` in event URL to reference the site base URL.
 - Supports calls to PLG_itemSaved() to allow plugins to submit and update events.
 - Added plugin->calendar mapping in the configuration (Integration section)
 - Add multiple event deletion

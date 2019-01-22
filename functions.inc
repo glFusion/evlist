@@ -83,11 +83,6 @@ if ($_CONF['loginrequired'] == 1) {
     $_EV_CONF['allow_anon_view'] = '0';
 }
 
-// Mark whether this is a uikit theme. Save to global conf var
-// so it's available where needed.
-$_EV_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
-$_EV_CONF['_iconset'] = $_EV_CONF['_is_uikit'] ? 'uk-icon uk-icon' : 'fa fa';
-
 if (empty($_EV_CONF['meetup_gid']) || empty($_EV_CONF['meetup_key'])) {
     $_EV_CONF['meetup_enabled'] = 0;
 }

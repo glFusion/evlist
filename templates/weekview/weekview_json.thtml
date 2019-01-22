@@ -42,11 +42,7 @@
 <div id="evlistCalendarPrintLink">
   <p>
     <a href="{pi_url}/index.php?view=pweek&amp;year={year}&amp;month={month}&amp;day={day}" target="_blank" title="Print">
-{!if is_uikit}
       <i class="uk-icon uk-icon-print"></i>
-{!else}
-      <img src="{layout_url}/images/print.png" alt="Print" width="16" height="16" />
-{!endif}
     </a>
   </p>
 </div>

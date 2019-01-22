@@ -389,6 +389,7 @@ $LANG_EVLIST = array(
 'show_after'    => 'Show After',
 'first'         => 'First',
 'ev_not_found'  => 'The requested event was not found.',
+'jump'          => 'Jump',
 );
 
 $LANG_EVLIST_HELP = array(

@@ -714,7 +714,7 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
     case 'orderby':
         $retval = COM_createLink(
             $_EV_CONF['icons']['arrow-up'],
-            EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id'],
+            EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
         );
         $retval .= COM_createLink(
             $_EV_CONF['icons']['arrow-down'],

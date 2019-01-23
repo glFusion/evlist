@@ -138,15 +138,18 @@ class TicketType
     public function Edit()
     {
         $T = new \Template(EVLIST_PI_PATH . '/templates');
-        $T->set_file('modify', 'ticketForm.thtml');
+        $T->set_file(array(
+            'modify'    => 'ticketForm.thtml',
+            'tips'      => 'tooltipster.thtml',
+        ) );
         $T->set_var(array(
             'id'                => $this->id,
             'description'       => $this->description,
             'event_pass_chk'    => $this->event_pass == 1 ? EVCHECKED : '',
             'enabled_chk'       => $this->enabled == 1 ? EVCHECKED : '',
-            'doc_url'           => EVLIST_getDocURL('tickettype.html'),
+            'doc_url'           => EVLIST_getDocURL('tickettype'),
         ) );
-
+        $T->parse('tooltipster_js', 'tips');
         $T->parse('output','modify');
         return $T->finish($T->get_var('output'));
     }

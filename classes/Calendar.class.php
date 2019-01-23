@@ -209,7 +209,10 @@ class Calendar
         global $_EV_CONF, $_SYSTEM;
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
-        $T->set_file('modify', 'calEditForm.thtml');
+        $T->set_file(array(
+            'modify'    => 'calEditForm.thtml',
+            'tips'      => 'tooltipster.thtml',
+        ) );
 
         // Create the calendar selection. Include all calendars except the
         // current one.
@@ -236,15 +239,14 @@ class Calendar
             'ical_chk'      => $this->cal_ena_ical == 1 ? EVCHECKED : '',
             'cancel_url'    => EVLIST_ADMIN_URL. '/index.php?admin=cal',
             'can_delete'    => $this->cal_id > 1 ? 'true' : '',
-            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
-            'help_url' => LGLIB_getDocUrl('calendar', 'evlist'),
-            'colorpicker' => LGLIB_colorpicker(array(
-                    'fg_id'     => 'fld_fgcolor',
-                    'fg_color'  => $this->fgcolor,
-                    'bg_id'     => 'fld_bgcolor',
-                    'bg_color'  => $this->bgcolor,
-                    'sample_id' => 'sample',
-                )),
+            'doc_url'       => EVLIST_getDocUrl('calendar', 'evlist'),
+            'colorpicker_js' => LGLIB_colorpicker(array(
+                'fg_id'     => 'fld_fgcolor',
+                'fg_color'  => $this->fgcolor,
+                'bg_id'     => 'fld_bgcolor',
+                'bg_color'  => $this->bgcolor,
+                'sample_id' => 'sample',
+            ) ),
             'fg_inherit_chk' => $this->fgcolor == '' ? EVCHECKED : '',
             'bg_inherit_chk' => $this->bgcolor == '' ? EVCHECKED : '',
             'icon'              => $this->cal_icon,
@@ -253,6 +255,7 @@ class Calendar
             'orderby'       => $this->orderby,
         ) );
 
+        $T->parse('tooltipster_js', 'tips');
         $T->parse('output','modify');
         return $T->finish($T->get_var('output'));
     }

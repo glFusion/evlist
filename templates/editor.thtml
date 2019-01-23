@@ -1136,32 +1136,6 @@ for (i = 0; i < el.length; i++) {
   }
 }
 
-var ConfigDocUrl = "{doc_url}";
-$(document).ready(function() {
-    $('.tooltip_cfg').tooltipster({
-        contentAsHTML: true,
-        animation: 'fade',
-        trigger: 'click',
-        iconDesktop: true,
-        iconTouch: true,
-        functionBefore: function(origin, continueTooltip) {
-            var attrHref = ConfigDocUrl;
-            var ajobj = $(this);
-            $.get(attrHref, function(data) {
-                var confVar = ajobj.attr('id');
-                if (data.indexOf(confVar) > 0) {
-                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
-                    origin.tooltipster('content', desc);
-                } else {
-                    origin.tooltipster('content', 'No Help Text Found');
-                    console.log('Unable to find help text for desc_%s',confVar);
-                }
-                continueTooltip();
-            });
-        }
-    });
-});
-
 $(document).ready(function() {
     toggleRSVPdetail({use_rsvp});
 {!if recur_section}
@@ -1171,6 +1145,7 @@ $(document).ready(function() {
     showhide_tzselect(document.getElementById("tz_local"));
     chk_allday();
 });
+
 jQuery('#custom_trigger').datetimepicker({
   timepicker:false,
   format:"Y-m-d",
@@ -1187,6 +1162,6 @@ jQuery('#custom_trigger').datetimepicker({
     return true;
   }
 });
-
 </script>
+{tooltipster_js}
 {# end {templatelocation} #}

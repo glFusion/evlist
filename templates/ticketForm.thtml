@@ -1,33 +1,4 @@
 {# begin {templatelocation} #}
-<script type="text/javascript">
-<!--
-var ConfigDocUrl = '{doc_url}';
-$(document).ready(function() {
-    $('.tooltip_cfg').tooltipster({
-        contentAsHTML: true,
-        animation: 'fade',
-        trigger: 'click',
-        iconDesktop: true,
-        iconTouch: true,
-        functionBefore: function(origin, continueTooltip) {
-            var attrHref = ConfigDocUrl;
-            var ajobj = $(this);
-            $.get(attrHref, function(data) {
-                var confVar = ajobj.attr('id');
-                if (data.indexOf(confVar) > 0) {
-                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
-                    origin.tooltipster('content', desc);
-                } else {
-                    origin.tooltipster('content', 'No Help Text Found');
-                    console.log('Unable to find help text for desc_%s',confVar);
-                }
-                continueTooltip();
-            });
-        }
-    });
-});
--->
-</script>
 <form id="ticketedit" method="post" class="uk-form uk-form-horizontal"
     action="{site_admin_url}/plugins/evlist/index.php">
   <input type="hidden" name="id" value="{id}" />
@@ -64,4 +35,5 @@ $(document).ready(function() {
       <button type="submit" class="uk-button uk-button-danger" name="delticket" value="{$LANG_ADMIN['delete']}">{$LANG_ADMIN['delete']}</button>
   </div>
 </form>
+{tooltipster_js}
 {# begin {templatelocation} #}

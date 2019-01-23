@@ -12,7 +12,7 @@
 */
 namespace Evlist;
 
-use LGLib\Date_Calc;
+use \Evlist\Date_Calc;
 USES_evlist_functions();
 
 /**
@@ -847,7 +847,10 @@ class Event
         }
 
         $T = new \Template($_CONF['path'] . 'plugins/evlist/templates/');
-        $T->set_file('editor', 'editor.thtml');
+        $T->set_file(array(
+            'editor'    => 'editor.thtml',
+            'tips'      => 'tooltipster.thtml',
+        ) );
 
         // Set up the wysiwyg editor, if available
         switch (PLG_getEditorType()) {
@@ -1016,7 +1019,7 @@ class Event
                 'custom_label' => sprintf($LANG_EVLIST['custom_label'],
                         $LANG_EVLIST['dates'], ''),
                 'datestart_note' => $LANG_EVLIST['datestart_note'],
-                'help_url' => LGLIB_getDocURL($file='event', $pi_name='evlist'),
+                'help_url' => EVLIST_getDocURL('event'),
             ) );
         }
 
@@ -1201,8 +1204,7 @@ class Event
             'lng'           => EVLIST_coord2str($this->Detail->lng),
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
-            'doc_url'       => EVLIST_getDocURL('event.html'),
-            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
+            'doc_url'       => EVLIST_getDocURL('event'),
             // If the event timezone is "local", just use some valid timezone
             // for the selection. The checkbox will be checked which will
             // hide the timezone selection anyway.
@@ -1387,7 +1389,7 @@ class Event
                 ) );
             }
         }
-
+        $T->parse('tooltipster_js', 'tips');
         $T->parse('output', 'editor');
         $retval .= $T->finish($T->get_var('output'));
 

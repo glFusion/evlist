@@ -149,7 +149,7 @@ spl_autoload_register(function ($class)
     }
 });
 
-use LGLib\Date_Calc;
+use \Evlist\Date_Calc;
 
 function USES_evlist_functions()
 {    require_once __DIR__ . '/evlist_functions.inc.php'; }
@@ -1858,14 +1858,13 @@ function EVLIST_getDocURL($file='', $doclang='english')
         if (!file_exists($doc_path . $file)) {
             $doclang = 'english';
         }
-        $doc_url = EVLIST_URL . "/docs/$doclang/$file";
+        $doc_url = EVLIST_URL . "/docs/{$doclang}/{$file}.html";
     } else {
         if (!is_dir($doc_path)) {
             $doclang = 'english';
         }
         $doc_url = EVLIST_URL . "/docs/$doclang/";
     }
-
     return $doc_url;
 }
 

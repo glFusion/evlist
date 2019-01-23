@@ -1,34 +1,4 @@
 {# begin {templatelocation} #}
-<script type="text/javascript">
-<!--
-var ConfigDocUrl = '{help_url}';
-$(document).ready(function() {
-    $('.tooltip_cfg').tooltipster({
-        contentAsHTML: true,
-        animation: 'fade',
-        trigger: 'click',
-        iconDesktop: true,
-        iconTouch: true,
-        functionBefore: function(origin, continueTooltip) {
-            var attrHref = ConfigDocUrl;
-            var ajobj = $(this);
-            $.get(attrHref, function(data) {
-                var confVar = ajobj.attr('id');
-                if (data.indexOf(confVar) > 0) {
-                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
-                    origin.tooltipster('content', desc);
-                } else {
-                    origin.tooltipster('content', 'No Help Text Found');
-                    console.log('Unable to find help text for desc_%s',confVar);
-                }
-                continueTooltip();
-            });
-        }
-    });
-});
--->
-</script>
-
  <form id="calendaredit" method="post" class="uk-form uk-form-horizontal evForm"
     action="{site_admin_url}/plugins/evlist/index.php">
   <input type="hidden" name="cal_id" value="{cal_id}" />
@@ -150,5 +120,6 @@ $(document).ready(function() {
   <button type="reset" class="uk-button uk-button-primary" name="cancel" value="{$LANG_ADMIN['cancel']}"
       onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
 </form>
-{colorpicker}
+{colorpicker_js}
+{tooltipster_js}
 {# end {templatelocation} #}

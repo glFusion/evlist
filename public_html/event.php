@@ -407,6 +407,7 @@ default:
     if (!empty($rp_id)) {
         $Rep = Evlist\Repeat::getInstance($rp_id);
         if ($Rep->rp_id == 0 || !$Rep->Event->hasAccess(2)) {
+            echo "Here";die;
             COM_setMsg($LANG_EVLIST['ev_not_found']);
             echo COM_refresh(EVLIST_URL . '/index.php');
             exit;
@@ -427,7 +428,7 @@ default:
 }
 
 $display = EVLIST_siteHeader($pagetitle);
-$V = new Evlist\View_detail();
+$V = \Evlist\View::getView('detail');
 $display .= $V->Header($add_link);
 
 if (!empty($msg)) {

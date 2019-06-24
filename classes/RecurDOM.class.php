@@ -1,24 +1,30 @@
 <?php
 /**
-*   Class to create day-of-month recurrences for the evList plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to create day-of-month recurrences for the evList plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
-use LGLib\Date_Calc;
+
 
 /**
-*   Class for handling recurrence by day of month.
-*   @package evlist
-*/
+ * Class for handling recurrence by day of month.
+ * @package evlist
+ */
 class RecurDOM extends Recur
 {
+    /**
+     * Create the recurring dates.
+     *
+     * @see     Recur::storeEvent()
+     * @return  array   Array of event dates and times
+     */
     public function MakeRecurrences()
     {
         global $_EV_CONF;
@@ -39,7 +45,7 @@ class RecurDOM extends Recur
 
         $count = 0;
         // reduce the weekday number, since evlist uses Sun=1 while
-        // Date_Calc uses Sun=0
+        // DateFunc uses Sun=0
         $datecalc_weekday = (int)$this->event->rec_data['weekday'] - 1;
 
         while ($occurrence <= $this->event->rec_data['stop'] &&
@@ -48,9 +54,10 @@ class RecurDOM extends Recur
 
             foreach ($intervalA as $interval) {
 
-                $occurrence = Date_Calc::NWeekdayOfMonth(
-                            (int)$interval, $datecalc_weekday,
-                            $m, $y, '%Y-%m-%d'
+                $occurrence = DateFunc::NWeekdayOfMonth(
+                    (int)$interval,
+                    $datecalc_weekday,
+                    $m, $y
                 );
 
                 // Skip any dates earlier than the starting date
@@ -60,9 +67,7 @@ class RecurDOM extends Recur
                 // for the last (5th) week, then re-adjust to use the 4th week.
                 // If we already have a 4th, this will just overwrite it
                 if ($occurrence == -1 && $interval == 5) {
-                    $occurrence = Date_Calc::NWeekdayOfMonth(
-                                4, $datecalc_weekday,
-                                $m, $y, '%Y-%m-%d');
+                    $occurrence = DateFunc::NWeekdayOfMonth(4, $datecalc_weekday, $m, $y);
                 }
 
                 // Stop when we hit the stop date

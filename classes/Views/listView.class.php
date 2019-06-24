@@ -11,7 +11,7 @@
  * @filesource
  */
 namespace Evlist\Views;
-use LGLib\Date_Calc;
+use Evlist\DateFunc;
 
 /**
  * Create a list of events.
@@ -27,7 +27,7 @@ class listView extends \Evlist\View
      * @param   integer $day    Starting day
      * @param   integer $cat    Event category
      * @param   integer $cal    Calendar ID
-     * @param   string  $opt    Optional template modifier, e.g. "print"
+     * @param   string  $opts   Optional template modifier, e.g. "print"
      */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
@@ -81,15 +81,15 @@ class listView extends \Evlist\View
             $opts['order'] = 'DESC';
             break;
         case 3:         //this week
-            $start = Date_Calc::beginOfWeek();
-            $end = Date_Calc::endOfWeek();
+            $start = DateFunc::beginOfWeek();
+            $end = DateFunc::endOfWeek();
             break;
         case 4:         //this month
-            $start = Date_Calc::beginOfMonth();
-            $year = Date_Calc::getYear();
-            $month = Date_Calc::getMonth();
-            $day = Date_Calc::daysInMonth($month, $year);
-            $end = Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
+            $start = DateFunc::beginOfMonth();
+            $year = DateFunc::getYear();
+            $month = DateFunc::getMonth();
+            $day = DateFunc::daysInMonth($month, $year);
+            $end = DateFunc::dateFormat($day, $month, $year);
             break;
         case 2:         //upcoming
         default:

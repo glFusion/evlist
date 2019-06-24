@@ -1,23 +1,22 @@
 <?php
 /**
-*   Class to manage events for the EvList plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage events for the EvList plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
-use \Evlist\Date_Calc;
 USES_evlist_functions();
 
 /**
- *  Class for event
- *  @package evlist
+ * Class for event records.
+ * @package evlist
  */
 class Event
 {
@@ -36,8 +35,13 @@ class Event
     *   @var boolean */
     var $isAdmin;           // Has evlist.admin privilege
 
-    var $isNew;             // Flags a new event record
-    var $det_id;            // Detail record ID
+    /** Flags a new event record.
+     * @var boolean */
+    var $isNew;
+
+    /** Detail record ID
+     * @var integer */
+    var $det_id;
 
     /** Recurring event data
     *   @var array */
@@ -47,24 +51,35 @@ class Event
     *   @var array */
     var $options;
 
-    var $old_schedule;      // Keeper of old schedul info before updating
+    /** Original schedule.
+     * Used to check if the schedule must be updated after saving.
+     * @var array */
+    var $old_schedule;
 
-    var $Detail;            // Detail object
-    var $Calendar;          // Calendar object
-    var $table;             // DB table being used
+    /** Detail object.
+     * @var object */
+    var $Detail;
 
-    /** Array of error messages
-     *  @var array */
-    var $Errors = array();
+    /** Calendar object.
+     * @var object */
+    private $Calendar;
+
+    /** DB table being used (production vs. submission)
+     * @var string */
+    private $table;
+
+    /** Array of error messages.
+     * @var array */
+    public $Errors = array();
 
 
     /**
-     *  Constructor.
-     *  Reads in the specified class, if $id is set.  If $id is zero,
-     *  then a new entry is being created.
+     * Constructor.
+     * Reads in the specified class, if $id is set.  If $id is zero,
+     * then a new entry is being created.
      *
-     *  @param  string  $ev_id  Optional event ID
-     *  @param  integer $detail Optional detail record ID for single repeat
+     * @param   string  $ev_id  Optional event ID
+     * @param   integer $detail Optional detail record ID for single repeat
      */
     public function __construct($ev_id='', $detail=0)
     {
@@ -170,12 +185,12 @@ class Event
 
 
     /**
-    *   Get an instance of an event.
-    *
-    *   @param  string  $ev_id      Event ID
-    *   @param  integer $det_id     Optional specific detail record ID
-    *   @return object              Event object
-    */
+     * Get an instance of an event.
+     *
+     * @param   string  $ev_id      Event ID
+     * @param   integer $det_id     Optional specific detail record ID
+     * @return  object              Event object
+     */
     public static function getInstance($ev_id, $det_id = 0)
     {
         static $records = array();
@@ -196,12 +211,11 @@ class Event
 
 
     /**
-    *   Set a property's value.
-    *   Emulates the __set() magic function in PHP 5.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         switch ($var) {
@@ -279,13 +293,11 @@ class Event
 
 
     /**
-    *   Get the value of a property.
-    *   Emulates the behaviour of __get() function in PHP 5.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @param  boolean $db     True if string values should be escaped for DB.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
@@ -297,10 +309,10 @@ class Event
 
 
     /**
-     *  Sets all variables to the matching values from $rows.
+     * Sets all variables to the matching values from $rows.
      *
-     *  @param  array   $row        Array of values, from DB or $_POST
-     *  @param  boolean $fromDB     True if read from DB, false if from $_POST
+     * @param   array   $row        Array of values, from DB or $_POST
+     * @param   boolean $fromDB     True if read from DB, false if from $_POST
      */
     public function SetVars($row, $fromDB=false)
     {
@@ -455,10 +467,11 @@ class Event
 
 
     /**
-     *  Read a specific record and populate the local values.
+     * Read a specific record and populate the local values.
      *
-     *  @param  integer $id Optional ID.  Current ID is used if zero.
-     *  @return boolean     True if a record was read, False on failure.
+     * @param   integer $ev_id  Optional ID.  Current ID is used if zero.
+     * @param   string  $table  Table name, default = production
+     * @return  boolean     True if a record was read, False on failure.
      */
     public function Read($ev_id = '', $table = 'evlist_events')
     {
@@ -502,17 +515,17 @@ class Event
 
 
     /**
-     *  Save the current values to the database.
-     *  Appends error messages to the $Errors property.
+     * Save the current values to the database.
+     * Appends error messages to the $Errors property.
      *
-     *  The $forceNew parameter is a hack to force this record to be saved
-     *  as a new record even if it already has an ID.  This is only to
-     *  handle events imported from the Calendar plugin.
+     * The $forceNew parameter is a hack to force this record to be saved
+     * as a new record even if it already has an ID.  This is only to
+     * handle events imported from the Calendar plugin.
      *
-     *  @param  array   $A      Optional array of values from $_POST
-     *  @param  string  $table  Table name (submission or production)
-     *  @param  boolean $forceNew   Hack to force this record to be "new"
-     *  @return string      Error text, or empty string on success
+     * @param   array   $A      Optional array of values from $_POST
+     * @param   string  $table  Table name (submission or production)
+     * @param   boolean $forceNew   Hack to force this record to be "new"
+     * @return  string      Error text, or empty string on success
      */
     public function Save($A = '', $table = 'evlist_submissions', $forceNew=false)
     {
@@ -745,21 +758,26 @@ class Event
 
 
     /**
-    *   Delete the current event record and all repeats.
-    */
+     * Delete the specified event record and all repeats.
+     *
+     * @param   integer $eid    Event ID
+     * @return      True on success, False on failure
+     */
     public static function Delete($eid)
     {
         global $_TABLES, $_PP_CONF;
 
-        if ($eid == '')
+        if ($eid == '') {
             return false;
+        }
 
         // Make sure the current user has access to delete this event
         $sql = "SELECT id FROM {$_TABLES['evlist_events']}
                 WHERE id='$eid' " . COM_getPermSQL('AND', 0, 3);
         $res = DB_query($sql);
-        if (!$res || DB_numRows($res) != 1)
+        if (!$res || DB_numRows($res) != 1) {
             return false;
+        }
 
         DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
         DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
@@ -774,9 +792,9 @@ class Event
 
 
     /**
-     *  Determines if the current record is valid.
+     * Determines if the current record is valid.
      *
-     *  @return boolean     True if ok, False when first test fails.
+     * @return  boolean     True if ok, False when first test fails.
      */
     private function isValidRecord()
     {
@@ -813,7 +831,9 @@ class Event
     /**
      * Creates the edit form.
      *
-     * @param   integer $id Optional ID, current record used if zero
+     * @param   string  $eid    Optional Event ID, current record used if zero
+     * @param   integer $rp_id  Optional Repeat ID
+     * @param   string  $saveaction     Action when saving
      * @return  string      HTML for edit form
      */
     public function Edit($eid = '', $rp_id = 0, $saveaction = '')
@@ -1003,7 +1023,7 @@ class Event
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
                         EVLIST_GetOptions($LANG_EVLIST['rec_formats'], isset($this->rec_data['type']) ? $this->rec_data['type'] : ''),
-                'recurring_weekday_options' => EVLIST_GetOptions(Date_Calc::getWeekDays(), $recweekday, 1),
+                'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
                 'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
@@ -1093,7 +1113,7 @@ class Event
             list($endmonth1, $endday1, $endyear1,
                     $endhour1, $endminute1) =
                     $this->DateParts($this->date_end1, $this->time_end1);
-            $days_interval = Date_Calc::dateDiff(
+            $days_interval = DateFunc::dateDiff(
                     $endday1, $endmonth1, $endyear1,
                     $startday1, $startmonth1, $startyear1);
         } else {
@@ -1399,13 +1419,13 @@ class Event
 
 
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $oldvalue   Original value
-    *   @param  string  $varname    DB field name to toggle
-    *   @param  string  $ev_id      Event record ID
-    *   @return integer     New value, or old value upon failure
-    */
+     * Toggles a field to the opposite of the existing value.
+     *
+     * @param   integer $oldvalue   Original value
+     * @param   string  $varname    DB field name to toggle
+     * @param   string  $ev_id      Event record ID
+     * @return  integer     New value, or old value upon failure
+     */
     private static function _toggle($oldvalue, $varname, $ev_id)
     {
         global $_TABLES;
@@ -1430,12 +1450,12 @@ class Event
 
 
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $oldvalue   Original value
-    *   @param  string  $ev_id      Event record ID
-    *   @return         New value, or old value upon failure
-    */
+     * Sets the `enabled` field based on the existing value.
+     *
+     * @param  integer $oldvalue   Original value
+     * @param  string  $ev_id      Event record ID
+     * @return         New value, or old value upon failure
+     */
     public static function toggleEnabled($oldvalue, $ev_id='')
     {
         return self::_toggle($oldvalue, 'status', $ev_id);
@@ -1443,11 +1463,11 @@ class Event
 
 
     /**
-    *   Create the individual occurrances of a the current event.
-    *   If the event is not recurring, returns an array with only one element.
-    *
-    *   @return array           Array of matching events, keyed by date, or false
-    */
+     * Create the individual occurrances of a the current event.
+     * If the event is not recurring, returns an array with only one element.
+     *
+     * @return  array       Array of matching events, keyed by date, or false
+     */
     public function MakeRecurrences()
     {
         $events = array();
@@ -1499,13 +1519,13 @@ class Event
 
 
     /**
-    *   Update all the repeats in the database.
-    *   Deletes all existing repeats, then creates new ones.  Not very
-    *   efficient; it might make sense to check all related values, but there
-    *   are several.
-    *
-    *   @return boolean     True on success, False on failure
-    */
+     * Update all the repeats in the database.
+     * Deletes all existing repeats, then creates new ones. Not very
+     * efficient; it might make sense to check all related values, but there
+     * are several.
+     *
+     * @return  boolean     True on success, False on failure
+     */
     public function UpdateRepeats()
     {
         global $_TABLES;
@@ -1551,10 +1571,10 @@ class Event
 
 
     /**
-    *   Create a formatted display-ready version of the error messages.
-    *
-    *   @return string      Formatted error messages.
-    */
+     * Create a formatted display-ready version of the error messages.
+     *
+     * @return  string      Formatted error messages.
+     */
     public function PrintErrors()
     {
         $retval = '';
@@ -1566,12 +1586,12 @@ class Event
 
 
     /**
-    *   Break up a date & time into component parts
-    *
-    *   @param  string  $date   SQL-formatted date
-    *   @param  string  $time   Time (HH:MM)
-    *   @return array   Array of values.
-    */
+     * Break up a date & time into component parts.
+     *
+     * @param   string  $date   SQL-formatted date
+     * @param   string  $time   Time (HH:MM)
+     * @return  array   Array of values.
+     */
     public function DateParts($date, $time)
     {
         $month = '';
@@ -1667,15 +1687,15 @@ class Event
 
 
     /**
-    *   Determine if an update to the repeat table is needed.
-    *   Checks all the dates & times, and the recurring settings to see
-    *   if any have changed.
-    *   Uses the old_schedule variable, which must be set first.
-    *
-    *   @uses   self::_arrayDiffAssocRecursive()
-    *   @param  array   $A  Array of values (e.g. $_POST)
-    *   @return boolean     True if an update is needed, false if not
-    */
+     * Determine if an update to the repeat table is needed.
+     * Checks all the dates & times, and the recurring settings to see
+     * if any have changed.
+     * Uses the old_schedule variable, which must be set first.
+     *
+     * @uses    self::_arrayDiffAssocRecursive()
+     * @param   array   $A  Array of values (e.g. $_POST)
+     * @return  boolean     True if an update is needed, false if not
+     */
     public function NeedRepeatUpdate($A)
     {
         // Just check each relevant value in $A against our value.
@@ -1741,14 +1761,14 @@ class Event
 
 
     /**
-    *   Recursively check two arrays for differences.
-    *   From http://nl3.php.net/manual/en/function.array-diff-assoc.php#73972
-    *
-    *   @see    self::NeedRepeatUpdate()
-    *   @param  array   $array1     First array
-    *   @param  array   $array2     Second array
-    *   @return mixed       Array of differences, or 0 if none.
-    */
+     * Recursively check two arrays for differences.
+     * From http://nl3.php.net/manual/en/function.array-diff-assoc.php#73972
+     *
+     * @see     self::NeedRepeatUpdate()
+     * @param   array   $array1     First array
+     * @param   array   $array2     Second array
+     * @return  mixed       Array of differences, or 0 if none.
+     */
     private static function _arrayDiffAssocRecursive($array1, $array2)
     {
         $difference = array();
@@ -1773,11 +1793,12 @@ class Event
 
 
     /**
-    *   Creates the rec_data array.
-    *
-    *   @param  array   $A      Array of data, default to $_POST
-    *   @return none        Sets $this->rec_data values
-    */
+     * Creates the rec_data array.
+     * This holds the recurrence frequency, type, start, end, etc.
+     *
+     * @param   array   $A      Array of data, default to $_POST
+     * @return  none        Sets $this->rec_data values
+     */
     public function MakeRecData($A = '')
     {
         if ($A == '') $A = $_POST;
@@ -1799,7 +1820,7 @@ class Event
         // Validate the user-supplied stopdate
         if (!empty($A['stopdate'])) {
             list($stop_y, $stop_m, $stop_d) = explode('-', $A['stopdate']);
-            if (Date_Calc::isValidDate($stop_d, $stop_m, $stop_y)) {
+            if (DateFunc::isValidDate($stop_d, $stop_m, $stop_y)) {
                 $this->rec_data['stop'] = $A['stopdate'];
             }
         } else {
@@ -1849,16 +1870,16 @@ class Event
 
 
     /**
-    *   Get a friendly description of a recurring event's frequency.
-    *   Returns strings like "2 weeks", "month", "3 days", etc, which can
-    *   be used to create phrases like "occurs every 2 months".
-    *   This can be called as an object method or an api function by
-    *   supplying both of the optional parameters.
-    *
-    *   @param  integer $freq       Frequency (number of intervals)
-    *   @param  integer $interval   Interval, one to six
-    *   @return string      Friendly text describing the interval
-    */
+     * Get a friendly description of a recurring event's frequency.
+     * Returns strings like "2 weeks", "month", "3 days", etc, which can
+     * be used to create phrases like "occurs every 2 months".
+     * This can be called as an object method or an api function by
+     * supplying both of the optional parameters.
+     *
+     * @param   integer $freq       Frequency (number of intervals)
+     * @param   integer $interval   Interval, one to six
+     * @return  string      Friendly text describing the interval
+     */
     public function RecurDescrip($freq = '', $interval = '')
     {
         global $LANG_EVLIST;
@@ -1891,10 +1912,10 @@ class Event
 
 
     /**
-    *   Check if the current user is the owner of this event.
-    *
-    *   @return boolean     True if the user is the owner, False if not
-    */
+     * Check if the current user is the owner of this event.
+     *
+     * @return  boolean     True if the user is the owner, False if not
+     */
     public function isOwner()
     {
         global $_USER;
@@ -1903,14 +1924,14 @@ class Event
 
 
     /**
-    *   Determine if the current user can edit this event.
-    *   Editing is allowed for:
-    *   - Moderators
-    *   - All owners if moderation is not required
-    *   - Owners who have the evlist.submit privilege
-    *
-    *   @return boolean     True if editing is allowed, False if not
-    */
+     * Determine if the current user can edit this event.
+     * Editing is allowed for:
+     * - Moderators
+     * - All owners if moderation is not required
+     * - Owners who have the evlist.submit privilege
+     *
+     * @return boolean     True if editing is allowed, False if not
+     */
     public function canEdit()
     {
         global $_CONF;

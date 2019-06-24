@@ -1,25 +1,30 @@
 <?php
 /**
-*   Class to create monthly recurrences for the evList plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to create monthly recurrences for the evList plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
-use LGLib\Date_Calc;
+
 
 /**
-*   Class to handle monthly recurrences.
-*   @package evlist
-*/
+ * Class to handle monthly recurrences.
+ * @package evlist
+ */
 class RecurMonthly extends Recur
 {
-
+    /**
+     * Create the recurrences for a monthly event.
+     * Also sets `$this->events` with the recurring data.
+     *
+     * @return  array   Array of event start/end dates and times.
+     */
     public function MakeRecurrences()
     {
         global $_EV_CONF;
@@ -35,14 +40,11 @@ class RecurMonthly extends Recur
         // Start by reducing the starting date by one day. Then the for
         // loop can handle all the events.
         list($y, $m, $d) = explode('-', $occurrence);
-        //$occurrence = Date_Calc::prevDay($d, $m, $y);
-        //$count = 1;
         $count = 0;
         while ($occurrence <= $this->event->rec_data['stop'] &&
-                    //$occurrence >= '1971-01-01' &&
-                    $count < $_EV_CONF['max_repeats']) {
-
-            $lastday = Date_Calc::daysInMonth($m, $y); // last day in month
+            //$occurrence >= '1971-01-01' &&
+            $count < $_EV_CONF['max_repeats']) {
+            $lastday = cal_days_in_month(CAL_GREGORIAN, $m, $y);
 
             foreach ($days_on as $dom) {
 
@@ -82,10 +84,15 @@ class RecurMonthly extends Recur
         }   // while not at stop date
 
         return $this->events;
-
     }   // function MakeRecurrences
 
 
+    /**
+     * Skip a weekend day according to the event setting.
+     *
+     * @param   string  $occurrence     Date string of the current occurrence
+     * @return  string      Date of next occurrence
+     */
     protected function SkipWeekend($occurrence)
     {
         // Figure out the next day if we're supposed to skip one.
@@ -94,12 +101,11 @@ class RecurMonthly extends Recur
         if ($this->skip > 0) {
             // Split out the components of the new working date.
             list($y, $m, $d) = explode('-', $occurrence);
-
-            $dow = Date_Calc::dayOfWeek($d, $m, $y);
+            $dow = DateFunc::dayOfWeek($d, $m, $y);
             if ($dow == 6 || $dow == 0) {
                 if ($this->skip == 2) {
                     // Skip to the next weekday
-                    $occurrence = Date_Calc::nextWeekday($d, $m, $y);
+                    $occurrence = DateFunc::nextWeekday($d, $m, $y);
                 } else {
                     // Monthly recurrences are on specific dates, so don't
                     // just skip to the next one- return NULL so the
@@ -109,10 +115,17 @@ class RecurMonthly extends Recur
             }
         }
         return $occurrence;
-
     }   // function SkipWeekend
 
 
+    /**
+     * Get the next date from the supplied parameters, based on the frequency.
+     *
+     * @param   integer $d  Current Day Number
+     * @param   integer $m  Current Month Number
+     * @param   integer $y  Current Year Number
+     * @return  string      Next date formatted as "YYYY-MM-DD"
+     */
     private function incrementDate($d, $m, $y)
     {
         $newdate = date('Y-m-d', mktime(0, 0, 0, ($m + $this->freq), $d, $y));

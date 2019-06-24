@@ -11,7 +11,7 @@
  * @filesource
  */
 namespace Evlist\Views;
-use LGLib\Date_Calc;
+use Evlist\DateFunc;
 
 /**
  * Class to create a small single-month claender view.
@@ -35,7 +35,7 @@ class smallmonthView extends \Evlist\View
         $monthnum_str = sprintf('%02d', (int)$this->month);
 
         // Get all the dates in the month
-        $calendarView = Date_Calc::getCalendarMonth($this->month, $this->year, '%Y-%m-%d');
+        $calendarView = DateFunc::getCalendarMonth($this->month, $this->year);
         $x = count($calendarView) - 1;
         $y = count($calendarView[$x]) - 1;
         $starting_date = $calendarView[0][0];

@@ -27,7 +27,7 @@ class yearView extends \Evlist\View
      * @param   integer $day    Starting day
      * @param   integer $cat    Event category
      * @param   integer $cal    Calendar ID
-     * @param   string  $opt    Optional template modifier, e.g. "print"
+     * @param   string  $opts   Optional template modifier, e.g. "print"
      */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {

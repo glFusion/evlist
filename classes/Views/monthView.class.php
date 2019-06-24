@@ -2,16 +2,16 @@
 /**
  * Monthly View functions for the evList plugin.
  *
- * @author     Lee P. Garner <lee@leegarner.com>
- * @copyright  Copyright (c) 2017 Lee Garner <lee@leegarner.com
- * @package    evlist
- * @version    1.4.3
- * @license    http://opensource.org/licenses/gpl-2.0.php
+ * @author      Lee P. Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist\Views;
-use LGLib\Date_Calc;
+use Evlist\DateFunc;
 
 /**
  * Display a monthly calendar.
@@ -29,7 +29,7 @@ class monthView extends \Evlist\View
      * @param   integer $day    Starting day
      * @param   integer $cat    Event category
      * @param   integer $cal    Calendar ID
-     * @param   string  $opt    Optional template modifier, e.g. "print"
+     * @param   string  $opts   Optional template modifier, e.g. "print"
      */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
@@ -50,8 +50,7 @@ class monthView extends \Evlist\View
         $retval = '';
 
         // Get all the dates in the month
-        $calendarView = Date_Calc::getCalendarMonth($this->month, $this->year, '%Y-%m-%d');
-
+        $calendarView = DateFunc::getCalendarMonth($this->month, $this->year);
         $x = count($calendarView) - 1;
         $y = count($calendarView[$x]) - 1;
         $starting_date = $calendarView[0][0];
@@ -86,7 +85,7 @@ class monthView extends \Evlist\View
         }
 
         list($y, $m, $d) = explode('-', $starting_date);
-        $weekOfYear = Date_Calc::weekOfYear($d, $m, $y);
+        $weekOfYear = DateFunc::weekOfYear($d, $m, $y);
 
         $T->set_block('monthview', 'weekBlock', 'wBlock');
         foreach ($calendarView as $weeknum => $weekdata) {

@@ -11,7 +11,7 @@
  * @filesource
  */
 namespace Evlist\Views;
-use LGLib\Date_Calc;
+use Evlist\DateFunc;
 
 /**
  * Create a weekly view calendar.
@@ -27,7 +27,7 @@ class weekView extends \Evlist\View
      * @param   integer $day    Starting day
      * @param   integer $cat    Event category
      * @param   integer $cal    Calendar to show
-     * @param   string  $opt    Optional template modifier, e.g. "print"
+     * @param   string  $opts   Optional template modifier, e.g. "print"
      */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
@@ -48,7 +48,7 @@ class weekView extends \Evlist\View
         $retval = '';
 
         // Get the events
-        $calendarView = Date_Calc::getCalendarWeek($this->day, $this->month, $this->year, '%Y-%m-%d');
+        $calendarView = DateFunc::getCalendarWeek($this->day, $this->month, $this->year);
         $start_date = $calendarView[0];
         $end_date = $calendarView[6];
 

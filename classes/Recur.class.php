@@ -1,48 +1,65 @@
 <?php
 /**
-*   Class to create recurrences for the evList plugin.
-*   Each class is derived from Recur, and should override either
-*   MakeRecurrences() or incrementDate().
-*   MakeRecurrences is the only public function and the only one that is
-*   required.  Derived classes may also implement the base MakeRecurrences()
-*   function, in which case they should at least provide their own
-*   incrementDate().
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to create recurrences for the evList plugin.
+ * Each class is derived from Recur, and should override either
+ * MakeRecurrences() or incrementDate().
+ * MakeRecurrences is the only public function and the only one that is
+ * required.  Derived classes may also implement the base MakeRecurrences()
+ * function, in which case they should at least provide their own
+ * incrementDate().
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
-use LGLib\Date_Calc;
+
 
 /**
-*   Class for event recurrence calculations.
-*   Override this class for specific recurrence types
-*   @package evlist
-*/
+ * Class for event recurrence calculations.
+ * Override this class for specific recurrence types
+ * @package evlist
+ */
 class Recur
 {
-    /** Recurring data
-    *   @var array */
-    //var $rec_data = array();
+    /** Event object.
+     * @var object */
     var $event;
+
+    /** Array of event dates and times.
+     @var array */
     var $events;
 
+    /** Starting date for the event.
+     * @var string */
     var $dt_start;
-    var $dt_end;
+
+    /** Ending date for the event.
+     * @var string /
+     var $dt_end;
+
+    /** Number of days the event runs.
+     * @var integer */
     var $duration;
+
+    /** Frequency.
+     * @var integer */
     var $freq;
+
+    /** Skip-weekends setting.
+     * @var integer */
     var $skip;
 
+
     /**
-    *   Constructor.
-    *
-    *   @param  object  $event  Event object
-    */
+     * Constructor.
+     *
+     * @param   object  $event  Event object
+     */
     public function __construct($event)
     {
         global $_EV_CONF;
@@ -66,8 +83,10 @@ class Recur
             list($syear, $smonth, $sday) = explode('-', $this->dt_start);
             list($eyear, $emonth, $eday) = explode('-', $this->dt_end);
             // Need to get the number of days the event lasts
-            $this->duration = Date_Calc::dateDiff($eday, $emonth, $eyear,
-                        $sday, $smonth,$syear);
+            $this->duration = DateFunc::dateDiff(
+                $eday, $emonth, $eyear,
+                $sday, $smonth,$syear
+            );
         } else {
             $this->duration = 0;      // single day event
         }
@@ -75,13 +94,13 @@ class Recur
 
 
     /**
-    *   Find the next date, based on the current day, month & year
-    *
-    *   @param  integer $d  current day
-    *   @param  integer $m  current month
-    *   @paam   integer $y  current year
-    *   @return array           array of (scheduled, actual) dates
-    */
+     * Find the next date, based on the current day, month & year.
+     *
+     * @param   integer $d  current day
+     * @param   integer $m  current month
+     * @param   integer $y  current year
+     * @return  array           array of (scheduled, actual) dates
+     */
     private function getNextDate($d, $m, $y)
     {
         $newdate = array();
@@ -96,11 +115,11 @@ class Recur
 
 
     /**
-    *   Skip a weekend date, if configured.
-    *
-    *   @param  string  $occurrence     Date being checked
-    *   @return string      Original or new date
-    */
+     * Skip a weekend date, if configured in the event.
+     *
+     * @param   string  $occurrence     Date being checked
+     * @return  string      Original or new date
+     */
     protected function SkipWeekend($occurrence)
     {
         // Figure out the next day if we're supposed to skip one.
@@ -109,29 +128,29 @@ class Recur
         if ($this->skip > 0) {
             // Split out the components of the new working date.
             list($y, $m, $d) = explode('-', $occurrence);
-
-            $dow = Date_Calc::dayOfWeek($d, $m, $y);
+            $dow = DateFunc::dayOfWeek($d, $m, $y);
             if ($dow == 6 || $dow == 0) {
                 if ($this->skip == 2) {
                     // Skip to the next weekday
-                    $occurrence = Date_Calc::nextWeekday($d, $m, $y);
+                    $occurrence = DateFunc::nextWeekday($d, $m, $y);
                 } elseif ($dow == 0) {
                     // Skip must = 1, so just jump to the next occurrence.
                     $occurrence = $this->incrementDate($d, $m, $y);
                 }
             }
         }
-
         return $occurrence;
-
     }   // function SkipWeekend
 
 
     /**
-    *   Create recurrences.
-    *   This is a common function for the most common recurrence types:
-    *   once per week/year, etc.
-    */
+     * Create recurrences.
+     * This is a common function for the most common recurrence types:
+     * once per week/year, etc.
+     * Also sets `$this->events` with the recurring data.
+     *
+     * @return  array   Array of event start/end dates and times.
+     */
     public function MakeRecurrences()
     {
         global $_EV_CONF;
@@ -143,7 +162,7 @@ class Recur
         //  actual date in case it's rescheduled due to a weekend.
         //  Keeping the occurrence is based on (1), scheduling the next
         //  occurrence is based on (0).
-        $thedate = Date_Calc::dateFormat($day, $month, $year, '%Y-%m-%d');
+        $thedate = DateFunc::dateFormat($day, $month, $year);
         $occurrence = array($thedate, $thedate);
 
         // Get any occurrences before our stop.  Keep these.
@@ -170,12 +189,12 @@ class Recur
 
 
     /**
-    *   Store an event in the array.
-    *   Figures out the ending date based on the duration.
-    *   The events array is keyed by start date to avoid duplicates.
-    *
-    *   @param  string  $start  Starting date in Y-m-d format
-    */
+     * Store an event in the array.
+     * Figures out the ending date based on the duration.
+     * The events array is keyed by start date to avoid duplicates.
+     *
+     * @param   string  $start  Starting date in Y-m-d format
+     */
     public function storeEvent($start)
     {
         global $_CONF;

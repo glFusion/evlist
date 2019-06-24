@@ -487,14 +487,15 @@ function evlist_upgrade_1_3_0()
 
 
 /**
-*   Actually perform any sql updates.
-*   Gets the sql statements from the $UPGRADE array defined (maybe)
-*   in the SQL installation file.
-*
-*   @since  version 1.3.4
-*   @param  string  $version    Version being upgraded TO
-*   @return boolean             True on success, False after a failure
-*/
+ * Actually perform any sql updates.
+ * Gets the sql statements from the $UPGRADE array defined (maybe)
+ * in the SQL installation file.
+ *
+ * @since   v1.3.4
+ * @param   string  $version    Version being upgraded TO
+ * @param   boolean $dvlp       True to ignore errors and continue
+ * @return  boolean             True on success, False after a failure
+ */
 function EVLIST_do_upgrade_sql($version='', $dvlp = false)
 {
     global $_TABLES, $_EV_CONF, $_EV_UPGRADE;
@@ -560,6 +561,7 @@ function EVLIST_remove_old_files()
     $paths = array(
         // private/plugins/evlist
         __DIR__ => array(
+            // 1.4.2
             'classes/DateCalc.class.php',
             'classes/evCalendar.class.php',
             'classes/evCategory.class.php',
@@ -570,6 +572,13 @@ function EVLIST_remove_old_files()
             'classes/evTicket.class.php',
             'classes/evTicketType.class.php',
             'classes/evView.class.php',
+            'classes/View_day.class.php'.
+            'classes/View_detail.class.php'.
+            'classes/View_list.class.php'.
+            'classes/View_month.class.php'.
+            'classes/View_smallmonth.class.php'.
+            'classes/View_week.class.php'.
+            'classes/View_year.class.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

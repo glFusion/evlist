@@ -111,7 +111,7 @@ define('EVSELECTED', 'selected="selected"');
 // define date format for Pear Date_Calc as common SQL format.
 // also defined in lglib/functions.inc starting with version 0.0.7
 if (!defined('DATE_CALC_FORMAT')) {
-    define('DATE_CALC_FORMAT', '%Y-%m-%d');
+    define('DATE_CALC_FORMAT', 'Y-m-d');
 }
 
 // The services file only has functions for event signups and payments.
@@ -149,8 +149,11 @@ spl_autoload_register(function ($class)
     }
 });
 
-use \Evlist\Date_Calc;
+use \Evlist\DateFunc;
 
+/**
+ * Load plugin-specific functions.
+ */
 function USES_evlist_functions()
 {    require_once __DIR__ . '/evlist_functions.inc.php'; }
 
@@ -195,6 +198,7 @@ function plugin_autouninstall_evlist()
 /**
  * Upgrade the plugin.
  *
+ * @param   boolean $ignore_errors  True to ignore errors (dvlpupdate)
  * @return  mixed   True for success, False or error message number otherwise
  */
 function plugin_upgrade_evlist($ignore_errors=false)
@@ -314,6 +318,14 @@ function plugin_getmenuitems_evlist()
 }
 
 
+/**
+ * Show plugin statistics on the user profile page.
+ * if $showsitestats is 1 then we are to only print the overall stats in the 'site
+ * statistics' box otherwise we show the detailed stats for the plugin
+ *
+ * @param   boolean $showsitestats  Not used
+ * @return  string      HTML for stats section
+ */
 function plugin_showstats_evlist($showsitestats)
 {
     global $_CONF, $_EV_CONF, $_TABLES, $LANG_EVLIST;
@@ -373,6 +385,11 @@ function plugin_showstats_evlist($showsitestats)
 }
 
 
+/**
+ * Get summary stats for the user profile page.
+ *
+ * @return  array   Array of text=>number
+ */
 function plugin_statssummary_evlist()
 {
     global $_EV_CONF, $_TABLES, $LANG_EVLIST;
@@ -416,7 +433,16 @@ function plugin_searchtypes_evlist()
 /**
  * Set up the search for this plugin.
  *
- * @return mixed       SearchCriteria object, or NULL if not allowed
+ * @param   string  $query      Search query string
+ * @param   string  $datestart  Starting date for search
+ * @param   string  $dateend    Ending date for search
+ * @param   string  $topic      Topic selected for search
+ * @param   string  $type       Item type
+ * @param   string  $author     Limit results to this author (not used)
+ * @param   string  $keyType    Type selected during search
+ * @param   integer $page       Page number
+ * @param   integer $perpage    Number of results per page
+ * @return  object              Search object to be processed by Search class
  */
 function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $topic, $type, $author, $keyType, $page, $perpage
@@ -653,9 +679,9 @@ function EVLIST_cb_content($format)
         return '';
     }
 
-    $Y = Date_Calc::getYear();
-    $D = Date_Calc::getDay();
-    $M = Date_Calc::getMonth();
+    $Y = $_CONF['_now']->format('Y');
+    $D = $_CONF['_now']->format('d');
+    $M = $_CONF['_now']->format('m');
     switch ($_EV_CONF['range_centerblock']) {
     case 1:         // past events
         $start = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 month"));
@@ -670,12 +696,12 @@ function EVLIST_cb_content($format)
         $end = EV_MAX_DATE;
         break;
     case 3:         // this week
-        $start = Date_Calc::beginOfWeek($D, $M, $Y);
-        $end = Date_Calc::endOfWeek($D, $M, $Y);
+        $start = DateFunc::beginOfWeek($D, $M, $Y);
+        $end = DateFunc::endOfWeek($D, $M, $Y);
         break;
     case 4:         // upcoming month
-        $start = Date_Calc::beginOfMonth($M, $Y);
-        $end = Date_Calc::dateFormat(Date_Calc::daysInMonth($M, $Y), $M, $Y, '%Y-%m-%d');
+        $start = DateFunc::beginOfMonth($M, $Y);
+        $end = DateFunc::dateFormat(DateFunc::daysInMonth($M, $Y), $M, $Y);
         break;
     }
 
@@ -1239,10 +1265,10 @@ function plugin_itemdeleted_evlist($id, $type)
 
 
 /**
- *  Get a list (actually an array) of all groups this group belongs to.
+ * Get a list (actually an array) of all groups this group belongs to.
  *
- *  @param   basegroup   int     id of group
- *  @return              array   array of all groups 'basegroup' belongs to
+ * @param   integer $basegroup   id of group
+ * @return  array   Array of all groups 'basegroup' belongs to
  */
 function EV_getGroupList($basegroup)
 {
@@ -1603,7 +1629,7 @@ function plugin_configmanager_select_topic_centerblock_evlist()
  *
  * @return  array   $cal_id => $cal_name
  */
-function plugin_configmanager_select_pi_cal_map_evlist($idx = NULL)
+function plugin_configmanager_select_pi_cal_map_evlist()
 {
     $A = array();
     foreach (\Evlist\Calendar::getAll() as $cal) {
@@ -1858,7 +1884,7 @@ function EVLIST_getDocURL($file='', $doclang='english')
         if (!file_exists($doc_path . $file)) {
             $doclang = 'english';
         }
-        $doc_url = EVLIST_URL . "/docs/{$doclang}/{$file}.html";
+        $doc_url = EVLIST_URL . "/docs/{$doclang}/{$file}";
     } else {
         if (!is_dir($doc_path)) {
             $doclang = 'english';
@@ -2006,7 +2032,7 @@ function plugin_loadlanguage_evlist($requested='')
  * Provides the getItemInfo function for this plugin.
  *
  * @param   string  $id         Product ID
- * @param   string  $fields     Comma-separated list of fields to return
+ * @param   string  $what       Comma-separated list of fields to return
  * @param   integer $uid        User ID
  * @param   array   $options    Not used
  * @return  array           Array of product information
@@ -2328,9 +2354,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     if ($end == '') $end = $start;
 
     list($y, $m, $d) = explode('-', $start);
-    if (!Date_Calc::isValidDate($d, $m, $y)) $start = $_EV_CONF['_today'];
+    if (!DateFunc::isValidDate($d, $m, $y)) $start = $_EV_CONF['_today'];
     list($y, $m, $d) = explode('-', $end);
-    if (!Date_Calc::isValidDate($d, $m, $y)) $end = $start;
+    if (!DateFunc::isValidDate($d, $m, $y)) $end = $start;
     $start = DB_escapeString($start . ' 00:00:00');
     $end = DB_escapeString($end . ' 23:59:59');
 
@@ -2513,7 +2539,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                             $events[$newdate] = array();
                         $events[$newdate][] = $A;
                         list($y, $m, $d) = explode('-', $newdate);
-                        $newdate = Date_Calc::nextDay($d, $m, $y, '%Y-%m-%d');
+                        $newdate = DateFunc::nextDay($d, $m, $y);
                     }
                 }
             }   // while
@@ -2550,6 +2576,8 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
 function EVLIST_getMeetupEvents($start='', $end='', &$events)
 {
     global $_EV_CONF, $_CONF;
+
+    return;     // Meetup is deprecated
 
     $Cal = Evlist\Calendar::getMapped('meetup');
     // Check that meetup events and the meetup calendar are enabled
@@ -2603,6 +2631,14 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
 }
 
 
+/**
+ * Deprecate function
+ *
+ * @param   string  $start  Starting date
+ * @param   string  $end    Ending date
+ * @param   array   $opts   Options array
+ * @return  string      JSON view
+ */
 function X_EVLIST_getEvents_json($start='', $end='', $opts=array())
 {
     $events = EVLIST_getEvents($start, $end, $opts);

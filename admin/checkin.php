@@ -1,18 +1,18 @@
 <?php
 /**
-*   Check in a registrant to an event.
-*   Takes arguments "tic" for ticket ID and "rp" for occurrence ID.
-*   Intended to be called via QRCode but can be used directly from
-*   a browser.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Check in a registrant to an event.
+ * Takes arguments "tic" for ticket ID and "rp" for occurrence ID.
+ * Intended to be called via QRCode but can be used directly from
+ * a browser.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php 
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 require_once '../../../lib-common.php';
 

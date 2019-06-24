@@ -287,14 +287,14 @@ function EVLIST_list_user_events()
 
 
 /**
-*   Return the display value for an event field
-*
-*   @param  string  $fieldname  Name of the field
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Name-value pairs for all fields
-*   @param  array   $icon_arr   Array of system icons
-*   @return string      HTML to display for the field
-*/
+ * Return the display value for an event field.
+ *
+ * @param   string  $fieldname  Name of the field
+ * @param   mixed   $fieldvalue Value of the field
+ * @param   array   $A          Name-value pairs for all fields
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string      HTML to display for the field
+ */
 function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;

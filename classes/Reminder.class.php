@@ -1,45 +1,48 @@
 <?php
 /**
-*   Class to manage event reminders for the EvList plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2017 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage event reminders for the EvList plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
- *  Class for reminders
- *  @package evlist
+ * Class for reminders
+ * @package evlist
  */
 class Reminder
 {
-    /** Property fields.  Accessed via __set() and __get()
-    *   @var array */
+    /** Property fields.  Accessed via __set() and __get().
+     * @var array */
     private $properties = array();
 
     /** Indicates if this is a new record or not.
-    *   @var boolean */
+     * @var boolean */
     private $isNew;
 
     /** Repeat object for this reminder.
-    *   @var object */
+     * @var object */
     public $Repeat;
 
+    /** Holder for language arrays.
+     * @var array */
     private static $langs = array();
 
+
     /**
-    *   Constructor.
-    *   Reads in the specified reminder from the lookup table.
-    *   Sets isNew to false if a record is found, otherwise isNew will be true
-    *
-    *   @param  integer $rp_id      Optional Repeat ID
-    *   @param  integer $uid        Optional user ID
-    */
+     * Constructor.
+     * Reads in the specified reminder from the lookup table.
+     * Sets isNew to false if a record is found, otherwise isNew will be true
+     *
+     * @param   integer $rp_id      Optional Repeat ID
+     * @param   integer $uid        Optional user ID
+     */
     public function __construct($rp_id='', $uid='')
     {
         if ($rp_id !== '') {
@@ -57,11 +60,11 @@ class Reminder
 
 
     /**
-    *   Set a property's value.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         global $_USER;
@@ -104,11 +107,11 @@ class Reminder
 
 
     /**
-    *   Get the value of a property.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         if (isset($this->properties[$var])) {
@@ -120,10 +123,10 @@ class Reminder
 
 
     /**
-    *   Read a specific record and populate the local values.
-    *
-    *   @return boolean     True if a record was read, False on failure.
-    */
+     * Read a specific record and populate the local values.
+     *
+     * @return  boolean     True if a record was read, False on failure.
+     */
     public function Read()
     {
         global $_TABLES;
@@ -148,11 +151,11 @@ class Reminder
 
 
     /**
-    *   Sets all the values in array $A into object fields.
-    *   Only valid values are set, extras are ignored.
-    *
-    *   @param  array   $A      Array of name=>value pairs
-    */
+     * Sets all the values in array $A into object fields.
+     * Only valid values are set, extras are ignored.
+     *
+     * @param   array   $A      Array of name=>value pairs
+     */
     private function setVars($A)
     {
         foreach ($A as $fld=>$value) {
@@ -162,14 +165,14 @@ class Reminder
 
 
     /**
-    *   Add or update a reminder record.
-    *   The event form doesn't show the reminder form if a reminder exists,
-    *   so normally the update isn't needed.
-    *
-    *   @param  integer $days   days_notice value
-    *   @param  string  $email  Email address submitted
-    *   @return boolean         True on success, False on failure or no access
-    */
+     * Add or update a reminder record.
+     * The event form doesn't show the reminder form if a reminder exists,
+     * so normally the update isn't needed.
+     *
+     * @param   integer $days   days_notice value
+     * @param   string  $email  Email address submitted
+     * @return  boolean         True on success, False on failure or no access
+     */
     public function Add($days, $email='')
     {
         global $_USER, $_TABLES;
@@ -209,8 +212,8 @@ class Reminder
 
 
     /**
-    *   Delete the current reminder record from the database
-    */
+     * Delete the current reminder record from the database
+     */
     public function Delete()
     {
         global $_TABLES;
@@ -229,10 +232,10 @@ class Reminder
 
 
     /**
-    *   Get all the reminders that are ready for notification.
-    *
-    *   @return array   Array of Reminder objects
-    */
+     * Get all the reminders that are ready for notification.
+     *
+     * @return  array   Array of Reminder objects
+     */
     public static function getCurrent()
     {
         global $_TABLES;
@@ -250,14 +253,14 @@ class Reminder
 
 
     /**
-    *   Count reminders for a specific event, repeat and user
-    *   This is used to determine whether the reminder form is shown or not.
-    *
-    *   @param  string  $ev_id  Event ID
-    *   @param  integer $rp_id  Repeat ID
-    *   @param  integer $uid    User ID, default to current user
-    *   @return integer         Count of reminders, should be 0 or 1
-    */
+     * Count reminders for a specific event, repeat and user.
+     * This is used to determine whether the reminder form is shown or not.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   integer $rp_id  Repeat ID
+     * @param   integer $uid    User ID, default to current user
+     * @return  integer         Count of reminders, should be 0 or 1
+     */
     public static function countReminders($ev_id, $rp_id, $uid = 0)
     {
         global $_TABLES, $_USER;
@@ -272,8 +275,8 @@ class Reminder
 
 
     /**
-    *   Send the reminder
-    */
+     * Send the reminder.
+     */
     public function Send()
     {
         global $_TABLES, $_CONF, $LANG, $LANG_EVLIST;

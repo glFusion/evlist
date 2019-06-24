@@ -1,36 +1,42 @@
 <?php
 /**
-*   Class to manage ticket types.
-*   Ticket types are meant to represent the type of admission purchased,
-*   such as "General Admission", "VIP Pass", "Balcony", "Orchestra", etc.
-*   Each ticket type can also be set to be an Event Pass allowing admission
-*   to all occurrences of an event.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015-2017 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage ticket types.
+ * Ticket types are meant to represent the type of admission purchased,
+ * such as "General Admission", "VIP Pass", "Balcony", "Orchestra", etc.
+ * Each ticket type can also be set to be an Event Pass allowing admission
+ * to all occurrences of an event.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2017 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
-*   Class for ticket types
-*   @package evlist
-*/
+ * Class for ticket types.
+ * @package evlist
+ */
 class TicketType
 {
+    /** Properties accessed via `__set()` and `__get()`.
+     * @var array */
     var $properties = array();
+
+    /** Flag to indicate a new record.
+     * @var boolean */
     var $isNew;
 
+
     /**
-    *   Constructor
-    *   Create an empty ticket type object, or read an existing one
-    *
-    *   @param  integer $id     Ticket Type ID to read
-    */
+     * Constructor.
+     * Create an empty ticket type object, or read an existing one.
+     *
+     * @param   integer $id     Ticket Type ID to read
+     */
     public function __construct($id = 0)
     {
         $this->id           = $id;
@@ -46,10 +52,10 @@ class TicketType
 
 
     /**
-    *   Read an existing ticket type record into this object
-    *
-    *   @param  integer $id Optional type ID, $this->id used if 0
-    */
+     * Read an existing ticket type record into this object.
+     *
+     * @param   integer $id Optional type ID, $this->id used if 0
+     */
     public function Read($id = 0)
     {
         global $_TABLES;
@@ -74,12 +80,12 @@ class TicketType
 
 
     /**
-    *   Setter function.
-    *   Formats and sets $value into $this->properties[$key].
-    *
-    *   @param  string  $key    Variable name
-    *   @param  mixed   $value  Valut to assign
-    */
+     * Setter function.
+     * Formats and sets $value into $this->properties[$key].
+     *
+     * @param   string  $key    Variable name
+     * @param   mixed   $value  Valut to assign
+     */
     public function __set($key, $value)
     {
         switch ($key) {
@@ -100,11 +106,11 @@ class TicketType
 
 
     /**
-    *   Get the value of a property if it exists, NULL if not.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property if it exists, NULL if not.
+     *
+     * @param   string  $key   Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
@@ -116,11 +122,10 @@ class TicketType
 
 
     /**
-    *   Set the value of all variables from an array, either DB or a form
-    *
-    *   @param  array   $A      Array of fields
-    *   @param  boolean $fromDB True if $A is from the database, false for form
-    */
+     * Set the value of all variables from an array, either DB or a form.
+     *
+     * @param   array   $A      Array of fields
+     */
     public function SetVars($A)
     {
         $this->id = isset($A['id']) ? $A['id'] : 0;
@@ -156,10 +161,10 @@ class TicketType
 
 
     /**
-    *   Insert or update a ticket type.
-    *
-    *   @param array    $A  Array of data to save, typically from form
-    */
+     * Insert or update a ticket type.
+     *
+     * @param   array    $A  Array of data to save, typically from form
+     */
     public function Save($A=array())
     {
         global $_TABLES, $_EV_CONF;
@@ -199,21 +204,19 @@ class TicketType
 
 
     /**
-    *   Deletes the current ticket type.
-    *   First checks that the type isn't in use, and don't delete
-    *   the default ticket type (id == 1).
-    *
-    *   @param  integer $id     ID of ticket type to delete
-    */
-    public function Delete($id=0)
+     * Deletes the current ticket type.
+     * First checks that the type isn't in use, and don't delete
+     * the default ticket type (id == 1).
+     *
+     * @param   integer $id     ID of ticket type to delete
+     */
+    public static function Delete($id)
     {
         global $_TABLES;
 
         $id = (int)$id;
-        if ($id == 0 && is_object($this)) {
-            $id = $this->id;
-        }
         if ($id <= 2 || self::isUsed($id)) {
+            // Can't delete the default type, or one that has been used.
             return false;
         } else {
             DB_delete($_TABLES['evlist_tickettypes'], 'id', $id);
@@ -223,11 +226,11 @@ class TicketType
 
 
     /**
-    *   Determine if the ticket type is in use by any tickets.
-    *
-    *   @param  integer $id     Ticket type ID
-    *   @return boolean     False if unused, True if used
-    */
+     * Determine if the ticket type is in use by any tickets.
+     *
+     * @param   integer $id     Ticket type ID
+     * @return  boolean     False if unused, True if used
+     */
     public static function isUsed($id=0)
     {
         global $_TABLES;
@@ -239,13 +242,13 @@ class TicketType
 
 
     /**
-    *   Sets the field to the opposite of the specified value.
-    *
-    *   @param  string  $fld        DB Field to toggle
-    *   @param  integer $oldvalue   Old (current) value of field
-    *   @param  integer $id         ID number of element to modify
-    *   @return         New value, or old value upon failure
-    */
+     * Sets the field to the opposite of the specified value.
+     *
+     * @param   string  $fld        DB Field to toggle
+     * @param   integer $oldvalue   Old (current) value of field
+     * @param   integer $id         ID number of element to modify
+     * @return          New value, or old value upon failure
+     */
     public static function Toggle($fld, $oldvalue, $id)
     {
         global $_TABLES;
@@ -278,11 +281,11 @@ class TicketType
 
 
     /**
-    *   Get all the ticket types into objects
-    *
-    *   @param  boolean $enabled    True to get only enabled, false for all
-    *   @return array       Array of TicketType objects, indexed by ID
-    */
+     * Get all the ticket types into objects.
+     *
+     * @param   boolean $enabled    True to get only enabled, false for all
+     * @return  array       Array of TicketType objects, indexed by ID
+     */
     public static function GetTicketTypes($enabled = true)
     {
         global $_TABLES;

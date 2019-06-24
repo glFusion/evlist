@@ -535,6 +535,7 @@ $evlistConfigData = array(
 * exist. Initial values will be taken from $CONF_EVLIST if available (e.g. from
 * an old config.php), uses $CONF_EVLIST_DEFAULT otherwise.
 *
+* @param    integer $group_id   Not used
 * @return   boolean     true: success; false: an error occurred
 *
 */

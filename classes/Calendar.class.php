@@ -1,32 +1,38 @@
 <?php
 /**
-*   Class to manage calendars
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.6
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage calendars.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.6
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
-*   Class for calendar
-*   @package evlist
-*/
+ * Class for calendars.
+ * @package evlist
+ */
 class Calendar
 {
+    /** Properties accessed via `__set()` and `__get()`.
+     * @var array */
     var $properties = array();
+
+    /** Flag to indicate a new record.
+     * @var boolean */
     var $isNew;
 
+
     /**
-    *   Constructor
-    *   Create an empty calendar object, or read an existing one
-    *
-    *   @param  mixed   $calendar   Calendar ID to read, or array of info
-    */
+     * Constructor.
+     * Create an empty calendar object, or read an existing one.
+     *
+     * @param   mixed   $calendar   Calendar ID to read, or array of info
+     */
     public function __construct($calendar = 0)
     {
         global $_EV_CONF, $_USER;
@@ -61,12 +67,12 @@ class Calendar
 
 
     /**
-    *   Get an instance of a calendar.
-    *   Saves objects in a static variable to minimize DB lookups
-    *
-    *   @param  integer $cal_id Calendar ID
-    *   @return object          Calendar object
-    */
+     * Get an instance of a calendar.
+     * Saves objects in a static variable to minimize DB lookups
+     *
+     * @param   integer $cal_id Calendar ID
+     * @return  object          Calendar object
+     */
     public static function getInstance($cal_id)
     {
         $Cals = self::getAll();
@@ -75,10 +81,10 @@ class Calendar
 
 
     /**
-    *   Read an existing calendar record into this object
-    *
-    *   @param  integer $cal_id Optional calendar ID, $this->cal_id used if 0
-    */
+     * Read an existing calendar record into this object.
+     *
+     * @param   integer $cal_id Optional calendar ID, $this->cal_id used if 0
+     */
     public function Read($cal_id = 0)
     {
         global $_TABLES;
@@ -103,6 +109,12 @@ class Calendar
     }
 
 
+    /**
+     * Set a property's value.
+     *
+     * @param   string  $key    Property name
+     * @param   mixed   $value  Value to set
+     */
     public function __set($key, $value)
     {
         switch ($key) {
@@ -133,12 +145,11 @@ class Calendar
 
 
     /**
-    *   Get the value of a property.
-    *   Emulates the behaviour of __get() function in PHP 5.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $key    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
@@ -150,11 +161,11 @@ class Calendar
 
 
     /**
-    *   Set the value of all variables from an array, either DB or a form
-    *
-    *   @param  array   $A      Array of fields
-    *   @param  boolean $fromDB True if $A is from the database, false for form
-    */
+     * Set the value of all variables from an array, either DB or a form.
+     *
+     * @param   array   $A      Array of fields
+     * @param   boolean $fromDB True if $A is from the database, false for form
+     */
     public function SetVars($A, $fromDB=false)
     {
         if (isset($A['cal_id']) && !empty($A['cal_id']))
@@ -200,10 +211,10 @@ class Calendar
 
 
     /**
-    *   Provide the form to create or edit a calendar
-    *
-    *   @return string  HTML for editing form
-    */
+     * Provide the form to create or edit a calendar.
+     *
+     * @return  string  HTML for editing form
+     */
     public function Edit()
     {
         global $_EV_CONF, $_SYSTEM;
@@ -262,10 +273,10 @@ class Calendar
 
 
     /**
-    *   Insert or update a calendar.
-    *
-    *   @param array    $A  Array of data to save, typically from form
-    */
+     * Insert or update a calendar.
+     *
+     * @param   array    $A  Array of data to save, typically from form
+     */
     public function Save($A=array())
     {
         global $_TABLES, $_EV_CONF;
@@ -329,12 +340,12 @@ class Calendar
 
 
     /**
-    *   Deletes the current calendar.
-    *   Deletes all events, detail and repeats associated with this calendar,
-    *   or moves them to a different calendar if specified.
-    *
-    *   @param  integer $newcal ID of new calendar to use for events, etc.
-    */
+     * Deletes the current calendar.
+     * Deletes all events, detail and repeats associated with this calendar,
+     * or moves them to a different calendar if specified.
+     *
+     * @param   integer $newcal ID of new calendar to use for events, etc.
+     */
     public function Delete($newcal = 0)
     {
         global $_TABLES;
@@ -374,12 +385,12 @@ class Calendar
 
 
     /**
-    *   Display a confirmation form to the user to confirm the deletion.
-    *   Shows the user how many events are tied to the calendar being
-    *   deleted.
-    *
-    *   @return string      HTML for confirmation form.
-    */
+     * Display a confirmation form to the user to confirm the deletion.
+     * Shows the user how many events are tied to the calendar being
+     * deleted.
+     *
+     * @return  string      HTML for confirmation form.
+     */
     public function DeleteForm()
     {
         global $_TABLES, $LANG_EVLIST;
@@ -408,12 +419,12 @@ class Calendar
 
 
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $id ID number of element to modify
-    *   @param  integer $value New value to set
-    *   @return         New value, or old value upon failure
-    */
+     * Sets the "enabled" field baed on the existing value.
+     *
+     * @param   integer $oldvalue   Original value to be changed
+     * @param   integer $cal_id     ID number of element to modify
+     * @return         New value, or old value upon failure
+     */
     public static function toggleEnabled($oldvalue, $cal_id = 0)
     {
         global $_TABLES;
@@ -436,10 +447,10 @@ class Calendar
 
 
     /**
-    *   Determine if the current calendar is in use by any events.
-    *
-    *   @return mixed   Number of events using the calendar, false if unused.
-    */
+     * Determine if the current calendar is in use by any events.
+     *
+     * @return  mixed   Number of events using the calendar, false if unused.
+     */
     public function isUsed()
     {
         global $_TABLES;
@@ -459,6 +470,7 @@ class Calendar
      *
      * @param   integer $selected   ID of selected calendar
      * @param   boolean $enabled    True to show only enabled calendars
+     * @param   integer $access     Access level required (1 - 3)
      * @return  string      Option tags
      */
     public static function optionList($selected = 0, $enabled = true, $access = 0)
@@ -480,11 +492,11 @@ class Calendar
 
 
     /**
-    *   Get all calendars.
-    *
-    *   $param  boolean $enabled    True to get only enabled calendars
-    *   return  array       Array of calendar objects
-    */
+     * Get all calendars.
+     *
+     * $param   boolean $enabled    True to get only enabled calendars
+     * return   array       Array of calendar objects
+     */
     public static function getAll()
     {
         global $_TABLES;
@@ -526,14 +538,14 @@ class Calendar
 
 
     /**
-    *   Get the calendar that's mapped to a plugin name.
-    *   Returns the calendar object. If no mapping exists, or the mapping
-    *   refers to a non-existent calendar, then the default calendar object
-    *   is returned.
-    *
-    *   @param  string  $pi_name    Plugin or calendar name
-    *   @return object      Calendar object
-    */
+     * Get the calendar that's mapped to a plugin name.
+     * Returns the calendar object. If no mapping exists, or the mapping
+     * refers to a non-existent calendar, then the default calendar object
+     * is returned.
+     *
+     * @param   string  $pi_name    Plugin or calendar name
+     * @return  object      Calendar object
+     */
     public static function getMapped($pi_name)
     {
         global $_EV_CONF;
@@ -557,13 +569,13 @@ class Calendar
 
 
     /**
-    *   Reorder all calendars.
-    *   The "orderby" field can be overridden during upgrades to set a good
-    *   default order.
-    *   Clears the cache if any positions were changed.
-    *
-    *   @param  string  $orderby_fld    Field name for ordering
-    */
+     * Reorder all calendars.
+     * The "orderby" field can be overridden during upgrades to set a good
+     * default order.
+     * Clears the cache if any positions were changed.
+     *
+     * @param   string  $orderby_fld    Field name for ordering
+     */
     public static function reOrder($orderby_fld = 'orderby')
     {
         global $_TABLES;
@@ -594,11 +606,11 @@ class Calendar
 
 
     /**
-    *   Move a calendar up or down the admin list.
-    *
-    *   @param  string  $id     Calendar ID
-    *   @param  string  $where  Direction to move (up or down)
-    */
+     * Move a calendar up or down the admin list.
+     *
+     * @param  string  $id     Calendar ID
+     * @param  string  $where  Direction to move (up or down)
+     */
     public static function moveRow($id, $where)
     {
         global $_TABLES;

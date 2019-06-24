@@ -1,31 +1,34 @@
 <?php
 /**
-*   Class to manage tickets and registrations
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2015-2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.5
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage tickets and registrations.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.5
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
-*   Class for event tickets
-*   @package evlist
-*/
+ * Class for event tickets.
+ * @package evlist
+ */
 class Ticket
 {
+    /** Properties accessed via `_set()` and `__get()`.
+     * @var array */
     var $properties = array();
 
+
     /**
-    *   Constructor
-    *   Create an empty ticket type object, or read an existing one
-    *
-    *   @param  string  $tic_id     Ticket ID to load, or empty string
-    */
+     * Constructor.
+     * Create an empty ticket type object, or read an existing one
+     *
+     * @param   string  $tic_id     Ticket ID to load, or empty string
+     */
     public function __construct($tic_id = '')
     {
         $this->tic_id       = $tic_id;
@@ -44,10 +47,10 @@ class Ticket
 
 
     /**
-    *   Read an existing ticket record into this object
-    *
-    *   @param  string  $tic_id Optional ticket ID, $this->id used if empty
-    */
+     * Read an existing ticket record into this object.
+     *
+     * @param   string  $tic_id Optional ticket ID, $this->id used if empty
+     */
     public function Read($tic_id = '')
     {
         global $_TABLES;
@@ -71,6 +74,12 @@ class Ticket
     }
 
 
+    /**
+     * Set a property's value.
+     *
+     * @param   string  $key    Property name
+     * @param   mixed   $value  Value to set
+     */
     public function __set($key, $value)
     {
         switch ($key) {
@@ -100,12 +109,11 @@ class Ticket
 
 
     /**
-    *   Get the value of a property.
-    *   Emulates the behaviour of __get() function in PHP 5.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $key    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
@@ -117,11 +125,10 @@ class Ticket
 
 
     /**
-    *   Set the value of all variables from an array, either DB or a form
-    *
-    *   @param  array   $A      Array of fields
-    *   @param  boolean $fromDB True if $A is from the database, false for form
-    */
+     * Set the value of all variables from an array, either DB or a form.
+     *
+     * @param  array   $A      Array of fields
+     */
     public function SetVars($A)
     {
         $this->tic_id = $A['tic_id'];
@@ -138,11 +145,11 @@ class Ticket
 
 
     /**
-    *   Create a unique ticket ID
-    *
-    *   @param  array   $A      Array of values, non-indexed
-    *   @return string          Ticket ID
-    */
+     * Create a unique ticket ID.
+     *
+     * @param   array   $A      Array of values, non-indexed
+     * @return  string          Ticket ID
+     */
     public static function MakeTicketId($A = array())
     {
         global $_EV_CONF;
@@ -160,16 +167,16 @@ class Ticket
 
 
     /**
-    *   Create a ticket.
-    *
-    *   @param  string  $ev_id  Event ID (required)
-    *   @param  integer $rp_id  Optional Repeat ID, 0 for event pass
-    *   @param  integer $type   Type of ticket, from the ticket_types table
-    *   @param  float   $fee    Optional Ticket Fee, default = 0 (free)
-    *   @param  integer $uid    Optional User ID, default = current user
-    *   @param  integer $wl     Waitlisted ? 1 = yes, 0 = no
-    *   @return     string  Ticket identifier
-    */
+     * Create a ticket.
+     *
+     * @param   string  $ev_id  Event ID (required)
+     * @param   integer $type   Type of ticket, from the ticket_types table
+     * @param   integer $rp_id  Optional Repeat ID, 0 for event pass
+     * @param   float   $fee    Optional Ticket Fee, default = 0 (free)
+     * @param   integer $uid    Optional User ID, default = current user
+     * @param   integer $wl     Waitlisted ? 1 = yes, 0 = no
+     * @return  string      Ticket identifier
+     */
     public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0)
     {
         global $_TABLES, $_EV_CONF, $_USER;
@@ -205,10 +212,10 @@ class Ticket
 
 
     /**
-    *   Save the current ticket.
-    *
-    *   @return     string  Ticket identifier
-    */
+     * Save the current ticket.
+     *
+     * @return  string  Ticket identifier
+     */
     public function Save()
     {
         global $_TABLES, $_EV_CONF, $_USER;
@@ -251,10 +258,10 @@ class Ticket
 
 
     /**
-    *   Deletes the specified ticket(s).
-    *
-    *   @param  mixed   $id     Single or Array of ticket IDs to delete
-    */
+     * Deletes the specified ticket(s).
+     *
+     * @param   array|string    $id Single or Array of ticket IDs to delete
+     */
     public static function Delete($id='')
     {
         global $_TABLES;
@@ -286,10 +293,10 @@ class Ticket
 
 
     /**
-    *   Resets the "used" field in the ticket
-    *
-    *   @param  integer $id     ID of ticket reset
-    */
+     * Resets the "used" field in the ticket.
+     *
+     * @param   integer $id     ID of ticket reset
+     */
     public static function Reset($id='')
     {
         global $_TABLES;
@@ -311,17 +318,17 @@ class Ticket
 
 
     /**
-    *   Get all the tickets into objects for an event or repeat
-    *   Can get all tickets for an event, a single occurrence, or all for
-    *   a single user. Must have at lest one search parameter or an
-    *   empty array is returned.
-    *
-    *   @param  string  $ev_id      Event ID
-    *   @param  integer $rp_id      Repeat ID, 0 for all occurrences
-    *   @param  integer $uid        User ID, 0 for all users
-    *   @param  string  $paid       'paid', 'unpaid', or empty for all
-    *   @return array       Array of Ticket objects, indexed by ID
-    */
+     * Get all the tickets into objects for an event or repeat.
+     * Can get all tickets for an event, a single occurrence, or all for
+     * a single user. Must have at lest one search parameter or an
+     * empty array is returned.
+     *
+     * @param   string  $ev_id      Event ID
+     * @param   integer $rp_id      Repeat ID, 0 for all occurrences
+     * @param   integer $uid        User ID, 0 for all users
+     * @param   string  $paid       'paid', 'unpaid', or empty for all
+     * @return  array       Array of Ticket objects, indexed by ID
+     */
     public static function getTickets($ev_id, $rp_id = 0, $uid = 0, $paid='')
     {
         global $_TABLES;
@@ -364,15 +371,15 @@ class Ticket
 
 
     /**
-    *   Print tickets as PDF documents
-    *   Tickets can be printed for an event, a single occurrence,
-    *   or all tickets for a user ID.
-    *
-    *   @param  string  $ev_id  Event ID
-    *   @param  integer $rp_id  Repeat ID
-    *   @param  integer $uid    User ID
-    *   @return string          PDF Document containing tickets
-    */
+     * Print tickets as PDF documents.
+     * Tickets can be printed for an event, a single occurrence,
+     * or all tickets for a user ID.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   integer $rp_id  Repeat ID
+     * @param   integer $uid    User ID
+     * @return  string          PDF Document containing tickets
+     */
     public static function PrintTickets($ev_id='', $rp_id=0, $uid=0)
     {
         global $_CONF, $_USER, $LANG_EVLIST, $_PLUGINS;
@@ -468,7 +475,7 @@ class Ticket
                 $pdf->SetX(-40);
                 $pdf->Cell(0, 30, $LANG_EVLIST['fee'] . ': '. $fee);
                 if ($ticket->fee > 0) {
-                        $pdf->Ln(5);
+                    $pdf->Ln(5);
                     if ($ticket->paid >= $ticket->fee) {
                         $pdf->SetX(-40);
                         $pdf->Cell(0, 30, $LANG_EVLIST['paid']);
@@ -532,11 +539,11 @@ class Ticket
 
 
     /**
-    *   Export tickets to a CSV file for a single occurrence
-    *
-    *   @param  integer $rp_id  Repeat ID
-    *   @return string  CSV file containing all tickets
-    */
+     * Export tickets to a CSV file for a single occurrence.
+     *
+     * @param   integer $rp_id  Repeat ID
+     * @return  string  CSV file containing all tickets
+     */
     public static function ExportTickets($rp_id='')
     {
         global $_CONF, $LANG_EVLIST;
@@ -594,14 +601,14 @@ class Ticket
 
 
     /**
-    *   Check in a user at the event.
-    *   This is meant to work with the qrcode and a smartphone and is
-    *   called from admin/plugins/evlist/checkin.php.
-    *   Each ticket should have a ticket ID and occurrence ID in the URL.
-    *
-    *   @param  integer $rp_id  Occurrence ID.
-    *   @return integer Zero on success, Message ID on failure
-    */
+     * Check in a user at the event.
+     * This is meant to work with the qrcode and a smartphone and is
+     * called from admin/plugins/evlist/checkin.php.
+     * Each ticket should have a ticket ID and occurrence ID in the URL.
+     *
+     * @param   integer $rp_id  Occurrence ID.
+     * @return  integer Zero on success, Message ID on failure
+     */
     public function Checkin($rp_id)
     {
         global $_TABLES;
@@ -625,11 +632,11 @@ class Ticket
 
 
     /**
-    *   Adds a payment amount to the ticket record.
-    *
-    *   @param  string  $tick_id    ID of ticket to update
-    *   @param  float   $amt        Amount paid
-    */
+     * Adds a payment amount to the ticket record.
+     *
+     * @param   string  $tick_id    ID of ticket to update
+     * @param   float   $amt        Amount paid
+     */
     public static function AddPayment($tick_id, $amt)
     {
         global $_TABLES;
@@ -644,16 +651,16 @@ class Ticket
     }
 
 
-    /*
-    *   Format a money amount.
-    *   Calls on the Paypal plugin to format according to the selected
-    *   currency, and falls back to COM_numberFormat() if Paypal isn't
-    *   available.
-    *
-    *   @param  float   $amount     Amount to format
-    *   @param  string  $default    Default if amount is zero, '0.00' if empty
-    *   @return string      Formatted money string with currency specifier
-    */
+    /**
+     * Format a money amount.
+     * Calls on the Paypal plugin to format according to the selected
+     * currency, and falls back to COM_numberFormat() if Paypal isn't
+     * available.
+     *
+     * @param   float   $amount     Amount to format
+     * @param   string  $default    Default if amount is zero, '0.00' if empty
+     * @return  string      Formatted money string with currency specifier
+     */
     public static function formatAmount($amount, $default=NULL)
     {
         if ($amount > 0) {
@@ -677,13 +684,13 @@ class Ticket
 
 
     /**
-    *   Get a count of the unpaid tickets for a user/event.
-    *
-    *   @param  string  $ev_id      Event ID
-    *   @param  integer $rp_id      Instance ID, default 0 (event)
-    *   @param  integer $uid        User ID, default to current user
-    *   @return integer     Number of unpaid tickets
-    */
+     * Get a count of the unpaid tickets for a user/event.
+     *
+     * @param   string  $ev_id      Event ID
+     * @param   integer $rp_id      Instance ID, default 0 (event)
+     * @param   integer $uid        User ID, default to current user
+     * @return  integer     Number of unpaid tickets
+     */
     public static function CountUnpaid($ev_id, $rp_id=0, $uid=0)
     {
         global $_TABLES, $_USER;
@@ -705,15 +712,15 @@ class Ticket
 
 
     /**
-    *   Mark a number of tickets paid for a user/event
-    *
-    *   @uses   Ticket::CountUnpaid()
-    *   @param  integer $count      Number of tickets paid
-    *   @param  string  $ev_id      Event ID
-    *   @param  integer $rp_id      Instance ID, default 0 (event)
-    *   @param  integer $uid        User ID, default to current user
-    *   @return integer     Number of user/event tickets remainint unpaid
-    */
+     * Mark a number of tickets paid for a user/event.
+     *
+     * @uses    Ticket::CountUnpaid()
+     * @param   integer $count      Number of tickets paid
+     * @param   string  $ev_id      Event ID
+     * @param   integer $rp_id      Instance ID, default 0 (event)
+     * @param   integer $uid        User ID, default to current user
+     * @return  integer     Number of user/event tickets remainint unpaid
+     */
     public static function MarkPaid($count, $ev_id, $rp_id=0, $uid=0)
     {
         global $_TABLES, $_USER;
@@ -735,16 +742,15 @@ class Ticket
 
 
     /**
-    *   Reset the waitlist status for tickets.
-    *   Called after deleting or cancelling tickets to move waitlisted
-    *   tickets to non-waitlisted.
-    *
-    *   @param  integer $max_rsvp   Max reservations
-    *   @param  string  $ev_id      Event ID
-    *   @param  integer $rp_id      Instance ID
-    *   @param  integer $count      Count of tickets that were removed
-    *   @return array               Array of updated ticket IDs
-    */
+     * Reset the waitlist status for tickets.
+     * Called after deleting or cancelling tickets to move waitlisted
+     * tickets to non-waitlisted.
+     *
+     * @param   integer $max_rsvp   Max reservations
+     * @param   string  $ev_id      Event ID
+     * @param   integer $rp_id      Instance ID
+     * @return  array               Array of updated ticket IDs
+     */
     public static function resetWaitlist($max_rsvp, $ev_id, $rp_id)
     {
         global $_TABLES;

@@ -1,15 +1,15 @@
 <?php
 /**
-*   Sitemap driver for the evList plugin.
-*
-*   @author     Lee P. Garner <lee AT leegarner DOT com>
-*   @copyright  Copyright (c) 2017 Lee P. Garner <lee AT leegarner DOT com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Sitemap driver for the evList plugin.
+ *
+ * @author      Lee P. Garner <lee AT leegarner DOT com>
+ * @copyright   Copyright (c) 2017 Lee P. Garner <lee AT leegarner DOT com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
@@ -17,19 +17,21 @@ if (!defined ('GVERSION')) {
 }
 
 /**
-*   Sitemap driver for evList
-*   @package    evlist
-*/
+ * Sitemap driver for evList.
+ * @package    evlist
+ */
 class sitemap_evlist extends sitemap_base
 {
+    /** Plugin name.
+     * @var string */
     protected $name = 'evlist';
 
 
     /**
-    *   Get the friendly display name for the plugin
-    *
-    *   @return string  Plugin's display name
-    */
+     * Get the friendly display name for the plugin.
+     *
+     * @return  string  Plugin's display name
+     */
     public function getDisplayName()
     {
         global $LANG_EVLIST;
@@ -38,18 +40,19 @@ class sitemap_evlist extends sitemap_base
 
 
     /**
-    *   Get Event items to display in the sitemap
-    *
-    *   Returns an array of (
-    *       'id'        => $id (string),
-    *       'title'     => $title (string),
-    *       'uri'       => $uri (string),
-    *       'date'      => $date (int: Unix timestamp),
-    *       'image_uri' => $image_uri (string)
-    *   )
-    *
-    *   @return array   Array of item information
-    */
+     * Get Event items to display in the sitemap.
+     *
+     * Returns an array of (
+     *      'id'        => $id (string),
+     *      'title'     => $title (string),
+     *      'uri'       => $uri (string),
+     *      'date'      => $date (int: Unix timestamp),
+     *      'image_uri' => $image_uri (string)
+     * )
+     *
+     * @param   boolean $category   Category ID (not used)
+     * @return  array   Array of item information
+     */
     public function getItems($category = false)
     {
         global $_CONF, $_TABLES, $_EV_CONF;

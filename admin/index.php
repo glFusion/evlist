@@ -1,40 +1,21 @@
 <?php
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | index.php                                                                |
-// |                                                                          |
-// | Administration interface                                                 |
-// +--------------------------------------------------------------------------+
-// | Copyright (C) 2008 by the following authors:                             |
-// |                                                                          |
-// | Mark R. Evans          mark AT glfusion DOT org                          |
-// |                                                                          |
-// | Based on the evList Plugin for Geeklog CMS                               |
-// | Copyright (C) 2007 by the following authors:                             |
-// |                                                                          |
-// | Authors: Alford Deeley     - ajdeeley AT summitpages.ca                  |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
 /**
-*   Administration entry point for the evList plugin
-*   @package    evlist
-*/
+ * Administration entry point for the evList plugin.
+ *
+ * Based on the evList Plugin for Geeklog CMS by Alford Deeley.
+ *
+ * @author     Lee Garner <lee AT leegarner DOT com>
+ * @author     Mark R. Evans <mark AT glfusion DOT org>
+ * @author     Alford Deeley <ajdeeley AT sumitpages.ca>
+ * @copyright  Copyright (c) 2011-2019 Lee Garner <lee AT leegarner DOT com>
+ * @copyright  Copyright (c) 2008-2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright  Copyright (c) 2007 Alford Deeley <ajdeeley AT sumitpages.ca>
+ * @package    evlist
+ * @version    1.3.0
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /** Include glFusion core libraries */
 require_once '../../../lib-common.php';
@@ -46,11 +27,11 @@ if (!in_array('evlist', $_PLUGINS) || !plugin_ismoderator_evlist()) {
 }
 
 /**
-*   Create the common header for all admin functions
-*
-*   @param  string  $page   Current page.  Used for selecting menus
-*   @return string      HTML for admin header portion.
-*/
+ * Create the common header for all admin functions.
+ *
+ * @param   string  $page   Current page.  Used for selecting menus
+ * @return  string      HTML for admin header portion.
+ */
 function EVLIST_adminHeader($page)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_EV_CONF;
@@ -118,10 +99,10 @@ function EVLIST_adminHeader($page)
 
 
 /**
-*   Get the list of categories
-*
-*   @return string      HTML for admin list
-*/
+ * Get the list of categories.
+ *
+ * @return  string      HTML for admin list
+ */
 function EVLIST_adminlist_categories()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
@@ -173,10 +154,10 @@ function EVLIST_adminlist_categories()
 
 
 /**
-*   Get the list of ticket types
-*
-*   @return string      HTML for admin list
-*/
+ * Get the list of ticket types.
+ *
+ * @return  string      HTML for admin list
+ */
 function EVLIST_adminlist_tickettypes()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_EVLIST_HELP, $LANG_ADMIN;
@@ -249,10 +230,12 @@ function EVLIST_adminlist_tickettypes()
 
 
 /**
-*   Get the list of ticket types
-*
-*   @return string      HTML for admin list
-*/
+ * Get the list of tickets.
+ *
+ * @param   string  $ev_id  Event ID
+ * @param   integer $rp_id  Repeat ID, 0 for all
+ * @return  string      HTML for admin list
+ */
 function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
@@ -304,10 +287,10 @@ function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
 
 
 /**
-*   Get the list of events
-*
-*   @return string      HTML for admin list
-*/
+ * Get the list of events.
+ *
+ * @return  string      HTML for admin list
+ */
 function EVLIST_admin_list_events()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
@@ -503,14 +486,14 @@ function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $ico
 
 
 /**
-*   Return the display value for a ticket fields
-*
-*   @param  string  $fieldname  Name of the field
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Name-value pairs for all fields
-*   @param  array   $icon_arr   Array of system icons
-*   @return string      HTML to display for the field
-*/
+ * Return the display value for a ticket fields.
+ *
+ * @param   string  $fieldname  Name of the field
+ * @param   mixed   $fieldvalue Value of the field
+ * @param   array   $A          Name-value pairs for all fields
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string      HTML to display for the field
+ */
 function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
@@ -625,10 +608,10 @@ function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
 
 
 /**
-*   Get the admin list of calendars
-*
-*   @return string  HTML for admin list
-*/
+ * Get the admin list of calendars.
+ *
+ * @return  string  HTML for admin list
+ */
 function EVLIST_admin_list_calendars()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
@@ -762,10 +745,10 @@ function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
 
 
 /**
-*   Import events from a CSV file into the database.
-*
-*   @return string      Completion message
-*/
+ * Import events from a CSV file into the database.
+ *
+ * @return  string      Completion message
+ */
 function EVLIST_importCSV()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $_USER;
@@ -895,9 +878,7 @@ function EVLIST_importCSV()
 }
 
 
-/*
-*   Main function
-*/
+// Main function
 $expected = array(
     // Actions to perform
     'savecal', 'editcal', 'moderate', 'saveevent', 'saverepeat',

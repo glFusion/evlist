@@ -1,48 +1,51 @@
 <?php
 /**
-*   Class to manage event detail records for the EvList plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage event detail records for the EvList plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2019 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
-*   Class for event detail
-*   @package evlist
-*/
+ * Class for event detail.
+ * @package evlist
+ */
 class Detail
 {
     /** Property fields.  Accessed via __set() and __get()
-    *   @var array */
+     * @var array */
     var $properties = array();
 
+    /** Field names.
+     * @var array */
     var $fields = array(
             'ev_id', 'title', 'summary', 'full_description',
             'url', 'location', 'street', 'city', 'province', 'country',
-            'postal', 'contact', 'email', 'phone', 
+            'postal', 'contact', 'email', 'phone',
     );
 
-    /** Marker if this is a new vs. existing record
-    *   @var boolean */
+    /** Marker if this is a new vs. existing record.
+     * @var boolean */
     var $isNew;
 
-    /** Array of error messages
-     *  @var mixed */
+    /** Array of error messages.
+     * @var mixed */
     var $Errors = array();
 
 
     /**
-     *  Constructor.
-     *  Reads in the specified class, if $id is set.  If $id is zero, 
-     *  then a new entry is being created.
+     * Constructor.
+     * Reads in the specified class, if $id is set.  If $id is zero,
+     * then a new entry is being created.
      *
-     *  @param integer $id Optional type ID
+     * @param   integer $det_id Optional type ID
+     * @param   integer $ev_id  Optional event ID
      */
     public function __construct($det_id='', $ev_id='')
     {
@@ -77,11 +80,11 @@ class Detail
 
 
     /**
-    *   Get an instance of an event's detail record.
-    *
-    *   @param  integer $det_id     Detail record ID
-    *   @return object              Detail object
-    */
+     * Get an instance of an event's detail record.
+     *
+     * @param   integer $det_id     Detail record ID
+     * @return  object              Detail object
+     */
     public static function getInstance($det_id)
     {
         static $records = array();
@@ -103,11 +106,11 @@ class Detail
 
 
     /**
-    *   Set a property's value.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         switch ($var) {
@@ -151,11 +154,11 @@ class Detail
 
 
     /**
-    *   Get the value of a property.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
@@ -167,10 +170,10 @@ class Detail
 
 
     /**
-     *  Sets all variables to the matching values from $rows.
+     * Sets all variables to the matching values from $rows.
      *
-     *  @param  array   $row        Array of values, from DB or $_POST
-     *  @param  boolean $fromDB     True if read from DB, false if from $_POST
+     * @param   array   $row        Array of values, from DB or $_POST
+     * @param   boolean $fromDB     True if read from DB, false if from $_POST
      */
     public function SetVars($row, $fromDB=false)
     {
@@ -187,10 +190,10 @@ class Detail
 
 
     /**
-     *  Read a specific record and populate the local values.
+     * Read a specific record and populate the local values.
      *
-     *  @param  integer $id Optional ID.  Current ID is used if zero.
-     *  @return boolean     True if a record was read, False on failure.
+     * @param   integer $det_id Optional ID. Current ID is used if zero.
+     * @return  boolean     True if a record was read, False on failure.
      */
     public function Read($det_id = '')
     {
@@ -200,8 +203,8 @@ class Detail
             $this->det_id = $det_id;
         }
 
-        $result = DB_query("SELECT * 
-                    FROM {$_TABLES['evlist_detail']} 
+        $result = DB_query("SELECT *
+                    FROM {$_TABLES['evlist_detail']}
                     WHERE det_id='{$this->det_id}'");
         if (!$result || DB_numRows($result) != 1) {
             return false;
@@ -215,11 +218,11 @@ class Detail
 
 
     /**
-     *  Save the current values to the database.
-     *  Appends error messages to the $Errors property.
+     * Save the current values to the database.
+     * Appends error messages to the $Errors property.
      *
-     *  @param  array   $A      Optional array of values from $_POST
-     *  @return boolean         True if no errors, False otherwise
+     * @param   array   $A      Optional array of values from $_POST
+     * @return  boolean         True if no errors, False otherwise
      */
     public function Save($A = '')
     {
@@ -234,7 +237,7 @@ class Detail
         // the coordinates to be used when displaying the event.
         // At least a city and state/province is required.
         if ($_EV_CONF['use_locator'] == 1 &&
-                $this->city != '' && 
+                $this->city != '' &&
                 $this->province != '') {
             $address = $this->street . ' ' . $this->city . ', ' .
                         $this->province . ' ' . $this->postal . ' ' .
@@ -271,8 +274,7 @@ class Detail
             //echo $sql;die;
             DB_query($sql);
         } else {
-            $sql = "INSERT INTO {$_TABLES['evlist_detail']}
-                    SET 
+            $sql = "INSERT INTO {$_TABLES['evlist_detail']} SET
                     det_id = 0,
                     lat = '{$lat}',
                     lng = '{$lng}',
@@ -286,7 +288,7 @@ class Detail
 
 
     /**
-     *  Delete the current detail record from the database
+     * Delete the current detail record from the database.
      */
     public function Delete()
     {
@@ -307,7 +309,7 @@ class Detail
      *          1234 Main Street.
      *          Los Angeles, CA, USA, 90021
      *
-     *  @return string  HTML-formatted address
+     * @return  string  HTML-formatted address
      */
     public function formatAddress()
     {
@@ -329,6 +331,5 @@ class Detail
     }
 
 }   // class Detail
-
 
 ?>

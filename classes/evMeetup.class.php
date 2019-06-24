@@ -1,32 +1,41 @@
 <?php
 /**
-*   Class to retrieve events from meetup.com
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.6
-*   @since      1.4.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to retrieve events from meetup.com.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.6
+ * @since       v1.4.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php 
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
-*   Class for Meetup events
-*   @package evlist
-*/
+ * Class for Meetup events.
+ * @package evlist
+ */
 class evMeetup
 {
-    var $key;
-    var $params;
+    /** Calendar key.
+     * @var string */
+    public $key;
+
+    /** Parameters.
+     * @var array */
+    private $params;
+
+    /** Cache key.
+     * @var string */
     private static $tag = 'evlist_meetup';
 
+
     /**
-    *   Constructor
+    * Constructor
     *
-    *   @param  string  $key    Cache key, e.g. "meetup-week-2016-05-01'
+    * @param    string  $key    Cache key, e.g. "meetup-week-2016-05-01'
     */
     public function __construct($key = 'meetup')
     {
@@ -43,11 +52,11 @@ class evMeetup
 
 
     /**
-    *   Set a parameter
-    *
-    *   @param  string  $key    Name of parameter to set
-    *   @param  mixed   $value  Value to set
-    */
+     * Set a parameter.
+     *
+     * @param   string  $key    Name of parameter to set
+     * @param   mixed   $value  Value to set
+     */
     public function setParam($key, $value)
     {
         $this->params[$key] = $value;
@@ -55,10 +64,10 @@ class evMeetup
 
 
     /**
-    *   Remove a parameter.
-    *
-    *   @param  string  $key    Name of parameter to remove
-    */
+     * Remove a parameter.
+     *
+     * @param   string  $key    Name of parameter to remove
+     */
     public function unsetParam($key)
     {
         unset($this->params[$key]);
@@ -66,14 +75,14 @@ class evMeetup
 
 
     /**
-    *   Retrieve Meetup events.
-    *   Checks the cache table first for a recent entry.  If not found,
-    *   get information from meetup.com
-    *
-    *   @param  string  $start  Starting Date
-    *   @param  string  $end    Ending Date
-    *   @return array   Array of event information
-    */
+     * Retrieve Meetup events.
+     * Checks the cache table first for a recent entry.  If not found,
+     * get information from meetup.com
+     *
+     * @param   string  $start  Starting Date
+     * @param   string  $end    Ending Date
+     * @return  array   Array of event information
+     */
     public function getEvents($start='', $end='')
     {
         global $_TABLES, $_EV_CONF, $_CONF;

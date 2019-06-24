@@ -19,7 +19,7 @@ namespace Evlist\Views;
  */
 class dayView extends \Evlist\View
 {
-    /*
+    /**
      * Construct the daily view class.
      *
      * @param   integer $year   Year to display, default is current year
@@ -27,7 +27,7 @@ class dayView extends \Evlist\View
      * @param   integer $day    Starting day
      * @param   integer $cat    Category to show
      * @param   integer $cal    Calendar to show
-     * @param   string  $opt    Optional template modifier, e.g. "print"
+     * @param   string  $opts   Optional template modifier, e.g. "print"
      */
      public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
@@ -204,7 +204,6 @@ class dayView extends \Evlist\View
      * Organizes events by hour, and separates all-day events.
      *
      * @param   array   $events     Array of all events
-     * @param   string  $today      Current date, YYYY-MM-DD.  Optional.
      * @return  array               Array of 2 arrays, allday and hourly
      */
     function getViewData($events)

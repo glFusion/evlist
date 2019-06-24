@@ -1,32 +1,38 @@
 <?php
 /**
-*   Class to manage categories
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage categories.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
- *  Class for categories
- *  @package evlist
+ * Class for categories.
+ * @package evlist
  */
 class Category
 {
+    /** Properties accessed via `__set()` and `__get()`.
+     * @var array */
     var $properties = array();
+
+    /** Indicator that this is a new record.
+     * @var boolean */
     var $isNew;
 
+
     /**
-    *   Constructor
-    *   Create an empty calendar object, or read an existing one
-    *
-    *   @param  integer $cat_id     Calendar ID to read
-    */
+     * Constructor
+     * Create an empty calendar object, or read an existing one
+     *
+     * @param   integer $cat_id     Calendar ID to read
+     */
     public function __construct($cat_id = 0)
     {
         global $_EV_CONF, $_USER;
@@ -46,10 +52,10 @@ class Category
 
 
     /**
-    *   Read an existing calendar record into this object
-    *
-    *   @param  integer $cat_id Optional calendar ID, $this->cat_id used if 0
-    */
+     * Read an existing calendar record into this object.
+     *
+     * @param   integer $cat_id Optional calendar ID, $this->cat_id used if 0
+     */
     public function Read($cat_id = 0)
     {
         global $_TABLES;
@@ -74,6 +80,12 @@ class Category
     }
 
 
+    /**
+     * Set a property's value.
+     *
+     * @param   $key    Name of property
+     * @param   $value  Value to set
+     */
     public function __set($key, $value)
     {
         switch ($key) {
@@ -93,11 +105,11 @@ class Category
 
 
     /**
-    *   Get the value of a property.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $key    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
@@ -109,11 +121,10 @@ class Category
 
 
     /**
-    *   Set the value of all variables from an array, either DB or a form
-    *
-    *   @param  array   $A      Array of fields
-    *   @param  boolean $fromDB True if $A is from the database, false for form
-    */
+     * Set the value of all variables from an array, either DB or a form.
+     *
+     * @param   array   $A      Array of fields
+     */
     public function SetVars($A)
     {
         $this->cat_id = isset($A['id']) ? $A['id'] : 0;
@@ -195,10 +206,10 @@ class Category
 
 
     /**
-    *   Deletes the current category. Also deletes any lookup records.
-    *
-    *   @param  integer $cat_id Category to delete
-    */
+     * Deletes the current category. Also deletes any lookup records.
+     *
+     * @param   integer $cat_id Category to delete
+     */
     public static function Delete($cat_id=0)
     {
         global $_TABLES;
@@ -210,15 +221,14 @@ class Category
     }
 
 
-
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $id ID number of element to modify
-    #   @param  integer $value New value to set
-    *   @return         New value, or old value upon failure
-    */
-    public static function toggleEnabled($oldvalue, $cat_id = 0)
+     * Sets the "enabled" field to the specified value.
+     *
+     * @param   integer $oldvalue   Original value to be toggled
+     * @param   integer $cat_id     ID number of element to modify
+     * @return      New value, or old value upon failure
+     */
+    public static function toggleEnabled($oldvalue, $cat_id)
     {
         global $_TABLES;
 
@@ -238,11 +248,11 @@ class Category
 
 
     /**
-    *   Get all categories from the lookup table.
-    *
-    *   $param  boolean $enabled    True to get only enabled calendars
-    *   return  array       Array of calendar objects
-    */
+     * Get all categories from the lookup table.
+     *
+     * $param   boolean $enabled    True to get only enabled calendars
+     * return   array       Array of calendar objects
+     */
     public static function getAll()
     {
         global $_TABLES;
@@ -269,12 +279,12 @@ class Category
 
 
     /**
-    *   Get an instance of a category.
-    *   Saves objects in a static variable to minimize DB lookups
-    *
-    *   @param  integer $id     Category ID
-    *   @return object          Category object
-    */
+     * Get an instance of a category.
+     * Saves objects in a static variable to minimize DB lookups
+     *
+     * @param   integer $id     Category ID
+     * @return  object          Category object
+     */
     public static function getInstance($id)
     {
         $Cats = self::getAll();

@@ -1,37 +1,37 @@
 <?php
 /**
-*   Class to manage event repeats or single instances for the EvList plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.4.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage event repeats or single instances for the EvList plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.4.3
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Evlist;
 
 /**
-*   Class for event
-*   @package evlist
-*/
+ * Class for events.
+ * @package evlist
+ */
 class Repeat
 {
-    /** Property fields.  Accessed via Set() and Get()
-    *   @var array */
+    /** Property fields accessed via `__set()` and `__get()`.
+     * @var array */
     var $properties = array();
 
-    /** Associated event
-    *   @var object */
+    /** Associated event.
+     * @var object */
     var $Event;
 
     /** Associated event detail (title, location, summary, etc.
-    *   @var object */
+     * @var object */
     var $Detail;
 
-    /** Indicate if admin access is granted to this event/repeat
-    *   @var boolean */
+    /** Indicate if admin access is granted to this event/repeat.
+     * @var boolean */
     public $isAdmin;
 
 
@@ -40,7 +40,7 @@ class Repeat
      *  Reads in the specified event repeat, if $rp_id is set.
      *  If $id is zero, then a new entry is being created.
      *
-     *  @param integer $id Optional type ID
+     *  @param integer $rp_id   Optional repeat ID
      */
     public function __construct($rp_id=0)
     {
@@ -73,12 +73,12 @@ class Repeat
 
 
     /**
-    *   Get an instance of a repeat
-    *   Saves instances in a static array to speed multiple calls
-    *
-    *   @param  integer $rp_id  Repeat ID
-    *   @return object          Repeat object
-    */
+     * Get an instance of a repeat
+     * Saves instances in a static array to speed multiple calls.
+     *
+     * @param   integer $rp_id  Repeat ID
+     * @return  object          Repeat object
+     */
     public static function getInstance($rp_id)
     {
         static $repeats = array();
@@ -100,11 +100,11 @@ class Repeat
 
 
     /**
-    *   Set a property's value.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         global $_USER, $_CONF;
@@ -151,12 +151,11 @@ class Repeat
 
 
     /**
-    *   Get the value of a property.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @param  boolean $db     True if string values should be escaped for DB.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         switch($var) {
@@ -176,10 +175,10 @@ class Repeat
 
 
     /**
-     *  Sets all variables to the matching values from $rows.
+     * Sets all variables to the matching values from $rows.
      *
-     *  @param  array   $row        Array of values, from DB or $_POST
-     *  @param  boolean $fromDB     True if read from DB, false if from $_POST
+     * @param   array   $row        Array of values, from DB or $_POST
+     * @param   boolean $fromDB     True if read from DB, false if from $_POST
      */
     public function SetVars($row, $fromDB=false)
     {
@@ -237,10 +236,10 @@ class Repeat
 
 
     /**
-     *  Read a specific record and populate the local values.
+     * Read a specific record and populate the local values.
      *
-     *  @param  integer $id Optional ID.  Current ID is used if zero.
-     *  @return boolean     True if a record was read, False on failure.
+     * @param   integer $rp_id  Optional ID.  Current ID is used if zero.
+     * @return  boolean     True if a record was read, False on failure.
      */
     public function Read($rp_id = 0)
     {
@@ -277,13 +276,13 @@ class Repeat
 
 
     /**
-    *   Edit a single repeat.
-    *
-    *   @see    Event::Edit()
-    *   @param  integer $rp_id      ID of instance to edit
-    *   @param  string  $edit_type  Type of repeat (repeat or futurerepeat)
-    *   @return string      Editing form
-    */
+     * Edit a single repeat.
+     *
+     * @see     Event::Edit()
+     * @param   integer $rp_id      ID of instance to edit
+     * @param   string  $edit_type  Type of repeat (repeat or futurerepeat)
+     * @return  string      Editing form
+     */
     public function Edit($rp_id = 0, $edit_type='repeat')
     {
         if ($rp_id > 0) {
@@ -294,16 +293,16 @@ class Repeat
 
 
     /**
-    *   Save this occurance info to the database.
-    *   Only updates can be performed since the original record must have
-    *   been created by the Event class.
-    *
-    *   The incoming $A parameter will contain all the event info, so it can
-    *   be used to populate both the Detail and Repeat records.
-    *
-    *   @param  array   $A      Optional array of values from $_POST
-    *   @return boolean         True if no errors, False otherwise
-    */
+     * Save this occurance info to the database.
+     * Only updates can be performed since the original record must have
+     * been created by the Event class.
+     *
+     * The incoming $A parameter will contain all the event info, so it can
+     * be used to populate both the Detail and Repeat records.
+     *
+     * @param   array   $A      Optional array of values from $_POST
+     * @return  boolean         True if no errors, False otherwise
+     */
     public function Save($A = '')
     {
         global $_TABLES;
@@ -347,10 +346,10 @@ class Repeat
 
 
     /**
-    *   Delete the current instance from the database
-    *
-    *   @return boolean     True on success, False on failure
-    */
+     * Delete the current instance from the database.
+     *
+     * @return  boolean     True on success, False on failure
+     */
     public function Delete()
     {
         global $_TABLES;
@@ -371,13 +370,15 @@ class Repeat
 
 
     /**
-    *   Display the detail page for the event occurrence.
-    *
-    *   @param  integer $rp_id  ID of the repeat to display
-    *   @param  string  $query  Optional query string, for highlighting
-    *   @param  string  $tpl    Optional template filename, e.g. 'event_print'
-    *   @return string      HTML for the page.
-    */
+     * Display the detail page for the event occurrence.
+     *
+     * @param   integer $rp_id  ID of the repeat to display
+     * @param   string  $query  Optional query string, for highlighting
+     * @param   string  $tpl    Optional template filename, e.g. 'event_print'
+     * @param   string  $cmtmode    Comment Mode
+     * @param   string  $cmtorder   Comment order
+     * @return  string      HTML for the page.
+     */
     public function Render($rp_id=0, $query='', $tpl='', $cmtmode='nested', $cmtorder='ASC')
     {
         global $_CONF, $_USER, $_EV_CONF, $LANG_EVLIST, $LANG_WEEK,
@@ -423,7 +424,8 @@ class Repeat
 
         USES_lib_social();
         $permalink = COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $this->Event->id);
-        $ss = SOC_getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+        //$ss = SOC_getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+        $ss = $this->getShareIcons($permalink);
         // If plain text then replace newlines with <br> tags
         if ($this->Event->postmode == '1') {       //plaintext
             $this->Event->Detail->summary = nl2br($this->Event->Detail->summary);
@@ -566,7 +568,6 @@ class Repeat
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
             'more_info_link' => $more_info_link,
-            'mootools'  => $_SYSTEM['disable_mootools'] ? '' : 'true',
             'show_tz'   => $this->tzid == 'local' ? '' : 'true',
             'timezone'  => $this->tzid,
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
@@ -585,6 +586,7 @@ class Repeat
 
         // Show the user comments. Moderators and event owners can delete comments
         if (plugin_commentsupport_evlist() && $this->Event->enable_comments > -1) {
+            USES_lib_comment();
             $T->set_var('usercomments',
                 CMT_userComments($this->rp_id, $this->Event->Detail->title, 'evlist',
                     $cmtorder, $cmtmode, 0, 1, false,
@@ -865,13 +867,13 @@ class Repeat
 
 
     /**
-    *   Register a user for an event.
-    *
-    *   @param  integer $num_attendees  Number of attendees, default 1
-    *   @param  integer $tick_type      Id of ticket type
-    *   @param  integer $uid    User ID to register, 0 for current user
-    *   @return integer         Message code, zero for success
-    */
+     * Register a user for an event.
+     *
+     * @param   integer $num_attendees  Number of attendees, default 1
+     * @param   integer $tick_type      Id of ticket type
+     * @param   integer $uid    User ID to register, 0 for current user
+     * @return  integer         Message code, zero for success
+     */
     public function Register($num_attendees = 1, $tick_type = 0, $uid = 0)
     {
         global $_TABLES, $_USER, $_EV_CONF, $LANG_EVLIST;
@@ -968,12 +970,12 @@ class Repeat
 
 
     /**
-    *   Cancel a user's registration for an event.
-    *   Delete the newer records first, to preserve waitlist position for the user.
-    *
-    *   @param  integer $uid    Optional User ID to remove, 0 for current user
-    *   @param  integer $num    Number of reservations to cancel, 0 for all
-    */
+     * Cancel a user's registration for an event.
+     * Delete the newer records first, to preserve waitlist position for the user.
+     *
+     * @param   integer $uid    Optional User ID to remove, 0 for current user
+     * @param   integer $num    Number of reservations to cancel, 0 for all
+     */
     public function CancelRegistration($uid = 0, $num = 0)
     {
         global $_TABLES, $_USER, $_EV_CONF;
@@ -1001,12 +1003,12 @@ class Repeat
 
 
     /**
-    *   Determine if the user is registered for this event/repeat.
-    *
-    *   @param  integer $uid    Optional user ID, current user by default
-    *   @param  boolean $free_only  True to get count of only free tickets
-    *   @return mixed   Number of registrations, or False if rsvp disabled
-    */
+     * Determine if the user is registered for this event/repeat.
+     *
+     * @param   integer $uid    Optional user ID, current user by default
+     * @param   boolean $free_only  True to get count of only free tickets
+     * @return  mixed   Number of registrations, or False if rsvp disabled
+     */
     public function isRegistered($uid = 0, $free_only = false)
     {
         global $_TABLES, $_USER, $_EV_CONF;
@@ -1037,12 +1039,12 @@ class Repeat
 
 
     /**
-    *   Get the total number of users registered for this event/repeat
-    *   If provided, the $rp_id parameter will be considered an event ID or
-    *   a repeat ID, depending on the event's registration option.
-    *
-    *   @return integer         Total registrations for this instance
-    */
+     * Get the total number of users registered for this event/repeat.
+     * If provided, the $rp_id parameter will be considered an event ID or
+     * a repeat ID, depending on the event's registration option.
+     *
+     * @return  integer         Total registrations for this instance
+     */
     public function TotalRegistrations()
     {
         global $_TABLES, $_EV_CONF;
@@ -1063,10 +1065,10 @@ class Repeat
 
 
     /**
-    *   Get all the users registered for this event.
-    *
-    *   @return array   Array of uid's and dates, sorted by date
-    */
+     * Get all the users registered for this event.
+     *
+     * @return  array   Array of uid's and dates, sorted by date
+     */
     public function Registrations()
     {
         global $_TABLES, $_EV_CONF;
@@ -1101,11 +1103,11 @@ class Repeat
 
 
     /**
-    *   Delete the current and all future occurrences of an event.
-    *   First, gather and delete all the detail records for custom instances.
-    *   Then, delete all the future repeat records. Finally, update the stop
-    *   date for the main event.
-    */
+     * Delete the current and all future occurrences of an event.
+     * First, gather and delete all the detail records for custom instances.
+     * Then, delete all the future repeat records. Finally, update the stop
+     * date for the main event.
+     */
     public function DeleteFuture()
     {
         global $_TABLES;
@@ -1158,14 +1160,14 @@ class Repeat
 
 
     /**
-    *   Get one or all occurences of an event.
-    *   If $rp_id is zero, return all repeats. Otherwise return only the
-    *   requested one.
-    *
-    *   @param  string  $ev_id  Event ID
-    *   @param  integer $rp_id  Repeat ID
-    *   @return array       Array of occurrences
-    */
+     * Get one or all occurences of an event.
+     * If $rp_id is zero, return all repeats. Otherwise return only the
+     * requested one.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   integer $rp_id  Repeat ID
+     * @return  array       Array of occurrences
+     */
     public static function getRepeats($ev_id, $rp_id=0)
     {
         global $_TABLES;
@@ -1192,13 +1194,14 @@ class Repeat
 
 
     /**
-    *   Add the event fee to the shopping cart
-    *   No checking is done here to see if it's paid, that must be done
-    *   by the caller.
-    *
-    *   @param  boolean $info   True to just return vars, False to add to cart
-    *   @return array           Array of cart vars
-    */
+     * Add the event fee to the shopping cart.
+     * No checking is done here to see if it's paid, that must be done
+     * by the caller.
+     *
+     * @param   integer $tick_type  Ticket type
+     * @param   integer $qty        Quantity of tickets
+     * @return  array           Array of cart vars
+     */
     public function AddToCart($tick_type, $qty=1)
     {
         global $LANG_EVLIST, $_CONF;
@@ -1227,11 +1230,11 @@ class Repeat
 
 
     /**
-    *   Get the ID of the next upcoming instance of a given event.
-    *
-    *   @param  string  $ev_id  Event ID
-    *   @return integer         ID of the next instance of this event
-    */
+     * Get the ID of the next upcoming instance of a given event.
+     *
+     * @param   string  $ev_id  Event ID
+     * @return  integer         ID of the next instance of this event
+     */
     public static function getUpcoming($ev_id)
     {
         global $_EV_CONF, $_TABLES, $_CONF;
@@ -1246,12 +1249,12 @@ class Repeat
 
 
     /**
-    *   Get the ID of the last instance of a given event.
-    *   Used to find an instance to display for events that have passed.
-    *
-    *   @param  string  $ev_id  Event ID
-    *   @return integer         ID of the next instance of this event
-    */
+     * Get the ID of the last instance of a given event.
+     * Used to find an instance to display for events that have passed.
+     *
+     * @param   string  $ev_id  Event ID
+     * @return  integer         ID of the next instance of this event
+     */
     public static function getLast($ev_id)
     {
         global $_TABLES;
@@ -1264,11 +1267,11 @@ class Repeat
 
 
     /**
-    *   Get the ID of the first instance of a given event.
-    *
-    *   @param  string  $ev_id  Event ID
-    *   @return integer         ID of the first instance of this event
-    */
+     * Get the ID of the first instance of a given event.
+     *
+     * @param   string  $ev_id  Event ID
+     * @return  integer         ID of the first instance of this event
+     */
     public static function getFirst($ev_id)
     {
         global $_TABLES;
@@ -1281,17 +1284,17 @@ class Repeat
 
 
     /**
-    *   Get the nearest event, upcoming or past.
-    *   Try first to get the closest upcoming instance, then try for the
-    *   most recent past instance.
-    *   Used when sharing social links to retrieve the instance that's most
-    *   likely of interest.
-    *
-    *   @uses   Repeat::getLast()
-    *   @uses   Repeat::getUpcoming()
-    *   @param  string  $ev_id  Event ID
-    *   @return mixed       Instance ID, or False on an or not found
-    */
+     * Get the nearest event, upcoming or past.
+     * Try first to get the closest upcoming instance, then try for the
+     * most recent past instance.
+     * Used when sharing social links to retrieve the instance that's most
+     * likely of interest.
+     *
+     * @uses    self::getLast()
+     * @uses    self::getUpcoming()
+     * @param   string  $ev_id  Event ID
+     * @return  mixed       Instance ID, or False on an or not found
+     */
     public static function getNearest($ev_id)
     {
         $rp_id = self::getUpcoming($ev_id);
@@ -1299,6 +1302,23 @@ class Repeat
             $rp_id = self::getLast($ev_id);
         }
         return $rp_id;
+    }
+
+
+    /**
+     * Get the social sharing icons.
+     *
+     * @param   string  $permalink  URL to the specific event occurrence
+     * @return  string  HTML for social sharing icons
+     */
+    private function getShareIcons($permalink)
+    {
+        if (version_compare(GVERSION, '2.0.0', '<')) {
+            $ss = SOC_getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+        } else {
+            $ss = \glFusion\Social\Social::getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+        }
+        return $ss;
     }
 
 }   // class Repeat

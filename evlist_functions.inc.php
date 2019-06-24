@@ -48,12 +48,11 @@
 /**
  * Get the Google-style page navigation for the list display.
  *
- * @param   string  $start  Starting date
- * @param   string  $end    Ending date
- * @param   integer $cat    Category ID (optional)
- * @param   integer $page   Current page number
- * @param   integer $range  Range being displayed (upcoming, past, etc)
- * @param   integer $cal    ID of calendar being shown
+ * @param   integer $numrows    Total number of rows
+ * @param   integer $cat        Category ID (optional)
+ * @param   integer $page       Current page number
+ * @param   integer $range      Range being displayed (upcoming, past, etc)
+ * @param   integer $cal        ID of calendar being shown
  * @return  string          HTML for page navigation
  */
 function EVLIST_pagenav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)

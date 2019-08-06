@@ -51,7 +51,6 @@ $event_table =
   `split` tinyint(1) NOT NULL DEFAULT '0',
   `status` tinyint(1) NOT NULL DEFAULT '1',
   `postmode` varchar(10) NOT NULL DEFAULT 'plaintext',
-  `hits` int(11) NOT NULL DEFAULT '0',
   `enable_reminders` tinyint(1) NOT NULL DEFAULT '1',
   `enable_comments` tinyint(1) NOT NULL DEFAULT '0',
   `owner_id` mediumint(8) DEFAULT NULL,
@@ -356,6 +355,7 @@ $_EV_UPGRADE = array(
     ),
 '1.4.6' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
+    "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     ),
 );
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];

@@ -531,9 +531,7 @@ function plugin_getheaderjs_evlist()
     $path = $_CONF['path_html'] . '/evlist/js';
     $files = array(
         $path . '/toggleEnabled.js',
-        //$path . '/ckeditor.js',
     );
-
     return $files;
 }
 
@@ -1294,21 +1292,6 @@ function EV_getGroupList($basegroup)
     }
 
     return $checked;
-}
-
-
-/**
- * Add a hit to an event.
- *
- * @param   string  $eid    Event ID
- */
-function evlist_hit($eid)
-{
-    global $_TABLES;
-
-    DB_query("UPDATE {$_TABLES['evlist_events']}
-            SET hits = hits + 1
-            WHERE id = '" . DB_escapeString($eid) ."'");
 }
 
 

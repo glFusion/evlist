@@ -241,7 +241,6 @@ class View
             'use_json' => 'true',
             'view'  => $this->type,
         ) );
-
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
         $T->set_var('cal_select', Calendar::optionList($cal_selected, true, 2));
 
@@ -453,8 +452,6 @@ class View
         $T->set_var(array(
             'cal_header'    => $this->Header(),
             'calendar_content' => $this->Content(),
-            'urlfilt_cal' => (int)$this->cal,
-            'urlfilt_cat' => (int)$this->cat,
         ) );
         $T->parse('output', 'view');
         return $T->finish($T->get_var('output'));

@@ -3,17 +3,15 @@
 <script type="text/javascript" src="{site_url}/evlist/js/calselect.js"></script>
 <script type="text/javascript">
 var xmlHttp;
-var cat = {urlfilt_cat};
-var cal = {urlfilt_cal};
 
 // Placeholders for newly-selected date values
 var newyear = 0;
 var newmonth = 0;
 var newday = 0;
-function ChangeDate(year, month, day, type)
+function ChangeDate(year, month, day, view)
 {
  var action;
-  switch (type) {
+  switch (view) {
     case 'year': action = "year"; break;
     case 'month': action = "month"; break;
     case 'week': action = "week"; break;
@@ -25,11 +23,11 @@ function ChangeDate(year, month, day, type)
   newday = day;
   var dataS = {
     "action" : action,
-    "cat": cat,
-    "cal": cal,
     "year": year,
     "month": month,
     "day": day,
+    "cat": "{urlfilt_cat}",
+    "cal": "{urlfilt_cal}",
   };
   data = $.param(dataS);
   $.ajax({
@@ -122,11 +120,11 @@ function ChangeDate(year, month, day, type)
           changeYear: true,
         });
 
-        function jump2date(cal)
+        function jump2date(dt_str)
         {
-                var d = cal.substring(8, 10);
-                var m = cal.substring(5, 7);
-                var y = cal.substring(0, 4);
+                var d = dt_str.substring(8, 10);
+                var m = dt_str.substring(5, 7);
+                var y = dt_str.substring(0, 4);
                 ChangeDate(y, m, d, "{view}");
                 window.location="{pi_url}/index.php?view={view}&year="+y+"&month="+m+"&day="+d;
         }

@@ -579,10 +579,15 @@ function EVLIST_remove_old_files()
             'classes/View_smallmonth.class.php'.
             'classes/View_week.class.php'.
             'classes/View_year.class.php',
+            // 1.4.6
+            'classes/evMeetup.class.php',
+            'classes/meetup.class.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(
             'js/colorpicker.js',
+            // 1.4.6
+            'docs/english/config.legacy.html',
         ),
     );
 

@@ -13,6 +13,7 @@ Release TBD
 - Fix search results not excluding by calendar status or permissions.
 - Consider calendar perms in Event::hasAccess().
 - Request perms in `plugin_itemsaved`, calculate based on owner/group if not supplied.
+- Remove support for Meetup.com API
 
 ## v1.4.5
 Release 2018-04-14

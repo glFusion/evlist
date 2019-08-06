@@ -18,9 +18,6 @@
         <b>
 {!if is_birthday}
         {title}
-{!elseif is_meetup}
-        <a data-uk-tooltip title="{summary}::{startdate}"
-            href="{ev_url}" target="_blank">{title}</a>
 {!else}
         <a data-uk-tooltip title="{summary}::{startdate}"
             href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>

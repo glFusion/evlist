@@ -1,13 +1,9 @@
 {# begin {templatelocation} #}
 <!-- BEGIN eventRow -->
 <article class="uk-article tm-article uk-margin-large-bottom">
-   <h1 class="uk-article-title tm-article-title uk-margin-bottom-remove"><a
-{!if is_meetup}
-        href="{ev_url}" target="_blank"
-{!else}
-         href="{site_url}/evlist/event.php?eid={eid}"
-{!endif}
-        >{title} {startdate}</a></h1>
+  <h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
+      <a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}</a>
+  </h1>
     <div class="story-body">
         {summary}
     </div>

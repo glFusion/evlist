@@ -19,10 +19,10 @@ categories, and more.
 ## SYSTEM REQUIREMENTS
 evList has the following system requirements:
 
-    * PHP 5.6 and higher.
+    * PHP 7.0 and higher.
     * glFusion v1.7.0 or newer
     * lgLib plugin
-    * Paypal 0.6.0 or higher, if used.
+    * Shop Plugin 0.7.0 or higher, if used.
 
 evList makes use of the lgLib plugin to handle messages and PDF creation.
 
@@ -111,19 +111,6 @@ enter their email address for a reminder. Default = 1.
   * Number of characters (width) of the centerblock.
 
 ### Integrations
-* Enable Metup.com Integration - Select "True" to enable Meetup.com
-integration. You must also provide values for the other two fields.
-
-* Meetup API Key - Evlist can now display events from one or more Meetup.com
-in the calendar views. To enable this feature, obtain an API key from
-http://www.meetup.com/meetup_api/ and enter it here.
-
-* Meetup Group IDs - Enter one or more Meetup group ID (to which you have view
-access) here.
-
-* Cache Minutes - Enter a number of minutes to cache data from Meetup.com.
-This is to reduce API calls to meetup.com and stay within the terms of service.
-
 * Use Locator - Evlist can display maps from the Locator plugin on the event
 detail page. Select "True" to enable this feature (must also have the Locator
 plugin installed).

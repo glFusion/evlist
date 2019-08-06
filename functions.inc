@@ -83,10 +83,6 @@ if ($_CONF['loginrequired'] == 1) {
     $_EV_CONF['allow_anon_view'] = '0';
 }
 
-if (empty($_EV_CONF['meetup_gid']) || empty($_EV_CONF['meetup_key'])) {
-    $_EV_CONF['meetup_enabled'] = 0;
-}
-
 // Include the user's language file, if found.  Default to englsh.
 $langpath = __DIR__ . '/language';
 $langfile = $_CONF['language'] . '.php';
@@ -781,7 +777,6 @@ function EVLIST_cb_content($format)
 
             $T->set_var(array(
                 'cssid'     => $cssid,
-                'is_meetup' => $A['cal_id'] == -1 ? true : false,
                 'is_birthday' => $A['cal_id'] == -2 ? true : false,
                 'eid'       => $A['rp_id'],
                 'pi_url'    => EVLIST_URL,
@@ -2473,88 +2468,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
         }
         Evlist\Cache::set($key, $events, 'events');
     }
-
-    // Add the Meetup and Birthday events, if no category is selected.
-    // These event types don't get a category assigned.
-    if (!isset($opts['cat']) || $opts['cat'] == 0) {
-        // First have to get the starting and ending dates from the results
-        // if this is a list since Meetups and Birthdays don't use ranges.
-        if (isset($opts['page']) && !empty($events)) {
-           $start = array_keys($events)[0];
-           $end = array_keys($events)[count($events)-1];
-        }
-        if (!isset($opts['cal']) || $opts['cal'] == -1 || $opts['cal'] == 0) {
-            EVLIST_getMeetupEvents($start, $end, $events);
-        }
-    }
     return $events;
-}
-
-
-/**
- * Get events from meetup.com API.
- * Adds events to the $events array created by EVLIST_getEvents().
- * Assigns calendar ID "-1" named "meetup" to all events.
- *
- * @param   string  $start      Starting date (YYYY-MM-DD)
- * @param   string  $end        Ending date (YYYY-MM-DD)
- * @param   array   &$events    Existing array of events
- */
-function EVLIST_getMeetupEvents($start='', $end='', &$events)
-{
-    global $_EV_CONF, $_CONF;
-
-    return;     // Meetup is deprecated
-
-    $Cal = Evlist\Calendar::getMapped('meetup');
-    // Check that meetup events and the meetup calendar are enabled
-    if ($_EV_CONF['meetup_enabled'] == 0 || $Cal->cal_status == 0) return;
-
-    // Create a unique key for the query for cache identification
-    $key = $start . '-' . $end;
-    $key = md5($key);
-    $M = new Evlist\evMeetup($key);
-    $Mevents = $M->getEvents($start, $end);
-
-    foreach ($Mevents as $ev_date=>$ev_events) {
-        foreach ($ev_events as $event) {
-            // Format the meetup.com date information into the expected layout
-            $dt = new Date($event->time / 1000, $event->timezone);
-            $ev_start = $dt->format($_CONF['timeonly'], true);
-            if (!isset($event->duration)) {
-                $duration = 3600000;     // duration required, default one hour
-            } else {
-                $duration = $event->duration;
-            }
-            $end = $event->time + $duration;
-            $dt->setTimeStamp(($event->time + $duration) / 1000, $event->timezone);
-            $ev_end = $dt->format($_CONF['timeonly'], true);
-            $events[$ev_date][] = array(
-                'cal_name' => $Cal->cal_name,
-                'cal_ena_ical' => 0,
-                'cal_id' => $Cal->cal_id,
-                'rp_id' => $event->id,
-                'rp_ev_id' => $event->id,
-                'rp_date_start' => $ev_date,
-                'rp_date_end' => $ev_date,
-                'rp_time_start1' => $ev_start,
-                'rp_time_end1' => $ev_end,
-                'title' => $event->name,
-                'summary' => $event->description,
-                'full_description' => $event->description,
-                'url' => $event->event_url,
-                'show_upcoming' => 1,   // force to be shown in upcoming block
-                'fgcolor' => $Cal->fgcolor,
-                'bgcolor' => $Cal->bgcolor,
-                'tzid' => $event->timezone,
-                'cal_icon' => $Cal->cal_icon,
-                'allday' => 0,      // Meetup events are always timed
-            );
-        }
-    }
-    if (!empty($Mevents)) {
-        ksort($events);
-    }
 }
 
 

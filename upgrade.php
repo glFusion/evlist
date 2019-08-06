@@ -582,6 +582,7 @@ function EVLIST_remove_old_files()
             // 1.4.6
             'classes/evMeetup.class.php',
             'classes/meetup.class.php',
+            'evlist_functions.inc.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

@@ -137,6 +137,39 @@ class Menu
         return $retval;
     }
 
+
+    /**
+     * Get the Google-style page navigation for the list display.
+     *
+     * @param   integer $numrows    Total number of rows
+     * @param   integer $cat        Category ID (optional)
+     * @param   integer $page       Current page number
+     * @param   integer $range      Range being displayed (upcoming, past, etc)
+     * @param   integer $cal        ID of calendar being shown
+     * @return  string          HTML for page navigation
+     */
+    public static function pageNav($numrows, $cat=0, $page = 0, $range = 0, $cal = 0)
+    {
+        global $_TABLES, $_EV_CONF;
+
+        $cat = (int)$cat;
+        $range = (int)$range;
+        $cal = (int)$cal;
+        $limit = (int)$_EV_CONF['limit_list'];
+        $retval = '';
+        if ($limit < 1) {
+            return $retval;
+        }
+
+        $base_url = EVLIST_URL.
+            "/index.php?cat=$cat&amp;cal=$cal&amp;range=$range&amp;view=list";
+        if ($numrows > $limit) {
+            $numpages = ceil($numrows / $limit);
+            $retval = COM_printPageNavigation($base_url, $page, $numpages);
+        }
+        return $retval;
+    }
+
 }
 
 ?>

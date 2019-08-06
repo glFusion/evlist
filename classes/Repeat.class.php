@@ -213,17 +213,17 @@ class Repeat
                 $this->time_start2 = NULL;
                 $this->time_end2 = NULL;
             } else {
-                $tmp = EVLIST_12to24($row['starthour1'], $row['start1_ampm']);
+                $tmp = DateFunc::conv12to24($row['starthour1'], $row['start1_ampm']);
                 $this->time_start1 = sprintf('%02d:%02d:00',
                     $tmp, $row['startminute1']);
-                $tmp = EVLIST_12to24($row['endhour1'], $row['end1_ampm']);
+                $tmp = DateFunc::conv12to24($row['endhour1'], $row['end1_ampm']);
                 $this->time_end1 = sprintf('%02d:%02d:00',
                     $tmp, $row['endminute1']);
                 if (isset($row['split']) && $row['split'] == '1') {
-                    $tmp = EVLIST_12to24($row['starthour2'], $row['start2_ampm']);
+                    $tmp = DateFunc::conv12to24($row['starthour2'], $row['start2_ampm']);
                     $this->time_start2 = sprintf('%02d:%02d:00',
                         $tmp, $row['startminute1']);
-                    $tmp = EVLIST_12to24($row['endhour2'], $row['end2_ampm']);
+                    $tmp = DateFunc::conv12to24($row['endhour2'], $row['end2_ampm']);
                     $this->time_end2 = sprintf('%02d:%02d:00',
                         $tmp, $row['endminute2']);
                 } else {
@@ -404,9 +404,6 @@ class Repeat
         if ($this->rp_id == 0) {
             return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
         }
-
-        //update hit count
-        evlist_hit($this->ev_id);
 
         // Print or other template modifier can be passed in.
         $template = 'event';

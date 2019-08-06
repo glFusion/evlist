@@ -1438,6 +1438,49 @@ class DateFunc
         return $retval;
     }
 
+
+    /**
+     * Get an array of option lists for year, month, day, etc.
+     *
+     * @param   string  $prefix     Prefix to use for ampm variable name
+     * @param   string  $curtime    SQL-formatted time to use as default
+     * @return  array               Array of option lists, indexed by type
+     */
+    public static function TimeSelect($prefix, $curtime = '')
+    {
+        global $_CONF;
+
+        // Use "now" as the default if nothing else sent.  Also helps make sure
+        // that the explode() function works right.
+        if (empty($curtime)) {
+            $curtime = $_CONF['_now']->format('H:i:s', true);
+        }
+        list($hour, $minute, $second) = explode(':', $curtime);
+
+        // Set up the time if we're using 12-hour mode
+        if ($_CONF['hour_mode'] == 12) {
+            $ampm = $hour < 12 ? 'am' : 'pm';
+            if ($hour == 0) {
+                $hour = 12;
+            } elseif ($hour > 12) {
+                $hour -= 12;
+            }
+        }
+
+        $hourselect     = COM_getHourFormOptions($hour, $_CONF['hour_mode']);
+        $minuteselect   = COM_getMinuteFormOptions($minute, 15);
+
+        // This function gets the entire selection, not just the <option> parts,
+        // so we use $prefix to create the variable name.
+        $ampm_select    = COM_getAmPmFormSelection($prefix . '_ampm', $ampm);
+
+        return array(
+            'hour'      => $hourselect,
+            'minute'    => $minuteselect,
+            'ampm'      => $ampm_select
+        );
+    }
+
 }
 
 ?>

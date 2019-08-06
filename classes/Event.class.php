@@ -1150,10 +1150,10 @@ class Event
             }
         }
 
-        $start1 = EVLIST_TimeSelect('start1', $this->time_start1);
-        $start2 = EVLIST_TimeSelect('start2', $this->time_start2);
-        $end1 = EVLIST_TimeSelect('end1', $this->time_end1);
-        $end2 = EVLIST_TimeSelect('end2', $this->time_end2);
+        $start1 = DateFunc::TimeSelect('start1', $this->time_start1);
+        $start2 = DateFunc::TimeSelect('start2', $this->time_start2);
+        $end1 = DateFunc::TimeSelect('end1', $this->time_end1);
+        $end2 = DateFunc::TimeSelect('end2', $this->time_end2);
         $cal_select = Calendar::optionList($this->cal_id, true, 3);
         $navbar = new \navbar;
         $cnt = 0;
@@ -1191,10 +1191,10 @@ class Event
             'd_enddate1'    => EVLIST_formattedDate($this->date_end1),
             // Don't need seconds in the time boxes
             'hour_mode'     => $_CONF['hour_mode'],
-            'time_start1'   => EVLIST_24to12($this->time_start1),
-            'time_end1'     => EVLIST_24to12($this->time_end1),
-            'time_start2'   => EVLIST_24to12($this->time_start2),
-            'time_end2'     => EVLIST_24to12($this->time_end2),
+            'time_start1'   => DateFunc::conv24to12($this->time_start1),
+            'time_end1'     => DateFunc::conv24to12($this->time_end1),
+            'time_start2'   => DateFunc::conv24to12($this->time_start2),
+            'time_end2'     => DateFunc::conv24to12($this->time_end2),
             'start_hour_options1'   => $start1['hour'],
             'start_minute_options1' => $start1['minute'],
             'startdate1_ampm'       => $start1['ampm'],

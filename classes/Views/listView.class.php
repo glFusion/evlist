@@ -12,6 +12,7 @@
  */
 namespace Evlist\Views;
 use Evlist\DateFunc;
+use Evlist\Menu;
 
 /**
  * Create a list of events.
@@ -201,7 +202,7 @@ class listView extends \Evlist\View
         $retval .= $T->finish($T->get_var('output'));
 
         // Set page navigation
-        $retval .= EVLIST_pagenav($total_events, $this->cat, $page);
+        $retval .= Menu::pageNav($total_events, $this->cat, $page);
         //$retval .= EVLIST_pagenav($start, $end, $category, $page, $range, $calendar);
         return $retval;
     }

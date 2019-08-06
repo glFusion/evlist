@@ -42,7 +42,6 @@ function ChangeDate(year, month, day, type)
     url: glfusionSiteUrl + "/evlist/ajax.php",
     data: data,
     success: function(result) {
-alert(result);
       try {
         document.getElementById("evlist_content").innerHTML = result;
         document.getElementById("year_sel").value = newyear;

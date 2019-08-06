@@ -62,10 +62,6 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
     exit;
 }
 
-// Import plugin-specific function library
-USES_evlist_functions();
-//USES_evlist_views();
-
 /*
  * Main function
  */

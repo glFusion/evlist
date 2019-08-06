@@ -300,7 +300,6 @@ function evlist_upgrade_1_3_0()
 {
     global $_CONF, $_EV_CONF, $_TABLES, $_DB_dbms, $c, $CONF_EVLIST_DEFAULT;
 
-    USES_evlist_class_event();
     $c->add('default_view', $CONF_EVLIST_DEFAULT['default_view'], 'select',
                 0, 1, 14, 90, true, 'evlist');
     $c->add('max_upcoming_days', $CONF_EVLIST_DEFAULT['max_upcoming_days'], 'text',
@@ -453,7 +452,7 @@ function evlist_upgrade_1_3_0()
 
         // Now that the updated info is saved to the event record,
         // use the evEvent class to create the repeats
-        $Ev = new evEvent($A['id']);
+        $Ev = new Evlist\Event($A['id']);
         $Ev->UpdateRepeats();
 
     }   // for each event record

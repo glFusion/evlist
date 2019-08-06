@@ -58,7 +58,6 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
     exit;
 }
 
-USES_evlist_functions();
 
 /*
 *   MAIN
@@ -97,8 +96,11 @@ if (isset($_GET['cal'])) {
 }
 
 if (!empty($category)) {
-    $catname = DB_getItem($_TABLES['evlist_categories'], 'name',
-            "id = '$category'");
+    $catname = DB_getItem(
+        $_TABLES['evlist_categories'],
+        'name',
+        "id = '$category'"
+    );
 }
 
 if (!empty($_REQUEST['msg'])) {
@@ -108,12 +110,15 @@ if (!empty($_REQUEST['msg'])) {
 if (isset($_GET['date']) && !empty($_GET['date'])) {
     list($year, $month, $day) = explode('-', $_GET['date']);
 }
-if (empty($year))
+if (empty($year)) {
     $year = isset($_REQUEST['year']) ? (int)$_REQUEST['year'] : 0;
-if (empty($month))
+}
+if (empty($month)) {
     $month = isset($_REQUEST['month']) ? (int)$_REQUEST['month'] : 0;
-if (empty($day))
+}
+if (empty($day)) {
     $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
+}
 
 EVLIST_setReturn(EVLIST_URL . '/index.php?view=' . $view);
 $content = '';

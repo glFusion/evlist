@@ -148,12 +148,6 @@ spl_autoload_register(function ($class)
 use \Evlist\DateFunc;
 
 /**
- * Load plugin-specific functions.
- */
-function USES_evlist_functions()
-{    require_once __DIR__ . '/evlist_functions.inc.php'; }
-
-/**
  * Return the current code (not necessarily installed) version.
  *
  * @return  string  Current version
@@ -1330,32 +1324,6 @@ function EVLIST_getCatLinks($eid, $andrange = '')
     }
     return $retval;
 
-}
-
-
-/**
- * Get the options for a category selection list.
- *
- * @param   integer $selected   Selected category ID
- * @return  string      HTML for select options.
- */
-function evlist_getCategoryOptions($selected) {
-
-    global $_TABLES;
-
-    $options = '';
-    $result = DB_query("SELECT id, name
-                FROM {$_TABLES['evlist_categories']}
-                WHERE status = '1'");
-    while ($A = DB_fetchArray($result)) {
-        $options .= '<option value="' . $A['id'] . '"';
-        if ($selected == $A['id']) {
-            $options .= ' selected="selected"';
-        }
-        $options .= '>' . COM_stripslashes($A['name']) . '</option>';
-    }
-
-    return $options;
 }
 
 

@@ -13,7 +13,6 @@
  */
 namespace Evlist;
 
-USES_evlist_functions();
 date_default_timezone_set('UTC');
 
 /**

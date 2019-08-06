@@ -12,7 +12,6 @@
  */
 namespace Evlist;
 
-USES_evlist_functions();
 
 /**
  * Class for event records.

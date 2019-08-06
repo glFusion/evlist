@@ -188,6 +188,7 @@ div.evdata {
   float: left;
 }
 
+div.evlist_header,
 h2.evlist_header {
     text-align: center;
     color: #656567;
@@ -195,7 +196,7 @@ h2.evlist_header {
     font-size: 14pt;
     font-weight: bold;
     margin: 1em 0 0 0;
-    border: 1px solid #BBBBBB;
+    /*border: 1px solid #BBBBBB;*/
     padding: .25em;
     position: relative;
 }

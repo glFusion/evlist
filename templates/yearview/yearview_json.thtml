@@ -1,9 +1,15 @@
 {# begin {templatelocation} #}
-<h2 class="evlist_header">
-  <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, 1, 1, 'year');" href="#!">&lt;&lt;</a>
-  <span id="date_range">{thisyear}</span>
-  <a id="next_href" onclick="javascript:ChangeDate({nextyear}, 1, 1, 'year');" href="#!">&gt;&gt;</a>
-</h2>
+<div class="evlist_header">
+  <div class="uk-width-1-3 floatleft" style="text-align:right;">
+    <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, 1, 1, 'year');" href="#!"><i class="uk-icon uk-icon-backward ev-icon-info"></i></a>
+  </div>
+  <div class="uk-width-1-3 floatleft">
+    <span id="date_range">{thisyear}</span>
+  </div>
+  <div class="uk-width-1-3 floatleft" style="text-align:left;">
+    <a id="next_href" onclick="javascript:ChangeDate({nextyear}, 1, 1, 'year');" href="#!"><i class="uk-icon uk-icon-forward ev-icon-info"></i></a>
+  </div>
+</div>
 
 <div class="calcontainer" style="margin:auto;">
     <!-- BEGIN month -->

@@ -112,7 +112,7 @@ class View
         }
 
         // catch missing or incorrect view types, set to default or 'month'
-        if (!in_array($type, array('day','week','month','year','list', 'smallmonth'))) {
+        if (!in_array($type, array('day','week','month','year','list', 'smallmonth', 'detail'))) {
             $type = isset($_EV_CONF['default_view']) ?
                 $_EV_CONF['default_view'] : 'month';
         }

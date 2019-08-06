@@ -1,5 +1,61 @@
 {# begin {templatelocation} #}
-{!if use_json}
+{!if include_selections}
+<script type="text/javascript" src="{site_url}/evlist/js/calselect.js"></script>
+<script type="text/javascript">
+var xmlHttp;
+var cat = {urlfilt_cat};
+var cal = {urlfilt_cal};
+function JumpTo(year, month, day)
+{
+  ChangeMonth(month, year);
+}
+
+// Placeholders for newly-selected date values
+var newyear = 0;
+var newmonth = 0;
+var newday = 0;
+function ChangeDate(year, month, day, type)
+{
+ var action;
+  switch (type) {
+    case 'year': action = "year"; break;
+    case 'month': action = "month"; break;
+    case 'week': action = "week"; break;
+    case 'day': action = "day"; break;
+    default: return;
+  }
+  newyear = year;
+  newmonth = month;
+  newday = day;
+  var dataS = {
+    "action" : action,
+    "cat": cat,
+    "cal": cal,
+    "year": year,
+    "month": month,
+    "day": day,
+  };
+  data = $.param(dataS);
+  $.ajax({
+    type: "POST",
+    dataType: "text",
+    url: glfusionSiteUrl + "/evlist/ajax.php",
+    data: data,
+    success: function(result) {
+alert(result);
+      try {
+        document.getElementById("evlist_content").innerHTML = result;
+        document.getElementById("year_sel").value = newyear;
+        document.getElementById("month_sel").value = newmonth;
+        document.getElementById("day_sel").value = newday;
+      }
+      catch(err) {
+      }
+    }
+  });
+  return false;
+}
+</script>
 {!endif}
 <div id="evlist_nav_right">
 <div id="evlist_calendar_buttons">

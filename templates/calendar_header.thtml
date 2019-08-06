@@ -5,10 +5,6 @@
 var xmlHttp;
 var cat = {urlfilt_cat};
 var cal = {urlfilt_cal};
-function JumpTo(year, month, day)
-{
-  ChangeMonth(month, year);
-}
 
 // Placeholders for newly-selected date values
 var newyear = 0;
@@ -71,7 +67,6 @@ function ChangeDate(year, month, day, type)
       {feed_icons}&nbsp;
     {!endif}
 
-      <!--<input type="hidden" name="op" value="new">-->
       {!if addlink_day}
       <input type="hidden" name="day" value="{addlink_day}" />
       {!endif}
@@ -116,40 +111,25 @@ function ChangeDate(year, month, day, type)
         {view_select}
     </select>
     <button type="submit" name="hdrsubmit" class="uk-button uk-button-primary uk-button-small">{$LANG_EVLIST['jump']}</button>
-    <i class="uk-icon uk-icon-calendar tooltip" title="{$LANG_EVLIST['click_for_datepicker']}" id="jumpdate_trigger"></i>
-    <input type="hidden" name="jumpdate" id="f_jumpdate"
-        value="{curdate}" />
+    <input type="hidden" name="jumpdate" id="f_jumpdate" value="{curdate}" data-uk-datepicker onchange="jump2date(this.value);"/>
     <script type="text/javascript">
+        $( "#f_jumpdate" ).datepicker({
+          buttonImage: "/images/datepicker.jpg",
+          buttonImageOnly: true,
+          showOn: "button",
+          dateFormat: "yy-mm-dd",
+          changeMonth: true,
+          changeYear: true,
+        });
 
         function jump2date(cal)
         {
-            if (cal.dateClicked) {
-                var d = cal.date.getDate();
-                var m = cal.date.getMonth() + 1;
-                var y = cal.date.getFullYear();
-{!if use_json}
+                var d = cal.substring(8, 10);
+                var m = cal.substring(5, 7);
+                var y = cal.substring(0, 4);
                 ChangeDate(y, m, d, "{view}");
-                cal.hide();
-                cal.setDate(new Date(y, m-1, d));
-{!else}
                 window.location="{pi_url}/index.php?view={view}&year="+y+"&month="+m+"&day="+d;
-{!endif}
-            }
         }
-
-        var dt = new Date({year},{month},{day});
-
-        Calendar.setup({
-            inputField  :   "f_jumpdate",
-            ifFormat    :   "%Y-%m-%d",
-            showsTime   :   false,
-            timeFormat  :   "24",
-            button      :   "jumpdate_trigger",
-            onSelect    :   jump2date,
-            //onClose     :   jump2date,
-            date        :   dt,
-        });
-
     </script>
 
   {!else}

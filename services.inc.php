@@ -34,7 +34,7 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
     $item_id = isset($item[1]) ? $item[1] : '';
 
     // Create a return array with values to be populated later.
-    // The actual paypal product ID is evlist:type:id
+    // The actual Shop product ID is evlist:type:id
     if (empty($item_id)) return PLG_RET_ERROR;
     $output = array(
         'product_id' => 'evlist:' . $product_id . ':' . $item_id,
@@ -92,7 +92,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
     global $_TABLES, $LANG_PHOTO, $_CONF;
 
     $item = EV_getVar($args, 'item', 'array');
-    $paypal_data = EV_getVar($args, 'ipn_data', 'array');
+    $ipn_data = EV_getVar($args, 'ipn_data', 'array');
     $item_id = EV_getVar($item, 'item_id');
     $item_id = explode(':', $item_id);
     $quantity = EV_getVar($item, 'quantity', 'int');
@@ -112,14 +112,14 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
             'file' => '',
     );
 
-    $custom = EV_getVar($paypal_data, 'custom', 'array');
+    $custom = EV_getVar($ipn_data, 'custom', 'array');
     $uid = EV_getVar($custom, 'uid', 'int', 1);
 
     // Initialize an array of payment info to log
     $pmt_info = array(
         'type'          => 'payment',
-        'payment_date'  => $paypal_data['sql_date'],
-        'txn_id'        => $paypal_data['txn_id'],
+        'payment_date'  => $ipn_data['sql_date'],
+        'txn_id'        => $ipn_data['txn_id'],
         'amount'        => (float)$item['price'],
     );
 
@@ -184,15 +184,15 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
     global $_TABLES;
 
     $item = $args['item'];      // array of item number info
-    $paypal_data = $args['ipn_data'];
+    $ipn_data = $args['ipn_data'];
 
     // Must have an item ID following the plugin name
     if (!is_array($item) || !isset($item[1]))
         return PLG_RET_ERROR;
 
     // User ID is provided in the 'custom' field, so make sure it's numeric.
-    if (is_numeric($paypal_data['custom']['uid']))
-        $uid = (int)$paypal_data['custom']['uid'];
+    if (is_numeric($ipn_data['custom']['uid']))
+        $uid = (int)$ipn_data['custom']['uid'];
     else
         $uid = 1;
 

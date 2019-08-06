@@ -653,8 +653,8 @@ class Ticket
 
     /**
      * Format a money amount.
-     * Calls on the Paypal plugin to format according to the selected
-     * currency, and falls back to COM_numberFormat() if Paypal isn't
+     * Calls on the Shop plugin to format according to the selected
+     * currency, and falls back to COM_numberFormat() if Shop isn't
      * available.
      *
      * @param   float   $amount     Amount to format
@@ -664,13 +664,15 @@ class Ticket
     public static function formatAmount($amount, $default=NULL)
     {
         if ($amount > 0) {
-            $status = LGLIB_invokeService('paypal', 'formatAmount',
+            $status = LGLIB_invokeService(
+                'shop', 'formatAmount',
                 array(
                     'amount' => $amount,
                     'symbol' => false,
                 ),
                 $output,
-                $msg);
+                $msg
+            );
             if ($status == PLG_RET_OK) {
                 $formatted = $output;
             } else {

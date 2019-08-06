@@ -15,6 +15,7 @@ Release TBD
 - Request perms in `plugin_itemsaved`, calculate based on owner/group if not supplied.
 - Remove support for Meetup.com API
 - Remove hit counter, was never used.
+- Switch from Paypal plugin to Shop.
 
 ## v1.4.5
 Release 2018-04-14

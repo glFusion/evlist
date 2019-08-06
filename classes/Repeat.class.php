@@ -641,8 +641,11 @@ class Repeat
                         foreach ($this->Event->options['tickets'] as $tick_id=>$data) {
                             // Skip ticket types that may have been disabled
                             if (!array_key_exists($tick_id, $Ticks)) continue;
-                            $status = LGLIB_invokeService('paypal', 'formatAmount',
-                                    array('amount' => $data['fee']), $pp_fmt_amt, $svc_msg);
+                            $status = LGLIB_invokeService(
+                                'shop', 'formatAmount',
+                                array('amount' => $data['fee']),
+                                $pp_fmt_amt, $svc_msg
+                            );
                             $fmt_amt = $status == PLG_RET_OK ?
                                     $pp_fmt_amt : COM_numberFormat($data['fee'], 2);
                             $T->set_var(array(
@@ -938,8 +941,11 @@ class Repeat
             // as unpaid.
             $this->AddToCart($tick_type, $num_attendees);
             COM_setMsg($LANG_EVLIST['messages']['24']);
-            $status = LGLIB_invokeService('paypal', 'getURL',
-                array('type'=>'checkout'), $url, $msg);
+            $status = LGLIB_invokeService(
+                'shop', 'getURL',
+                array('type'=>'checkout'),
+                $url, $msg
+            );
             if ($status == PLG_RET_OK) {
                 LGLIB_storeMessage(sprintf($LANG_EVLIST['messages']['26'],
                     $url), '', true);
@@ -1221,7 +1227,11 @@ class Repeat
             'quantity' => $qty,
             'extras' => array('shipping' => 0),
         );
-        LGLIB_invokeService('paypal', 'addCartItem', $evCart, $output, $msg);
+        LGLIB_invokeService(
+            'shop', 'addCartItem',
+            $evCart,
+            $output, $msg
+        );
         return $evCart;
     }
 

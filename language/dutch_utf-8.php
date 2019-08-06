@@ -403,6 +403,7 @@ $LANG_EVLIST_HELP = array(
 'group' => 'Select the group associated with this item',
 'perms' => 'Set the permissions for this item.',
 'event_pass' => 'Checked if this ticket type is a full event pass.',
+'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
 );
 
 // Localization of the Admin Configuration UI

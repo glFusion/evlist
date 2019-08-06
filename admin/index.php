@@ -4,15 +4,15 @@
  *
  * Based on the evList Plugin for Geeklog CMS by Alford Deeley.
  *
- * @author     Lee Garner <lee AT leegarner DOT com>
- * @author     Mark R. Evans <mark AT glfusion DOT org>
- * @author     Alford Deeley <ajdeeley AT sumitpages.ca>
- * @copyright  Copyright (c) 2011-2019 Lee Garner <lee AT leegarner DOT com>
- * @copyright  Copyright (c) 2008-2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright  Copyright (c) 2007 Alford Deeley <ajdeeley AT sumitpages.ca>
- * @package    evlist
- * @version    1.3.0
- * @license    http://opensource.org/licenses/gpl-2.0.php
+ * @author      Lee Garner <lee AT leegarner DOT com>
+ * @author      Mark R. Evans <mark AT glfusion DOT org>
+ * @author      Alford Deeley <ajdeeley AT sumitpages.ca>
+ * @copyright   Copyright (c) 2011-2019 Lee Garner <lee AT leegarner DOT com>
+ * @copyright   Copyright (c) 2008-2010 Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2007 Alford Deeley <ajdeeley AT sumitpages.ca>
+ * @package     evlist
+ * @version     v1.4.6
+ * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
@@ -24,723 +24,6 @@ require_once '../../auth.inc.php';
 if (!in_array('evlist', $_PLUGINS) || !plugin_ismoderator_evlist()) {
     COM_404();
     exit;
-}
-
-/**
- * Create the common header for all admin functions.
- *
- * @param   string  $page   Current page.  Used for selecting menus
- * @return  string      HTML for admin header portion.
- */
-function EVLIST_adminHeader($page)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_EV_CONF;
-
-    $retval = '';
-
-    USES_lib_admin();
-
-    $menu_arr = array();
-    if ($page == 'events') {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?edit=x',
-            'text' => $LANG_EVLIST['new_event']);
-    } else {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php',
-            'text' => $LANG_EVLIST['events']);
-    }
-
-    if ($page == 'calendars') {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editcal=x',
-            'text' => $LANG_EVLIST['new_calendar']);
-    } else {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?view=calendars',
-            'text' => $LANG_EVLIST['calendars']);
-    }
-
-    if ($page == 'categories') {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editcat=x',
-            'text' => $LANG_EVLIST['new_category']);
-    } else {
-        $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?categories=x',
-            'text' => $LANG_EVLIST['categories']);
-    }
-
-    if ($_EV_CONF['enable_rsvp']) {
-        if ($page == 'tickettypes') {
-            $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?editticket=0',
-                'text' => $LANG_EVLIST['new_ticket_type']);
-        } else {
-            $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?tickettypes',
-                'text' => $LANG_EVLIST['ticket_types']);
-        }
-    }
-    $menu_arr[] = array(
-            'url' => EVLIST_ADMIN_URL . '/index.php?import=x',
-            'text' => $LANG_EVLIST['import'],
-    );
-    /*$menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?importcalendar=x',
-            'text' => $LANG_EVLIST['import_calendar']);
-    $menu_arr[] = array('url' => EVLIST_ADMIN_URL . '/index.php?import=x',
-            'text' => $LANG_EVLIST['import_from_csv']);*/
-
-    $menu_arr[] = array('url' => $_CONF['site_admin_url'],
-                'text' => $LANG_ADMIN['admin_home']);
-
-    $retval .= COM_startBlock('evList ' . $_EV_CONF['pi_version'], '',
-                              COM_getBlockTemplate('_admin_block', 'header'));
-    $retval .= ADMIN_createMenu(
-        $menu_arr,
-        isset($LANG_EVLIST['admin_instr'][$page]) ? $LANG_EVLIST['admin_instr'][$page] : '',
-        plugin_geticon_evlist()
-    );
-    $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-    return $retval;
-}
-
-
-/**
- * Get the list of categories.
- *
- * @return  string      HTML for admin list
- */
-function EVLIST_adminlist_categories()
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
-
-    USES_lib_admin();
-    EVLIST_setReturn('admincategories');
-
-    $retval = '';
-
-    $header_arr = array(
-        array('text' => $LANG_EVLIST['edit'],
-                'field' => 'edit', 'sort' => false,
-                'align' => 'center',
-        ),
-        array('text' => $LANG_EVLIST['id'],
-                'field' => 'id', 'sort' => true),
-        array('text' => $LANG_EVLIST['cat_name'],
-                'field' => 'name', 'sort' => true),
-        array('text' => $LANG_EVLIST['enabled'],
-                'field' => 'status', 'sort' => false,
-                'align' => 'center',
-        ),
-        array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false,
-                'align' => 'center',
-        ),
-    );
-
-    $defsort_arr = array('field' => 'name', 'direction' => 'ASC');
-
-    $text_arr = array('has_menu'     => false,
-                      'has_extras'   => false,
-                      'title'        => $LANG_EVLIST['pi_title'].': ' .
-                                        $LANG_EVLIST['categories'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?categories=x',
-                      'help_url'     => ''
-    );
-
-    $sql = "SELECT * FROM {$_TABLES['evlist_categories']} WHERE 1=1 ";
-    $query_arr = array('table' => 'evlist_categories',
-            'sql' => $sql,
-            'query_fields' => array('name'),
-    );
-
-    $retval .= ADMIN_list('evlist_cat_admin', 'EVLIST_admin_getListField_cat',
-            $header_arr, $text_arr, $query_arr, $defsort_arr);
-    return $retval;
-}
-
-
-/**
- * Get the list of ticket types.
- *
- * @return  string      HTML for admin list
- */
-function EVLIST_adminlist_tickettypes()
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_EVLIST_HELP, $LANG_ADMIN;
-
-    USES_lib_admin();
-    EVLIST_setReturn('admintickettypes');
-
-    $retval = '';
-
-    $header_arr = array(
-        array(
-            'text' => $LANG_EVLIST['edit'],
-            'field' => 'edit',
-            'sort' => false,
-            'align' => 'center',
-        ),
-        array(
-            'text' => $LANG_EVLIST['id'],
-            'field' => 'id',
-            'sort' => true,
-        ),
-        array(
-            'text' => $LANG_EVLIST['description'],
-            'field' => 'description',
-            'sort' => true,
-        ),
-        array(
-            'text' => $LANG_EVLIST['enabled'],
-            'field' => 'enabled',
-            'sort' => false,
-            'align' => 'center',
-        ),
-        array(
-            'text' => $LANG_EVLIST['event_pass'] .
-                ' <i class="tooltip uk-icon uk-icon-question-circle" title="' .
-                $LANG_EVLIST_HELP['event_pass'] . '"></i>',
-            'field' => 'event_pass',
-            'sort' => false,
-            'align' => 'center',
-        ),
-        array(
-            'text' => $LANG_ADMIN['delete'],
-            'field' => 'delete',
-            'sort' => false,
-           'align' => 'center',
-        ),
-    );
-
-    $defsort_arr = array('field' => 'id', 'direction' => 'ASC');
-
-    $text_arr = array('has_menu'     => false,
-                      'has_extras'   => false,
-                      'title'        => $LANG_EVLIST['pi_title'].': ' .
-                                        $LANG_EVLIST['categories'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?view=tickettypes',
-                      'help_url'     => ''
-    );
-
-    $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']} WHERE 1=1 ";
-
-    $query_arr = array('table' => 'evlist_tickettypes',
-            'sql' => $sql,
-            'query_fields' => array('description'),
-    );
-
-    $retval .= ADMIN_list('evlist_tickettype_admin', 'EVLIST_admin_getListField_tickettypes',
-            $header_arr, $text_arr, $query_arr, $defsort_arr);
-    return $retval;
-}
-
-
-/**
- * Get the list of tickets.
- *
- * @param   string  $ev_id  Event ID
- * @param   integer $rp_id  Repeat ID, 0 for all
- * @return  string      HTML for admin list
- */
-function EVLIST_adminlist_tickets($ev_id, $rp_id = 0)
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
-
-    USES_lib_admin();
-    EVLIST_setReturn('admintickets');
-
-    $retval = '';
-
-    $header_arr = array(
-        array('text' => $LANG_EVLIST['id'],
-                'field' => 'tick_id', 'sort' => true),
-        array('text' => $LANG_EVLIST['registrant'],
-                'field' => 'uid', 'sort' => false),
-        array('text' => $LANG_EVLIST['fee'],
-                'field' => 'fee', 'sort' => false),
-        array('text' => $LANG_EVLIST['event_pass'],
-                'field' => 'event_pass', 'sort' => false),
-        array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false,
-                'align' => 'center',
-        ),
-    );
-
-    $defsort_arr = array('field' => 'tick_id', 'direction' => 'ASC');
-
-    $text_arr = array('has_menu'     => false,
-                      'has_extras'   => false,
-                      'title'        => $LANG_EVLIST['pi_title'].': ' .
-                                        $LANG_EVLIST['tickets'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php',
-                      'help_url'     => ''
-    );
-
-    $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE ev_id='" .
-            DB_escapeString($ev_id) . "'";
-    if ($rp_id != 0) {
-        $sql .= " AND rp_id = " . (int)$rp_id;
-    }
-    $query_arr = array('table' => 'evlist_tickets',
-            'sql' => $sql,
-            'query_fields' => array(),
-    );
-
-    $retval .= ADMIN_list('evlist_ticket_admin', 'EVLIST_admin_getListField_tickets',
-            $header_arr, $text_arr, $query_arr, $defsort_arr);
-    return $retval;
-}
-
-
-/**
- * Get the list of events.
- *
- * @return  string      HTML for admin list
- */
-function EVLIST_admin_list_events()
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
-
-    USES_lib_admin();
-    EVLIST_setReturn('adminevents');
-
-    $cal_id = isset($_REQUEST['cal_id']) ? (int)$_REQUEST['cal_id'] : 0;
-    $retval = '';
-
-    $header_arr = array(
-        array('text' => $LANG_EVLIST['edit'],
-                'field' => 'edit', 'sort' => false,
-                'align' => 'center',
-        ),
-        array('text' => $LANG_EVLIST['copy'],
-                'field' => 'copy', 'sort' => false,
-                'align' => 'center',
-        ),
-        array('text' => $LANG_EVLIST['id'], 'field' => 'id', 'sort' => true),
-        array('text' => $LANG_EVLIST['title'],
-                'field' => 'title', 'sort' => true),
-        array('text' => $LANG_EVLIST['start_date'],
-                'field' => 'date_start1', 'sort' => true),
-        array('text' => $LANG_EVLIST['enabled'],
-                'field' => 'status', 'sort' => false,
-                'align' => 'center',
-        ),
-        array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false,
-                'align' => 'center',
-        ),
-    );
-
-    $defsort_arr = array('field' => 'date_start1', 'direction' => 'DESC');
-    $options = array(
-                'chkdelete' => 'true',
-                'chkfield' => 'id',
-                'chkname' => 'delevent',
-    );
-    $text_arr = array('has_menu'     => true,
-                      'has_extras'   => true,
-                      'title'        => $LANG_EVLIST['pi_title'].': ' .
-                                        $LANG_EVLIST['events'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?cal_id=' . $cal_id,
-                      'help_url'     => ''
-    );
-
-    // Select distinct to get only one entry per event.  We can only edit/modify
-    // events here, not repeats
-    $sql = "SELECT DISTINCT(ev.id), det.title, ev.date_start1, ev.status
-            FROM {$_TABLES['evlist_events']} ev
-            LEFT JOIN {$_TABLES['evlist_detail']} det
-                ON det.ev_id = ev.id
-            WHERE ev.det_id = det.det_id ";
-    if ($cal_id != 0) {
-        $sql .= "AND cal_id = $cal_id";
-    }
-
-    $filter = $LANG_EVLIST['calendar']
-        . ': <select name="cal_id" onchange="this.form.submit()">'
-        . '<option value="0">' . $LANG_EVLIST['all_calendars'] . '</option>'
-        . Evlist\Calendar::optionList($cal_id) . '</select>';
-
-    $query_arr = array('table' => 'users',
-            'sql' => $sql,
-            'query_fields' => array('id', 'title', 'summary',
-            'full_description', 'location', 'date_start1', 'status')
-    );
-
-    $retval .= ADMIN_list('evlist_event_admin', 'EVLIST_admin_getListField', $header_arr, $text_arr,
-                    $query_arr, $defsort_arr, $filter, '', $options);
-    return $retval;
-}
-
-
-
-/**
- * Return the display value for a category field.
- *
- * @param   string  $fieldname  Name of the field
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Name-value pairs for all fields
- * @param   array   $icon_arr   Array of system icons
- * @return  string      HTML to display for the field
- */
-function EVLIST_admin_getListField_cat($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
-
-    $retval = '';
-    switch($fieldname) {
-    case 'edit':
-        $retval = COM_createLink(
-            '<i class="uk-icon-edit"></i>',
-            EVLIST_ADMIN_URL . '/index.php?editcat=x&amp;id=' . $A['id'],
-            array(
-                'title' => $LANG_ADMIN['edit'],
-            )
-        );
-        break;
-    case 'status':
-        if ($A['status'] == '1') {
-            $switch = EVCHECKED;
-            $enabled = 1;
-        } else {
-            $switch = '';
-            $enabled = 0;
-        }
-        $retval .= "<input type=\"checkbox\" $switch value=\"1\"
-                name=\"cat_check\"
-                id=\"togenabled{$A['id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
-                '"category","'.EVLIST_ADMIN_URL."\");' />".LB;
-        break;
-    case 'delete':
-        $retval = COM_createLink(
-            $EV_CONF['icons']['delete'],
-            EVLIST_ADMIN_URL. '/index.php?delcat=x&id=' . $A['id'],
-            array('onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                'title' => $LANG_ADMIN['delete'],
-            )
-        );
-        break;
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
-}
-
-
-/**
- * Return the display value for a ticket type field.
- *
- * @param   string  $fieldname  Name of the field
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Name-value pairs for all fields
- * @param   array   $icon_arr   Array of system icons
- * @return  string      HTML to display for the field
- */
-function EVLIST_admin_getListField_tickettypes($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_EV_CONF;
-
-    $retval = '';
-    switch($fieldname) {
-    case 'edit':
-        $retval = COM_createLInk(
-            '<i class="uk-icon-edit"></i>',
-            EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['id'],
-            array(
-                'title' => $LANG_ADMIN['edit'],
-            )
-        );
-        break;
-
-    case 'enabled':
-    case 'event_pass':
-        if ($fieldvalue == '1') {
-            $switch = EVCHECKED;
-            $enabled = 1;
-        } else {
-            $switch = '';
-            $enabled = 0;
-        }
-        $retval = "<input type=\"checkbox\" $switch value=\"1\"
-                name=\"cat_check\"
-                id=\"tog{$fieldname}{$A['id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"{$fieldname}\",".
-                "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
-        break;
-
-    case 'delete':
-        if (!Evlist\TicketType::isUsed($A['id'])) {
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['delete'],
-                EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
-                array(
-                    'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                    'title' => $LANG_ADMIN['delete'],
-                )
-            );
-        }
-        break;
-
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
-}
-
-
-/**
- * Return the display value for a ticket fields.
- *
- * @param   string  $fieldname  Name of the field
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Name-value pairs for all fields
- * @param   array   $icon_arr   Array of system icons
- * @return  string      HTML to display for the field
- */
-function EVLIST_admin_getListField_tickets($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
-
-    switch($fieldname) {
-    case 'event_pass':
-        if ($A['rp_id'] == 0) {
-            $retval = 'Yes';
-        } else {
-            $retval = 'No';
-        }
-        break;
-    case 'delete':
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['delete'],
-            EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
-            array(
-                'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                'title' => $LANG_ADMIN['delete'],
-            )
-        );
-        break;
-    case 'uid':
-        $retval = COM_getDisplayName($fieldvalue);
-        break;
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
-}
-
-
-/**
- * Return the display value for an event field.
- *
- * @param   string  $fieldname  Name of the field
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Name-value pairs for all fields
- * @param   array   $icon_arr   Array of system icons
- * @return  string      HTML to display for the field
- */
-function EVLIST_admin_getListField($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
-
-    static $del_icon = NULL;
-    $retval = '';
-
-    switch($fieldname) {
-    case 'edit':
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['edit'],
-            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $A['id'] . '&from=admin',
-            array(
-                'title' => $LANG_EVLIST['edit_event'],
-            )
-        );
-        break;
-    case 'copy':
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['copy'],
-            EVLIST_URL . '/event.php?clone=x&amp;eid=' . $A['id'],
-            array(
-                'title' => $LANG_EVLIST['copy'],
-            )
-        );
-        break;
-    case 'title':
-        $rp_id = Evlist\Repeat::getNearest($A['id']);
-        if ($rp_id) {
-            $retval = COM_createLink(
-                $fieldvalue, EVLIST_URL . '/event.php?eid=' . $rp_id
-            );
-        } else {
-            $retval = $fieldvalue;
-        }
-        break;
-    case 'status':
-        if ($A['status'] == '1') {
-            $switch = EVCHECKED;
-            $enabled = 1;
-        } else {
-            $switch = '';
-            $enabled = 0;
-        }
-        $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
-                id=\"event_{$A['id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
-                '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
-        break;
-    case 'delete':
-        $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
-        if (isset($_REQUEST['cal_id'])) {
-            $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
-        }
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['delete'],
-            $url,
-            array(
-                'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
-                'title' => $LANG_ADMIN['delete'],
-            )
-        );
-        break;
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
-}
-
-
-/**
- * Get the admin list of calendars.
- *
- * @return  string  HTML for admin list
- */
-function EVLIST_admin_list_calendars()
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
-
-    USES_lib_admin();
-
-    $retval = '';
-
-    $header_arr = array(
-        array(  'text'  => $LANG_EVLIST['edit'],
-                'field' => 'edit',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array('text'    => $LANG_EVLIST['orderby'],
-                'field' => 'orderby',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-         array(  'text'  => $LANG_EVLIST['id'],
-                'field' => 'cal_id',
-                'sort'  => false,
-            ),
-        array(  'text'  => $LANG_EVLIST['title'],
-                'field' => 'cal_name',
-                'sort'  => false,
-            ),
-        array(  'text'  => $LANG_EVLIST['enabled'],
-                'field' => 'cal_status',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array(  'text'  => $LANG_ADMIN['delete'],
-                'field' => 'delete',
-                'sort'  => 'false',
-                'align' => 'center',
-            ),
-    );
-
-    $defsort_arr = array('field' => 'orderby', 'direction' => 'ASC');
-    $text_arr = array('has_menu'     => false,
-                      'has_extras'   => false,
-                      'title'        => $LANG_EVLIST['pi_title'].': ' .
-                                        $LANG_EVLIST['calendars'],
-                      'form_url'     => EVLIST_ADMIN_URL . '/index.php?view=calendars',
-                      'help_url'     => ''
-    );
-    $sql = "SELECT * FROM {$_TABLES['evlist_calendars']} WHERE 1=1 ";
-    $query_arr = array('table' => 'evlist_calendars',
-            'sql' => $sql,
-            'query_fields' => array('id', 'cal_name',),
-    );
-    $retval .= ADMIN_list('evlist_cal_admin', 'EVLIST_admin_field_calendars',
-                $header_arr, $text_arr, $query_arr, $defsort_arr);
-    return $retval;
-}
-
-
-/**
- * Return the display value for a calendar field.
- *
- * @param   string  $fieldname  Name of the field
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Name-value pairs for all fields
- * @param   array   $icon_arr   Array of system icons
- * @return  string      HTML to display for the field
- */
-function EVLIST_admin_field_calendars($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
-
-    $retval = '';
-    switch($fieldname) {
-    case 'edit':
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['edit'],
-            EVLIST_ADMIN_URL . '/index.php?editcal=' . $A['cal_id'],
-            array(
-                'title' => $LANG_EVLIST['edit_calendar'],
-            )
-        );
-        break;
-    case 'orderby':
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['arrow-up'],
-            EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
-        );
-        $retval .= COM_createLink(
-            $_EV_CONF['icons']['arrow-down'],
-            EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
-        );
-        break;
-    case 'cal_status':
-        if ($fieldvalue == '1') {
-            $switch = EVCHECKED;
-            $enabled = 1;
-        } else {
-            $switch = '';
-            $enabled = 0;
-        }
-        $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\"
-                id=\"togenabled{$A['cal_id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
-                '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
-        break;
-    case 'delete':
-        if ($A['cal_id'] > 1) {
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['delete'],
-                EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . $A['cal_id'],
-                array(
-                    'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                )
-            );
-        }
-        break;
-    case 'cal_name':
-        $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
-            ';">' . $fieldvalue;
-        if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
-            $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
-        }
-        $retval .= '</span>';
-        break;
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
 }
 
 
@@ -889,7 +172,7 @@ $expected = array(
     'import_csv', 'import_cal', 'movecal',
     'delbutton_x',
     // Views to display
-    'view', 'delevent', 'importcalendar', 'clone', 'rsvp',
+    'view', 'delevent', 'importcalendar', 'clone', 'rsvp', 'calendars',
     'import', 'edit', 'editcat', 'editticket', 'tickettypes',
     'tickets',
 );
@@ -1139,7 +422,7 @@ case 'editcal':
     break;
 
 case 'calendars':
-    $content .= EVLIST_admin_list_calendars();
+    $content .= Evlist\Calendar::adminList();
     break;
 
 case 'moderate':
@@ -1149,18 +432,18 @@ case 'moderate':
     break;
 
 case 'categories':
-    $content .= EVLIST_adminlist_categories();
+    $content .= Evlist\Category::adminList();
     break;
 
 case 'tickettypes':
     if ($_EV_CONF['enable_rsvp']) {
-        $content .= EVLIST_adminlist_tickettypes();
+        $content .= Evlist\TicketType::adminList();
     }
     break;
 
 case 'tickets':
     $ev_id = isset($_GET['ev_id']) ? $_GET['ev_id'] : '';
-    $content .= EVLIST_adminlist_tickets($ev_id);
+    $content .= Evlist\Ticket::adminList($ev_id);
     break;
 
 case 'editcat':
@@ -1176,13 +459,14 @@ case 'editticket':
     break;
 
 case 'rsvp':
-    USES_evlist_functions();
-    $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ?
-            $_POST['rp_id'] :
-            isset($_GET['rp_id']) && !empty($_GET['rp_id']) ?
-            $_GET['rp_id'] : 0;
+    $rp_id = 0;
+    if (isset($_POST['rp_id']) && !empty($_POST['rp_id'])) {
+        $rp_id = $_POST['rp_id'];
+    } elseif (isset($_GET['rp_id']) && !empty($_GET['rp_id'])) {
+        $rp_id =  $_GET['rp_id'];
+    }
     if ($rp_id > 0) {
-        $content .= EVLIST_adminRSVP($rp_id);
+        $content .= Evlist\Ticket::adminList($rp_id);
     }
     break;
 
@@ -1205,7 +489,7 @@ case 'edit':
     break;
 
 default:
-    $content .= EVLIST_admin_list_events();
+    $content .= Evlist\Event::adminList();
     $page = 'events';
     break;
 }
@@ -1219,7 +503,7 @@ if (!empty($msg)) {
     $display .= COM_endBlock('blockfooter-message.thtml');
 }
 
-$display .= EVLIST_adminHeader($page);
+$display .= Evlist\Menu::Admin($page);
 $display .= $content;
 $display .= COM_siteFooter();
 

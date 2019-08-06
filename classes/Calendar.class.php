@@ -638,6 +638,163 @@ class Calendar
         }
     }
 
+
+    /**
+     * Get the admin list of calendars.
+     *
+     * @return  string  HTML for admin list
+     */
+    public static function adminList()
+    {
+        global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_EVLIST_HELP, $LANG_ADMIN;
+
+        USES_lib_admin();
+
+        $retval = '';
+
+        $header_arr = array(
+            array(
+                'text'  => $LANG_EVLIST['edit'],
+                'field' => 'edit',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(
+                'text'    => $LANG_EVLIST['orderby'],
+                'field' => 'orderby',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+             array(
+                 'text'  => $LANG_EVLIST['id'],
+                'field' => 'cal_id',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['title'],
+                'field' => 'cal_name',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['enabled'],
+                'field' => 'cal_status',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(
+                'text'  => $LANG_ADMIN['delete'] .
+                    '&nbsp;<i class="uk-icon-question-circle tooltip" title="' .
+                    $LANG_EVLIST_HELP['del_hdr1'] . '"></i>',
+                'field' => 'delete',
+                'sort'  => 'false',
+                'align' => 'center',
+            ),
+        );
+
+        $defsort_arr = array('field' => 'orderby', 'direction' => 'ASC');
+        $text_arr = array(
+            'has_menu'     => false,
+            'has_extras'   => false,
+            'form_url'     => EVLIST_ADMIN_URL . '/index.php?view=calendars',
+            'help_url'     => ''
+        );
+        $sql = "SELECT * FROM {$_TABLES['evlist_calendars']} WHERE 1=1 ";
+        $query_arr = array(
+            'table' => 'evlist_calendars',
+            'sql' => $sql,
+            'query_fields' => array('id', 'cal_name'),
+        );
+
+        $retval .= COM_createLink(
+            $LANG_EVLIST['new_calendar'],
+            EVLIST_ADMIN_URL . '/index.php?editcal=x',
+            array(
+                'class' => 'uk-button uk-button-success',
+                'style' => 'float:left',
+            )
+        );
+        $retval .= ADMIN_list(
+            'evlist_cal_admin',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr
+        );
+        return $retval;
+    }
+
+
+    /**
+     * Return the display value for a calendar field.
+     *
+     * @param   string  $fieldname  Name of the field
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Name-value pairs for all fields
+     * @param   array   $icon_arr   Array of system icons
+     * @return  string      HTML to display for the field
+     */
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
+
+        $retval = '';
+        switch($fieldname) {
+        case 'edit':
+            $retval = COM_createLink(
+                $_EV_CONF['icons']['edit'],
+                EVLIST_ADMIN_URL . '/index.php?editcal=' . $A['cal_id'],
+                array(
+                    'title' => $LANG_EVLIST['edit_calendar'],
+                )
+            );
+            break;
+        case 'orderby':
+            $retval = COM_createLink(
+                $_EV_CONF['icons']['arrow-up'],
+                EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
+            );
+            $retval .= COM_createLink(
+                $_EV_CONF['icons']['arrow-down'],
+                EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
+            );
+            break;
+        case 'cal_status':
+            if ($fieldvalue == '1') {
+                $switch = EVCHECKED;
+                $enabled = 1;
+            } else {
+                $switch = '';
+                $enabled = 0;
+            }
+            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\"
+                id=\"togenabled{$A['cal_id']}\"
+                onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
+                '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
+            break;
+        case 'delete':
+            if ($A['cal_id'] > 1) {
+                $retval = COM_createLink(
+                    $_EV_CONF['icons']['delete'],
+                    EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . $A['cal_id'],
+                    array(
+                        'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                    )
+                );
+            }
+            break;
+        case 'cal_name':
+            $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
+                ';">' . $fieldvalue;
+            if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
+                $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
+            }
+            $retval .= '</span>';
+            break;
+        default:
+            $retval = $fieldvalue;
+            break;
+        }
+        return $retval;
+    }
+
 }
 
 ?>

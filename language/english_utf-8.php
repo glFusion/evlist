@@ -128,7 +128,6 @@ You may either move existing events to a new calendar, or delete those events.',
 'confirm_del'       => 'Confirm that you want to delete the item',
 'none_delete'       => 'None- delete the events',
 'deleting_cal'      => 'Deleting Calendar',
-
 'rec_formats'       => array (
     1   => 'Daily by date, e.g., April 4 thru April 7 (sequential)',
     2   => 'Monthly by date (the same dates each month)',
@@ -136,7 +135,7 @@ You may either move existing events to a new calendar, or delete those events.',
     4   => 'Weekly by day, e.g., Mon, Wed, and Fri',
     5   => 'Monthly by day, e.g., the 3rd Friday of each month',
     6   => 'Custom dates: a comma-delimited list of calendar dates',
-    ),
+),
 
 'rec_periods'       => array(
     0 => '',
@@ -146,36 +145,31 @@ You may either move existing events to a new calendar, or delete those events.',
     4 => 'week(s)',
     5 => 'month(s)',
     6 => '',
-    ),
-
+),
 'postmodes' => array (
     'plaintext' => 'plaintext',
     'html'      => 'html',
-    ),
-
+),
 'rec_intervals'     => array (
     1   => 'First',
     2   => 'Second',
     3   => 'Third',
     4   => 'Fourth',
     5   => 'Last',
-    ),
-
+),
 'ranges'            => array (
     1   => 'Past',
     2   => 'Upcoming',
     3   => 'This Week',
     4   => 'This Month',
-    ),
-
+),
 'periods'           => array(
     'day'   => 'Day',
     'week'  => 'Week',
     'month' => 'Month',
     'year'  => 'Year',
     'list'  => 'List',
-    ),
-
+),
 'filter'            => 'Filter',
 'when'              => 'When',
 'where'             => 'Where',
@@ -198,7 +192,7 @@ You may either move existing events to a new calendar, or delete those events.',
     4   => 'Occurs every %interval% week on %day%',
     5   => 'Occurs %interval% month on the %daynum% %day%',
     6   => '',      // custom dates
-    ),
+),
 'on_days'   => 'on %s',
 'on_the_days' => 'on the %s',
 'each'      => 'each',
@@ -293,7 +287,6 @@ You may either move existing events to a new calendar, or delete those events.',
     'events' => 'To create a new event, click on "New Event" above.<br />To modify or delete an event, click on that event\'s edit icon below. To enable/disable an event, check the appropriate box below.',
     'tickettypes' => 'Tickets can be created for free or paid admission, and to cover one event occurrence or all occurrences (event pass). Tickets are only used if the global &quot;Enable RSVP&quot; setting is enabled.<br />Ticket Types can only be deleted if they haven&apos;t been used for any events.',
 ),
-
 'current_events'  => 'Current Events',
 'past_events' => 'Past Events',
 'upcoming_events' => 'Upcoming Events',
@@ -406,8 +399,8 @@ $LANG_EVLIST_HELP = array(
 'owner' => 'Select the owner for this item.',
 'group' => 'Select the group associated with this item',
 'perms' => 'Set the permissions for this item.',
-
 'event_pass' => 'Checked if this ticket type is a full event pass.',
+'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

@@ -120,7 +120,7 @@ $page = $view;      // Default for menu creation
 switch ($view) {
 case 'tickets':
     $ev_id = isset($_GET['ev_id']) ? $_GET['ev_id'] : '';
-    $content .= EVLIST_adminlist_tickets($ev_id);
+    $content .= Evlist\Ticket::userList($ev_id);
     break;
 
 case 'editticket':

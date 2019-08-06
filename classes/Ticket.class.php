@@ -777,6 +777,293 @@ class Ticket
         return $upd;
     }
 
+
+    /**
+     * Get the list of tickets.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   integer $rp_id  Repeat ID, 0 for all
+     * @return  string      HTML for admin list
+     */
+    function userList($ev_id, $rp_id = 0)
+    {
+        global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
+
+        USES_lib_admin();
+        EVLIST_setReturn('admintickets');
+
+        $retval = '';
+
+        $header_arr = array(
+            array(
+                'text' => $LANG_EVLIST['id'],
+                'field' => 'tick_id',
+                'sort' => true,
+            ),
+            array(
+                'text' => $LANG_EVLIST['registrant'],
+                'field' => 'uid',
+                'sort' => false,
+            ),
+            array(
+                'text' => $LANG_EVLIST['fee'],
+                'field' => 'fee',
+                'sort' => false,
+            ),
+            array(
+                'text' => $LANG_EVLIST['event_pass'],
+                'field' => 'event_pass',
+                'sort' => false,
+            ),
+            array(
+                'text' => $LANG_ADMIN['delete'],
+                'field' => 'delete',
+                'sort' => false,
+                'align' => 'center',
+            ),
+        );
+
+        $defsort_arr = array('field' => 'tick_id', 'direction' => 'ASC');
+        $text_arr = array(
+            'has_menu'     => false,
+            'has_extras'   => false,
+            'form_url'     => EVLIST_ADMIN_URL . '/index.php',
+            'help_url'     => '',
+        );
+
+        $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE ev_id='" .
+            DB_escapeString($ev_id) . "'";
+        if ($rp_id != 0) {
+            $sql .= " AND rp_id = " . (int)$rp_id;
+        }
+        $query_arr = array(
+            'table' => 'evlist_tickets',
+            'sql' => $sql,
+            'query_fields' => array(),
+        );
+
+        $retval .= ADMIN_list(
+            'evlist_ticket_admin',
+            array(__CLASS__, 'getUserField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr
+        );
+        return $retval;
+    }
+
+
+    /**
+     * Return the display value for a ticket fields in the admin list.
+     *
+     * @param   string  $fieldname  Name of the field
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Name-value pairs for all fields
+     * @param   array   $icon_arr   Array of system icons
+     * @return  string      HTML to display for the field
+     */
+    public static function getUserField($fieldname, $fieldvalue, $A, $icon_arr)
+        {
+        global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
+
+        switch($fieldname) {
+        case 'event_pass':
+            $retval = $A['rp_id'] == 0 ? $LANG_EVLIST['yes'] : $LANG_EVLIST['no'];
+            break;
+        case 'delete':
+            $retval = COM_createLink(
+                $_EV_CONF['icons']['delete'],
+                EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
+                array(
+                    'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                    'title' => $LANG_ADMIN['delete'],
+                )
+            );
+            break;
+        case 'uid':
+            $retval = COM_getDisplayName($fieldvalue);
+            break;
+        default:
+            $retval = $fieldvalue;
+            break;
+        }
+        return $retval;
+    }
+
+
+    /**
+     * Administer user registrations.
+     * This will appear in the admin area for administrators, and as part of
+     * the event detail for event owners.  Owners can delete registrations.
+     *
+     * @param   integer $rp_id  Repeat ID being viewed or checked
+     * @return  string          HTML for admin list
+     */
+    function adminList_RSVP($rp_id)
+    {
+        global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
+
+        USES_lib_admin();
+        $Ev = \Evlist\Repeat::getInstance($rp_id);
+        if ($Ev->rp_id == 0) return '';
+
+        $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
+                    tk.uid, tk.used, tt.description, tk.waitlist, u.fullname,
+                    {$Ev->Event->options['max_rsvp']} as max_rsvp
+            FROM {$_TABLES['evlist_tickets']} tk
+            LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
+                ON tt.id = tk.tic_type
+            LEFT JOIN {$_TABLES['users']} u
+                ON u.uid = tk.uid
+            WHERE tk.ev_id = '{$Ev->Event->id}' ";
+
+        $title = $LANG_EVLIST['admin_rsvp'] .
+            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '/index.php?view=printtickets&eid=' . $Ev->ev_id .
+            '" class="lgButton blue" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
+            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
+            '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
+
+        if ($Ev->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
+            $sql .= " AND rp_id = '{$Ev->rp_id}' ";
+        }
+
+        $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
+        $text_arr = array(
+        'has_menu'     => false,
+        'has_extras'   => false,
+        'title'        => $title,
+        'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
+        'help_url'     => '',
+        );
+
+        $header_arr = array(
+            array(
+                'text'  => $LANG_EVLIST['rsvp_date'],
+                'field' => 'dt',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['name'],
+                'field' => 'fullname',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['fee'],
+                'field' => 'fee',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['paid'],
+                'field' => 'paid',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['ticket_num'],
+                'field' => 'tic_id',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['date_used'],
+                'field' => 'used',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['waitlisted'],
+                'field' => 'waitlist',
+                'sort'  => false,
+            ),
+        );
+        $options_arr = array(
+            'chkdelete' => true,
+            'chkfield'  => 'tic_id',
+            'chkname'   => 'delrsvp',
+            'chkactions' => COM_createLink(
+                $_EV_CONF['icons']['delete'],
+                '!#',
+                array(
+                    'data-uk-tooltip' => '',
+                    'name' => 'tickdelete',
+                    'style' => '"vertical-align:text-bottom;',
+                    'title' => $LANG_ADMIN['delete'],
+                    'onclick' => "return confirm('{$LANG_EVLIST['conf_del_item']}');",
+                )
+            ) . '&nbsp;' . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
+            COM_createLink(
+                $_EV_CONF['icons']['reset'],
+                '!#',
+                array(
+                    'data-uk-tooltip' => '',
+                    'name' => 'tickreset',
+                    'style' => '"vertical-align:text-bottom;',
+                    'title' => $LANG_ADMIN['reset_usage'],
+                    'onclick' => "return confirm('{$LANG_EVLIST['conf_reset']}');",
+                )
+            ) . '&nbsp;' . $LANG_EVLIST['reset_usage'] .
+            '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
+        );
+
+        $query_arr = array(
+            'sql'       => $sql,
+        );
+
+        return ADMIN_list(
+            'evlist_adminlist_rsvp',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            '', '', $options_arr
+        );
+    }
+
+
+    /**
+     * Display fields for the RSVP admin list.
+     *
+     * @param   string  $fieldname      Name of field
+     * @param   mixed   $fieldvalue     Value of field
+     * @param   array   $A              Array of all fields ($name=>$value)
+     * @param   array   $icon_arr       Handy array of icon images
+     * @return  string                  Field value formatted for display
+     */
+    function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
+
+        $retval = '';
+
+        switch($fieldname) {
+        case 'waitlist':
+            $retval = $fieldvalue == 0 ? '' : $LANG_EVLIST['yes'];
+            break;
+
+        case 'uid':
+            $retval = COM_getDisplayName($fieldvalue);
+            break;
+
+        case 'rank':
+            if ($fieldvalue > $A['max_signups']) {
+                $retval = $LANG_EVLIST['yes'];
+            } else {
+                $retval = $LANG_EVLIST['no'];
+            }
+            break;
+
+        case 'dt':
+        case 'used':
+            if ($fieldvalue > 0) {
+                $d = new \Date($fieldvalue);
+                $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
+            } else {
+                $retval = '';
+            }
+            break;
+
+        default:
+            $retval = $fieldvalue;
+            break;
+        }
+        return $retval;
+    }
+
 }   // class Ticket
 
 ?>

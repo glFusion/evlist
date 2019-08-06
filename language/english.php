@@ -408,6 +408,7 @@ $LANG_EVLIST_HELP = array(
 'perms' => 'Set the permissions for this item.',
 
 'event_pass' => 'Checked if this ticket type is a full event pass.',
+'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

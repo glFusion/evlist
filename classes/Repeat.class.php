@@ -854,7 +854,7 @@ class Repeat
                     $this->Event->options['use_rsvp'] > 0 &&
                 ($this->isAdmin || $this->Event->isOwner())) {
             $T->set_var(array(
-                'admin_rsvp'    => EVLIST_adminRSVP($this->rp_id),
+                'admin_rsvp'    => Ticket::adminList_RSVP($this->rp_id),
                 'rsvp_count'    => $this->TotalRegistrations(),
             ) );
         }

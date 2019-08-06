@@ -934,9 +934,10 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
     if ($limit > 500) $limit = 500;
 
     // Get all upcoming events
-    $events = EVLIST_getEvents($_EV_CONF['_today'],
-            date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
-            array('cat'=>$F['topic'], 'limit'=>$limit)
+    $events = EVLIST_getEvents(
+        $_EV_CONF['_today'],
+        date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
+        array('cat'=>$F['topic'], 'limit'=>$limit)
     );
 
     $rp_shown = array();    // Store repeat ids to avoid dups
@@ -1015,9 +1016,10 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
     $limit = (int)$limit;
     if ($limit > 500) $limit = 500;
 
-    $sql = EVLIST_getEvents_sql($_EV_CONF['_today'],
-            date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
-            array('cat'=>$topic, 'limit'=>$limit, 'select'=>'rep.rp_id')
+    $sql = EVLIST_getEvents_sql(
+        $_EV_CONF['_today'],
+        date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
+        array('cat'=>$topic, 'limit'=>$limit, 'select'=>'rep.rp_id')
     );
     $result = DB_query($sql, 1);
     while ($A = DB_fetchArray($result, false)) {
@@ -1636,81 +1638,6 @@ function plugin_configmanager_select_pi_cal_map_evlist()
         $A[$cal->cal_name] = $cal->cal_id;
     }
     return $A;
-}
-
-
-/**
- * Return information for an event.
- *
- * @deprecated
- * @param   string  $id         Event instance (repeat) ID
- * @param   string  $what       comma-separated list of properties
- * @param   int     $uid        user ID or 0 = current user
- * @param   array   $options    (reserved for future extensions)
- * @return  mixed         string or array of strings with the information
- */
-function Xplugin_getiteminfo_evlist($id, $what, $uid = 0, $options = array())
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST;
-
-    // Getting all events not yet supported
-    if ($id == '*') return array();
-
-    $Rp = new Evlist\Repeat($id);
-    if ($Rp->isNew) {
-        return array();
-    }
-
-    $properties = explode(',', $what);
-    $props = array();
-    foreach ($properties as $p) {
-        switch ($p) {
-        case 'date' :
-            $props[$p] = $Rp->date_start;
-            break;
-        case 'description':
-            if ($Rp->Event->postmode != 'plaintext') {
-                $props[$p] = PLG_replaceTags($Rp->Event->Detail->full_description);
-            } else {
-                $props[$p] = $Rp->Event->Detail->full_description;
-            }
-            break;
-        case 'raw-description' :
-            $props[$p] = $Rp->Event->Detail->full_description;
-            break;
-        case 'excerpt':
-            $props[$p] = $Rp->Event->Detail->summary;
-            break;
-        case 'id':
-            $props[$p] = $Rp->rp_id;
-            break;
-        case 'title':
-            $props[$p] = $Rp->Event->Detail->title;
-            break;
-        case 'url':
-            $props[$p] = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $Rp->rp_id);
-            break;
-        case 'label':
-            $props[$p] = $LANG_EVLIST['pi_title'];
-            break;
-        case 'author':
-            $props[$p] = $Rp->Event->owner_id;
-            break;
-        default:
-            $props[$p] = '';
-            break;
-        }
-    }
-
-    // Return a string if one property requested, or an array
-    // of property=>value elements
-    if (count($props) == 1) {
-        $tRet = array_values($props);
-        $retval = $tRet[0];
-    } else {
-        $retval = $props;
-    }
-    return $retval;
 }
 
 
@@ -2632,37 +2559,6 @@ function EVLIST_getMeetupEvents($start='', $end='', &$events)
 
 
 /**
- * Deprecate function
- *
- * @param   string  $start  Starting date
- * @param   string  $end    Ending date
- * @param   array   $opts   Options array
- * @return  string      JSON view
- */
-function X_EVLIST_getEvents_json($start='', $end='', $opts=array())
-{
-    $events = EVLIST_getEvents($start, $end, $opts);
-    $json_events = array();
-    // convert to simple array from key->value, add the date as a
-    // value within each event array
-    $counter = 0;
-    foreach ($events as $dt=>$data) {
-        foreach ($data as $key=>$event) {
-            // some massaging for json
-            // remove serialized values, messes with json text formatting
-            unset($data[$key]['rec_data']);
-            unset($data[$key]['options']);
-        }
-        $json_events[$counter]['date'] = $dt;
-        $json_events[$counter]['events'] = $data;
-        $counter++;
-    }
-    $events = json_encode($json_events);
-    return $events;
-}
-
-
-/**
  * Replace quotes and apostrophes with HTML entities.
  * This is to prevent quotes from corrupting the HTML display while allowing
  * other HTML in event data to be displayed as intended.
@@ -2823,6 +2719,143 @@ function EV_getVar($A, $varname, $type = 'string', $default = NULL)
     default:
         return (string)$val;
         break;
+    }
+}
+
+
+/**
+ * Display a formatted error message.
+ *
+ * @param   string  $msg    Error message to display
+ * @param   string  $type   Type of message, used for style and header
+ * @param   string  $header Optional header text.
+ * @return  string      Formatted error message
+ */
+function EVLIST_alertMessage($msg = '', $type = '', $header = '')
+{
+    global $LANG_EVLIST;
+
+    // Require a valid message
+    if ($msg == '')
+        return '';
+    return COM_showMessageText($msg, $header, true, $type);
+}
+
+
+/**
+ * Get the options for a select list.
+ * Similar to COM_optionList, but expects a value=>name array of
+ * elements, which will typically be from a language array.
+ *
+ * @param   array   $options    value=>description array of elements
+ * @param   mixed   $selected   Optional value to preselect
+ * @param   integer $bias       Amount to add to each value
+ * @return  string          HTML for <option></option> elements
+ */
+function EVLIST_GetOptions($options, $selected = '', $bias=0)
+{
+    if (!is_array($options)) return '';
+
+    $retval = '';
+    $bias = (int)$bias;
+
+    foreach ($options as $value=>$name) {
+        if (is_numeric($value)) $value += $bias;
+        $retval .= '<option value="' . $value . '"';
+        if ($value == $selected) {
+                $retval .= ' selected="selected"';
+        }
+        $retval .= ">$name</option>" . LB;
+    }
+    return $retval;
+}
+
+
+/**
+ * Get the RSS feed links only.
+ *
+ * @return  array   Array of links & titles
+ */
+function EVLIST_getFeedLinks()
+{
+    global $_EV_CONF, $_TABLES;
+
+    $retval = array();
+
+    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != 1)
+        return $retval;
+
+    // Get the feed info for configured feeds
+    $result = DB_query("SELECT title, filename
+            FROM {$_TABLES['syndication']}
+            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
+
+    if (DB_numRows($result) > 0) {
+        $feed_url = SYND_getFeedUrl();
+        while ($A = DB_fetchArray($result, false)) {
+            $retval[] = array(
+                'feed_title'   => $A['title'],
+                'feed_url'     => $feed_url . $A['filename'],
+            );
+        }
+    }
+    return $retval;
+}
+
+
+/**
+ * Get the feed subscription urls & icons.
+ * This returns a ready-to-display set of icons for visitors
+ * to subscribe to RSS feeds
+ *
+ * @return  string  HTML for icons
+ */
+function EVLIST_getFeedIcons()
+{
+    global $_CONF, $_EV_CONF, $_TABLES;
+
+    $retval = '';
+
+    // Anon access required for feed access anyway
+    if ($_EV_CONF['allow_anon_view'] != 1)
+        return $retval;
+
+    // Get the feed info for configured feeds
+    $result = DB_query("SELECT title, filename
+            FROM {$_TABLES['syndication']}
+            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
+
+    if (DB_numRows($result) > 0) {
+        $T = new Template(EVLIST_PI_PATH . '/templates/');
+        $T->set_file('feed', 'rss_icon.thtml');
+        $feed_url = SYND_getFeedUrl();
+        while ($A = DB_fetchArray($result, false)) {
+            $T->set_var(array(
+                'feed_title'    => $A['title'],
+                'feed_url'     => $feed_url . $A['filename'],
+            ) );
+            $T->parse('output', 'feed', true);
+        }
+        $retval = $T->finish($T->get_var('output'));
+    }
+    return $retval;
+}
+
+
+/**
+ * Convert a latitude or longitude to a string based on the configured separators.
+ *
+ * @param   float   $val    Value to convert
+ * @param   boolean $us     True to force US formatting, False for locale-based
+ * @return  string      Formatted numeric string
+ */
+function EVLIST_coord2str($val, $us = false)
+{
+    if (!is_numeric($val)) return '';
+    if ($us) {
+        return number_format($val, 6, '.', ',');
+    } else {
+        return COM_numberFormat($val, 6);
     }
 }
 

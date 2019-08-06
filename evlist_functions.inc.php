@@ -5,6 +5,7 @@
  * @author      Lee P. Garner <lee@leegarner.com
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
  * @copyright   Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2007 Alford Deeley <ajdeeley AT sumitpages.ca>
  * @package     evlist
  * @version     v1.4.5
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -90,7 +91,7 @@ function EVLIST_TimeSelect($prefix, $curtime = '')
     // Use "now" as the default if nothing else sent.  Also helps make sure
     // that the explode() function works right.
     if (empty($curtime)) {
-        $curtime = date('H:i:s');
+        $curtime = $_CONF['_now']->format('H:i:s', true);
     }
     list($hour, $minute, $second) = explode(':', $curtime);
 
@@ -130,6 +131,8 @@ function EVLIST_TimeSelect($prefix, $curtime = '')
  */
 function EVLIST_12to24($hour, $ampm='')
 {
+    return Evlist\DateFunc::conv12to24($hour, $ampm);
+    /*
     global $_CONF;
 
     $hour = (int)$hour;
@@ -141,6 +144,7 @@ function EVLIST_12to24($hour, $ampm='')
     if ($ampm == 'pm' && $hour < 12) $hour += 12;
 
     return $hour;
+     */
 }
 
 
@@ -155,453 +159,15 @@ function EVLIST_12to24($hour, $ampm='')
  */
 function EVLIST_24to12($time_str)
 {
-    global $_CONF;
+    return Evlist\DateFunc::conv24to12($time_str);
+
+    /*global $_CONF;
 
     if ($_CONF['hour_mode'] == '12') {
         return date("h:i A", strtotime($time_str));
     } else {
         return $time_str;
-    }
-}
-
-
-/**
- * Organizes events by hour, and separates all-day events.
- *
- * @deprecated
- * @param   array   $events     Array of all events
- * @param   string  $today      Current date, YYYY-MM-DD.  Optional.
- * @return  array               Array of 2 arrays, allday and hourly
- */
-function XXEVLIST_getDayViewData($events, $today = '')
-{
-    global $_CONF, $_EV_CONF;
-
-    // If no date/time passed used current timestamp
-    if (empty($today)) $today = $_EV_CONF['_today'];
-
-    $hourlydata = array(
-        0   => array(), 1   => array(), 2   => array(), 3   => array(),
-        4   => array(), 5   => array(), 6   => array(), 7   => array(),
-        8   => array(), 9   => array(), 10  => array(), 11  =>array(),
-        12  => array(), 13  => array(), 14  => array(), 15  => array(),
-        16  => array(), 17  => array(), 18  => array(), 19  => array(),
-        20  => array(), 21  => array(), 22  => array(), 23  => array(),
-    );
-    $alldaydata = array();
-
-    //USES_class_date();
-
-    // Events are keyed by hour, so read through each hour
-    foreach ($events as $date=>$E) {
-        // Now read each event contained in each hour
-        foreach ($E as $id=>$A) {
-            // remove serialized data, not needed for display and interferes
-            // with json encoding.
-            unset($A['rec_data']);
-            unset($A['options']);
-
-            if ($A['allday'] == 1 ||
-                ( ($A['rp_date_start'] < $today) &&
-                    ($A['rp_date_end'] > $today) )
-            ) {
-                // This is an allday event, or spans days
-                $alldaydata[] = $A;
-            } else {
-                // This is an event with start/end times.  For non-recurring
-                // events, see if it actually starts before or after today
-                // and adjust the times accordingly.
-                if ($A['rp_date_start'] < $today) {
-                    list($hr, $min, $sec) = explode(':', $A['rp_time_start1']);
-                    $hr = '00';
-                    $A['rp_times_start1'] = implode(':', array($hr, $min, $sec));
-                }
-                if ($A['rp_date_end'] > $today) {
-                    list($hr, $min, $sec) = explode(':', $A['rp_time_end1']);
-                    $hr = '23';
-                    $A['rp_times_end1'] = implode(':', array($hr, $min, $sec));
-                }
-                $dtStart = new Date(strtotime($A['rp_date_start'] .
-                                    ' ' . $A['rp_time_start1']));
-                $dtEnd = new Date(strtotime($A['rp_date_end'] .
-                                    ' ' . $A['rp_time_end1']));
-
-                // Save the start & end times in separate variables.
-                // This way we can add $A to a different hour if it's a split.
-                //if (!isset($hourlydata[$starthour]))
-                //    $hourlydata[$starthour] = array();
-                // Set localized, formatted start and end time fields
-                $starthour = $dtStart->format('G', false); // array index
-                $time_start = $dtStart->format($_CONF['timeonly'], false);
-                $time_end = $dtEnd->format($_CONF['timeonly'], false);
-                $hourlydata[(int)$starthour][] = array(
-                    'starthour'  => $starthour,
-                    'time_start' => $time_start,
-                    'time_end'   => $time_end,
-                    'data'       => $A,
-                );
-
-                if ($A['split'] == 1 &&
-                        $A['rp_time_end2'] > $A['rp_time_start2']) {
-                    // This is a split event, second half occurs later today.
-                    // Events spanning multiple days can't be split, so we
-                    // know that the start and end times are on the same day.
-                    $dtStart->setTimestamp(strtotime($event['rp_date_start'] .
-                                ' ' . $event['rp_time_start2']));
-                    $starthour = $dtStart->format('G', false);
-                    $time_start = $dtStart->format($_CONF['timeonly'], false);
-                    $dtEnd->setTimestamp(strtotime($event['rp_date_start'] .
-                                ' ' . $event['rp_time_end2']));
-                    $time_end = $dtEnd->format($_CONF['timeonly'], false);
-                    $hourlydata[(int)$starthour][] = array(
-                        'starthour' => $starthour,
-                        'time_start' => $time_start,
-                        'time_end'   => $time_end,
-                        'data'       => $A,
-                    );
-
-                }
-            }
-        }
-    }
-    return array($alldaydata, $hourlydata);
-}
-
-
-/**
- * Return link to "delete event" image.
- *
- * Note: Personal events can be deleted if the current user is the owner of the
- *       calendar and has _read_ access to them.
- *
- * @param   array   $A      event permissions and id
- * @param   string  $token  security token
- * @return  string          link or empty string
- * @todo    This needs to bring up the javascript menu to delete the
- *          event or just an instance
- * @deprecated
- */
-function X_EVLIST_deleteImageLink($A, $token)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST;
-
-    $retval = '';
-    if ($A['cal_id'] < 0) return '';
-
-    if (plugin_ismoderator_evlist() ||
-        SEC_hasAccess($A['owner_id'], $A['group_id'], $A['perm_owner'],
-                $A['perm_group'], $A['perm_members'], $A['perm_anon']) == 3) {
-
-        $img = "<img data-uk-tooltip
-            src=\"{$_CONF['layout_url']}/images/admin/delete.png\"
-            alt=\"{$LANG_ADMIN['delete']}\"
-            title=\"{$LANG_ADMIN['delete']}\"
-            width=\"14\" height=\"14\"";
-
-        $retval = COM_createLink($img, EVLIST_URL .
-                    '/event.php?delrepeat=x&amp;rp_id=' . $A['rp_id'] . '&amp;'
-                    . CSRF_TOKEN . '=' . $token,
-                array('onclick'=>
-                    "return confirm('{$LANG_EVLIST['conf_del_repeat']}');",
-                    'title' => $LANG_ADMIN['delete'],
-                ) );
-
-    }
-    return $retval;
-}
-
-
-/**
- * Display a formatted error message.
- *
- * @param   string  $msg    Error message to display
- * @param   string  $type   Type of message, used for style and header
- * @param   string  $header Optional header text.
- * @return  string      Formatted error message
- */
-function EVLIST_alertMessage($msg = '', $type = '', $header = '')
-{
-    global $LANG_EVLIST;
-
-    // Require a valid message
-    if ($msg == '')
-        return '';
-    return COM_showMessageText($msg, $header, true, $type);
-}
-
-
-/**
- * Get the options for a select list.
- * Similar to COM_optionList, but expects a value=>name array of
- * elements, which will typically be from a language array.
- *
- * @param   array   $options    value=>description array of elements
- * @param   mixed   $selected   Optional value to preselect
- * @param   integer $bias       Amount to add to each value
- * @return  string          HTML for <option></option> elements
- */
-function EVLIST_GetOptions($options, $selected = '', $bias=0)
-{
-    if (!is_array($options)) return '';
-
-    $retval = '';
-    $bias = (int)$bias;
-
-    foreach ($options as $value=>$name) {
-        if (is_numeric($value)) $value += $bias;
-        $retval .= '<option value="' . $value . '"';
-        if ($value == $selected) {
-                $retval .= ' selected="selected"';
-        }
-        $retval .= ">$name</option>" . LB;
-    }
-    return $retval;
-}
-
-
-/**
- * Get the RSS feed links only.
- *
- * @return  array   Array of links & titles
- */
-function EVLIST_getFeedLinks()
-{
-    global $_EV_CONF, $_TABLES;
-
-    $retval = array();
-
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != 1)
-        return $retval;
-
-    // Get the feed info for configured feeds
-    $result = DB_query("SELECT title, filename
-            FROM {$_TABLES['syndication']}
-            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
-
-    if (DB_numRows($result) > 0) {
-        $feed_url = SYND_getFeedUrl();
-        while ($A = DB_fetchArray($result, false)) {
-            $retval[] = array(
-                'feed_title'   => $A['title'],
-                'feed_url'     => $feed_url . $A['filename'],
-            );
-        }
-    }
-    return $retval;
-}
-
-
-/**
- * Get the feed subscription urls & icons.
- * This returns a ready-to-display set of icons for visitors
- * to subscribe to RSS feeds
- *
- * @return  string  HTML for icons
- */
-function EVLIST_getFeedIcons()
-{
-    global $_CONF, $_EV_CONF, $_TABLES;
-
-    $retval = '';
-
-    // Anon access required for feed access anyway
-    if ($_EV_CONF['allow_anon_view'] != 1)
-        return $retval;
-
-    // Get the feed info for configured feeds
-    $result = DB_query("SELECT title, filename
-            FROM {$_TABLES['syndication']}
-            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
-
-    if (DB_numRows($result) > 0) {
-        $T = new Template(EVLIST_PI_PATH . '/templates/');
-        $T->set_file('feed', 'rss_icon.thtml');
-        $feed_url = SYND_getFeedUrl();
-        while ($A = DB_fetchArray($result, false)) {
-            $T->set_var(array(
-                'feed_title'    => $A['title'],
-                'feed_url'     => $feed_url . $A['filename'],
-            ) );
-            $T->parse('output', 'feed', true);
-        }
-        $retval = $T->finish($T->get_var('output'));
-    }
-    return $retval;
-}
-
-
-/**
- * Administer user registrations.
- * This will appear in the admin area for administrators, and as part of
- * the event detail for event owners.  Owners can delete registrations.
- *
- * @param   integer $rp_id  Repeat ID being viewed or checked
- * @return  string          HTML for admin list
- */
-function EVLIST_adminRSVP($rp_id)
-{
-    global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
-
-    USES_lib_admin();
-    $Ev = \Evlist\Repeat::getInstance($rp_id);
-    if ($Ev->rp_id == 0) return '';
-
-    $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                    tk.uid, tk.used, tt.description, tk.waitlist, u.fullname,
-                    {$Ev->Event->options['max_rsvp']} as max_rsvp
-            FROM {$_TABLES['evlist_tickets']} tk
-            LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
-                ON tt.id = tk.tic_type
-            LEFT JOIN {$_TABLES['users']} u
-                ON u.uid = tk.uid
-            WHERE tk.ev_id = '{$Ev->Event->id}' ";
-
-    $title = $LANG_EVLIST['admin_rsvp'] .
-            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=printtickets&eid=' . $Ev->ev_id .
-            '" class="lgButton blue" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
-            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
-            '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
-
-    if ($Ev->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
-        $sql .= " AND rp_id = '{$Ev->rp_id}' ";
-    }
-
-    $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
-    $text_arr = array(
-        'has_menu'     => false,
-        'has_extras'   => false,
-        'title'        => $title,
-        'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
-        'help_url'     => '',
-    );
-
-    $header_arr = array(
-        array(
-            'text'  => $LANG_EVLIST['rsvp_date'],
-            'field' => 'dt',
-            'sort'  => true,
-        ),
-        array(
-            'text'  => $LANG_EVLIST['name'],
-            'field' => 'fullname',
-            'sort'  => false,
-        ),
-        array(
-            'text'  => $LANG_EVLIST['fee'],
-            'field' => 'fee',
-            'sort'  => false,
-        ),
-        array(
-            'text'  => $LANG_EVLIST['paid'],
-            'field' => 'paid',
-            'sort'  => false,
-        ),
-        array(
-            'text'  => $LANG_EVLIST['ticket_num'],
-            'field' => 'tic_id',
-            'sort'  => false,
-        ),
-        array(
-            'text'  => $LANG_EVLIST['date_used'],
-            'field' => 'used',
-            'sort'  => false,
-        ),
-        array(
-            'text'  => $LANG_EVLIST['waitlisted'],
-            'field' => 'waitlist',
-            'sort'  => false,
-        ),
-    );
-    $options_arr = array(
-        'chkdelete' => true,
-        'chkfield'  => 'tic_id',
-        'chkname'   => 'delrsvp',
-        'chkactions' => COM_createLink(
-            $_EV_CONF['icons']['delete'],
-            '!#',
-            array(
-                'data-uk-tooltip' => '',
-                'name' => 'tickdelete',
-                'style' => '"vertical-align:text-bottom;',
-                'title' => $LANG_ADMIN['delete'],
-                'onclick' => "return confirm('{$LANG_EVLIST['conf_del_item']}');",
-            )
-        ) . '&nbsp;' . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
-        COM_createLink(
-            $_EV_CONF['icons']['reset'],
-            '!#',
-            array(
-                'data-uk-tooltip' => '',
-                'name' => 'tickreset',
-                'style' => '"vertical-align:text-bottom;',
-                'title' => $LANG_ADMIN['reset_usage'],
-                'onclick' => "return confirm('{$LANG_EVLIST['conf_reset']}');",
-            )
-        ) . '&nbsp;' . $LANG_EVLIST['reset_usage'] .
-        '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
-    );
-
-    $query_arr = array(
-        'sql'       => $sql,
-    );
-
-    return ADMIN_list('evlist', 'EVLIST_getField_rsvp',
-                $header_arr, $text_arr, $query_arr, $defsort_arr,
-                '', '', $options_arr);
-}
-
-
-/**
- * Display fields for the RSVP admin list.
- *
- * @param   string  $fieldname      Name of field
- * @param   mixed   $fieldvalue     Value of field
- * @param   array   $A              Array of all fields ($name=>$value)
- * @param   array   $icon_arr       Handy array of icon images
- * @return  string                  Field value formatted for display
- */
-function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
-
-    //USES_class_date();
-
-    $retval = '';
-
-    switch($fieldname) {
-    case 'waitlist':
-        $retval = $fieldvalue == 0 ? '' : $LANG_EVLIST['yes'];
-        break;
-
-    case 'uid':
-        $retval = COM_getDisplayName($fieldvalue);
-        break;
-
-    case 'rank':
-        if ($fieldvalue > $A['max_signups']) {
-            $retval = $LANG_EVLIST['yes'];
-        } else {
-            $retval = $LANG_EVLIST['no'];
-        }
-        break;
-
-    case 'dt':
-    case 'used':
-        if ($fieldvalue > 0) {
-            $d = new Date($fieldvalue);
-            $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
-        } else {
-            $retval = '';
-        }
-        break;
-
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
+    }*/
 }
 
 
@@ -614,6 +180,8 @@ function EVLIST_getField_rsvp($fieldname, $fieldvalue, $A, $icon_arr)
  */
 function EVLIST_getDayNames($letters = 0)
 {
+    return Evlist\DateFunc::getDayNames($letters);
+    /*
     global $_CONF, $LANG_WEEK;
 
     $retval = array();
@@ -632,24 +200,7 @@ function EVLIST_getDayNames($letters = 0)
         }
     }
     return $retval;
-}
-
-
-/**
- * Convert a latitude or longitude to a string based on the configured separators.
- *
- * @param   float   $val    Value to convert
- * @param   boolean $us     True to force US formatting, False for locale-based
- * @return  string      Formatted numeric string
- */
-function EVLIST_coord2str($val, $us = false)
-{
-    if (!is_numeric($val)) return '';
-    if ($us) {
-        return number_format($val, 6, '.', ',');
-    } else {
-        return COM_numberFormat($val, 6);
-    }
+     */
 }
 
 ?>

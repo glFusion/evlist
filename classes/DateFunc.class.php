@@ -800,7 +800,7 @@ class DateFunc
                 - ($this_weekday - DATE_CALC_BEGIN_WEEKDAY)); */
         }
         return self::daysToDate($beginOfWeek, $format);
-    } // end of func beginOfWeek
+    }
 
 
     /**
@@ -915,8 +915,8 @@ class DateFunc
         $week_array = array();
 
         // date for the column of week
-        $curr_day = self::beginOfWeek($day, $month, $year,'E');
-        for($counter=0; $counter <= 6; $counter++) {
+        $curr_day = self::beginOfWeek($day, $month, $year, 'E');
+        for ($counter=0; $counter <= 6; $counter++) {
             $week_array[$counter] = self::daysToDate($curr_day, $format);
             $curr_day++;
         }
@@ -1119,10 +1119,17 @@ class DateFunc
         if ($format == '') {
             $format = self::DEF_FORMAT;
         }
-
-        $output = "";
-        $dt = new \Date(sprintf('%d-%02d-%02d', $year, $month, $day), $_CONF['timezone']);
-        return $dt->format($format);
+        $output = '';
+        switch ($format) {
+        case 'E':
+            $output = self::dateToDays($day, $month, $year);
+            break;
+        default:
+            $dt = new \Date(sprintf('%d-%02d-%02d', $year, $month, $day), $_CONF['timezone']);
+            $output = $dt->format($format);
+            break;
+        }
+        return $output;
     }
 
 
@@ -1353,6 +1360,83 @@ class DateFunc
         $day = self::daysInMonth($month, $year);
         return self::dateFormat($day, $month, $year, $format);
      }
+
+
+    /**
+     * Convert the hour from 12-hour time to 24-hour.
+     * This is meant to convert incoming values from forms to 24-hour format. If
+     * the site uses 24-hour time, the form values should already be that way
+     * (and there will be no am/pm indicator), so the hour is returned unchanged.
+     *
+     * @param   integer $hour   Hour to check (0 - 23)
+     * @param   string  $ampm   Either 'am' or 'pm'
+     * @return  integer         Hour after switching it to 24-hour time.
+     */
+    public static function conv12to24($hour, $ampm='')
+    {
+        global $_CONF;
+
+        $hour = (int)$hour;
+
+        if ($hour < 0 || $hour > 23) $hour = 0;
+        if ($_CONF['hour_mode'] == 24) return $hour;
+
+        if ($ampm == 'am' && $hour == 12) $hour = 0;
+        if ($ampm == 'pm' && $hour < 12) $hour += 12;
+
+        return $hour;
+    }
+
+
+    /**
+     * Get the 12-hour string from a 24-hour time value.
+     * The returned value is actually the 24-hour format depending on $_CONF.
+     * Used to set the times for the event entry form. Time displays are controlled
+     * by the global locale configuration.
+     *
+     * @param   string  $time_str   24-hour time string, e.g. "14:30"
+     * @return  string      12-hour string, e.g. "02:30 PM"
+     */
+    public static function conv24to12($time_str)
+    {
+        global $_CONF;
+
+        if ($_CONF['hour_mode'] == '12') {
+            return date("h:i A", strtotime($time_str));
+        } else {
+            return $time_str;
+        }
+    }
+
+
+    /**
+     * Get the day names for a week based on week start day of Sun or Mon.
+     * Used to create calendar headers for weekly, monthly and yearly views.
+     *
+     * @param   integer $letters    Optional number of letters to return
+     * @return  array       Array of day names for a week, 0-indexed
+     */
+    public static function getDayNames($letters = 0)
+    {
+        global $_CONF, $LANG_WEEK;
+
+        $retval = array();
+
+        if ($_CONF['week_start'] == 'Sun') {
+            $keys = array(1, 2, 3, 4, 5, 6, 7);
+        } else {
+            $keys = array(2, 3, 4, 5, 6, 7, 1);
+        }
+
+        for ($i = 0; $i < 7; $i++) {
+            if ($letters > 0) {
+                $retval[$i] = substr($LANG_WEEK[$keys[$i]], 0, $letters);
+            } else {
+                $retval[$i] = $LANG_WEEK[$keys[$i]];
+            }
+        }
+        return $retval;
+    }
 
 }
 

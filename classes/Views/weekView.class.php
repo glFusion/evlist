@@ -69,8 +69,13 @@ class weekView extends \Evlist\View
         ) );
 
         $daynames = self::DayNames();
-        $events = EVLIST_getEvents($start_date, $end_date,
-                array('cat'=>$this->cat, 'cal'=>$this->cal));
+        $events = EVLIST_getEvents(
+            $start_date, $end_date,
+            array(
+                'cat'=>$this->cat,
+                'cal'=>$this->cal,
+            )
+        );
 
         $start_mname = $LANG_MONTH[(int)$sMonth];
         $last_date = getdate($dtStart->toUnix() + (86400 * 6));

@@ -1,9 +1,9 @@
 {# begin {templatelocation} #}
 {!if admin_rsvp}
-<div id="evEventButtons">
-  <button id="btn_event" class="uk-button uk-button-primary" onclick="changeView('event')">{$LANG_EVLIST['event']}</button>
-  <button id="btn_rsvp" class="uk-button" onclick="changeView('rsvp')">RSVP ({rsvp_count})</button>
-</div>
+<ul class="uk-tab" data-uk-tab="{connect:'#view-options'}">
+  <li><a href="#">{$LANG_EVLIST['event']}</a></li>
+  <li><a href="#">RSVP ({rsvp_count})</a></li>
+</ul>
 {!endif}
 
 <div id="evlistEventHeader">
@@ -116,6 +116,10 @@
 {# End header div #}
 </div>
 
+{!if admin_rsvp}
+<ul id="view-options" class="uk-switcher uk-margin">
+<li>
+{!endif}
 <div id="evlistEvent">
 {!if summary}
   <div class="evEventItem">
@@ -256,7 +260,7 @@
   {$LANG_EVLIST['cancel_free']}<br />
   <form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
     <input type="hidden" name="rp_id" value="{rp_id}" />
-    <input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
+    <input type="submit" name="cancelreg" value="Cancel " class="uk-button uk-button-danger uk-button-small" />
     <input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
   </form>
 </div>
@@ -293,7 +297,7 @@
     {tick_descr} - {tick_fee}
 {!endif}
 
-    <input type="submit" class="lgButton orange" name="register"
+    <input type="submit" class="uk-button uk-button-success uk-button-small" name="register"
         value="{$LANG_EVLIST['register']}" />
   </form>
 
@@ -301,7 +305,7 @@
 {!endif}
 {!if have_tickets}
 <div class="evEventRegInfo">
-  <a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}&rp_id={tic_rp_id}" class="lgButton blue" target="_blank">{$LANG_EVLIST['print_tickets']}</a>
+  <a href="{ticket_url}" class="uk-button uk-button-primary uk-button-small" target="_blank">{$LANG_EVLIST['print_tickets']}</a>
 </div>
 {!endif}
 
@@ -328,15 +332,20 @@
 {!endif}
 {adblock}
 </div>
-
 {!if admin_rsvp}
-<div id="evlistRSVP" style="display:none">
+</li>
+
+<li>
+<!--<div id="evlistRSVP" style="display:none">-->
+<div id="evlistRSVP">
   <div class="evAdminRSVP">
     <hr />
     {admin_rsvp}
   </div>
 </div>
 {!endif}
+</li>
+</ul>
 
 <script type="text/javascript">
 var showregdiv = 0;
@@ -396,20 +405,5 @@ $(document).ready(function() {
   showReminder({reminder_set});
 });
 {!endif}
-
-function changeView(view)
-{
-  if (view == 'event') {
-    document.getElementById("btn_event").className = "uk-button uk-button-primary";
-    document.getElementById("btn_rsvp").className = "uk-button";
-    document.getElementById("evlistEvent").style = "display:''";
-    document.getElementById("evlistRSVP").style = "display:none";
-  } else {
-    document.getElementById("btn_event").className = "uk-button";
-    document.getElementById("btn_rsvp").className = "uk-button uk-button-primary";
-    document.getElementById("evlistEvent").style = "display:none";
-    document.getElementById("evlistRSVP").style = "display:''";
-  }
-}
 </script>
 {# end {templatelocation} #}

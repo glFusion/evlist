@@ -1,3 +1,4 @@
+{# begin {templatelocation} #}
 <script type="text/javascript" src="{site_url}/ckeditor/ckeditor.js" ></script >
 <script type="text/javascript" >
 var site_url = "{site_url}";
@@ -8,7 +9,7 @@ function loadEditor(id) {
         contentsCss: '{site_url}/css.php?t={theme}',
         bodyClass: 'tm-container uk-article tm-article',
         //bodyClass: 'forumpost',
-        removePlugins: 'elementspath fileman vimeo',
+        removePlugins: 'elementspath vimeo',
         resize_enabled: false,
      } );
      return instance;
@@ -23,3 +24,4 @@ function woff (id) {
     descript.destroy();
 }
 </script>
+{# end {templatelocation} #}

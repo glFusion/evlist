@@ -7,9 +7,9 @@
  * to all occurrences of an event.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2017 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2019 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.0
+ * @version     v1.4.6
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -24,11 +24,11 @@ class TicketType
 {
     /** Properties accessed via `__set()` and `__get()`.
      * @var array */
-    var $properties = array();
+    private $properties = array();
 
     /** Flag to indicate a new record.
      * @var boolean */
-    var $isNew;
+    private $isNew;
 
 
     /**
@@ -132,6 +132,28 @@ class TicketType
         $this->description = $A['description'];
         $this->event_pass = $A['event_pass'];
         $this->enabled = $A['enabled'];
+    }
+
+
+    /**
+     * Check if this ticket type is an event pass or for a single instance.
+     *
+     * @return  boolean     True if it is a pass, False for single
+     */
+    public function isEventPass()
+    {
+        return $this->event_pass;
+    }
+
+
+    /**
+     * Get the description for this ticket type.
+     *
+     * @return  string      Description value
+     */
+    public function getDscp()
+    {
+        return $this->description;
     }
 
 

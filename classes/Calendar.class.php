@@ -20,11 +20,11 @@ class Calendar
 {
     /** Properties accessed via `__set()` and `__get()`.
      * @var array */
-    var $properties = array();
+    private $properties = array();
 
     /** Flag to indicate a new record.
      * @var boolean */
-    var $isNew;
+    public $isNew;
 
 
     /**

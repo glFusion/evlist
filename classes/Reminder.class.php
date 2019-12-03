@@ -45,6 +45,11 @@ class Reminder
      */
     public function __construct($rp_id='', $uid='')
     {
+        global $_USER;
+
+        if (empty($uid)) {
+            $uid = $_USER['uid'];
+        }
         if ($rp_id !== '') {
             $this->Repeat = Repeat::getInstance($rp_id);
         }
@@ -268,9 +273,11 @@ class Reminder
         if ($uid < 1) {
             $uid = $_USER['uid'];
         }
-        return DB_count($_TABLES['evlist_remlookup'],
-                        array('eid', 'rp_id', 'uid'),
-                        array($ev_id, $rp_id, $uid));
+        return DB_count(
+            $_TABLES['evlist_remlookup'],
+            array('eid', 'rp_id', 'uid'),
+            array($ev_id, $rp_id, $uid)
+        );
     }
 
 

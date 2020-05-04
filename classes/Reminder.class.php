@@ -12,23 +12,52 @@
  */
 namespace Evlist;
 
+
 /**
  * Class for reminders
  * @package evlist
  */
 class Reminder
 {
-    /** Property fields.  Accessed via __set() and __get().
-     * @var array */
-    private $properties = array();
+    /** Reminder record ID.
+     * @var integer */
+    private $rem_id = 0;
+
+    /** Subscribing user ID.
+     * @var integer */
+    private $uid = 0;
+
+    /** Event recurrance ID.
+     * @var integer */
+    private $rp_id = 0;
+
+    /** Event record ID.
+     * @var string */
+    private $eid = '';
+
+    /** User name.
+     * @var string */
+    private $name = '';
+
+    /** User Email address.
+     * @var string */
+    private $email = '';
+
+    /** Starting date of the event recurrance as a timestamp.
+     * @var integer */
+    private $date_start = 0;
+
+    /** How many days ahead of event to send notification.
+     * @var integer */
+    private $days_notice = 3;
 
     /** Indicates if this is a new record or not.
      * @var boolean */
-    private $isNew;
+    private $isNew = true;
 
     /** Repeat object for this reminder.
      * @var object */
-    public $Repeat;
+    private $Repeat = NULL;
 
     /** Holder for language arrays.
      * @var array */
@@ -53,76 +82,13 @@ class Reminder
         if ($rp_id !== '') {
             $this->Repeat = Repeat::getInstance($rp_id);
         }
-        if ($this->Repeat->rp_id > 0) {
-            $this->eid = $this->Repeat->ev_id;
+        if ($this->Repeat->getID() > 0) {
+            $this->eid = $this->Repeat->getEventID();
             $this->rp_id = $rp_id;
             $this->uid = $uid;
             $this->Read();
         } else {
             $this->isNew = true;
-        }
-    }
-
-
-    /**
-     * Set a property's value.
-     *
-     * @param   string  $var    Name of property to set.
-     * @param   mixed   $value  New value for property.
-     */
-    public function __set($var, $value='')
-    {
-        global $_USER;
-        switch ($var) {
-        case 'uid':
-            // Empty user ID supplied by default when adding a reminder
-            if (empty($value)) {
-                $value = $_USER['uid'];
-            }
-            $this->properties[$var] = (int)$value;
-            break;
-
-        case 'rp_id':
-            if (empty($value)) {
-                $value = 0;
-            }
-            $this->properties[$var] = (int)$value;
-            break;
-
-        case 'eid':
-            $this->properties[$var] = COM_sanitizeID($value, false);
-            break;
-
-        case 'name':
-        case 'email':
-            $this->properties[$var] = DB_escapeString($value);
-            break;
-
-        case 'date_start':
-        case 'timestamp':
-        case 'days_notice':
-            $this->properties[$var] = (int)$value;
-            break;
-
-        default:
-            // Undefined values (do nothing)
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property.
-     *
-     * @param   string  $var    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
-     */
-    public function __get($var)
-    {
-        if (isset($this->properties[$var])) {
-            return $this->properties[$var];
-        } else {
-            return NULL;
         }
     }
 
@@ -163,9 +129,14 @@ class Reminder
      */
     private function setVars($A)
     {
-        foreach ($A as $fld=>$value) {
-            $this->$fld = $value;
-        }
+        $this->rem_id = (int)$A['rem_id'];
+        $this->eid = COM_sanitizeId($A['eid']);
+        $this->rp_id = (int)$A['rp_id'];
+        $this->date_start = (int)$A['date_start'];
+        $this->uid = (int)$A['uid'];
+        $this->name = $A['name'];
+        $this->email = $A['email'];
+        $this->days_notice = (int)$A['days_notice'];
     }
 
 
@@ -182,9 +153,11 @@ class Reminder
     {
         global $_USER, $_TABLES;
 
-        if (COM_isAnonUser() ||
-                $this->Repeat->rp_id == '' ||
-                !$this->Repeat->Event->hasAccess(2)) {
+        if (
+            COM_isAnonUser() ||
+            $this->Repeat->getID() == 0 ||
+            !$this->Repeat->Event->hasAccess(2)
+        ) {
             return false;
         }
 
@@ -289,7 +262,7 @@ class Reminder
         global $_TABLES, $_CONF, $LANG, $LANG_EVLIST;
 
         // Guard against sending reminders for invalid events
-        if ($this->Repeat->rp_id < 1 || $this->email == '') {
+        if ($this->Repeat->getID() < 1 || $this->email == '') {
             return;
         }
         // Load the user's language

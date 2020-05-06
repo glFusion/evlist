@@ -56,8 +56,14 @@ class monthView extends \Evlist\View
         $starting_date = $calendarView[0][0];
         $ending_date = $calendarView[$x][$y];
         $daynames = self::DayNames();
-        $events = EVLIST_getEvents($starting_date, $ending_date,
-                array('cat'=>$this->cat, 'cal'=>$this->cal));
+        $events = EVLIST_getEvents(
+            $starting_date,
+            $ending_date,
+            array(
+                'cat'=>$this->cat,
+                'cal'=>$this->cal,
+            )
+        );
 
         $nextmonth = $this->month + 1;
         $nextyear = $this->year;

@@ -82,6 +82,7 @@ define('EVLIST_URL', "{$_CONF['site_url']}/{$_EV_CONF['pi_name']}");
 define('EVLIST_ADMIN_URL',
         "{$_CONF['site_admin_url']}/plugins/{$_EV_CONF['pi_name']}");
 
+define('EV_RECUR_ONETIME',  0);     // Non-recurring
 define('EV_RECUR_DAILY',    1);     // Every day
 define('EV_RECUR_MONTHLY',  2);     // Monthly on the date
 define('EV_RECUR_YEARLY',   3);     // Yearly on the date

@@ -322,7 +322,7 @@ class View
 
         // Get ical options for displayed calendars
         $ical_links = '';
-        $webcal_url = preg_replace('/^https?/', 'webcal', EVLIST_URL);
+        $webcal_url = EVLIST_URL;
         if (is_array($this->cal_used)) {
             foreach ($this->cal_used as $cal) {
                 if ($cal['cal_ena_ical']) {
@@ -360,7 +360,10 @@ class View
         if ($this->type == 'detail') return;
 
         $A = SESS_getVar('evlist.current');
-        if (is_array($A['date'])) {
+        if (!is_array($A)) {
+            $A = array();
+        }
+        if (isset($A['date']) && is_array($A['date'])) {
             if ($this->year == 0) $this->year = $A['date'][0];
             if ($this->month == 0) $this->month = $A['date'][1];
             if ($this->day == 0) $this->day = $A['date'][2];

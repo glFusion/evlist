@@ -135,7 +135,7 @@
   {map}
   <div id="directions">
     <form action="https://maps.google.com/maps" method="GET" target="_blank">
-      <input type="text" size="40" maxlength="128"
+      <input type="text" size="40" maxlength="128" style="max-width:60%"
         name="saddr" id="saddr" placeholder="{$LANG_GEO['start_addr']}" />
       <input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
       <input type="hidden" name="daddr" value="{lat},{lng}" />
@@ -212,6 +212,7 @@
 
 </div>
 
+<div style="clear:both;padding-top:1em;"></div>
 {!if login_to_register}
 <div class="evEventRegInfo uk-alert">{$LANG_EVLIST['login_to_register']}</div>
 {!endif}
@@ -336,7 +337,6 @@
 </li>
 
 <li>
-<!--<div id="evlistRSVP" style="display:none">-->
 <div id="evlistRSVP">
   <div class="evAdminRSVP">
     <hr />

@@ -1083,7 +1083,7 @@ class Event
             isset($_CONF['notification']) &&
             in_array ('evlist', $_CONF['notification'])
         ) {
-            $N = new \Template(EVLIST_PI_PATH . '/templates/');
+            $N = new \Template(EVLIST_PI_PATH . '/templates');
             $N->set_file('mail', 'notify_submission.thtml');
             $N->set_var(array(
                 'title'     => $this->Detail->getTitle(),
@@ -1232,7 +1232,7 @@ class Event
             COM_404();
         }
 
-        $T = new \Template($_CONF['path'] . 'plugins/evlist/templates/');
+        $T = new \Template(EVLIST_PI_PATH . '/templates');
         $T->set_file(array(
             'editor'    => 'editor.thtml',
             'tips'      => 'tooltipster.thtml',

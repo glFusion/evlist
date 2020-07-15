@@ -714,7 +714,7 @@ function EVLIST_cb_content($format)
         }
     }
 
-    $T = new Template(__DIR__ . '/templates/');
+    $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('centerblock', $tpl_file);
 
     $T->set_var(array(
@@ -1458,7 +1458,7 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     $events = EVLIST_getEvents($_EV_CONF['_today'], $end, $opts);
     if (empty($events)) return $retval;
 
-    $T = new Template(__DIR__ . '/templates/');
+    $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('block','phpblock.thtml');
     $listlink = COM_buildURL(EVLIST_URL . '/index.php');
 
@@ -2698,7 +2698,7 @@ function EVLIST_getFeedIcons()
             WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
 
     if (DB_numRows($result) > 0) {
-        $T = new Template(EVLIST_PI_PATH . '/templates/');
+        $T = new Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('feed', 'rss_icon.thtml');
         $feed_url = SYND_getFeedUrl();
         while ($A = DB_fetchArray($result, false)) {

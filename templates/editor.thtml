@@ -338,8 +338,7 @@ function toggleRSVPdetail(val)
           <span id="summary" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
-          <textarea name="summary" id="summary"
-            cols="80" rows="2">{summary}</textarea>
+          <textarea name="summary" id="summary" style="width:80">{summary}</textarea>
         </div>
       </div>
 
@@ -349,8 +348,7 @@ function toggleRSVPdetail(val)
           <span id="hlp_dscp" class="tooltip_cfg tooltipstered"></span>
         </label>
         <div class="uk-form-controls">
-          <textarea name="full_description" id="description" class="uk-form-width-large" style="width:100%"
-            cols="80" rows="3">{description}</textarea>
+          <textarea name="full_description" id="description" class="uk-form-width-large" style="width:100%">{description}</textarea>
         </div>
       </div>
 

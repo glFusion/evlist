@@ -54,9 +54,8 @@ case 'tickreset_x':
 
 case 'saveevent':
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
-    $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
     $Ev = new Evlist\Event($eid);
-    $errors = $Ev->Save($_POST, $table);
+    $errors = $Ev->Save($_POST, empty($eid));
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
         $content .= $Ev->Edit();
@@ -125,8 +124,8 @@ case 'tickets':
 
 case 'editticket':
     if ($_EV_CONF['enable_rsvp']) {
-        $Tic = new Evlist\TicketType($actionval);
-        $content .= $Tic->Edit();
+        $TT = new Evlist\TicketType($actionval);
+        $content .= $TT->Edit();
     }
     break;
 

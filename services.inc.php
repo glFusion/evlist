@@ -52,7 +52,7 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
         if ($tick_type == 0) {
             return PLG_RET_ERROR;
         }
-        $Tick = new Evlist\TicketType($tick_type);
+        $TT = new Evlist\TicketType($tick_type);
         $Ev = new Evlist\Event($ev_id);
         if (isset($Ev->options['tickets'][$tick_type])) {
             $fee = (float)$Ev->options['tickets'][$tick_type]['fee'];
@@ -60,12 +60,12 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
             $fee = 0;
         }
 
-        $short_desc = $Tick->description. ': ' . $Ev->Detail->title;
+        $short_desc = $TT->getDscp() . ': ' . $Ev->Detail->title;
         if ($rp_id > 0) {
-            $Ev = new Evlist\Repeat($rp_id);
-            if ($Ev->rp_id == $rp_id) { // valid repeat ID
-                $short_desc .=
-                    ', ' . $Ev->date_start . ' ' . $Ev->time_start1;
+            $Rp = new Evlist\Repeat($rp_id);
+            if ($Rp->rp_id == $rp_id) { // valid repeat ID
+                $short_desc .= ', ' . $Rp->date_start . ' ' . $Rp->time_start1;
+                $output['url'] = $Ev->getLink($rp_id);
             } else {
                 return PLG_RET_ERROR;
             }
@@ -98,8 +98,9 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
     $quantity = EV_getVar($item, 'quantity', 'int');
 
     // Must have an item ID following the plugin name
-    if (!is_array($item_id) || !isset($item_id[1]))
+    if (!is_array($item_id) || !isset($item_id[1])) {
         return PLG_RET_ERROR;
+    }
 
     // Initialize the output array
     $output = array(
@@ -134,7 +135,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
         $tick_type = $item_parts[1];
         $rp_id = $item_parts[2];
 
-        $TickType = new Evlist\TicketType($tick_type);
+        $TT = new Evlist\TicketType($tick_type);
         $repeats = array();
         if ($rp_id > 0) {
             $repeats[] = $rp_id;
@@ -144,7 +145,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
             $dt_info = $Rp->start_date1 . ' ' . $Rp->start_time1;
         } else {
             // rp_id = 0, make sure it's an event pass
-            if ($TickType->event_pass) {
+            if ($TT->isEventPass()) {
                 $Ev = new Evlist\Event($ev_id);
                 $dt_info = $Ev->date_start1 . ' ' . $Ev->time_start1;
             } else {
@@ -154,7 +155,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
         $ev_fee = (float)$Ev->options['tickets'][$tick_type]['fee'];
 
         $output['price'] = $ev_fee;
-        $output['name'] = $TickType->description . ': ' . $Ev->Detail->title .
+        $output['name'] = $TT->getDscp(). ': ' . $Ev->Detail->title .
                 ', ' . $dt_info;
         $output['short_description'] = $output['name'];
 

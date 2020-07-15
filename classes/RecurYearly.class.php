@@ -16,7 +16,7 @@ namespace Evlist;
  * Class to handle annual recurrences.
  * @package evlist
  */
-class RecurYearly extends Recur
+class RecurYearly extends Recurrence
 {
     /**
      * Increment the date by one year.

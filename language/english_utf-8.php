@@ -129,6 +129,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'none_delete'       => 'None- delete the events',
 'deleting_cal'      => 'Deleting Calendar',
 'rec_formats'       => array (
+    0   => 'Does not recur',
     1   => 'Daily by date, e.g., April 4 thru April 7 (sequential)',
     2   => 'Monthly by date (the same dates each month)',
     3   => 'Yearly by date, e.g., December 25th year after year',
@@ -376,6 +377,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'first'         => 'First',
 'ev_not_found'  => 'The requested event was not found.',
 'jump'          => 'Jump',
+'no_tickets_print' => 'There are no tickets qualified for printing.',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -401,6 +403,7 @@ $LANG_EVLIST_HELP = array(
 'perms' => 'Set the permissions for this item.',
 'event_pass' => 'Checked if this ticket type is a full event pass.',
 'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

@@ -63,8 +63,10 @@ class dayView extends \Evlist\View
             'event'     => 'singleevent.thtml',
             'dayview'   => $tpl . '.thtml',
         ) );
-        $events = EVLIST_getEvents($today_sql, $today_sql,
-                array('cat'=>$this->cat, 'cal'=>$this->cal));
+        $events = EVLIST_getEvents(
+            $today_sql, $today_sql,
+            array('cat'=>$this->cat, 'cal'=>$this->cal)
+        );
         list($allday, $hourly) = $this->getViewData($events);
 
         // Get allday events

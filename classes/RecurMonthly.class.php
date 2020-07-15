@@ -17,7 +17,7 @@ namespace Evlist;
  * Class to handle monthly recurrences.
  * @package evlist
  */
-class RecurMonthly extends Recur
+class RecurMonthly extends Recurrence
 {
     /**
      * Create the recurrences for a monthly event.
@@ -29,7 +29,7 @@ class RecurMonthly extends Recur
     {
         global $_EV_CONF;
 
-        $days_on = $this->event->rec_data['listdays'];
+        $days_on = $this->rec_data['listdays'];
         if (!is_array($days_on)) return false;
 
         $occurrence = $this->dt_start;
@@ -41,7 +41,7 @@ class RecurMonthly extends Recur
         // loop can handle all the events.
         list($y, $m, $d) = explode('-', $occurrence);
         $count = 0;
-        while ($occurrence <= $this->event->rec_data['stop'] &&
+        while ($occurrence <= $this->rec_data['stop'] &&
             //$occurrence >= '1971-01-01' &&
             $count < $_EV_CONF['max_repeats']) {
             $lastday = cal_days_in_month(CAL_GREGORIAN, $m, $y);
@@ -60,7 +60,7 @@ class RecurMonthly extends Recur
                 if ($occurrence < $this->dt_start) continue;
 
                 // Stop when we hit the stop date
-                if ($occurrence > $this->event->rec_data['stop']) break;
+                if ($occurrence > $this->rec_data['stop']) break;
 
                 if ($this->skip > 0) {
                     $occurrence = $this->SkipWeekend($occurrence);
@@ -75,7 +75,7 @@ class RecurMonthly extends Recur
             }   // foreach days_on
 
             // Increment the month
-            $m += $this->event->rec_data['freq'];
+            $m += $this->rec_data['freq'];
             if ($m > 12) {      // Roll over to next year
                 $y += 1;
                 $m = $m - 12;

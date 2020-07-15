@@ -3,9 +3,10 @@
  * Class to manage tickets and registrations.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2019 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.5
+ * @version     v1.4.6
+ * @since       v1.4.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -18,9 +19,45 @@ namespace Evlist;
  */
 class Ticket
 {
-    /** Properties accessed via `_set()` and `__get()`.
-     * @var array */
-    var $properties = array();
+    /** Ticket record ID.
+     * @var string */
+    private $tic_id = '';
+
+    /** Ticket type record ID.
+     * @var integer */
+    private $tic_type = 0;
+
+    /** Event ID.
+     * @var string */
+    private $ev_id = '';
+
+    /** Repeat ID.
+     * @var integer */
+    private $rp_id = 0;
+
+    /** Ticket fee.
+     * @var float */
+    private $fee = 0;
+
+    /** Amount paid.
+     * @var float */
+    private $paid = 0;
+
+    /** Purchaser's user ID
+     * @var integer */
+    private $uid = 0;
+
+    /** Timestamp indicating when ticket was used.
+     * @var integer  */
+    private $used = 0;
+
+    /** Timestamp when the ticket was purchased.
+     * @var integer */
+    private $dt = 0;
+
+    /** Flag indicating that this ticket is waitlisted.
+     * @var boolean */
+    private $waitlist = 0;
 
 
     /**
@@ -31,17 +68,13 @@ class Ticket
      */
     public function __construct($tic_id = '')
     {
-        $this->tic_id       = $tic_id;
-        $this->tic_type     = '';
-        $this->ev_id        = '';
-        $this->rp_id        = 1;
-        $this->fee          = 0;
-        $this->paid         = 0;
-        $this->uid          = 0;
-        $this->used         = 0;
-        $this->dt           = NULL;
-        if ($this->tic_id != '') {
-            $this->Read($this->tic_id);
+        if (is_array($tic_id)) {
+            $this->setVars($tic_id);
+        } else {
+            $this->tic_id = $tic_id;
+            if ($this->tic_id != '') {
+                $this->Read($this->tic_id);
+            }
         }
     }
 
@@ -68,59 +101,97 @@ class Ticket
             return false;
         } else {
             $row = DB_fetchArray($result, false);
-            $this->SetVars($row, true);
+            $this->setVars($row, true);
             return true;
         }
     }
 
 
     /**
-     * Set a property's value.
+     * Get the ticket ID.
      *
-     * @param   string  $key    Property name
-     * @param   mixed   $value  Value to set
+     * @return  string      Ticket record ID
      */
-    public function __set($key, $value)
+    public function getID()
     {
-        switch ($key) {
-        case 'uid':
-        case 'rp_id':
-        case 'tic_type':
-        case 'used':
-        case 'dt':
-            $this->properties[$key] = (int)$value;
-            break;
-
-        case 'fee':
-        case 'paid':
-            $this->properties[$key] = (float)$value;
-            break;
-
-        case 'tic_id':
-        case 'ev_id':
-            $this->properties[$key] = trim($value);
-            break;
-
-        case 'waitlist':
-            $this->properties[$key] = $value == 1 ? 1 : 0;
-            break;
-        }
+        return $this->tic_id;
     }
 
 
     /**
-     * Get the value of a property.
+     * Get the related base Event record ID.
      *
-     * @param   string  $key    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
+     * @return   string     Event ID
      */
-    public function __get($key)
+    public function getEventID()
     {
-        if (array_key_exists($key, $this->properties)) {
-            return $this->properties[$key];
-        } else {
-            return NULL;
-        }
+        return $this->ev_id;
+    }
+
+
+    /**
+     * Get the related event instance ID.
+     *
+     * @return  integer     Repeat ID
+     */
+    public function getRepeatID()
+    {
+        return (int)$this->rp_id;
+    }
+
+
+    /**
+     * Get the ticket type ID.
+     *
+     * @return  integer     TicketType ID
+     */
+    public function getTypeID()
+    {
+        return (int)$this->tic_type;
+    }
+
+
+    /**
+     * Get the amount paid for this ticket.
+     *
+     * @return  float       Amount paid
+     */
+    public function getPaid()
+    {
+        return (float)$this->paid;
+    }
+
+
+    /**
+     * Get the total amount charged for this ticket.
+     *
+     * @return  float       Total price
+     */
+    public function getFee()
+    {
+        return (float)$this->fee;
+    }
+
+
+    /**
+     * Check if this ticket is fully paid.
+     *
+     * @return  boolean     True if paid, False if not
+     */
+    public function isPaid()
+    {
+        return $this->paid >= $this->fee;
+    }
+
+
+    /**
+     * Check if this ticket is on a waitlist.
+     *
+     * return   boolean     1 if waitlisted, 0 if not
+     */
+    public function isWaitlisted()
+    {
+        return $this->waitlist ? 1 : 0;
     }
 
 
@@ -129,18 +200,18 @@ class Ticket
      *
      * @param  array   $A      Array of fields
      */
-    public function SetVars($A)
+    public function setVars($A)
     {
         $this->tic_id = $A['tic_id'];
         $this->tic_type = $A['tic_type'];
         $this->ev_id = $A['ev_id'];
-        $this->rp_id = $A['rp_id'];
-        $this->uid = $A['uid'];
-        $this->fee = $A['fee'];
-        $this->paid = $A['paid'];
-        $this->used = $A['used'];
-        $this->dt = $A['dt'];
-        $this->waitlist = $A['waitlist'];
+        $this->rp_id = (int)$A['rp_id'];
+        $this->uid = (int)$A['uid'];
+        $this->fee = (float)$A['fee'];
+        $this->paid = (float)$A['paid'];
+        $this->used = (int)$A['used'];
+        $this->dt = (int)$A['dt'];
+        $this->waitlist = isset($A['waitlist']) && $A['waitlist'] ? 1 : 0;
     }
 
 
@@ -154,15 +225,21 @@ class Ticket
     {
         global $_EV_CONF;
 
-        // Make sure a default format is defined if not in the config
-        if (strstr($_EV_CONF['ticket_format'], '%s') === false) {
-            $_EV_CONF['ticket_format'] = 'EV%s';
-        }
+        if (function_exists('CUSTOM_evlist_MakeTicketId')) {
+            $retval = CUSTOM_evlist_MakeTicketId($A);
+        } else {
+            // Make sure a default format is defined if not in the config
+            if (strstr($_EV_CONF['ticket_format'], '%s') === false) {
+                $_EV_CONF['ticket_format'] = 'EV%s';
+            }
 
-        // md5 makes a long value to put in a qrcode url.
-        // makeSid() should be sufficient since it includes some
-        // random characters.
-        return sprintf($_EV_CONF['ticket_format'], COM_makeSid());
+            // md5 makes a long value to put in a qrcode url.
+            // makeSid() should be sufficient since it includes some
+            // random characters.
+            $token = dechex(date('y')) . dechex(date('m')) . self::createToken();
+            $retval = sprintf($_EV_CONF['ticket_format'], $token);
+        }
+        return $retval;
     }
 
 
@@ -281,12 +358,12 @@ class Ticket
         // waitlist should be updated.
         $tic = new self($key);
         $Ev = new Event($tic->ev_id);
-        $max_rsvp = (int)$Ev->options['max_rsvp'];
+        $max_rsvp = (int)$Ev->getOption('max_rsvp');
         $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE tic_id $where";
         DB_query($sql);
         // Now that the tickets have been deleted, reset the waitlist if needed
-        if ($max_rsvp > 0 && $Ev->options['rsvp_waitlist'] == 1) {
-            self::resetWaitlist($max_rsvp, $Ev->id, $tic->rp_id);
+        if ($max_rsvp > 0 && $Ev->getOption('rsvp_waitlist')) {
+            self::resetWaitlist($max_rsvp, $Ev->getID(), $tic->getID());
         }
         EVLIST_log("Deleted tickets $where");
     }
@@ -357,13 +434,13 @@ class Ticket
 
         if (!empty($where)) {
             $sql_where = implode(' AND ', $where);
-            $sql = "SELECT * FROM {$_TABLES['evlist_tickets']} WHERE $sql_where
-                    ORDER BY waitlist, dt ASC";
+            $sql = "SELECT * FROM {$_TABLES['evlist_tickets']}
+                WHERE $sql_where
+                ORDER BY waitlist, dt ASC";
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
-                // create empty objects and use SetVars to save DB lookups
-                $tickets[$A['tic_id']] = new Ticket();
-                $tickets[$A['tic_id']]->SetVars($A);
+                // create empty objects and use setVars to save DB lookups
+                $tickets[$A['tic_id']] = new self($A);
             }
         }
         return $tickets;
@@ -380,12 +457,12 @@ class Ticket
      * @param   integer $uid    User ID
      * @return  string          PDF Document containing tickets
      */
-    public static function PrintTickets($ev_id='', $rp_id=0, $uid=0)
+    public static function printEvent($ev_id='', $rp_id=0, $uid=0)
     {
         global $_CONF, $_USER, $LANG_EVLIST, $_PLUGINS;
 
-        $Event = new Event($ev_id);
-        $rsvp_print = EV_getVar($Event->options, 'rsvp_print', 'integer');
+        $Event = Event::getInstance($ev_id);
+        $rsvp_print = (int)$Event->getOption('rsvp_print');
 
         // Verify that the current user is an admin or event owner to print
         // all tickets, otherwise only print the user's tickets.
@@ -393,19 +470,71 @@ class Ticket
             $uid = $_USER['uid'];
         }
 
+        // get the tickets, paid and unpaid. Need event id and uid.
+        $tickets = self::getTickets($ev_id, $rp_id, $uid);
+        return self::_printTickets($tickets);
+    }
+
+
+    /**
+     * Print selected as a PDF document.
+     *
+     * @param   array   $tic_ids    Ticket ID numbers
+     * @return  string          PDF Document containing tickets
+     */
+    public static function printSelected($tic_ids)
+    {
+        foreach ($tic_ids as $id) {
+            $tic = new self($id);
+            if ($tic->getID() != '') {
+                $tickets[$tic->getID()] = $tic;
+            }
+        }
+        if (!empty($tickets)) {
+            return self::_printTickets($tickets);
+        }
+    }
+
+    
+    /**
+     * Print tickets as PDF documents.
+     * Tickets can be printed for an event, a single occurrence,
+     * or all tickets for a user ID.
+     *
+     * @param   array   $tickets    Array of Ticket objects
+     * @return  string          PDF Document containing tickets
+     */
+    private static function _printTickets($tickets)
+    {
+        global $_CONF, $_USER, $LANG_EVLIST, $_PLUGINS;
+
+        /*$Event = Event::getInstance($ev_id);
+
+        // Verify that the current user is an admin or event owner to print
+        // all tickets, otherwise only print the user's tickets.
+        if (!$Event->hasAccess(3) && $uid == 0) {
+            $uid = $_USER['uid'];
+        }
+        */
         $checkin_url = $_CONF['site_admin_url'] . '/plugins/evlist/checkin.php?tic=';
 
         // get the tickets, paid and unpaid. Need event id and uid.
-        $tickets = self::getTickets($ev_id, $rp_id, $uid);
+        //$tickets = self::getTickets($ev_id, $rp_id, $uid);
 
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
         // the lglib version during installation
-        if ($rsvp_print == 0 || empty($tickets) || !in_array('lglib', $_PLUGINS)) {
+        if (
+        //    $rsvp_print == 0 ||
+            empty($tickets) ||
+            !in_array('lglib', $_PLUGINS)
+        ) {
             return "There are no tickets available to print";
         }
         USES_lglib_class_fpdf();
 
+        // Track when the event information is read to avoid duplicate
+        // reading.
         $ev_id = NULL;
 
         // create params array for qrcode, if used
@@ -416,51 +545,58 @@ class Ticket
         $pdf->AddPage();
 
         $tic_types = array();
-        $counter = 0;
+        $counter = 0;           // count tickets printed per page
+        $tic_count = 0;         // count total tickets printed
         foreach ($tickets as $tic_id=>$ticket) {
             // Don't print waitlisted tickets
-            if ($ticket->waitlist == 1) continue;
+            if ($ticket->isWaitlisted()) continue;
 
-            // Don't print unpaid tickets if not allowed
-            if ($rsvp_print == 1 && $ticket->paid < $ticket->fee) continue;
-
-            if (!isset($tick_types[$ticket->tic_type])) {
-                $tick_types[$ticket->tic_type] = new TicketType($ticket->tic_type);
+            if (!isset($tick_types[$ticket->getTypeID()])) {
+                $tick_types[$ticket->getTypeID()] = new TicketType($ticket->getTypeID());
             }
 
             // If we don't already have the event info, get it and construct
             // the address string
-            if ($ev_id != $ticket->ev_id) {
-                $Ev = new Event($ticket->ev_id);
-                $ev_id = $Ev->id;
-                $addr = array();
-                if ($Ev->Detail->street != '') $addr[] = $Ev->Detail->street;
-                if ($Ev->Detail->city != '') $addr[] = $Ev->Detail->city;
-                if ($Ev->Detail->province != '') $addr[] = $Ev->Detail->province;
-                if ($Ev->Detail->country != '') $addr[] = $Ev->Detail->country;
-                if ($Ev->Detail->postal != '') $addr[] = $Ev->Detail->postal;
+            if ($ev_id != $ticket->getEventID()) {
+                $Ev = new Event($ticket->getEventID());
+                $ev_id = $Ev->getID();
+                $addr = $Ev->getDetail()->getAddress();
                 $address = implode(' ', $addr);
+                $rsvp_print = (int)$Ev->getOption('rsvp_print');
+                if ($rsvp_print == 0) {     // no printing allowed
+                    return false;
+                }
+            }
+
+            // Don't print unpaid tickets if not allowed
+            if ($rsvp_print == 1 && !$ticket->isPaid()) {
+                continue;
             }
 
             // Get the repeat(s) for the ticket(s) to print a ticket for each
             // occurrence.
-            $repeats = Repeat::getRepeats($ticket->ev_id, $ticket->rp_id);
-            if (empty($repeats)) continue;
-
+            $repeats = Repeat::getRepeats($ticket->getEventID(), $ticket->getRepeatID());
+            if (empty($repeats)) {
+                continue;
+            }
             foreach ($repeats as $rp_id => $event) {
-                $counter++;
+                $counter++;         // increment the per-page counter
+                // Increment the printed ticket counter to know whether to display
+                // the PDF output or show an error message.
+                $tic_count++;
+
                 if ($counter > 3) {     // Print up to 3 tickets per page
                     $pdf->AddPage();
                     $counter = 1;
                 }
 
-                $ev_date = $event->date_start;
-                $ev_time = $event->time_start1 . ' - ' . $event->time_end1;
-                if (!empty($event->time_start2)) {
-                    $ev_time .= '; ' . $event->time_start1 . ' - ' . $event->time_end2;
+                $ev_date = $event->getDateStart1()->format('Y-m-d');
+                $ev_time = $event->getTimeStart1() . ' - ' . $event->getTimeEnd1();
+                if (!empty($event->getTimeStart2())) {
+                    $ev_time .= '; ' . $event->getTimeStart2() . ' - ' . $event->getTimeEnd2();
                 }
 
-                $fee = self::formatAmount($ticket->fee);
+                $fee = self::formatAmount($ticket->getFee());
 
                 // Get the veritcal position of the current ticket
                 // for positioning the qrcode
@@ -468,20 +604,20 @@ class Ticket
 
                 // Title
                 $pdf->SetFont('Times','B',12);
-                $pdf->Cell(130,10, "{$tick_types[$ticket->tic_type]->description}: {$Ev->Detail->title}",1,0,'C');
+                $pdf->Cell(130,10, "{$tick_types[$ticket->getTypeID()]->getDscp()}: {$Ev->getDetail()->getTitle()}",1,0,'C');
                 $pdf->Ln(13);
 
                 $pdf->SetFont('Times','',12);
                 $pdf->SetX(-40);
                 $pdf->Cell(0, 30, $LANG_EVLIST['fee'] . ': '. $fee);
-                if ($ticket->fee > 0) {
+                if ($ticket->getFee() > 0) {
                     $pdf->Ln(5);
-                    if ($ticket->paid >= $ticket->fee) {
+                    if ($ticket->isPaid()) {
                         $pdf->SetX(-40);
                         $pdf->Cell(0, 30, $LANG_EVLIST['paid']);
                     } else {
                         $pdf->SetX(-55);
-                        $due = $ticket->fee - $ticket->paid;
+                        $due = $ticket->getFee() - $ticket->getPaid();
                         $pdf->Cell(0, 30, $LANG_EVLIST['balance_due'] . ': ' . self::formatAmount($due));
                     }
                 }
@@ -495,15 +631,15 @@ class Ticket
                 $pdf->Cell(0, 6, $ev_time, 0, 1);
 
                 $addr_line = 0;
-                if ($Ev->Detail->location != '') {
+                if ($Ev->getDetail()->getLocation() != '') {
                     $pdf->Ln(5);
                     $pdf->Cell(0, 2, $LANG_EVLIST['where'] . ': ', 0, 0);
                     $pdf->SetX(40);
-                    $pdf->Cell(0, 2, $Ev->Detail->location, 0, 1);
+                    $pdf->Cell(0, 2, $Ev->getDetail()->getLocation(), 0, 1);
                     $addr_line = 4;
                 }
                 if (!empty($address)) {
-                    if ($Ev->Detail->location == '') {
+                    if ($Ev->getDetail()->getLocation() == '') {
                         $pdf->Ln(5);
                         $pdf->Cell(0, 2, $LANG_EVLIST['where'] . ': ', 0, 0);
                     }
@@ -517,7 +653,7 @@ class Ticket
                 $pdf->setFont('Times', 'I', 10);
                 $pdf->Cell(0,10, $_CONF['site_name'], 0, 0);
                 $pdf->Ln(6);
-                $pdf->Cell(0,10, $ticket->tic_id);
+                $pdf->Cell(0,10, $ticket->getID());
 
                 // print qrcode if possible
                 $params['data'] = $checkin_url . $tic_id . '&rp=' . $rp_id;
@@ -534,8 +670,12 @@ class Ticket
                 $pdf->Ln();
             }
         }
-        $pdf->Output();
-    }   // end func PrintTickets()
+        if ($tic_count > 0) {
+            $pdf->Output();
+        } else {
+            return false;
+        }
+    }   // end func _printTickets()
 
 
     /**
@@ -552,13 +692,13 @@ class Ticket
 
         $Rp = new Repeat($rp_id);
         // Verify that the current is an admin or event owner
-        if (!$Rp->Event->hasAccess(3)) {
+        if (!$Rp->getEvent()->hasAccess(3)) {
             return $retval;
         }
 
         // get the tickets, paid and unpaid.
         // $uid = 0 to export all
-        $tickets = self::getTickets($Rp->ev_id, $rp_id, 0);
+        $tickets = self::getTickets($Rp->getEventID(), $rp_id, 0);
 
         $header = array(
             $LANG_EVLIST['ticket_num'],
@@ -588,8 +728,8 @@ class Ticket
                 $ticket->paid,
                 $ticket->used > $ticket->dt ? $dt_used->toMySQL(true): '',
             );
-            if ($Rp->Event->options['max_rsvp'] > 0) {
-                $is_waitlisted = ($counter > $Rp->Event->options['max_rsvp']) ? 'Yes': 'No';
+            if ($Rp->getEvent()->getOption('max_rsvp') > 0) {
+                $is_waitlisted = ($counter > $Rp->getEvent()->getOption('max_rsvp')) ? 'Yes': 'No';
             } else {
                 $is_waitlisted = 'N/A';
             }
@@ -616,6 +756,13 @@ class Ticket
         // Check that the ticket hasn't already been used
         if ($this->used > 0) return 51;
         if ($this->fee > 0 && $this->paid < $this->fee) return 50;
+        $reg_cookie = EV_getVar($_COOKIE, 'evlist_register', 'array');
+        $code = EV_getVar($reg_cookie, $this->ev_id);
+        $auth = (int)DB_getItem('gl_evlist_checkin_auth', 'auth', "ev_id = '{$this->ev_id}' AND code = '$code'");
+        if ($auth != 1) {
+            echo "Unauthorized";
+            return 52;
+        }
 
         // Record the current timestamp in the DB
         $this->used = time();
@@ -735,7 +882,7 @@ class Ticket
 
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
                 SET paid = fee
-                WHERE ev_id = '$ev_id' AND uid = $uid";
+                WHERE ev_id = '$ev_id' AND uid = $uid AND paid=0";
         if ($rp_id > 0) $sql .= " AND rp_id = $rp_id";
         $sql .= " LIMIT $count";
         DB_query($sql);
@@ -899,34 +1046,34 @@ class Ticket
      * @param   integer $rp_id  Repeat ID being viewed or checked
      * @return  string          HTML for admin list
      */
-    function adminList_RSVP($rp_id)
+    public static function adminList_RSVP($rp_id)
     {
         global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
 
         USES_lib_admin();
         $Ev = \Evlist\Repeat::getInstance($rp_id);
-        if ($Ev->rp_id == 0) return '';
+        if ($Ev->getID() == 0) return '';
 
         $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                    tk.uid, tk.used, tt.description, tk.waitlist, u.fullname,
-                    {$Ev->Event->options['max_rsvp']} as max_rsvp
+                    tk.uid, tk.used, tt.dscp, tk.waitlist, u.fullname,
+                    {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
             FROM {$_TABLES['evlist_tickets']} tk
             LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
-                ON tt.id = tk.tic_type
+                ON tt.tt_id = tk.tic_type
             LEFT JOIN {$_TABLES['users']} u
                 ON u.uid = tk.uid
-            WHERE tk.ev_id = '{$Ev->Event->id}' ";
+            WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
 
         $title = $LANG_EVLIST['admin_rsvp'] .
             '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=printtickets&eid=' . $Ev->ev_id .
-            '" class="lgButton blue" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
+            '/index.php?view=printtickets&eid=' . $Ev->getEventID() .
+            '" class="uk-button uk-button-primary uk-button-small" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
             '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=exporttickets&eid=' . $Ev->rp_id .
-            '" class="lgButton blue">' . $LANG_EVLIST['export_list'] . '</a>';
+            '/index.php?view=exporttickets&eid=' . $Ev->getID() .
+            '" class="uk-button uk-button-primary uk-button-small">' . $LANG_EVLIST['export_list'] . '</a>';
 
-        if ($Ev->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
-            $sql .= " AND rp_id = '{$Ev->rp_id}' ";
+        if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
+            $sql .= " AND rp_id = '{$Ev->getID()}' ";
         }
 
         $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
@@ -979,29 +1126,19 @@ class Ticket
             'chkdelete' => true,
             'chkfield'  => 'tic_id',
             'chkname'   => 'delrsvp',
-            'chkactions' => COM_createLink(
-                $_EV_CONF['icons']['delete'],
-                '!#',
-                array(
-                    'data-uk-tooltip' => '',
-                    'name' => 'tickdelete',
-                    'style' => '"vertical-align:text-bottom;',
-                    'title' => $LANG_ADMIN['delete'],
-                    'onclick' => "return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                )
-            ) . '&nbsp;' . $LANG_ADMIN['delete'] . '&nbsp;&nbsp;' .
-            COM_createLink(
-                $_EV_CONF['icons']['reset'],
-                '!#',
-                array(
-                    'data-uk-tooltip' => '',
-                    'name' => 'tickreset',
-                    'style' => '"vertical-align:text-bottom;',
-                    'title' => $LANG_ADMIN['reset_usage'],
-                    'onclick' => "return confirm('{$LANG_EVLIST['conf_reset']}');",
-                )
-            ) . '&nbsp;' . $LANG_EVLIST['reset_usage'] .
-            '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
+            'chkactions' =>
+                '<button type="submit" '
+                . 'class="uk-button uk-button-mini uk-button-danger" '
+                . 'onclick="return confirm(\'' . $LANG_EVLIST['conf_del_item'] . '\');" '
+                . 'name="tickdelete">' . $LANG_ADMIN['delete'] . '</button>'
+                . '&nbsp;&nbsp;<button type="submit" '
+                . 'class="uk-button uk-button-mini" '
+                . 'onclick="return confirm(\'' . $LANG_EVLIST['conf_reset'] . '\');" '
+                . 'name="tickreset">' . $LANG_EVLIST['reset_usage'] . '</button>'
+                . '&nbsp;&nbsp;<button type="submit" '
+                . 'class="uk-button uk-button-mini uk-button-primary" '
+                . 'name="tickprint">' . $LANG_EVLIST['print'] . '</button>'
+                . '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
         );
 
         $query_arr = array(
@@ -1026,7 +1163,7 @@ class Ticket
      * @param   array   $icon_arr       Handy array of icon images
      * @return  string                  Field value formatted for display
      */
-    function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
     {
         global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
 
@@ -1064,6 +1201,25 @@ class Ticket
             break;
         }
         return $retval;
+    }
+
+
+    /**
+     * Create a random token string for this order to allow anonymous users
+     * to view the order from an email link.
+     *
+     * @return  string      Token string
+     */
+    public static function createToken($len=13)
+    {
+        if (function_exists('random_bytes')) {
+            $bytes = random_bytes(ceil($len / 2));
+        } elseif (function_exists("openssl_random_pseudo_bytes")) {
+            $bytes = openssl_random_pseudo_bytes(ceil($len / 2));
+        } else {
+            $bytes = md5(time() . rand(1,1000));
+        }
+        return substr(bin2hex($bytes), 0, $len);
     }
 
 }   // class Ticket

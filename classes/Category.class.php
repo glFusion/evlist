@@ -3,7 +3,7 @@
  * Class to manage categories.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
  * @version     v1.4.1
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -12,19 +12,28 @@
  */
 namespace Evlist;
 
+
 /**
  * Class for categories.
  * @package evlist
  */
 class Category
 {
-    /** Properties accessed via `__set()` and `__get()`.
-     * @var array */
-    var $properties = array();
-
     /** Indicator that this is a new record.
      * @var boolean */
-    var $isNew;
+    private $isNew = true;
+
+    /** Category record ID.
+     * @var integer */
+    private $cat_id = 0;
+
+    /** Category enabled status.
+     * @var boolean */
+    private $cat_status = 1;
+
+    /** Category name.
+     * @var string */
+    private $cat_name = '';
 
 
     /**
@@ -43,7 +52,7 @@ class Category
         $this->isNew = true;
 
         if (is_array($cat_id)) {
-            $this->SetVars($cat_id);
+            $this->setVars($cat_id);
             $this->isNew = false;
         } else if ($this->cat_id > 0) {
             $this->Read($this->cat_id);
@@ -74,49 +83,55 @@ class Category
             return false;
         } else {
             $row = DB_fetchArray($result, false);
-            $this->SetVars($row, true);
+            $this->setVars($row, true);
             return true;
         }
     }
 
 
     /**
-     * Set a property's value.
+     * Get the category record ID
      *
-     * @param   $key    Name of property
-     * @param   $value  Value to set
+     * @return  integer     Record ID
      */
-    public function __set($key, $value)
+    public function getID()
     {
-        switch ($key) {
-        case 'cat_id':
-            $this->properties[$key] = (int)$value;
-            break;
-
-        case 'cat_status':
-            $this->properties[$key] = $value == 1 ? 1 : 0;
-            break;
-
-        case 'cat_name':
-            $this->properties[$key] = trim($value);
-            break;
-        }
+        return (int)$this->cat_id;
     }
 
 
     /**
-     * Get the value of a property.
+     * Get the category status.
      *
-     * @param   string  $key    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
+     * @return  intetger    1 if enabled, 2 if disabled
      */
-    public function __get($key)
+    public function getStatus()
     {
-        if (array_key_exists($key, $this->properties)) {
-            return $this->properties[$key];
-        } else {
-            return NULL;
-        }
+        return (int)$this->cat_status;
+    }
+
+
+    /**
+     * Set the category name.
+     *
+     * @param   string  $name   Category name
+     * @return  object  $this
+     */
+    public function setName($name)
+    {
+        $this->cat_name = $name;
+        return $this;
+    }
+
+
+    /**
+     * Get the category name.
+     *
+     * @return  string      Category name
+     */
+    public function getName()
+    {
+        return $this->cat_name;
     }
 
 
@@ -125,11 +140,11 @@ class Category
      *
      * @param   array   $A      Array of fields
      */
-    public function SetVars($A)
+    public function setVars($A)
     {
-        $this->cat_id = isset($A['id']) ? $A['id'] : 0;
+        $this->cat_id = isset($A['id']) ? (int)$A['id'] : 0;
         $this->cat_name = $A['name'];
-        $this->cat_status = isset($A['status'])? $A['status'] : 0;
+        $this->cat_status = isset($A['status'])? (int)$A['status'] : 0;
     }
 
 
@@ -166,7 +181,7 @@ class Category
         global $_TABLES, $_EV_CONF;
 
         if (is_array($A) && !empty($A)) {
-            $this->SetVars($A);
+            $this->setVars($A);
         }
 
         if ($this->cat_id > 0) {
@@ -303,9 +318,9 @@ class Category
         $Cats = self::getAll();
         $retval = '';
         foreach ($Cats as $Cat) {
-            if (!$Cat->cat_status) continue;
-            $sel = $selected == $Cat->cat_id ? 'selected="selected"' : '';
-            $retval .= "<option value=\"{$Cat->cat_id}\" $sel>{$Cat->cat_name}</option>" . LB;
+            if (!$Cat->getStatus()) continue;
+            $sel = $selected == $Cat->getID() ? 'selected="selected"' : '';
+            $retval .= "<option value=\"{$Cat->getID()}\" $sel>{$Cat->getName()}</option>" . LB;
         }
         return $retval;
     }

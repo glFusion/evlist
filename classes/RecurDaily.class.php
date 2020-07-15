@@ -17,9 +17,8 @@ namespace Evlist;
  * Class to handle daily recurrences.
  * @package evlist
  */
-class RecurDaily extends Recur
+class RecurDaily extends Recurrence
 {
-
     /**
      * Increment the given date according to the frequency value.
      *

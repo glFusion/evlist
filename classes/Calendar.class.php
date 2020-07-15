@@ -24,7 +24,64 @@ class Calendar
 
     /** Flag to indicate a new record.
      * @var boolean */
-    public $isNew;
+    private $isNew = true;
+
+    /** Calendar record ID.
+     * @var integer */
+    private $cal_id = 0;
+
+    /** Owner permission.
+     * @var integer */
+    private $perm_owner = 3;
+
+    /** Group permission.
+     * Indicates who can submit events to this calendar, not editing the calendar.
+     * @var integer */
+    private $perm_group = 3;
+
+    /** Site member permission.
+     * @var integer */
+    private $perm_members = 2;  // view only by default
+
+    /** Anonymous user permission.
+     * @var integer */
+    private $perm_anon = 2;     // view only by default
+
+    /** Calendar owner user ID.
+     * @var integer */
+    private $owner_id = 2;      // Root by default
+
+    /** Calendar group ID, for group permission.
+     * @var integer */
+    private $group_id = 13;     // logged-in users
+
+    /** Calendar sort order for display.
+     * @var integer */
+    private $orderby = 9999;
+
+    /** Calendar enabled status.
+     * @var boolean */
+    private $cal_status = 1;
+
+    /** Enable Ical subscription?
+     * @var boolean */
+    private $cal_ena_ical = 1;
+
+    /** Calendar descriptive name.
+     * @var string */
+    private $cal_name = '';
+
+    /** Foreground color.
+     * @var string */
+    private $fgcolor = '#000000';
+
+    /** Background color.
+     * @var string */
+    private $bgcolor = '#FFFFFF';
+
+    /** Icon name. Just the unique portion from the UIkit icon set.
+     * @var string */
+    private $cal_icon = '';
 
 
     /**
@@ -42,26 +99,16 @@ class Calendar
             $this->setVars($calendar, true);
         } elseif ($calendar != 0) {
             // Have a calendar ID to read
-            $this->cal_id = $calendar;
+            $this->cal_id = (int)$calendar;
             if ($this->Read())
                 $this->isNew = false;
         } else {
-            // Default, create an empty object
-            $this->cal_id = 0;
-            $this->isNew = true;
-            $this->fgcolor = '#000000';
-            $this->bgcolor = '#FFFFFF';
-            $this->cal_name = '';
+            // Default, set perms from configuration.
             $this->perm_owner   = $_EV_CONF['default_permissions'][0];
             $this->perm_group   = $_EV_CONF['default_permissions'][1];
             $this->perm_members = $_EV_CONF['default_permissions'][2];
             $this->perm_anon    = $_EV_CONF['default_permissions'][3];
             $this->owner_id     = $_USER['uid'];
-            $this->group_id     = 13;
-            $this->cal_status   = 1;
-            $this->cal_ena_ical = 1;
-            $this->cal_icon     = '';
-            $this->orderby      = 9999;
         }
     }
 
@@ -103,7 +150,7 @@ class Calendar
             return false;
         } else {
             $row = DB_fetchArray($result, false);
-            $this->SetVars($row, true);
+            $this->setVars($row, true);
             return true;
         }
     }
@@ -115,7 +162,7 @@ class Calendar
      * @param   string  $key    Property name
      * @param   mixed   $value  Value to set
      */
-    public function __set($key, $value)
+    public function X__set($key, $value)
     {
         switch ($key) {
         case 'cal_id':
@@ -150,7 +197,7 @@ class Calendar
      * @param   string  $key    Name of property to retrieve.
      * @return  mixed           Value of property, NULL if undefined.
      */
-    public function __get($key)
+    public function X__get($key)
     {
         if (array_key_exists($key, $this->properties)) {
             return $this->properties[$key];
@@ -161,12 +208,60 @@ class Calendar
 
 
     /**
+     * See if the Ical subscription is enabled.
+     *
+     * @return  boolean     True if enabled, False if not
+     */
+    public function isIcalEnabled()
+    {
+        return $this->cal_ena_ical ? 1 : 0;
+    }
+
+
+    /**
+     * Get the calendar record ID.
+     *
+     * @return  integer     Calendar ID
+     */
+    public function getID()
+    {
+        return (int)$this->cal_id;
+    }
+
+
+    /**
+     * Get the calendar decriptive name.
+     *
+     * @return  string      Calendar name
+     */
+    public function getName()
+    {
+        return $this->cal_name;
+    }
+
+
+    /**
+     * Check the current users's access to this calendar.
+     *
+     * @return  integer     3 for read/edit 2 for read only 0 for no access
+     */
+    public function getSecAccess()
+    {
+        return SEC_hasAccess(
+            $this->owner_id, $this->group_id,
+            $this->perm_owner, $this->perm_group,
+            $this->perm_members, $this->perm_anon
+        );
+    }
+
+
+    /**
      * Set the value of all variables from an array, either DB or a form.
      *
      * @param   array   $A      Array of fields
      * @param   boolean $fromDB True if $A is from the database, false for form
      */
-    public function SetVars($A, $fromDB=false)
+    public function setVars($A, $fromDB=false)
     {
         if (isset($A['cal_id']) && !empty($A['cal_id']))
             $this->cal_id = $A['cal_id'];
@@ -281,8 +376,9 @@ class Calendar
     {
         global $_TABLES, $_EV_CONF;
 
-        if (is_array($A) && !empty($A))
-            $this->SetVars($A);
+        if (is_array($A) && !empty($A)) {
+            $this->setVars($A);
+        }
 
         if ($this->cal_id != 0) {
             $this->isNew = false;
@@ -636,6 +732,17 @@ class Calendar
             DB_query($sql);
             self::reOrder();
         }
+    }
+
+
+    /**
+     * Get the icon for the calendar, if any.
+     *
+     * @return  string      Calendar icon name
+     */
+    public function getIcon($style='')
+    {
+        return $this->cal_icon;
     }
 
 

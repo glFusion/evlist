@@ -699,6 +699,8 @@ class DateFunc
      */
     public static function weeksInMonth($month=0, $year=0)
     {
+        global $_CONF;
+
         list($day, $month, $year) = self::validateParams(1, $month, $year);
 
         // Set $dt to the beginning of the month and get the ISO week where it falls.

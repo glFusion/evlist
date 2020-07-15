@@ -20,19 +20,79 @@ class Repeat
 {
     /** Property fields accessed via `__set()` and `__get()`.
      * @var array */
-    var $properties = array();
+    //var $properties = array();
+
+    /** Event record ID.
+     * @var string */
+    private $ev_id = '';
+
+    /** Repeat record ID.
+     * @var integer */
+    private $rp_id = 0;
+
+    /** Detail record ID.
+     * @var integer */
+    private $det_id = 0;
+
+    /** User ID.
+     * @var integer */
+    private $uid = 0;
+
+    /** Starting date.
+     * @var string */
+    private $date_start = '';
+
+    /** Ending date.
+     * @var string */
+    private $date_end = '';
+
+    /** Timezone ID.
+     * @var string */
+    private $tzid = '';
+
+    /** First starting time.
+     * @var string */
+    private $time_start1 = '00:00:00';
+
+    /** First ending time.
+     * @var string */
+    private $time_end1 = '23:59:59';
+
+    /** Second starting time, for split events.
+     * @var string */
+    private $time_start2 = '00:00:00';
+
+    /** Second ending time, for split events.
+     * @var string */
+    private $time_end2 = '23:59:59';
+
+    /** First starting date/time object.
+     * @var object */
+    private $dtStart1 = NULL;
+
+    /** First ending date/time object.
+     * @var object */
+    private $dtEnd1 = NULL;
+
+    /** Second starting date/time object, for split events.
+     * @var object */
+    private $dtStart2 = NULL;
+
+    /** Second ending date/time object, for split events.
+     * @var object */
+    private $dtEnd2 = NULL;
 
     /** Associated event.
      * @var object */
-    var $Event;
+    private $Event = NULL;
 
     /** Associated event detail (title, location, summary, etc.
      * @var object */
-    var $Detail;
+    private $Detail = NULL;
 
     /** Indicate if admin access is granted to this event/repeat.
      * @var boolean */
-    public $isAdmin;
+    private $isAdmin = false;
 
 
     /**
@@ -46,21 +106,10 @@ class Repeat
     {
         global $_USER, $_CONF;
 
-        if ($rp_id == 0) {
-            $this->rp_id = 0;
-            $this->ev_id = '';
-            $this->det_id = 0;
-            $this->date_start = '';
-            $this->date_end = '';
-            $this->time_start1 = '';
-            $this->time_end1 = '';
-            $this->time_start2 = '';
-            $this->time_end2 = '';
-            $this->tzid = 'local';
-        } else {
-            $this->rp_id = $rp_id;
+        if ($rp_id > 0) {
+            $this->rp_id = (int)$rp_id;
             if (!$this->Read()) {
-                $this->rp_id = '';
+                $this->rp_id = 0;
             } else {
                 // This gets used a few places, so save on function calls.
                 $this->isAdmin = plugin_ismoderator_evlist();
@@ -90,7 +139,7 @@ class Repeat
                 $tags = array(
                     'events',
                     'repeats',
-                    'event_' . $repeats[$rp_id]->rp_ev_id,
+                    'event_' . $repeats[$rp_id]->getEventID(),
                 );
                 Cache::set($key, $repeats[$rp_id], $tags);
             }
@@ -105,7 +154,7 @@ class Repeat
      * @param   string  $var    Name of property to set.
      * @param   mixed   $value  New value for property.
      */
-    public function __set($var, $value='')
+    public function X__set($var, $value='')
     {
         global $_USER, $_CONF;
 
@@ -156,7 +205,7 @@ class Repeat
      * @param   string  $var    Name of property to retrieve.
      * @return  mixed           Value of property, NULL if undefined.
      */
-    public function __get($var)
+    public function X__get($var)
     {
         switch($var) {
         case 'use_tz':
@@ -175,20 +224,73 @@ class Repeat
 
 
     /**
+     * Set the first starting date/time object.
+     *
+     * @param   string  $dt_tm  MySQL-formatted datetime string
+     * @return  object  $this
+     */
+    private function setDateStart1($dt_tm)
+    {
+        global $_CONF;
+        $this->dtStart1 = new \Date($dt_tm, $_CONF['timezone']);
+    }
+
+
+    /**
+     * Set the first ending date/time object.
+     *
+     * @param   string  $dt_tm  MySQL-formatted datetime string
+     * @return  object  $this
+     */
+    private function setDateEnd1($dt_tm)
+    {
+        global $_CONF;
+        $this->dtEnd1 = new \Date($dt_tm, $_CONF['timezone']);
+    }
+
+
+    /**
+     * Set the second starting date/time object.
+     *
+     * @param   string  $dt_tm  MySQL-formatted datetime string
+     * @return  object  $this
+     */
+    private function setDateStart2($dt_tm)
+    {
+        global $_CONF;
+        $this->dtStart2 = new \Date($dt_tm, $_CONF['timezone']);
+    }
+
+
+    /**
+     * Set the second ending date/time object.
+     *
+     * @param   string  $dt_tm  MySQL-formatted datetime string
+     * @return  object  $this
+     */
+    private function setDateEnd2($dt_tm)
+    {
+        global $_CONF;
+        $this->dtEnd2 = new \Date($dt_tm, $_CONF['timezone']);
+    }
+
+
+    /**
      * Sets all variables to the matching values from $rows.
      *
      * @param   array   $row        Array of values, from DB or $_POST
      * @param   boolean $fromDB     True if read from DB, false if from $_POST
      */
-    public function SetVars($row, $fromDB=false)
+    public function setVars($row, $fromDB=false)
     {
         if (!is_array($row)) return;
 
-        $fields = array('ev_id', 'det_id',
-                'date_start', 'date_end',
-                'time_start1', 'time_end1',
-                'time_start2', 'time_end2',
-                );
+        $fields = array(
+            'ev_id', 'det_id',
+            'date_start', 'date_end',
+            'time_start1', 'time_end1',
+            'time_start2', 'time_end2',
+        );
         foreach ($fields as $field) {
             if (isset($row['rp_' . $field])) {
                 $this->$field = $row['rp_' . $field];
@@ -198,9 +300,9 @@ class Repeat
         if ($fromDB) {      // Read from the database
 
             // dates are YYYY-MM-DD
-            list($startyear, $startmonth, $startday) = explode('-', $row['rp_date_start']);
+            /*list($startyear, $startmonth, $startday) = explode('-', $row['rp_date_start']);
             list($endyear, $endmonth, $endday) = explode('-', $row['rp_date_end']);
-
+             */
         } else {            // Coming from the form
 
             $this->date_start = $row['date_start1'];
@@ -213,25 +315,43 @@ class Repeat
                 $this->time_start2 = NULL;
                 $this->time_end2 = NULL;
             } else {
-                $tmp = DateFunc::conv12to24($row['starthour1'], $row['start1_ampm']);
-                $this->time_start1 = sprintf('%02d:%02d:00',
-                    $tmp, $row['startminute1']);
+                $this->time_start1 = $row['time_start1'];
+                $this->time_end1 = $row['time_end1'];
+                /*$tmp = DateFunc::conv12to24($row['starthour1'], $row['start1_ampm']);
+                $this->time_start1 = sprintf(
+                    '%02d:%02d:00',
+                    $tmp,
+                    $row['startminute1']
+                );
                 $tmp = DateFunc::conv12to24($row['endhour1'], $row['end1_ampm']);
-                $this->time_end1 = sprintf('%02d:%02d:00',
-                    $tmp, $row['endminute1']);
+                $this->time_end1 = sprintf(
+                    '%02d:%02d:00',
+                    $tmp,
+                    $row['endminute1']
+                );*/
                 if (isset($row['split']) && $row['split'] == '1') {
-                    $tmp = DateFunc::conv12to24($row['starthour2'], $row['start2_ampm']);
-                    $this->time_start2 = sprintf('%02d:%02d:00',
-                        $tmp, $row['startminute1']);
+                    $this->time_start2 = $row['time_start2'];
+                    $this->time_end2 = $row['time_end2'];
+                    /*$tmp = DateFunc::conv12to24($row['starthour2'], $row['start2_ampm']);
+                    $this->time_start2 = sprintf(
+                        '%02d:%02d:00',
+                        $tmp,
+                        $row['startminute1']
+                    );
                     $tmp = DateFunc::conv12to24($row['endhour2'], $row['end2_ampm']);
-                    $this->time_end2 = sprintf('%02d:%02d:00',
-                        $tmp, $row['endminute2']);
+                    $this->time_end2 = sprintf(
+                        '%02d:%02d:00',
+                        $tmp,
+                        $row['endminute2']
+                    );*/
                 } else {
                     $this->time_start2 = NULL;
                     $this->time_end2   = NULL;
                 }
             }
         }
+        $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
+        $this->setDateEnd1($this->date_start . ' ' . $this->time_end1);
     }
 
 
@@ -246,7 +366,7 @@ class Repeat
         global $_TABLES;
 
         if ($rp_id != 0) {
-            $this->rp_id = $rp_id;
+            $this->rp_id = (int)$rp_id;
         }
 
         $sql = "SELECT *
@@ -258,7 +378,7 @@ class Repeat
         } else {
             $A = DB_fetchArray($result, false);
             $this->ev_id        = $A['rp_ev_id'];
-            $this->det_id       = $A['rp_det_id'];
+            $this->det_id       = (int)$A['rp_det_id'];
             $this->date_start   = $A['rp_date_start'];
             $this->date_end     = $A['rp_date_end'];
             $this->time_start1  = $A['rp_time_start1'];
@@ -266,10 +386,10 @@ class Repeat
             $this->time_start2  = $A['rp_time_start2'];
             $this->time_end2    = $A['rp_time_end2'];
             // This is used by Reminders so make sure it's set:
-            $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
+            $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
 
             $this->Event = Event::getInstance($this->ev_id, $this->det_id);
-            $this->tzid = $this->Event->tzid;
+            $this->tzid = $this->Event->getTZID();
             return true;
         }
     }
@@ -288,7 +408,11 @@ class Repeat
         if ($rp_id > 0) {
             $this->Read($rp_id);
         }
-        return $this->Event->Edit($this->ev_id, $this->rp_id, 'save' . $edit_type);
+        return $this->Event->Edit(
+            $this->ev_id,
+            $this->rp_id,
+            'save' . $edit_type
+        );
     }
 
 
@@ -308,19 +432,19 @@ class Repeat
         global $_TABLES;
 
         if (is_array($A)) {
-            $this->SetVars($A);
+            $this->setVars($A);
         }
 
         if ($this->rp_id > 0) {
             // Update this repeat's detail record if there is one.  Otherwise
             // create a new one.
-            if ($this->det_id != $this->Event->det_id) {
+            if ($this->det_id != $this->Event->getDetailID()) {
                 $D = new Detail($this->det_id);
             } else {
                 $D = new Detail();
             }
-            $D->SetVars($A);
-            $D->ev_id = $this->ev_id;
+            $D->setVars($A);
+            $D->setEventID($this->ev_id);
             $this->det_id = $D->Save();
             $date_start = DB_escapeString($this->date_start);
             $date_end = DB_escapeString($this->date_end);
@@ -328,7 +452,7 @@ class Repeat
             $time_start2 = DB_escapeString($this->time_start2);
             $time_end1 = DB_escapeString($this->time_end1);
             $time_end2 = DB_escapeString($this->time_end2);
-            $t_end = $this->Event->split ? $time_end2 : $time_end1;
+            $t_end = $this->Event->isSplit() ? $time_end2 : $time_end1;
             $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
                 rp_date_start = '$date_start',
                 rp_date_end= '$date_end',
@@ -341,6 +465,7 @@ class Repeat
                 rp_det_id='" . (int)$this->det_id . "'
             WHERE rp_id='{$this->rp_id}'";
             DB_query($sql);
+            Cache::clear();
         }
     }
 
@@ -360,8 +485,9 @@ class Repeat
         }
 
         // If we have our own detail record, then delete it also
-        if ($this->det_id != $this->Event->det_id)
-            $this->Event->Detail->Delete();
+        if ($this->det_id != $this->Event->getDetailID()) {
+            $this->Event->getDetail()->Delete();
+        }
 
         DB_delete($_TABLES['evlist_repeat'], 'rp_id', $this->rp_id);
         Cache::clear();
@@ -420,67 +546,66 @@ class Repeat
         ) );
 
         USES_lib_social();
-        $permalink = COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $this->Event->id);
-        //$ss = SOC_getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+        $permalink = COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $this->Event->getID());
         $ss = $this->getShareIcons($permalink);
+
+        $Detail = $this->Event->getDetail();
         // If plain text then replace newlines with <br> tags
-        if ($this->Event->postmode == '1') {       //plaintext
-            $this->Event->Detail->summary = nl2br($this->Event->Detail->summary);
-            $this->Event->Detail->full_description = nl2br($this->Event->Detail->full_description);
-            $this->Event->Detail->location = nl2br($this->Event->Detail->location);
+        $summary = $Detail->getSummary();
+        $full_description = $Detail->getDscp();
+        $location = $Detail->getLocation();
+        if ($this->Event->getPostMode() == '1') {       //plaintext
+            $summary = nl2br($summary);
+            $full_description = nl2br($summary);
+            $location = nl2br($summary);
         }
-        $title = $this->Event->Detail->title;
-        if ($this->postmode != 'plaintext') {
-            $summary = PLG_replaceTags($this->Event->Detail->summary);
-            $fulldescription = PLG_replaceTags($this->Event->Detail->full_description);
-            $location = $this->Event->Detail->location != '' ?
-                PLG_replaceTags($this->Event->Detail->location) : '';
-        } else {
-            $summary = $this->Event->Detail->summary;
-            $fulldescription = $this->Event->Detail->full_description;
-            $location = $this->Event->Detail->location;
+        $title = $Detail->getTitle();
+        if ($this->Event->getPostmode() != 'plaintext') {
+            $summary = PLG_replaceTags($summary);
+            $full_description = PLG_replaceTags($full_description);
+            $location = $location != '' ? PLG_replaceTags($location) : '';
         }
         if ($query != '') {
             $title = COM_highlightQuery($title, $query);
             if (!empty($summary)) {
                 $summary  = COM_highlightQuery($summary, $query);
             }
-            if (!empty($fulldescription)) {
-                $fulldescription = COM_highlightQuery($fulldescription, $query);
+            if (!empty($full_description)) {
+                $full_description = COM_highlightQuery($full_description, $query);
             }
             if (!empty($location)) {
                 $location = COM_highlightQuery($location, $query);
             }
         }
-        $this->dtStart1 = $this->date_start . ' ' . $this->time_start1;
-        $this->dtEnd1 = $this->date_end . ' ' . $this->time_end1;
-        $date_start = $this->dtStart1->format($_CONF['dateonly'], $this->use_tz);
-        $date_end = $this->dtEnd1->format($_CONF['dateonly'], $this->use_tz);
+        $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
+        $this->setDateEnd1($this->date_end . ' ' . $this->time_end1);
+        $date_start = $this->dtStart1->format($_CONF['dateonly'], true);
+        $date_end = $this->dtEnd1->format($_CONF['dateonly'], true);
         $time_start1 = '';
         $time_end1 = '';
         $time_start2 = '';
         $time_end2 = '';
         if ($date_end == $date_start) $date_end = '';
-        if ($this->Event->allday == '1') {
+        if ($this->Event->isAllDay()) {
             $allday = '<br />' . $LANG_EVLIST['all_day_event'];
         } else {
             $allday = '';
             if ($this->time_start1 != '') {
-                $time_start1 = $this->dtStart1->format($_CONF['timeonly'], $this->use_tz);
-                $time_end1 =  $this->dtEnd1->format($_CONF['timeonly'], $this->use_tz);
+                $time_start1 = $this->dtStart1->format($_CONF['timeonly'], true);
+                $time_end1 =  $this->dtEnd1->format($_CONF['timeonly'], true);
             }
             //$time_period = $time_start . $time_end;
-            if ($this->Event->split == '1') {
-                $this->dtStart2 = $this->date_start . ' ' . $this->time_start2;
-                $this->dtEnd2 = $this->date_start . ' ' . $this->time_end2;
-                $time_start2 = $this->dtStart2->format($_CONF['timeonly'], $this->use_tz);
-                $time_end2 = $this->dtEnd2->format($_CONF['timeonly'], $this->use_tz);
+            if ($this->Event->isSplit()) {
+                $this->setDateStart2($this->date_start . ' ' . $this->time_start2);
+                $this->setDateEnd2($this->date_start . ' ' . $this->time_end2);
+                $time_start2 = $this->dtStart2->format($_CONF['timeonly'], true);
+                $time_end2 = $this->dtEnd2->format($_CONF['timeonly'], true);
             }
         }
 
         // Get the link to more info. If it's an external link, target a
         // new browser window.
-        $url = $this->Event->Detail->url;
+        $url = $Detail->getUrl();
         if (!empty($url)) {
             $url = str_replace('%site_url%', $_CONF['site_url'], $url);
             if (strncasecmp($_CONF['site_url'], $url, strlen($_CONF['site_url']))) {
@@ -492,16 +617,18 @@ class Repeat
         } else {
             $more_info_link = '';
         }
-        $street = $this->Event->Detail->street;
-        $city = $this->Event->Detail->city;
-        $province = $this->Event->Detail->province;
-        $postal = $this->Event->Detail->postal;
-        $country = $this->Event->Detail->country;
+        $street = $Detail->getStreet();
+        $city = $Detail->getCity();
+        $province = $Detail->getProvince();
+        $postal = $Detail->getPostal();
+        $country = $Detail->getCountry();
 
         // Now get the text description of the recurring interval, if any
-        if ($this->Event->recurring &&
-                $this->Event->rec_data['type'] < EV_RECUR_DATES) {
-            $rec_data = $this->Event->rec_data;
+        if (
+            $this->Event->getRecurring() &&
+            $this->Event->getRecData()['type'] < EV_RECUR_DATES
+        ) {
+            $rec_data = $this->Event->getRecData();
             $rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
                 $this->Event->RecurDescrip();
             switch ($rec_data['type']) {
@@ -528,11 +655,15 @@ class Repeat
                     $days_text);
                 break;
             }
-            if ($this->Event->rec_data['stop'] != '' &&
-                $this->Event->rec_data['stop'] < EV_MAX_DATE) {
-                $stop_date = new \Date($this->Event->rec_data['stop'], $this->tzid);
-                $rec_string .= ' ' . sprintf($LANG_EVLIST['recur_stop_desc'],
-                    $stop_date->format($_CONF['dateonly'], $this->use_tz));
+            if (
+                $this->Event->getRecData()['stop'] != '' &&
+                $this->Event->getRecData()['stop'] < EV_MAX_DATE
+            ) {
+                $stop_date = new \Date($this->Event->getRecData()['stop'], $this->tzid);
+                $rec_string .= ' ' . sprintf(
+                    $LANG_EVLIST['recur_stop_desc'],
+                    $stop_date->format($_CONF['dateonly'], true)
+                );
             }
         } else {
             $rec_string = '';
@@ -540,12 +671,12 @@ class Repeat
 
         $T->set_var(array(
             'pi_url' => EVLIST_URL,
-            'webcal_url' => preg_replace('/^https?/', 'webcal', EVLIST_URL),
+            'webcal_url' => EVLIST_URL,
             'rp_id'     => $this->rp_id,
             'ev_id'     => $this->ev_id,
             'title' => $title,
             'summary' => $summary,
-            'full_description' => $fulldescription,
+            'full_description' => $full_description,
             'can_edit' => $this->Event->canEdit() ? 'true' : '',
             'start_time1' => $time_start1,
             'end_time1' => $time_end1,
@@ -555,13 +686,13 @@ class Repeat
             'end_date' => $date_end,
             'start_datetime1' => $date_start . $time_start1,
             'end_datetime1' => $date_end . $time_end2,
-            'allday_event' => $this->Event->allday == 1 ? 'true' : '',
-            'is_recurring' => $this->Event->recurring,
-            'can_subscribe' => $this->Event->Calendar->cal_ena_ical,
+            'allday_event' => $this->Event->isAllDay() ? 'true' : '',
+            'is_recurring' => $this->Event->getRecurring(),
+            'can_subscribe' => $this->Event->getCalendar()->isIcalEnabled(),
             'recurring_event'    => $rec_string,
-            'owner_id'      => $this->Event->owner_id,
-            'cal_name'      => $this->Event->Calendar->cal_name,
-            'cal_id'        => $this->Event->cal_id,
+            'owner_id'      => $this->Event->getOwnerID(),
+            'cal_name'      => $this->Event->getCalendar()->getName(),
+            'cal_id'        => $this->Event->getCalendarID(),
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
             'more_info_link' => $more_info_link,
@@ -573,28 +704,74 @@ class Repeat
 
         $outputHandle = \outputHandler::getInstance();
         $outputHandle->addLink('canonical', $permalink, HEADER_PRIO_NORMAL);
-        $outputHandle->addMeta('property','og:site_name', urlencode($_CONF['site_name']), HEADER_PRIO_NORMAL);
-        $outputHandle->addMeta('property','og:locale', isset($LANG_LOCALE) ? $LANG_LOCALE : 'en_US', HEADER_PRIO_NORMAL);
-        $outputHandle->addMeta('property','og:title', $this->Event->Detail->title, HEADER_PRIO_NORMAL);
-        $outputHandle->addMeta('property','og:type', 'event', HEADER_PRIO_NORMAL);
-        $outputHandle->addMeta('property','og:url', $permalink, HEADER_PRIO_NORMAL);
-        $outputHandle->AddMeta('name', 'description', $this->Event->Detail->summary, HEADER_PRIO_NORMAL);
-        $outputHandle->AddMeta('property', 'og:description', $this->Event->Detail->summary, HEADER_PRIO_NORMAL);
+        $outputHandle->addMeta(
+            'property',
+            'og:site_name',
+            urlencode($_CONF['site_name']),
+            HEADER_PRIO_NORMAL
+        );
+        $outputHandle->addMeta(
+            'property',
+            'og:locale',
+            isset($LANG_LOCALE) ? $LANG_LOCALE : 'en_US',
+            HEADER_PRIO_NORMAL
+        );
+        $outputHandle->addMeta(
+            'property',
+            'og:title',
+            $Detail->getTitle(),
+            HEADER_PRIO_NORMAL
+        );
+        $outputHandle->addMeta(
+            'property',
+            'og:type',
+            'event',
+            HEADER_PRIO_NORMAL
+        );
+        $outputHandle->addMeta(
+            'property',
+            'og:url',
+            $permalink,
+            HEADER_PRIO_NORMAL
+        );
+        $outputHandle->AddMeta(
+            'name',
+            'description',
+            $Detail->getSummary(),
+            HEADER_PRIO_NORMAL
+        );
+        $outputHandle->AddMeta(
+            'property',
+            'og:description',
+            $Detail->getSummary(),
+            HEADER_PRIO_NORMAL
+        );
 
         // Show the user comments. Moderators and event owners can delete comments
-        if (plugin_commentsupport_evlist() && $this->Event->enable_comments > -1) {
+        if ($this->Event->commentsAllowed()) {
             USES_lib_comment();
-            $T->set_var('usercomments',
-                CMT_userComments($this->rp_id, $this->Event->Detail->title, 'evlist',
-                    $cmtorder, $cmtmode, 0, 1, false,
-                    (plugin_ismoderator_evlist() || $this->Event->owner_id == $_USER['uid']),
-                    $this->Event->enable_comments)
+            $T->set_var(
+                'usercomments',
+                CMT_userComments(
+                    $this->rp_id,
+                    $Detail->getTitle(),
+                    'evlist',
+                    $cmtorder,
+                    $cmtmode,
+                    0,
+                    1,
+                    false,
+                    (plugin_ismoderator_evlist() || $this->Event->getOwnerID() == $_USER['uid']),
+                    $this->Event->commentsEnabled()
+                )
             );
         }
 
-        if ($_EV_CONF['enable_rsvp'] == 1 &&
-                $this->Event->options['use_rsvp'] > 0) {
-            if (time() > $this->dtStart1->toUnix() - ((int)$this->Event->options['rsvp_cutoff'] * 86400)) {
+        if (
+            $_EV_CONF['enable_rsvp'] == 1 &&
+            $this->Event->getOption('use_rsvp') > 0
+        ) {
+            if (time() > $this->dtStart1->toUnix() - ((int)$this->Event->getOption('rsvp_cutoff') * 86400)) {
                 $past_cutoff = true;
             } else {
                 $past_cutoff = false;
@@ -612,24 +789,27 @@ class Repeat
                         'unregister_link' => 'true',
                         'num_free_reg' => $num_free_tickets,
                     ) );
-               }
+                }
 
                 // Show the registration link
-               if (     ($this->Event->options['max_rsvp'] == 0 ||
-                        $this->Event->options['rsvp_waitlist'] == 1 ||
-                        $this->Event->options['max_rsvp'] >
-                            $this->TotalRegistrations() )
-                        &&
-                        ($this->Event->options['max_user_rsvp'] == 0 ||
-                          $total_tickets < $this->Event->options['max_user_rsvp'] )
+                if (
+                    (
+                        $this->Event->getOption('max_rsvp') == 0 ||
+                        $this->Event->getOption('rsvp_waitlist') == 1 ||
+                        $this->Event->getOption('max_rsvp') > $this->TotalRegistrations()
+                    )
+                    &&
+                    (
+                        $this->Event->getOption('max_user_rsvp') == 0 ||
+                        $total_tickets < $this->Event->getOption('max_user_rsvp')
+                    )
                 ) {
                     $Ticks = TicketType::GetTicketTypes();
                     if (!empty($Ticks)) {
-                        if ($this->Event->options['max_user_rsvp'] > 0) {
+                        if ($this->Event->getOption('max_user_rsvp') > 0) {
                             $T->set_block('event', 'tickCntBlk', 'tcBlk');
                             $T->set_var('register_multi', true);
-                            $avail_tickets = $this->Event->options['max_user_rsvp'] -
-                                        $total_tickets;
+                            $avail_tickets = $this->Event->getOption('max_user_rsvp') - $total_tickets;
                             for ($i = 1; $i <= $avail_tickets; $i++) {
                                 $T->set_var('tick_cnt', $i);
                                 $T->parse('tcBlk', 'tickCntBlk', true);
@@ -638,7 +818,7 @@ class Repeat
                             $T->set_var('register_unltd', 'true');
                         }
                         $T->set_block('event', 'tickTypeBlk', 'tBlk');
-                        foreach ($this->Event->options['tickets'] as $tick_id=>$data) {
+                        foreach ($this->Event->getOption('tickets') as $tick_id=>$data) {
                             // Skip ticket types that may have been disabled
                             if (!array_key_exists($tick_id, $Ticks)) continue;
                             $status = LGLIB_invokeService(
@@ -650,14 +830,14 @@ class Repeat
                                     $pp_fmt_amt : COM_numberFormat($data['fee'], 2);
                             $T->set_var(array(
                                 'tick_type' => $tick_id,
-                                'tick_descr' => $Ticks[$tick_id]->description,
+                                'tick_descr' => $Ticks[$tick_id]->getDscp(),
                                 'tick_fee' => $data['fee'] > 0 ? $fmt_amt : 'FREE',
                             ) );
                             $T->parse('tBlk', 'tickTypeBlk', true);
                         }
                         $T->set_var(array(
                             'register_link' => 'true',
-                            'ticket_types_multi' => count($this->Event->options['tickets']) > 1 ? 'true' : '',
+                            'ticket_types_multi' => count($this->Event->getOption('tickets')) > 1 ? 'true' : '',
                         ) );
                     }
                 }
@@ -665,13 +845,15 @@ class Repeat
 
             // If ticket printing is enabled for this event, see if the
             // current user has any tickets to print.
-            if ($this->Event->options['rsvp_print'] > 0) {
-                $paid = $this->Event->options['rsvp_print'] == 1 ? 'paid' : '';
+            if ($this->Event->getOption('rsvp_print') > 0) {
+                $paid = $this->Event->getOption('rsvp_print') == 1 ? 'paid' : '';
                 $tickets = Ticket::GetTickets($this->ev_id, $this->rp_id, $this->uid, $paid);
                 if (count($tickets) > 0) {
+                    $tick_url = EVLIST_URL . "/tickets.php?ev_id={$this->ev_id}&rp_id={$this->rp_id}";
                     $T->set_var(array(
                         'have_tickets'  => 'true',
-                        'tic_rp_id' => $this->Event->options['use_rsvp'] == EV_RSVP_REPEAT ? $this->rp_id : 0,
+                        'ticket_url' => COM_buildUrl($tick_url),
+                        'tic_rp_id' => $this->Event->getOption('use_rsvp') == EV_RSVP_REPEAT ? $this->rp_id : 0,
                     ) );
                 }
             }
@@ -683,14 +865,19 @@ class Repeat
         }
 
         // Get coordinates for easy use in Weather and Locator blocks
-        $lat = $this->Event->Detail->lat;
-        $lng = $this->Event->Detail->lng;
+        $lat = $Detail->getLatitude();
+        $lng = $Detail->getLongitude();
 
         // Only process the location block if at least one element exists.
         // Don't want an empty block showing.
-        if (!empty($location) || !empty($street) ||
-            !empty($city) || !empty($province) || !empty($postal)) {
-            $T->set_var(array(
+        if (
+            !empty($location) ||
+            !empty($street) ||
+            !empty($city) ||
+            !empty($province) ||
+            !empty($postal)
+        ) {
+            /*$T->set_var(array(
                 'location' => $location,
                 'street' => $street,
                 'city' => $city,
@@ -698,30 +885,42 @@ class Repeat
                 'country' => $country,
                 'postal' => $postal,
             ) );
-            $T->parse('address_info', 'address');
+            $T->parse('address_info', 'address');*/
 
             // Get info from the Weather plugin, if configured and available
             // There has to be at least some location data for this to work.
             if ($_EV_CONF['use_weather']) {
                 // Try coordinates first, if present
                 if (!empty($lat) && !empty($lng)) {
-                    $loc = $lat . ',' . $lng;
+                    $loc = array(
+                        'lat' => $lat,
+                        'lng' => $lng,
+                    );
                 } else {
                     // The postal code works best, but not internationally.
                     // Try the regular address first.
                     if (!empty($city) && !empty($province)) {
-                        $loc = $city . ', ' . $province . ' ' . $country;
+                        $loc = array(
+                            'city' => $city,
+                            'province' => $province,
+                            'country' => $country,
+                        );
                     }
                     if (!empty($postal)) {
-                        $loc .= ' ' . $postal;
+                        $loc['postal'] = $postal;
                     }
                 }
                 $weather = '';
 
                 if (!empty($loc)) {
                     // Location info was found, get the weather
-                    LGLIB_invokeService('weather', 'embed',
-                        array('loc' => $loc), $weather, $svc_msg);
+                    $s = LGLIB_invokeService(
+                        'weather', 'embed',
+                        array(
+                            'loc' => $loc,
+                        ),
+                        $weather, $svc_msg
+                    );
                     if (!empty($weather)) {
                         // Weather info was found
                         $T->set_var('weather', $weather);
@@ -735,29 +934,29 @@ class Repeat
             $args = array(
                 'lat'   => $lat,
                 'lng'   => $lng,
-                'text'  => $this->Event->Detail->formatAddress(),
+                'text'  => $Detail->formatAddress(),
             );
             $status = LGLIB_invokeService('locator', 'getMap', $args, $map, $svc_msg);
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'map'   => $map,
-                    'lat'   => EVLIST_coord2str($this->Event->Detail->lat),
-                    'lng'   => EVLIST_coord2str($this->Event->Detail->lng),
+                    'lat'   => EVLIST_coord2str($Detail->getLatitude()),
+                    'lng'   => EVLIST_coord2str($Detail->getLongitude()),
                 ) );
             }
         }
 
         //put contact info here: contact, email, phone#
-        $name = $this->Event->Detail->contact != '' ?
-            COM_applyFilter($this->Event->Detail->contact) : '';
-        if ($this->Event->Detail->email != '') {
-            $email = COM_applyFilter($this->Event->Detail->email);
+        $name = $Detail->getContact() != '' ?
+            COM_applyFilter($Detail->getContact()) : '';
+        if ($Detail->getEmail() != '') {
+            $email = COM_applyFilter($Detail->getEmail());
             $email = EVLIST_obfuscate($email);
         } else {
             $email = '';
         }
-        $phone = $this->Event->Detail->phone != '' ?
-            COM_applyFilter($this->Event->Detail->phone) : '';
+        $phone = $Detail->getPhone() != '' ?
+            COM_applyFilter($Detail->getPhone()) : '';
 
         if (!empty($name) || !empty($email) || !empty($phone)) {
             $T->set_var(array(
@@ -803,10 +1002,15 @@ class Repeat
         }
 
         $hasReminder = 0;
-        if (!COM_isAnonUser() && $_EV_CONF['enable_reminders'] == '1' &&
-                $this->Event->enable_reminders == '1' &&
-                time() < strtotime("-".$_EV_CONF['reminder_days']." days",
-                    strtotime($this->date_start))) {
+        if (
+            !COM_isAnonUser() &&
+            $_EV_CONF['enable_reminders'] == '1' &&
+            $this->Event->remindersEnabled() &&
+            time() < strtotime(
+                "-".$_EV_CONF['reminder_days']." days",
+                strtotime($this->date_start)
+            )
+        ) {
             //form will not appear within XX days of scheduled event.
             $show_reminders = true;
 
@@ -818,9 +1022,9 @@ class Repeat
             $show_reminders = false;
         }
 
-        if ($this->Event->options['contactlink'] == 1 && $this->Event->owner_id > 1) {
+        if ($this->Event->getOption('contactlink') && $this->Event->getOwnerID() > 1) {
             $ownerlink = $_CONF['site_url'] . '/profiles.php?uid=' .
-                    $this->Event->owner_id;
+                    $this->Event->getOwnerID();
             $ownerlink = sprintf($LANG_EVLIST['contact_us'], $ownerlink);
         } else {
             $ownerlink = '';
@@ -833,16 +1037,17 @@ class Repeat
             'rp_id' => $this->rp_id,
             'eid' => $this->ev_id,
             'show_reminderform' => $show_reminders ? 'true' : '',
+            'address_info' =>$Detail->formatAddress(),
         ) );
 
         $tick_types = TicketType::GetTicketTypes();
         $T->set_block('event', 'registerBlock', 'rBlock');
-        if (is_array($this->Event->options['tickets'])) {
-            foreach ($this->Event->options['tickets'] as $tic_type=>$info) {
+        if (is_array($this->Event->getOption('tickets'))) {
+            foreach ($this->Event->getOption('tickets') as $tic_type=>$info) {
                 // Skip ticket types that may have been disabled
                 if (!array_key_exists($tic_type, $tick_types)) continue;
                 $T->set_var(array(
-                    'tic_description' => $tick_types[$tic_type]->description,
+                    'tic_description' => $tick_types[$tic_type]->getDscp(),
                     'tic_fee' => COM_numberFormat($info['fee'], 2),
                 ) );
                 $T->parse('rBlock', 'registerBlock', true);
@@ -850,9 +1055,11 @@ class Repeat
         }
 
         // Show the "manage reservations" link to the event owner
-        if ($_EV_CONF['enable_rsvp'] == 1 &&
-                    $this->Event->options['use_rsvp'] > 0 &&
-                ($this->isAdmin || $this->Event->isOwner())) {
+        if (
+            $_EV_CONF['enable_rsvp'] == 1 &&
+            $this->Event->getOption('use_rsvp') > 0 &&
+            ($this->isAdmin || $this->Event->isOwner())
+        ) {
             $T->set_var(array(
                 'admin_rsvp'    => Ticket::adminList_RSVP($this->rp_id),
                 'rsvp_count'    => $this->TotalRegistrations(),
@@ -885,11 +1092,11 @@ class Repeat
         // Make sure that registrations are enabled and that the current user
         // has access to this event.  If $uid > 0, then this is an admin
         // registering another user, don't check access
-        if ($this->Event->options['use_rsvp'] == 0 ||
+        if ($this->Event->getOption('use_rsvp') == 0 ||
             ($uid == 0 && !$this->Event->hasAccess(2))) {
             COM_setMsg($LANG_EVLIST['messages'][20]);
             return 20;
-        } elseif ($this->Event->options['use_rsvp'] == 1) {
+        } elseif ($this->Event->getOption('use_rsvp') == 1) {
             // Registering for entire event, all repeats
             $rp_id = 0;
         } else {
@@ -897,14 +1104,14 @@ class Repeat
             $rp_id = $this->rp_id;
         }
 
-        if (!isset($this->Event->options['tickets'][$tick_type])) {
+        if (!isset($this->Event->getOption('tickets')[$tick_type])) {
             COM_setMsg($LANG_EVLIST['messages'][24]);
             return 24;
         }
 
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
         $num_attendees = (int)$num_attendees;
-        $fee = (float)$this->Event->options['tickets'][$tick_type]['fee'];
+        $fee = (float)$this->Event->getOption('tickets')[$tick_type]['fee'];
 
         // Check that the current user isn't already registered
         // TODO: Allow registrations up to max count, or to waitlist
@@ -915,9 +1122,9 @@ class Repeat
         // waitlisting is disabled
         $total_reg = $this->TotalRegistrations();
         $new_total = $total_reg + $num_attendees;
-        $max_rsvp = $this->Event->options['max_rsvp'];
+        $max_rsvp = $this->Event->getOption('max_rsvp');
         if ($max_rsvp > 0 && $max_rsvp < $new_total) {
-            if ($this->Event->options['rsvp_waitlist'] == 0 || $fee > 0) {
+            if ($this->Event->getOption('rsvp_waitlist') == 0 || $fee > 0) {
                 // Event is full, no waiting list. Can't waitlist paid tickets.
                 LGLIB_storeMessage($LANG_EVLIST['messages'][22]);
                 return 22;
@@ -944,11 +1151,14 @@ class Repeat
             $status = LGLIB_invokeService(
                 'shop', 'getURL',
                 array('type'=>'checkout'),
-                $url, $msg
+                $url,
+                $msg
             );
             if ($status == PLG_RET_OK) {
-                LGLIB_storeMessage(sprintf($LANG_EVLIST['messages']['26'],
-                    $url), '', true);
+                LGLIB_storeMessage(
+                    sprintf($LANG_EVLIST['messages']['26'],
+                    $url
+                ), '', true);
             }
         } else {
             LGLIB_storeMessage($LANG_EVLIST['messages'][24]);
@@ -956,7 +1166,7 @@ class Repeat
 
         // for free tickets, just create the ticket records
         $TickType = new TicketType($tick_type);
-        if ($TickType->event_pass) {
+        if ($TickType->isEventPass()) {
             $t_rp_id = 0;
         } else {
             $t_rp_id = $this->rp_id;
@@ -966,7 +1176,7 @@ class Repeat
             if ($max_rsvp > 0) {
                 $wl = ($total_reg + $i) <= $max_rsvp ? 0 : 1;
             }
-            Ticket::Create($this->Event->id, $tick_type, $t_rp_id, $fee, $uid, $wl);
+            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl);
         }
         return 0;
     }
@@ -988,18 +1198,19 @@ class Repeat
         $num = (int)$num;
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
         $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE
-                ev_id = '" . $this->Event->id . "'
+                ev_id = '" . $this->Event->getID() . "'
                 AND uid = $uid
                 AND fee = 0
                 ORDER BY waitlist,dt DESC";
         if ($num > 0) $sql .= " LIMIT $num";
         DB_query($sql, 1);
 
-        if ($this->Event->options['max_rsvp'] > 0 &&
-            $this->Event->options['rsvp_waitlist'] == 1) {
+        if (
+            $this->Event->getOption('max_rsvp') > 0 &&
+            $this->Event->getOption('rsvp_waitlist') == 1
+        ) {
             // for free tickets, just create the ticket records
-            $TickType = new TicketType($tick_type);
-            Ticket::resetWaitlist($this->Event->options['max_rsvp'], $this->ev_id, $this->rp_id);
+            Ticket::resetWaitlist($this->Event->getoption('max_rsvp'), $this->ev_id, $this->rp_id);
         }
         return DB_error() ? false : true;
     }
@@ -1027,7 +1238,7 @@ class Repeat
         }
         if (!isset($counter[$key][$uid])) {
             $sql = "SELECT count(*) AS c FROM {$_TABLES['evlist_tickets']}
-                    WHERE ev_id = '{$this->Event->id}'
+                    WHERE ev_id = '{$this->Event->getID()}'
                     AND (rp_id = 0 OR rp_id = {$this->rp_id})
                     AND uid = $uid";
             // check for fee = 0 if free_only is set
@@ -1057,7 +1268,7 @@ class Repeat
         if ($count === NULL) {
             if ($_EV_CONF['enable_rsvp'] != 1) {
                 $count = 0;
-            } elseif ($this->Event->options['use_rsvp'] == EV_RSVP_EVENT) {
+            } elseif ($this->Event->getOption('use_rsvp') == EV_RSVP_EVENT) {
                 $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $this->ev_id);
             } else {
                 $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $this->rp_id);
@@ -1083,13 +1294,13 @@ class Repeat
 
             // Check that registrations are enabled
             if ($_EV_CONF['enable_rsvp'] == 1 &&
-                    $this->Event->options['use_rsvp'] != 0) {
+                    $this->Event->getOption('use_rsvp') != 0) {
 
                 $sql = "SELECT uid, dt_reg
                         FROM {$_TABLES['evlist_tickets']}
                         WHERE ev_id = '{$this->ev_id}' ";
 
-                if ($this->Event->options['use_rsvp'] == EV_RSVP_REPEAT) {
+                if ($this->Event->getOption('use_rsvp') == EV_RSVP_REPEAT) {
                     $sql .= " AND rp_id = '{$this->rp_id}' ";
                 }
                 $sql .= ' ORDER BY dt_reg ASC';
@@ -1120,7 +1331,7 @@ class Repeat
             return false;
         }
 
-        if ($this->date_start <= $this->Event->date_start1) {
+        if ($this->date_start <= $this->Event->getStartDate1()) {
             // This is easy- we're deleting ALL repeats, so also
             // delete the event
             $this->Event->Delete();
@@ -1130,7 +1341,7 @@ class Repeat
                     FROM {$_TABLES['evlist_repeat']}
                     WHERE rp_ev_id='{$this->ev_id}'
                     AND rp_date_start >= '{$this->date_start}'
-                    AND rp_det_id <> '{$this->Event->det_id}'";
+                    AND rp_det_id <> '{$this->Event->getDetailID()}'";
             $res = DB_query($sql);
             $details = array();
             while ($A = DB_fetchArray($res, false)) {
@@ -1155,11 +1366,24 @@ class Repeat
                 "rp_ev_id='{$R->ev_id}'
                     ORDER BY rp_date_start DESC LIMIT 1");
             if (!empty($new_stop)) {
-                $this->Event->rec_data['stop'] = $new_stop;
+                $this->Event->getRecData()['stop'] = $new_stop;
                 $this->Event->Save();
             }
         }
     }   // function DeleteFuture()
+
+
+    public function updateFuture()
+    {
+        global $_TABLES;
+
+        $sql = "UPDATE {$_TABLES['evlist_repeat']}
+            SET rp_det_id = '{$this->getDetailID()}'
+            WHERE rp_date_start >= '{$this->getDateStart1()->toMySQL(true)}'
+            AND rp_ev_id = '{$this->getEventID()}'";
+        DB_query($sql);
+        return $this;
+    }
 
 
     /**
@@ -1189,7 +1413,7 @@ class Repeat
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 $repeats[$A['rp_id']] = new Repeat();
-                $repeats[$A['rp_id']]->SetVars($A, true);
+                $repeats[$A['rp_id']]->setVars($A, true);
             }
         }
         return $repeats;
@@ -1210,17 +1434,17 @@ class Repeat
         global $LANG_EVLIST, $_CONF;
 
         $TickType = new TicketType($tick_type);
-        $fee = $this->Event->options['tickets'][$tick_type]['fee'];
-        $rp_id = $TickType->event_pass ? 0 : $this->rp_id;
+        $fee = $this->Event->getOption('tickets')[$tick_type]['fee'];
+        $rp_id = $TickType->isEventPass() ? 0 : $this->rp_id;
 
         $evCart = array(
-            'item_number' => 'evlist:eventfee:' . $this->Event->id . '/' .
+            'item_number' => 'evlist:eventfee:' . $this->Event->getID() . '/' .
                     $tick_type . '/' . $rp_id,
-            'item_name' => $TickType->description . ': ' . $LANG_EVLIST['fee'] . ' - ' .
-                    $this->Event->Detail->title . ' ' . $this->start_date1 .
+            'item_name' => $TickType->getDscp() . ': ' . $LANG_EVLIST['fee'] . ' - ' .
+                    $this->Event->getDetail()->getTitle() . ' ' . $this->start_date1 .
                     ' ' . $this->start_time1,
-            'short_description' => $TickType->description . ': ' .
-                    $this->Event->Detail->title . ' ' . $this->start_date1 .
+            'short_description' => $TickType->getDscp() . ': ' .
+                    $this->Event->getDetail()->getTitle() . ' ' . $this->start_date1 .
                     ' ' . $this->start_time1,
 
             'amount' => number_format((float)$fee, 2, '.', ''),
@@ -1321,11 +1545,133 @@ class Repeat
     private function getShareIcons($permalink)
     {
         if (version_compare(GVERSION, '2.0.0', '<')) {
-            $ss = SOC_getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+            $ss = SOC_getShareIcons(
+                $this->Event->getDetail()->getTitle(),
+                $this->Event->getDetail()->getSummary(),
+                $permalink
+            );
         } else {
-            $ss = \glFusion\Social\Social::getShareIcons($this->Event->title, $this->Event->Detail->summary, $permalink);
+            $ss = \glFusion\Social\Social::getShareIcons(
+                $this->Event->getDetail()->getTitle(),
+                $this->Event->getDetail()->getSummary(),
+                $permalink
+            );
         }
         return $ss;
+    }
+
+
+    /**
+     * Get the record ID of the recurrance.
+     *
+     * @return  integer     Record ID
+     */
+    public function getID()
+    {
+        return (int)$this->rp_id;
+    }
+
+
+    /**
+     * Get the ID of the related event record.
+     *
+     * @return  string      Event record ID
+     */
+    public function getEventID()
+    {
+        return $this->ev_id;
+    }
+
+
+    public function getDetailID()
+    {
+        return (int)$this->det_id;
+    }
+
+
+    /**
+     * Get the event opject related to this repeat.
+     *
+     * @return  object      Event object
+     */
+    public function getEvent()
+    {
+        return $this->Event;
+    }
+
+
+    /**
+     * Get the first starting date/time object.
+     *
+     * @return  object      Starting date object
+     */
+    public function getDateStart1()
+    {
+        return $this->dtStart1;
+    }
+
+
+    /**
+     * Get the first starting time.
+     *
+     * @return  string      Starting time HH:MM:SS
+     */
+    public function getTimeStart1()
+    {
+        return $this->dtStart1->format('H:i:s', true);
+    }
+
+
+    /**
+     * Get the first ending time.
+     *
+     * @return  string      Ending time HH:MM:SS
+     */
+    public function getTimeEnd1()
+    {
+        return $this->dtEnd1->format('H:i:s', true);
+    }
+
+
+    /**
+     * Get the second starting time.
+     *
+     * @return  string      Starting time HH:MM:SS
+     */
+    public function getTimeStart2()
+    {
+        if ($this->dtStart2) {
+            return $this->dtStart2->format('H:i:s', true);
+        } else {
+            return '';
+        }
+    }
+
+
+    /**
+     * Get the second ending time.
+     *
+     * @return  string      Ending time HH:MM:SS
+     */
+    public function getTimeEnd2()
+    {
+        if ($this->dtEnd2) {
+            return $this->dtEnd2->format('H:i:s', true);
+        } else {
+            return '';
+        }
+    }
+
+
+    /**
+     * Check if this is a new record.
+     * Used to validate the retrieval of an instance.
+     *
+     * @return  boolean     True if new, False if existing
+     */
+    public function isNew()
+    {
+        return $this->rp_id == 0;
     }
 
 }   // class Repeat

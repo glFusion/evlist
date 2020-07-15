@@ -572,6 +572,13 @@ function EVLIST_remove_old_files()
             'classes/evMeetup.class.php',
             'classes/meetup.class.php',
             'evlist_functions.inc.php',
+            'templates/calEditForm.uikit.thtml',
+            'templates/catEditForm.uikit.thtml',
+            'templates/editor.uikit.thtml',
+            'templates/event.uikit.thtml',
+            'templates/import.uikit.thtml',
+            'templates/ticketForm.uikit.thtml',
+            'css'
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(
@@ -583,9 +590,36 @@ function EVLIST_remove_old_files()
 
     foreach ($paths as $path=>$files) {
         foreach ($files as $file) {
-            @unlink("$path/$file");
+            EV_rmdir("$path/$file");
         }
     }
 }
+
+
+/**
+ * Remove a file, or recursively remove a directory.
+ *
+ * @param   string  $dir    Directory name
+ */
+function EV_rmdir($dir)
+{
+    if (is_dir($dir)) {
+        $objects = scandir($dir);
+        foreach ($objects as $object) {
+            if ($object != "." && $object != "..") {
+                if (is_dir($dir . '/' . $object)) {
+                    EV_rmdir($dir . '/' . $object);
+                } else {
+                    @unlink($dir . '/' . $object);
+                }
+            }
+        }
+        @rmdir($dir);
+    } elseif (is_file($dir)) {
+        @unlink($dir);
+    }
+}
+
+
 
 ?>

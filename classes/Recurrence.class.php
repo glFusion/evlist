@@ -1,7 +1,7 @@
 <?php
 /**
  * Class to create recurrences for the evList plugin.
- * Each class is derived from Recur, and should override either
+ * Each class is derived from this one, and should override either
  * MakeRecurrences() or incrementDate().
  * MakeRecurrences is the only public function and the only one that is
  * required.  Derived classes may also implement the base MakeRecurrences()
@@ -24,35 +24,56 @@ namespace Evlist;
  * Override this class for specific recurrence types
  * @package evlist
  */
-class Recur
+class Recurrence
 {
     /** Event object.
      * @var object */
-    var $event;
+    protected $Event = NULL;
+
+    /** Recurrence information for the event, for convenience.
+     * @var array */
+    protected $rec_data = array();
 
     /** Array of event dates and times.
-     @var array */
-    var $events;
+     * @var array */
+    protected $events = array();
 
     /** Starting date for the event.
      * @var string */
-    var $dt_start;
+    protected $date_start = '';
 
     /** Ending date for the event.
-     * @var string /
-     var $dt_end;
+     * @var string */
+    protected $date_end = '';
 
+    /** First or only starting time.
+     * @var string */
+    protected $time_start1 = '';
+
+    /** First or only ending time.
+     * @var string */
+    protected $time_end1 = '';
+
+    /** Second starting time, if any.
+     * @var string */
+    protected $time_start2 = '';
+
+    /** Second ending time, if any.
+     * @var string */
+    protected $time_end2 = '';
+
+    /** First or only starting time
     /** Number of days the event runs.
      * @var integer */
-    var $duration;
+    protected $duration = 0;
 
     /** Frequency.
      * @var integer */
-    var $freq;
+    protected $freq = 0;
 
     /** Skip-weekends setting.
      * @var integer */
-    var $skip;
+    protected $skip = 0;
 
 
     /**
@@ -64,24 +85,27 @@ class Recur
     {
         global $_EV_CONF;
 
-        $this->event = $event;
+        $this->Event = $event;
+        $this->rec_data = $this->Event->getRecData();
 
         // Initialize array of events to be loaded
-        $this->events = array();
-        $this->freq = isset($event->rec_data['freq']) ?
-                (int)$event->rec_data['freq'] : 1;
-        if ($this->freq < 1) $this->freq = 1;
-        $this->skip = isset($event->rec_data['skip']) ?
-                (int)$event->rec_data['skip'] : 0;
+        $this->Events = array();
+        $this->freq = isset($this->rec_data['freq']) ?
+                (int)$this->rec_data['freq'] : 1;
+        if ($this->freq < 1) {
+            $this->freq = 1;
+        }
+        $this->skip = isset($this->rec_data['skip']) ?
+                (int)$this->rec_data['skip'] : 0;
 
-        $this->dt_start = $this->event->date_start1 != '' ?
-                    $this->event->date_start1 : $_EV_CONF['_today'];
-        $this->dt_end = $this->event->date_end1 > $this->event->date_start1 ?
-                    $this->event->date_end1 : $this->event->date_start1;
+        $this->date_start = $this->Event->getDateStart1() != '' ?
+            $this->Event->getDateStart1() : $_EV_CONF['_today'];
+        $this->date_end = $this->Event->getDateEnd1() > $this->Event->getDateStart1() ?
+            $this->Event->getDateEnd1() : $this->Event->getDateStart1();
 
-        if ($this->dt_start != $this->dt_end) {
-            list($syear, $smonth, $sday) = explode('-', $this->dt_start);
-            list($eyear, $emonth, $eday) = explode('-', $this->dt_end);
+        if ($this->date_start != $this->date_end) {
+            list($syear, $smonth, $sday) = explode('-', $this->date_start);
+            list($eyear, $emonth, $eday) = explode('-', $this->date_end);
             // Need to get the number of days the event lasts
             $this->duration = DateFunc::dateDiff(
                 $eday, $emonth, $eyear,
@@ -90,6 +114,49 @@ class Recur
         } else {
             $this->duration = 0;      // single day event
         }
+    }
+
+
+    /**
+     * Get a recurrence instance based on event data.
+     *
+     * @param   array   $Event  Event object
+     * @return  object      Recurrence object
+     */
+    public static function getInstance($Event)
+    {
+        switch ((int)$Event->getRecData()['type']) {
+        case EV_RECUR_ONETIME:
+            $Rec = new RecurOnetime($Event);
+            break;
+        case EV_RECUR_DATES:
+            // Specific dates.  Simple handling.
+            $Rec = new RecurDates($Event);
+            break;
+        case EV_RECUR_DOM:
+            // Recurs on one or more days each month-
+            // e.g. first and third Tuesday
+            $Rec = new RecurDOM($Event);
+            break;
+        case EV_RECUR_DAILY:
+            // Recurs daily for a number of days
+            $Rec = new RecurDaily($Event);
+            break;
+        case EV_RECUR_WEEKLY:
+            // Recurs on one or more days each week-
+            // e.g. Tuesday and Thursday
+            $Rec = new RecurWeekly($Event);
+            break;
+        case EV_RECUR_MONTHLY:
+            // Recurs on the same date(s) each month
+            $Rec = new RecurMonthly($Event);
+            break;
+        case EV_RECUR_YEARLY:
+            // Recurs once each year
+            $Rec = new RecurYearly($Event);
+            break;
+        }
+        return $Rec;
     }
 
 
@@ -147,7 +214,7 @@ class Recur
      * Create recurrences.
      * This is a common function for the most common recurrence types:
      * once per week/year, etc.
-     * Also sets `$this->events` with the recurring data.
+     * Also sets `$this->Events` with the recurring data.
      *
      * @return  array   Array of event start/end dates and times.
      */
@@ -155,7 +222,7 @@ class Recur
     {
         global $_EV_CONF;
 
-        list($year, $month, $day) = explode('-', $this->dt_start);
+        list($year, $month, $day) = explode('-', $this->date_start);
 
         //  Get the date of this occurrence.  The date is stored as two
         //  values: 0 = the scheduled date for this occurrence, 1 = the
@@ -167,9 +234,11 @@ class Recur
 
         // Get any occurrences before our stop.  Keep these.
         $count = 0;
-        while ($occurrence[1] <= $this->event->rec_data['stop'] &&
-                $occurrence[1] >= '1971-01-01' &&
-                $count < $_EV_CONF['max_repeats']) {
+        while (
+            $occurrence[1] <= $this->rec_data['stop'] &&
+            $occurrence[1] >= '1971-01-01' &&
+            $count < $_EV_CONF['max_repeats']
+        ) {
             $this->storeEvent($occurrence[1]);
             $count++;
 
@@ -183,8 +252,7 @@ class Recur
             }
             list($year, $month, $day) = explode('-', $occurrence[0]);
         }
-
-        return $this->events;
+        return $this->Events;
     }
 
 
@@ -209,15 +277,15 @@ class Recur
 
         // Add this occurance to our array.  The first selected date is
         // always added
-        $this->events[$start] = array(
-                        'dt_start'  => $start,
-                        'dt_end'    => $enddate,
-                        'tm_start1'  => $this->event->time_start1,
-                        'tm_end1'    => $this->event->time_end1,
-                        'tm_start2'  => $this->event->time_start2,
-                        'tm_end2'    => $this->event->time_end2,
+        $this->Events[$start] = array(
+            'dt_start'  => $start,
+            'dt_end'    => $enddate,
+            'tm_start1'  => $this->Event->getTimeStart1(),
+            'tm_end1'    => $this->Event->getTimeEnd1(),
+            'tm_start2'  => $this->Event->getTimeStart2(),
+            'tm_end2'    => $this->Event->getTimeEnd2(),
         );
-    }   // function storeEvent()
+    }
 
 }   // class Recur
 

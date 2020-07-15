@@ -20,7 +20,7 @@ namespace Evlist;
  * @package evlist
  * @return  mixed   Array of events on success, False on failure
  */
-class RecurWeekly extends Recur
+class RecurWeekly extends Recurrence
 {
     /**
      * Create the recurring dates.
@@ -32,7 +32,7 @@ class RecurWeekly extends Recur
     {
         global $_EV_CONF;
 
-        $days_on = $this->event->rec_data['listdays'];
+        $days_on = $this->rec_data['listdays'];
         if (empty($days_on)) return false;
 
         $occurrence = $this->dt_start;
@@ -45,7 +45,7 @@ class RecurWeekly extends Recur
         list($y, $m, $d) = explode('-', $occurrence);
         $occurrence = DateFunc::prevDay($d, $m, $y);
         $count = 1;
-        while ($occurrence <= $this->event->rec_data['stop'] &&
+        while ($occurrence <= $this->rec_data['stop'] &&
                     $occurrence >= '1971-01-01' &&
                     $count < $_EV_CONF['max_repeats']) {
 
@@ -55,7 +55,7 @@ class RecurWeekly extends Recur
                 $occurrence = DateFunc::nextDayOfWeek($dow-1, $d, $m, $y);
 
                 // Stop when we hit the stop date
-                if ($occurrence > $this->event->rec_data['stop']) break;
+                if ($occurrence > $this->rec_data['stop']) break;
 
                 $this->storeEvent($occurrence);
 

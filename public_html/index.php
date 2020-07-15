@@ -155,9 +155,14 @@ case 'printtickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
         $eid = COM_sanitizeID($_GET['eid'], false);
-        $doc = Evlist\Ticket::PrintTickets($eid);
-        echo $doc;
-        exit;
+        $doc = Evlist\Ticket::printEvent($eid);
+        if ($doc !== false) {
+            echo $doc;
+            exit;
+        } else {
+            COM_setMsg($LANG_EVLIST['no_tickets_print']);
+            COM_refresh(EVLIST_URL . '/event.php?view=event&eid=' . $eid);
+        }
     } else {
         $content .= 'Function not available';
     }

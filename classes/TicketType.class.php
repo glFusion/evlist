@@ -16,19 +16,32 @@
  */
 namespace Evlist;
 
+
 /**
  * Class for ticket types.
  * @package evlist
  */
 class TicketType
 {
-    /** Properties accessed via `__set()` and `__get()`.
-     * @var array */
-    private $properties = array();
-
     /** Flag to indicate a new record.
      * @var boolean */
-    private $isNew;
+    private $isNew = true;
+
+    /** Ticket type record ID.
+     * @var integer */
+    private $tt_id = 0;
+
+    /** Flag indicating this is an event pass vs. one occurance.
+     * @var boolean */
+    private $event_pass = 0;
+
+    /** Flag indicating this ticket type is enabled.
+     * @var boolean */
+    private $enabled = 1;
+
+    /** Description of the ticket type.
+     * @var string */
+    private $dscp = '';
 
 
     /**
@@ -39,14 +52,9 @@ class TicketType
      */
     public function __construct($id = 0)
     {
-        $this->id           = $id;
-        $this->description  = '';
-        $this->enabled      = 1;
-        $this->event_pass   = 0;
-        $this->isNew = true;
-
-        if ($this->id > 0) {
-            $this->Read($this->id);
+        $this->tt_id = (int)$id;
+        if ($this->tt_id > 0) {
+            $this->Read($this->tt_id);
         }
     }
 
@@ -54,69 +62,27 @@ class TicketType
     /**
      * Read an existing ticket type record into this object.
      *
-     * @param   integer $id Optional type ID, $this->id used if 0
+     * @param   integer $id Optional type ID, $this->tt_id used if 0
      */
     public function Read($id = 0)
     {
         global $_TABLES;
 
         if ($id > 0)
-            $this->id = $id;
+            $this->tt_id = $id;
 
         $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']}
-            WHERE id='{$this->id}'";
+            WHERE tt_id='{$this->tt_id}'";
         //echo $sql;
         $result = DB_query($sql);
 
         if (!$result || DB_numRows($result) == 0) {
-            $this->id = 0;
+            $this->tt_id = 0;
             return false;
         } else {
             $row = DB_fetchArray($result, false);
             $this->SetVars($row, true);
             return true;
-        }
-    }
-
-
-    /**
-     * Setter function.
-     * Formats and sets $value into $this->properties[$key].
-     *
-     * @param   string  $key    Variable name
-     * @param   mixed   $value  Valut to assign
-     */
-    public function __set($key, $value)
-    {
-        switch ($key) {
-        case 'id':
-            $this->properties[$key] = (int)$value;
-            break;
-
-        case 'event_pass':
-        case 'enabled':
-            $this->properties[$key] = $value == 1 ? 1 : 0;
-            break;
-
-        case 'description':
-            $this->properties[$key] = trim($value);
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property if it exists, NULL if not.
-     *
-     * @param   string  $key   Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
-     */
-    public function __get($key)
-    {
-        if (array_key_exists($key, $this->properties)) {
-            return $this->properties[$key];
-        } else {
-            return NULL;
         }
     }
 
@@ -128,10 +94,10 @@ class TicketType
      */
     public function SetVars($A)
     {
-        $this->id = isset($A['id']) ? $A['id'] : 0;
-        $this->description = $A['description'];
-        $this->event_pass = $A['event_pass'];
-        $this->enabled = $A['enabled'];
+        $this->tt_id = isset($A['tt_id']) ? (int)$A['tt_id'] : 0;
+        $this->dscp = $A['dscp'];
+        $this->event_pass = isset($A['event_pass']) && $A['event_pass'] ? 1 : 0;
+        $this->enabled = isset($A['enabled']) && $A['enabled'] ? 1 : 0;
     }
 
 
@@ -153,7 +119,7 @@ class TicketType
      */
     public function getDscp()
     {
-        return $this->description;
+        return $this->dscp;
     }
 
 
@@ -170,8 +136,8 @@ class TicketType
             'tips'      => 'tooltipster.thtml',
         ) );
         $T->set_var(array(
-            'id'                => $this->id,
-            'description'       => $this->description,
+            'tt_id'             => $this->tt_id,
+            'dscp'              => $this->dscp,
             'event_pass_chk'    => $this->event_pass == 1 ? EVCHECKED : '',
             'enabled_chk'       => $this->enabled == 1 ? EVCHECKED : '',
             'doc_url'           => EVLIST_getDocURL('tickettype'),
@@ -194,13 +160,13 @@ class TicketType
         if (is_array($A) && !empty($A))
             $this->SetVars($A);
 
-        if ($this->id > 0) {
+        if ($this->tt_id > 0) {
             $this->isNew = false;
         } else {
             $this->isNew = true;
         }
 
-        $fld_sql = "description = '" . DB_escapeString($this->description) ."',
+        $fld_sql = "dscp = '" . DB_escapeString($this->dscp) ."',
             enabled = '{$this->enabled}',
             event_pass = '{$this->event_pass}'";
 
@@ -210,13 +176,15 @@ class TicketType
         } else {
             $sql = "UPDATE {$_TABLES['evlist_tickettypes']} SET
                     $fld_sql
-                    WHERE id='{$this->id}'";
+                    WHERE tt_id='{$this->tt_id}'";
         }
 
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
-            if ($this->isNew) $this->id = DB_insertId();
+            if ($this->isNew) {
+                $this->tt_id = DB_insertId();
+            }
             return true;
         } else {
             COM_errorLog("Evist\\TicketType::Save SQL Error: $sql");
@@ -290,7 +258,7 @@ class TicketType
         $newvalue = $oldvalue == 0 ? 1 : 0;
         $sql = "UPDATE {$_TABLES['evlist_tickettypes']}
                 SET $fld = $newvalue
-                WHERE id = '$id'";
+                WHERE tt_id = '$id'";
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
@@ -322,8 +290,8 @@ class TicketType
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 // create empty objects and use SetVars to save DB lookups
-                $types[$key][$A['id']] = new TicketType();
-                $types[$key][$A['id']]->SetVars($A);
+                $types[$key][$A['tt_id']] = new TicketType();
+                $types[$key][$A['tt_id']]->SetVars($A);
             }
         }
         return $types[$key];
@@ -385,7 +353,10 @@ class TicketType
             ),
         );
 
-        $defsort_arr = array('field' => 'id', 'direction' => 'ASC');
+        $defsort_arr = array(
+            'field' => 'tt_id',
+            'direction' => 'ASC',
+        );
         $text_arr = array(
             'has_menu'     => false,
             'has_extras'   => false,
@@ -435,7 +406,7 @@ class TicketType
         case 'edit':
             $retval = COM_createLInk(
                 '<i class="uk-icon-edit"></i>',
-                EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['id'],
+                EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['tt_id'],
                 array(
                     'title' => $LANG_ADMIN['edit'],
                 )
@@ -453,16 +424,16 @@ class TicketType
             }
             $retval = "<input type=\"checkbox\" $switch value=\"1\"
                 name=\"cat_check\"
-                id=\"tog{$fieldname}{$A['id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"{$fieldname}\",".
+                tt_id=\"tog{$fieldname}{$A['tt_id']}\"
+                onclick='EVLIST_toggle(this,\"{$A['tt_id']}\",\"{$fieldname}\",".
                 "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
             break;
 
         case 'delete':
-            if (!self::isUsed($A['id'])) {
+            if (!self::isUsed($A['tt_id'])) {
                 $retval = COM_createLink(
                     $_EV_CONF['icons']['delete'],
-                    EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['id'],
+                    EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['tt_id'],
                     array(
                         'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                         'title' => $LANG_ADMIN['delete'],

@@ -16,7 +16,7 @@ namespace Evlist;
  * Class for events recurring by user-specified dates.
  * @package evlist
  */
-class RecurDates extends Recur
+class RecurDates extends Recurrence
 {
     /**
      * Create the recurring dates.
@@ -26,10 +26,11 @@ class RecurDates extends Recur
      */
     public function MakeRecurrences()
     {
-        if (!is_array($this->event->rec_data['custom']))
+        if (!is_array($this->rec_data['custom'])) {
             return $this->events;
+        }
 
-        foreach($this->event->rec_data['custom'] as $occurrence) {
+        foreach($this->rec_data['custom'] as $occurrence) {
             list($y, $m, $d) = explode('-', $occurrence);
             if (checkdate($m, $d, $y)) {
                 $this->storeEvent($occurrence);

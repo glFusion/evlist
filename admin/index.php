@@ -160,11 +160,11 @@ function EVLIST_importCSV()
     return "$successes Succeeded<br />$failures Failed";
 }
 
-
 // Main function
 $expected = array(
     // Actions to perform
     'savecal', 'editcal', 'moderate', 'saveevent', 'saverepeat',
+    'savefuturerepeat',
     'deletecal', 'delcalconfirm', 'approve', 'disapprove',
     'categories', 'updateallcats', 'delcat', 'savecat',
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
@@ -231,16 +231,15 @@ case 'delcalconfirm':
 
 case 'saveevent':
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
-    $table = empty($eid) ? 'evlist_submissions' : 'evlist_events';
     $Ev = new Evlist\Event($eid);
-    $errors = $Ev->Save($_POST, $table);
+    $errors = $Ev->Save($_POST, empty($eid));
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
         $content .= $Ev->Edit();
         $view = 'none';
     } else {
         $view = 'home';
-        if ($Ev->table == 'evlist_submissions') {
+        if ($Ev->isSubmission()) {
             COM_setMsg($LANG_EVLIST['messages'][9]);
         } else {
             COM_setMsg($LANG_EVLIST['messages'][2]);
@@ -250,6 +249,7 @@ case 'saveevent':
     break;
 
 case 'saverepeat':
+case 'savefuturerepeat':
     $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? $_POST['rp_id'] : '';
     $Rp = new Evlist\Repeat($rp_id);
     $errors = $Rp->Save($_POST);
@@ -258,8 +258,11 @@ case 'saverepeat':
         $content .= $Rp->Edit();
         $view = 'none';
     } else {
+        if ($action == 'savefuturerepeat') {
+            $Rp->updateFuture();
+        }
         COM_setMsg($LANG_EVLIST['messages'][2]);
-        echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
+        COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     }
     break;
 
@@ -278,8 +281,8 @@ case 'savecat':
 
 case 'saveticket':
     if ($_EV_CONF['enable_rsvp']) {
-        $C = new Evlist\TicketType($_POST['id']);
-        $status = $C->Save($_POST);
+        $TT = new Evlist\TicketType($_POST['id']);
+        $status = $TT->Save($_POST);
         $view = 'tickettypes';
     } else {
         $view = '';

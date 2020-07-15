@@ -74,14 +74,14 @@ function ChangeDate(year, month, day, view)
       {!if addlink_year}
       <input type="hidden" name="year" value="{addlink_year}" />
       {!endif}
-      <input type="submit" name="edit" value="{add_event_text}" class="uk-button uk-button-success uk-button-small" />
+      <button type="submit" name="edit" value="event" class="uk-button uk-button-success uk-button-small">{add_event_text}</button>
     </form>
   {!endif}
 </div>
 
 {!if include_selections}
 <div id="evlist_nav_left">
-<form action="{action_url}" method="get" name="hdrform" id="evlistHdrForm"
+<form class="uk-form" action="{action_url}" method="get" name="hdrform" id="evlistHdrForm"
     enctype="application/x-www-form-urlencoded" class="uk-form uk-form-horizontal">
   <select name="cat" onchange="this.form.submit();">
     <option value="0">{$LANG_EVLIST['all_categories']}</option>

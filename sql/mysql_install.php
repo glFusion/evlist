@@ -356,6 +356,8 @@ $_EV_UPGRADE = array(
 '1.4.6' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
+    "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `id` `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT",
+    "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `description` `dscp` varchar(255) NOT NULL DEFAULT ''",
     ),
 );
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];

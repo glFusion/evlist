@@ -156,7 +156,7 @@ class Reminder
         if (
             COM_isAnonUser() ||
             $this->Repeat->getID() == 0 ||
-            !$this->Repeat->Event->hasAccess(2)
+            !$this->Repeat->getEvent()->hasAccess(2)
         ) {
             return false;
         }
@@ -174,11 +174,11 @@ class Reminder
                     uid = '$uid',
                     name = '" . DB_escapeString(COM_getDisplayName($_USER['uid'])) . "',
                     email = '" . DB_escapeString($email) . "',
-                    date_start = '{$this->Repeat->dtStart1->toUnix()}',
+                    date_start = '{$this->Repeat->getDateStart1()->toUnix()}',
                     days_notice = '" . (int)$days . "'";
         } else {
             $sql = "UPDATE {$_TABLES['evlist_remlookup']} SET
-                    date_start = '{$this->Repeat->dtStart1->toUnix()}',
+                    date_start = '{$this->Repeat->getDateStart1()->toUnix()}',
                     days_notice = '" . (int)$days . "'
                     WHERE  eid = '{$this->eid}'
                     AND rp_id = '{$this->rp_id}'
@@ -271,20 +271,20 @@ class Reminder
                     "uid = '{$this->uid}'");
         }
         $LANG = plugin_loadlanguage_evlist(self::$langs[$this->uid]);
-
+        $Detail = $this->Repeat->getEvent()->getDetail();
         $subject = $LANG['rem_subject'];
-        $title = COM_stripslashes($this->Repeat->Event->title);
-        $summary = COM_stripslashes($this->Repeat->Event->summary);
-        $date_start = $this->Repeat->dtStart1->format($_CONF['dateonly']);
+        $title = COM_stripslashes($Detail->getTitle());
+        $summary = COM_stripslashes($Detail->getSummary());
+        $date_start = $this->Repeat->getDateStart1()->format($_CONF['dateonly']);
         $event_url = EVLIST_URL . '/event.php?eid=' . $this->rp_id;
-        if ($this->Repeat->Event->allday == 1) {
+        if ($this->Repeat->getEvent()->isAllDay()) {
             $times = $LANG['allday'];
         } else {
-            $times = EVLIST_formattedTime($this->Repeat->time_start1) . ' - ' .
-                    EVLIST_formattedTime($this->Repeat->time_end1);
-            if ($this->Repeat->Event->split == 1) {
-                $times .= ', ' . EVLIST_formattedTime($this->Repeat->rp_time_start2) .
-                    ' - ' . EVLIST_formattedTime($this->Repeat->rp_time_end2);
+            $times = EVLIST_formattedTime($this->Repeat->getTimeStart1()) . ' - ' .
+                    EVLIST_formattedTime($this->Repeat->getTimeEnd1());
+            if ($this->Repeat->getEvent()->isSplit()) {
+                $times .= ', ' . EVLIST_formattedTime($this->Repeat->getTimeStart2()) .
+                    ' - ' . EVLIST_formattedTime($this->Repeat->getTimeEnd2());
             }
         }
 
@@ -294,29 +294,24 @@ class Reminder
             'addr' => 'address.thtml',
         ) );
 
-        // Determine if there is any location info to include and set a
-        // template flag if so.
-        foreach (array('location', 'street', 'city', 'province', 'postal', 'country') as $x) {
-            if ($this->Repeat->Event->Detail->$x != '') {
-                $T->set_var('have_address', true);
-                break;
-            }
+        if (!empty($Detail->getAddress())) {
+            $T->set_var('have_address', true);
         }
 
         $T->set_var(array(
             'lang_what' => $LANG['what'],
             'lang_when' => $LANG['when'],
             'lang_where'    => $LANG['where'],
-            'what'      => $this->Repeat->Event->Detail->title,
+            'what'      => $Detail->getTitle(),
             'when'      => $date_start . ' ' . $times,
-            'location'  => $this->Repeat->Event->Detail->location,
-            'street'    => $this->Repeat->Event->Detail->street,
-            'city'      => $this->Repeat->Event->Detail->city,
-            'province'  => $this->Repeat->Event->Detail->province,
-            'postal'    => $this->Repeat->Event->Detail->postal,
-            'country'   => $this->Repeat->Event->Detail->country,
+            'location'  => $Detail->getLocation(),
+            'street'    => $Detail->getStreet(),
+            'city'      => $Detail->getCity(),
+            'province'  => $Detail->getProvince(),
+            'postal'    => $Detail->getPostal(),
+            'country'   => $Detail->getCountry(),
             'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
-            'summary'   => COM_stripSlashes($this->Repeat->Event->Detail->summary),
+            'summary'   => COM_stripSlashes($Detail->getSummary()),
             'msg1'      => $LANG['rem_msg1'],
             'msg2'      => $LANG['rem_msg2'],
         ) );

@@ -3,9 +3,9 @@
  * Class to manage events for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2019 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.4.6
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -26,50 +26,194 @@ class Event
     const MIN_TIME      = '00:00:00';
     const MAX_TIME      = '23:59:59';
 
-    /** Property fields.  Accessed via Set() and Get()
-    *   @var array */
-    var $properties = array();
+    /** Event record ID.
+     * @var string */
+    private $id = '';
 
-    /** Indicate whether the current user is an administrator
-    *   @var boolean */
-    var $isAdmin;           // Has evlist.admin privilege
+    /** Page views for this event.
+     * @var integer */
+    private $hits = 0;
+
+    /** Owner user ID.
+     * @var integer */
+    private $owner_id = 2;
+
+    /** Group ID.
+     * @var integer */
+    private $group_id = 13;
+
+    /** Owner permission.
+     * @var integer */
+    private $perm_owner = 3;
+
+    /** Group permission.
+     * @var integer */
+    private $perm_group = 2;
+
+    /** Logged-in user permission.
+     * @var integer */
+    private $perm_members = 2;
+
+    /** Anonymous permission.
+     * @var integer */
+    private $perm_anon = 2;
+
+    /** Starting year 1.
+     * @var integer */
+    //private $startyear1 = 0;
+
+    /** Starting month 1.
+     * @var integer */
+    //private $startmonth1 = 0;
+
+    /** Starting day 1.
+     * @var integer */
+    //private $startday1 = 0;
+
+    /** Starting year 2.
+     * @var integer */
+    //private $startyear2 = 0;
+
+    /** Starting month 2.
+     * @var integer */
+    //private $startmonth2 = 0;
+
+    /** Starting day 2.
+     * @var integer */
+    //private $startday2 = 0;
+
+    /** Ending year 1.
+     * @var integer */
+    //private $endyear1 = 0;
+
+    /** Ending month 1.
+     * @var integer */
+    //private $endmonth1 = 0;
+
+    /** Ending day 1.
+     * @var integer */
+    //private $endday1 = 0;
+
+    /** Ending year 2.
+     * @var integer */
+    //private $endyear2 = 0;
+
+    /** Ending month 2.
+     * @var integer */
+    //private $endmonth2 = 0;
+
+    /** Ending day 2.
+     * @var integer */
+    //private $endday2 = 0;
+
+    /** Calendar record ID.
+     * @var integer */
+    private $cal_id = 0;
+
+    /** Comments enabled flag.
+     * @var integer */
+    private $enable_comments = 0;
+
+    /** Recurrance type.
+     * @var integer */
+    private $recurring = 0;
+
+    /** Starting date 1.
+     * @var string */
+    private $date_start1 = '';
+
+    /** Ending date 1.
+     * @var string */
+    private $date_end1 = '';
+
+    /** Postmode (HTML or plaintext).
+     * @var string */
+    private $postmode = 'plaintext';
+
+    /** Timezone identifier.
+     * @var string */
+    private $tzid = 'local';
+
+    /** Starting time 1.
+     * @var string */
+    private $time_start1 = '';
+
+    /** Starting time 2 for split events.
+     * @var string */
+    private $time_start2 = '';
+
+    /** Ending time 1.
+     * @var string */
+    private $time_end1 = self::MAX_TIME;
+
+    /** Ending time 2 for split events.
+     * @var string */
+    private $time_end2 = '';
+
+    /** Enabled status.
+     * @var boolean */
+    private $status = 1;
+
+    /** Is this an all-day event?
+     * @var boolean */
+    private $allday = 0;
+
+    /** Is this a split event?
+     * @var boolean */
+    private $split = 0;
+
+    /** Are reminders enabled?
+     * @var boolean */
+    private $enable_reminders = 1;
+
+    /** Show in upcoming events block?
+     * @var boolean */
+    private $show_upcoming = 1;
+
+    /** Related category names.
+     * @var array */
+    private $categories = array();
+
+    /** Indicate whether the current user is an administrator.
+     * @var boolean */
+    private $isAdmin = false;
 
     /** Flags a new event record.
      * @var boolean */
-    var $isNew;
+    private $isNew = true;
 
     /** Detail record ID
      * @var integer */
-    var $det_id;
+    private $det_id = 0;
 
     /** Recurring event data
-    *   @var array */
-    var $rec_data;
-
+     * @var array */
+    private $rec_data = array();
+    
     /** Other miscelaneous options
-    *   @var array */
-    var $options;
+     * @var array */
+    private $options = array();
 
     /** Original schedule.
      * Used to check if the schedule must be updated after saving.
      * @var array */
-    var $old_schedule;
+    private $old_schedule = array();
 
     /** Detail object.
      * @var object */
-    var $Detail;
+    private $Detail = NULL;
 
     /** Calendar object.
      * @var object */
-    private $Calendar;
+    private $Calendar = NULL;
 
     /** DB table being used (production vs. submission)
-     * @var string */
-    private $table;
+     @var string */
+    private $table = 'evlist_events';
 
     /** Array of error messages.
      * @var array */
-    public $Errors = array();
+    private $Errors = array();
 
 
     /**
@@ -87,31 +231,20 @@ class Event
         $this->isNew = true;
 
         if ($ev_id == '') {
-            $this->id = '';
-            $this->recurring = 0;
-            $this->rec_data = array();
-            $this->allday = 0;
-            $this->split = 0;
-            $this->status = 1;          // assume "enabled"
-            $this->show_upcoming = 1;   // show in upcoming events by default
-            $this->postmode = 'plaintext';
-            $this->hits = 0;
-            $this->enable_reminders = 1;
-            $this->categories = array();
             $this->owner_id = $_USER['uid'];
-            $this->group_id = 13;
             $this->enable_comments = $_EV_CONF['commentsupport'] ? 0 : 2;
-            $this->tzid = 'local';  // Defautl to backward compatible
 
             // Create dates & times based on individual URL parameters,
             // or defaults.
             // Start date/time defaults to now
             $startday1 = isset($_GET['day']) ? (int)$_GET['day'] : '';
-            if ($startday1 < 1 || $startday1 > 31)
-                    $startday1 = $_EV_CONF['_now']->format('j', true);
+            if ($startday1 < 1 || $startday1 > 31) {
+                $startday1 = $_EV_CONF['_now']->format('j', true);
+            }
             $startmonth1 = isset($_GET['month']) ? (int)$_GET['month'] : '';
-            if ($startmonth1 < 1 || $startmonth1 > 12)
-                    $startmonth1 = $_EV_CONF['_now']->format('n', true);
+            if ($startmonth1 < 1 || $startmonth1 > 12) {
+                $startmonth1 = $_EV_CONF['_now']->format('n', true);
+            }
             $startyear1 = isset($_GET['year']) ?
                     (int)$_GET['year'] : $_EV_CONF['_now']->format('Y', true);
             $starthour1 = isset($_GET['hour']) ?
@@ -132,14 +265,22 @@ class Event
             $endhour2 = $endhour1;
             $endminute2 = $endminute1;
 
-            $this->date_start1 = sprintf("%4d-%02d-%02d",
-                            $startyear1, $startmonth1, $startday1);
-            $this->time_start1 = sprintf("%02d:%02d:00",
-                            $starthour1, $startminute1);
-            $this->time_start2 = sprintf("%02d:%02d:00",
-                            $starthour2, $startminute2);
-            $this->date_end1 = sprintf("%4d-%02d-%02d",
-                            $endyear1, $endmonth1, $endday1);
+            $this->date_start1 = sprintf(
+                "%4d-%02d-%02d",
+                $startyear1, $startmonth1, $startday1
+            );
+            $this->time_start1 = sprintf(
+                "%02d:%02d:00",
+                $starthour1, $startminute1
+            );
+            $this->time_start2 = sprintf(
+                "%02d:%02d:00",
+                $starthour2, $startminute2
+            );
+            $this->date_end1 = sprintf(
+                "%4d-%02d-%02d",
+                $endyear1, $endmonth1, $endday1
+            );
             $this->time_end1 = sprintf("%02d:%02d:00", $endhour1, $endminute1);
             $this->time_end2 = sprintf("%02d:%02d:00", $endhour2, $endminute2);
 
@@ -148,13 +289,13 @@ class Event
             $this->perm_members = $_EV_CONF['default_permissions'][2];
             $this->perm_anon    = $_EV_CONF['default_permissions'][3];
             $this->options      = array(
-                    'use_rsvp'   => 0,
-                    'max_rsvp'   => 0,
-                    'rsvp_cutoff' => 0,
-                    'rsvp_waitlist' => 0,
-                    'ticket_types' => array(),
-                    'contactlink' => '',
-                    'max_user_rsvp' => 1,
+                'use_rsvp'   => 0,
+                'max_rsvp'   => 0,
+                'rsvp_cutoff' => 0,
+                'rsvp_waitlist' => 0,
+                'ticket_types' => array(),
+                'contactlink' => '',
+                'max_user_rsvp' => 1,
             );
             if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
                 $this->options['rsvp_print'] = 0;
@@ -215,7 +356,7 @@ class Event
      * @param   string  $var    Name of property to set.
      * @param   mixed   $value  New value for property.
      */
-    public function __set($var, $value='')
+    public function X__set($var, $value='')
     {
         switch ($var) {
         case 'id':
@@ -243,6 +384,7 @@ class Event
         case 'endday2':
         case 'cal_id':
         case 'enable_comments':
+        case 'recurring':
             // Integer values
             if ($value == '') $value = 0;
             $this->properties[$var] = (int)$value;
@@ -267,7 +409,6 @@ class Event
             break;
 
         case 'status':
-        case 'recurring':
         case 'allday':
         case 'split':
         case 'enable_reminders':
@@ -297,13 +438,226 @@ class Event
      * @param   string  $var    Name of property to retrieve.
      * @return  mixed           Value of property, NULL if undefined.
      */
-    public function __get($var)
+    public function X__get($var)
     {
         if (array_key_exists($var, $this->properties)) {
             return $this->properties[$var];
         } else {
             return NULL;
         }
+    }
+
+
+    /**
+     * Sanitize and set the event ID property.
+     *
+     * @param   string  $id     Event record ID
+     * @return  object  $this
+     */
+    public function setID($id)
+    {
+        $this->id = COM_sanitizeID($id);
+        return $this;
+    }
+
+    
+    /**
+     * Get the event record ID.
+     *
+     * @return  string      Event ID
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * Set the category names into the property, creating array if needed.
+     *
+     * @param   string|array    $value  Comma-separated string or array
+     * @return  object  $this
+     */
+    private function setCategories($value)
+    {
+        if (is_array($value)) {
+            $this->categories= $value;
+        } else {
+            $this->categories = explode(',', $value);
+        }
+        return $this;
+    }
+
+
+    /**
+     * Sanitize and set the owner ID.
+     *
+     * @param   integer $id     Owner's user ID, 0 for current user
+     * @return  object  $this
+     */
+    public function setOwner($id=0)
+    {
+        global $_USER;
+
+        if ($id == 0) $id = $_USER['uid'];
+        $this->owner_id = (int)$id;
+        return $this;
+    }
+
+
+    /**
+     * Sanitize and set the group ID.
+     *
+     * @param   integer $id     Group ID
+     * @return  object  $this
+     */
+    public function setGroup($id)
+    {
+        $this->group_id = (int)$id;
+        return $this;
+    }
+
+
+    /**
+     * Set the owner permission.
+     *
+     * @param   integer $perm   Permission value, -1 for default
+     */
+    public function setPermOwner($perm = -1)
+    {
+        global $_EV_CONF;
+
+        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][0];
+        $this->perm_owner = (int)$perm;
+        return $this;
+    }
+
+
+    /**
+     * Set the group permission.
+     *
+     * @param   integer $perm   Permission value, -1 for default
+     */
+    public function setPermGroup($perm = -1)
+    {
+        global $_EV_CONF;
+
+        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][1];
+        $this->perm_group = (int)$perm;
+        return $this;
+    }
+
+
+    /**
+     * Set the member permission.
+     *
+     * @param   integer $perm   Permission value, -1 for default
+     */
+    public function setPermMembers($perm = -1)
+    {
+        global $_EV_CONF;
+
+        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][2];
+        $this->perm_member = (int)$perm;
+        return $this;
+    }
+
+
+    /**
+     * Set the anonymous permission.
+     *
+     * @param   integer $perm   Permission value, -1 for default
+     */
+    public function setPermAnon($perm = -1)
+    {
+        global $_EV_CONF;
+
+        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][3];
+        $this->perm_anon = (int)$perm;
+        return $this;
+    }
+
+
+    /**
+     * Get the options set for the event.
+     *
+     * @return  array   Array of all options
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+
+    /**
+     * Get a single option value, NULL if not set.
+     *
+     * @return  mixed   Single value from the options array
+     */
+    public function getOption($key)
+    {
+        if (array_key_exists($key, $this->options)) {
+            return $this->options[$key];
+        } else {
+            return NULL;
+        }
+    }
+
+
+    /**
+     * Check if this event is using the submission table vs. production.
+     *
+     * @return  boolean     True if submission, False if production
+     */
+    public function isSubmission()
+    {
+        return $this->table == 'evlist_submissions';
+    }
+
+
+    /**
+     * Set the table to be used, either subsmissions or events.
+     *
+     * @param   boolean $submission True to use the submission table
+     * @return  object  $this
+     */
+    public function setTable($submission=true)
+    {
+        $this->table = $submission ? 'evlist_submissions' : 'evlist_events';
+        return $this;
+    }
+
+
+    public function getDateStart1()
+    {
+        return $this->date_start1;
+    }
+
+
+    public function getDateEnd1()
+    {
+        return $this->date_end1;
+    }
+
+
+    public function getTimeStart1()
+    {
+        return $this->time_start1;
+    }
+
+    public function getTimeEnd1()
+    {
+        return $this->time_end1;
+    }
+
+    public function getTimeStart2()
+    {
+        return $this->time_end2;
+    }
+
+    public function getTimeEnd2()
+    {
+        return $this->time_end2;
     }
 
 
@@ -324,11 +678,8 @@ class Event
         $this->date_end1 = (isset($row['date_end1']) &&
             !empty($row['date_end1'])) ? $row['date_end1'] : $this->date_start1;
         $this->cal_id = $row['cal_id'];
-        $this->show_upcoming = isset($row['show_upcoming']) ? 1 : 0;
-        $this->recurring = isset($row['recurring']) &&
-                $row['recurring'] == 1 ? 1 : 0;
-        $this->show_upcoming = isset($row['show_upcoming']) &&
-                $row['show_upcoming'] == 1 ? 1 : 0;
+        $this->show_upcoming = isset($row['show_upcoming']) ? (int)$row['show_upcoming'] : 0;
+        $this->recurring = (int)$row['recurring'];
         if (isset($row['allday']) && $row['allday'] == 1) {
             $this->allday = 1;
             $this->split = 0;
@@ -347,33 +698,34 @@ class Event
                 $row['postmode'] == 'html' ? 'html' : 'plaintext';
         $this->enable_reminders = isset($row['enable_reminders']) &&
                 $row['enable_reminders'] == 1 ? 1 : 0;
-        $this->owner_id = isset($row['owner_id']) ? $row['owner_id'] : 2;
-        $this->group_id = isset($row['group_id']) ? $row['group_id'] : 13;
+        $this->setOwner(isset($row['owner_id']) ? $row['owner_id'] : 2);
+        $this->setGroup(isset($row['group_id']) ? $row['group_id'] : 13);
         $this->enable_comments = isset($row['enable_comments']) ? $row['enable_comments'] : 0;
 
 
         // Categores get added to the row during Read if from a DB, or as part
         // of the posted form.
-        $this->categories = EV_getVar($row, 'categories', 'array', array());
+        $this->setCategories(EV_getVar($row, 'categories', 'array', array()));
 
         // Join or split the date values as needed
         if ($fromDB) {
             // dates are YYYY-MM-DD
-            $this->id = isset($row['id']) ? $row['id'] : '';
-            $this->rec_data = unserialize($row['rec_data']);
-            if (!$this->rec_data) $this->rec_data = array();
-            $this->det_id = $row['det_id'];
-            $this->hits = $row['hits'];
-            $this->perm_owner = $row['perm_owner'];
-            $this->perm_group = $row['perm_group'];
-            $this->perm_members = $row['perm_members'];
-            $this->perm_anon = $row['perm_anon'];
+            $this->setID(isset($row['id']) ? $row['id'] : '');
+            $this->setRecData($row['rec_data']);
+            $this->det_id = (int)$row['det_id'];
+            $this->hits = (int)$row['hits'];
+            $this->setPermOwner($row['perm_owner'])
+                ->setPermGroup($row['perm_group'])
+                ->setPermMembers($row['perm_members'])
+                ->setPermAnon($row['perm_anon']);
             $this->time_start1 = $row['time_start1'];
             $this->time_end1 = $row['time_end1'];
             $this->time_start2 = $row['time_start2'];
             $this->time_end2 = $row['time_end2'];
-            $this->options = unserialize($row['options']);
-            if (!$this->options) $this->options = array();
+            $this->options = @unserialize($row['options']);
+            if (!$this->options) {
+                $this->options = array();
+            }
             $this->tzid = $row['tzid'];
         } else {        // Coming from the form
             $this->id = isset($row['eid']) ? $row['eid'] : '';
@@ -411,17 +763,18 @@ class Event
             }
 
             if (isset($row['perm_owner'])) {
-                $perms = SEC_getPermissionValues($row['perm_owner'],
-                    $row['perm_group'], $row['perm_members'],
-                    $row['perm_anon']);
+                $perms = SEC_getPermissionValues(
+                    $row['perm_owner'], $row['perm_group'],
+                    $row['perm_members'], $row['perm_anon']
+                );
                 $this->perm_owner   = $perms[0];
                 $this->perm_group   = $perms[1];
                 $this->perm_members = $perms[2];
                 $this->perm_anon    = $perms[3];
             }
 
-            $this->owner_id = isset($row['owner_id']) ? $row['owner_id'] : 2;
-            $this->group_id = isset($row['group_id']) ? $row['group_id'] : 13;
+            $this->setOwner(isset($row['owner_id']) ? (int)$row['owner_id'] : 2);
+            $this->setGroup(isset($row['group_id']) ? (int)$row['group_id'] : 13);
             $this->options['contactlink'] = isset($row['contactlink']) ? 1 : 0;
 
             $this->options['tickets'] = array();
@@ -472,7 +825,7 @@ class Event
      * @param   string  $table  Table name, default = production
      * @return  boolean     True if a record was read, False on failure.
      */
-    public function Read($ev_id = '', $table = 'evlist_events')
+    public function Read($ev_id = '', $submissions=false)
     {
         global $_TABLES;
 
@@ -480,9 +833,7 @@ class Event
             $this->id = COM_sanitizeID($ev_id);
         }
 
-        if ($table != 'evlist_events') $table = 'evlist_submissions';
-        $this->table = $table;
-
+        $this->setTable($submissions);
         $sql = "SELECT * FROM {$_TABLES[$this->table]} WHERE id='$this->id'";
         $result = DB_query($sql);
         if (!$result || DB_numRows($result) != 1) {
@@ -505,8 +856,8 @@ class Event
             $this->SetVars($row, true);
             $this->isNew = false;
 
-            $this->Detail = new Detail($this->det_id);
-            $this->Calendar = new Calendar($this->cal_id);
+            $this->Detail = Detail::getInstance($this->det_id);
+            $this->Calendar = Calendar::getInstance($this->cal_id);
 
             return true;
         }
@@ -522,13 +873,13 @@ class Event
      * handle events imported from the Calendar plugin.
      *
      * @param   array   $A      Optional array of values from $_POST
-     * @param   string  $table  Table name (submission or production)
+     * @param   boolean $isSubmission   True if this uses the submission table
      * @param   boolean $forceNew   Hack to force this record to be "new"
      * @return  string      Error text, or empty string on success
      */
-    public function Save($A = '', $table = 'evlist_submissions', $forceNew=false)
+    public function Save($A = '', $isSubmission = true, $forceNew=false)
     {
-        global $_TABLES, $LANG_EVLIST, $_EV_CONF, $_USER, $_CONF;
+        global $_TABLES, $LANG_EVLIST, $_EV_CONF, $_CONF;
 
         // This is a bit of a hack, but we're going to save the old schedule
         // first before changing our own values.  This is done so that we
@@ -548,7 +899,9 @@ class Event
             );
         } else {
             // submit privilege required to submit new events
-            if (!EVLIST_canSubmit()) return false;
+            if (!EVLIST_canSubmit()) {
+                return false;
+            }
             $this->old_schedule = array();
         }
 
@@ -565,9 +918,10 @@ class Event
 
         // Authorized to bypass the queue
         if ($this->isAdmin || plugin_ismoderator_evlist()) {
-            $table = 'evlist_events';
+            $this->setTable(false);
+        } else {
+            $this->setTable($isSubmission);
         }
-        $this->table = $table;
 
         if ($this->id == '') {
             // If we allow users to create IDs, this could happen
@@ -580,8 +934,8 @@ class Event
         if (!$this->isNew) {
 
             // Existing event, we already have a Detail object instantiated
-            $this->Detail->SetVars($A);
-            $this->Detail->ev_id = $this->id;
+            $this->Detail->setVars($A);
+            //$this->Detail->setEventID($this->id);
             if (!$this->isValidRecord()) {
                 return $this->PrintErrors();
             }
@@ -634,21 +988,23 @@ class Event
             // New event
             if (!$this->isAdmin) {
                 // Override any submitted permissions if user is not an admin
-                $this->perm_owner = $_EV_CONF['default_permissions'][0];
-                $this->perm_group = $_EV_CONF['default_permissions'][1];
-                $this->perm_members = $_EV_CONF['default_permissions'][2];
-                $this->perm_anon = $_EV_CONF['default_permissions'][3];
-                // Set the group_id to the default
-                $this->group_id = (int)DB_getItem($_TABLES['groups'],
-                        'grp_id', 'grp_name="evList Admin"');
-                // Set the owner to the submitter
-                $this->owner_id = (int)$_USER['uid'];
+                $this->setPermOwner()
+                    ->setPermGroup()
+                    ->setPermMembers()
+                    ->setPermAnon()
+                    ->setGroup(DB_getItem(
+                        $_TABLES['groups'],
+                        'grp_id',
+                        'grp_name="evList Admin"'
+                    ) )
+                    // Set the owner to the submitter
+                    ->setOwner();
             }
 
             // Create a detail record
             $this->Detail = new Detail();
-            $this->Detail->SetVars($A);
-            $this->Detail->ev_id = $this->id;
+            $this->Detail->setVars($A);
+            $this->Detail->setEventID($this->id);
             if (!$this->isValidRecord()) {
                 return $this->PrintErrors();
             }
@@ -659,12 +1015,11 @@ class Event
             // Quit now if the detail record failed
             if ($this->det_id == 0) return false;
 
-            if ($this->table != 'evlist_submissions') {
+            if (!$this->isSubmission()) {
                 // This function gets the rec_data value.
                 if (!$this->UpdateRepeats()) {
                     return $this->PrintErrors();
                 }
-                //var_dump($this);die;
             }
 
             $sql1 = "INSERT INTO {$_TABLES[$this->table]} SET
@@ -723,14 +1078,16 @@ class Event
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
-        } elseif ($this->table == 'evlist_submissions' &&
-                isset($_CONF['notification']) &&
-                in_array ('evlist', $_CONF['notification'])) {
+        } elseif (
+            $this->isSubmission() &&
+            isset($_CONF['notification']) &&
+            in_array ('evlist', $_CONF['notification'])
+        ) {
             $N = new \Template(EVLIST_PI_PATH . '/templates/');
             $N->set_file('mail', 'notify_submission.thtml');
             $N->set_var(array(
-                'title'     => $this->Detail->title,
-                'summary'   => $this->Detail->summary,
+                'title'     => $this->Detail->getTitle(),
+                'summary'   => $this->Detail->getSummary(),
                 'start_date' => $this->date_start1,
                 'end_date'  => $this->date_end1,
                 'start_time' => $this->time_start1,
@@ -745,9 +1102,9 @@ class Event
         }
 
         if (empty($this->Errors)) {
-            if ($this->table = 'evlist_events') {
-                PLG_itemSaved($this->id, 'evlist');
+            if (!$this->isSubmission()) {
                 Cache::clear('events');
+                PLG_itemSaved($this->id, 'evlist');
             }
             return '';
         } else {
@@ -802,22 +1159,32 @@ class Event
         // Check that basic required fields are filled in.  We don't
         // check the event ID since that will be created automatically if
         // it is.
-        if ($this->Detail->title == '')
+        if ($this->Detail->getTitle() == '') {
             $this->Errors[] = $LANG_EVLIST['err_missing_title'];
-
-        if ($this->date_start1 . ' ' . $this->time_start1 >
-            $this->date_end1 . ' ' . $this->time_end1)
-            $this->Errors[] = $LANG_EVLIST['err_times'];
-
-        if ($this->split == 1 && $this->date_start1 == $this->date_end1) {
-            if ($this->date_start1 . ' ' . $this->time_start2 >
-                $this->date_start1 . ' ' . $this->time_end2)
-                $this->Errors[] = $LANG_EVLIST['err_times'];
         }
 
-        if ($this->format == EV_RECUR_WEEKLY &&
-                $this->listdays == '')
+        if (
+            $this->date_start1 . ' ' . $this->time_start1 >
+            $this->date_end1 . ' ' . $this->time_end1
+        ) {
+            $this->Errors[] = $LANG_EVLIST['err_times'];
+        }
+
+        if ($this->split == 1 && $this->date_start1 == $this->date_end1) {
+            if (
+                $this->date_start1 . ' ' . $this->time_start2 >
+                $this->date_start1 . ' ' . $this->time_end2
+            ) {
+                $this->Errors[] = $LANG_EVLIST['err_times'];
+            }
+        }
+
+        if (
+            $this->recurring == EV_RECUR_WEEKLY &&
+            empty($this->rec_data['listdays'])
+        ) {
             $this->Errors[] = $LANG_EVLIST['err_missing_weekdays'];
+        }
 
         if (!empty($this->Errors)) {
             return false;
@@ -889,36 +1256,18 @@ class Event
             break;
         }
 
-        if ($this->recurring != '1') {
-            $T->set_var(array(
-                'recurring_show'    => ' style="display:none;"',
-                'format_opt'        => '0',
-            ) );
-            $rec_type = 0;
-            //for ($i = 1; $i <= 6; $i++) {
-            //    $T->set_var('format' . $i . 'show', ' style="display:none;"');
-            //}
-        } else {
-            $rec_type = (int)$this->rec_data['type'];
-            $T->set_var(array(
-                'recurring_show' => '',
-                'recurring_checked' => EVCHECKED,
-                'format_opt'    => $rec_type,
-            ) );
-        }
-
-        if (isset($this->rec_data['stop']) &&
-                    !empty($this->rec_data['stop'])) {
+        if (
+            isset($this->rec_data['stop']) &&
+            !empty($this->rec_data['stop'])
+        ) {
             $T->set_var(array(
                 'stopdate'      => $this->rec_data['stop'],
-                'd_stopdate'    =>
-                            EVLIST_formattedDate($this->rec_data['stop']),
             ) );
         }
 
         // Set up the recurring options needed for the current event
         $recweekday  = '';
-        switch ($rec_type) {
+        switch ($this->recurring) {
         case 0:
             // Not a recurring event
             break;
@@ -1011,6 +1360,7 @@ class Event
                 $T->set_var('permissions_editor', 'true');
             }
             $T->set_var(array(
+                'recurring' => $this->recurring,
                 'recur_section' => 'true',
                 'contact_section' => 'true',
                 'category_section' => 'true',
@@ -1021,7 +1371,7 @@ class Event
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], isset($this->rec_data['type']) ? $this->rec_data['type'] : ''),
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
                 'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
@@ -1075,18 +1425,36 @@ class Event
                     'username', "uid='{$this->owner_id}'");
 
         $retval .= COM_startBlock($LANG_EVLIST['event_editor']);
-        $summary = $this->Detail->summary;
-        $full_description = $this->Detail->full_description;
-        $location = $this->Detail->location;
+        $summary = $this->Detail->getSummary();
+        $full_description = $this->Detail->getDscp();
+        $location = $this->Detail->getLocation();
         if (($this->isAdmin ||
                 ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1))
                 && $this->postmode == 'html') {
             $postmode = '2';      //html
         } else {
             $postmode = '1';            //plaintext
-            $summary = htmlspecialchars(COM_undoClickableLinks(COM_undoSpecialChars($this->Detail->summary)));
-            $full_description = htmlspecialchars(COM_undoClickableLinks(COM_undoSpecialChars($this->Detail->full_description)));
-            $location = htmlspecialchars(COM_undoClickableLinks(COM_undoSpecialChars($this->Detail->location)));
+            $summary = htmlspecialchars(
+                COM_undoClickableLinks(
+                    COM_undoSpecialChars(
+                        $this->Detail->getSummary()
+                    )
+                )
+            );
+            $full_description = htmlspecialchars(
+                COM_undoClickableLinks(
+                    COM_undoSpecialChars(
+                        $this->Detail->getDscp()
+                    )
+                )
+            );
+            $location = htmlspecialchars(
+                COM_undoClickableLinks(
+                    COM_undoSpecialChars(
+                        $this->Detail->getLocation()
+                    )
+                )
+            );
          }
 
         $starthour2 = '';
@@ -1134,7 +1502,7 @@ class Event
             $freq = 1;
         }
         $T->set_var(array(
-            'freq_text' => $LANG_EVLIST['rec_periods'][$rec_type],
+            'freq_text' => $LANG_EVLIST['rec_periods'][$this->recurring],
             'rec_freq'  => $freq,
             "skipnext{$skip}_checked" => EVCHECKED,
         ) );
@@ -1170,30 +1538,34 @@ class Event
             'cancel_url'    => $cancel_url,
             'eid'           => $this->id,
             'rp_id'         => $rp_id,
-            'title'         => $this->Detail->title,
+            'title'         => $this->Detail->getTitle(),
             'summary'       => $summary,
             'description'   => $full_description,
             'location'      => $location,
             'status_checked' => $this->status == 1 ? EVCHECKED : '',
-            'url'           => $this->Detail->url,
-            'street'        => $this->Detail->street,
-            'city'          => $this->Detail->city,
-            'province'      => $this->Detail->province,
-            'country'       => $this->Detail->country,
-            'postal'        => $this->Detail->postal,
-            'contact'       => $this->Detail->contact,
-            'email'         => $this->Detail->email,
-            'phone'         => $this->Detail->phone,
+            'url'           => $this->Detail->getUrl(),
+            'street'        => $this->Detail->getStreet(),
+            'city'          => $this->Detail->getCity(),
+            'province'      => $this->Detail->getProvince(),
+            'country'       => $this->Detail->getCountry(),
+            'postal'        => $this->Detail->getPostal(),
+            'contact'       => $this->Detail->getContact(),
+            'email'         => $this->Detail->getEmail(),
+            'phone'         => $this->Detail->getPhone(),
             'startdate1'    => $this->date_start1,
             'enddate1'      => $this->date_end1,
             'd_startdate1'  => EVLIST_formattedDate($this->date_start1),
             'd_enddate1'    => EVLIST_formattedDate($this->date_end1),
             // Don't need seconds in the time boxes
             'hour_mode'     => $_CONF['hour_mode'],
-            'time_start1'   => DateFunc::conv24to12($this->time_start1),
+            /*'time_start1'   => DateFunc::conv24to12($this->time_start1),
             'time_end1'     => DateFunc::conv24to12($this->time_end1),
             'time_start2'   => DateFunc::conv24to12($this->time_start2),
-            'time_end2'     => DateFunc::conv24to12($this->time_end2),
+            'time_end2'     => DateFunc::conv24to12($this->time_end2),*/
+            'time_start1'   => $this->time_start1,
+            'time_end1'     => $this->time_end1,
+            'time_start2'   => $this->time_start2,
+            'time_end2'     => $this->time_end2,
             'start_hour_options1'   => $start1['hour'],
             'start_minute_options1' => $start1['minute'],
             'startdate1_ampm'       => $start1['ampm'],
@@ -1219,8 +1591,8 @@ class Event
             'cal_select'    => $cal_select,
             'contactlink_chk' => $this->options['contactlink'] == 1 ?
                                 EVCHECKED : '',
-            'lat'           => EVLIST_coord2str($this->Detail->lat),
-            'lng'           => EVLIST_coord2str($this->Detail->lng),
+            'lat'           => EVLIST_coord2str($this->Detail->getLatitude()),
+            'lng'           => EVLIST_coord2str($this->Detail->getLongitude()),
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event'),
@@ -1232,6 +1604,7 @@ class Event
                         array('id' => 'tzid', 'name' => 'tzid')),
             'tz_islocal'    => $this->tzid == 'local' ? EVCHECKED : '',
             'isNew'         => (int)$this->isNew,
+            'fomat_opt'     => $this->recurring,
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
@@ -1254,7 +1627,7 @@ class Event
                 $tick_opts .= '<tr><td><input name="tickets[' . $tick_id .
                     ']" type="checkbox" ' . $checked .
                     ' value="' . $tick_id . '" /></td>' .
-                    '<td>' . $tick_obj->description . '</td>' .
+                    '<td>' . $tick_obj->getDscp() . '</td>' .
                     '<td><input type="text" name="tick_fees[' . $tick_id .
                     ']" value="' . $fee . '" size="8" /></td></tr>' . LB;
                 /*$T->set_var(array(
@@ -1469,51 +1842,8 @@ class Event
      */
     public function MakeRecurrences()
     {
-        $events = array();
-
-        switch ($this->rec_data['type']) {
-        case 0:
-            // Single non-repeating event
-            $events[] = array(
-                    'dt_start'  => $this->date_start1,
-                    'dt_end'    => $this->date_end1,
-                    'tm_start1' => $this->time_start1,
-                    'tm_end1'   => $this->time_end1,
-                    'tm_start2' => $this->time_start2,
-                    'tm_end2'   => $this->time_end2,
-            );
-            return $events;
-            break;
-        case EV_RECUR_DATES:
-            // Specific dates.  Simple handling.
-            $Rec = new RecurDates($this);
-            break;
-        case EV_RECUR_DOM:
-            // Recurs on one or more days each month-
-            // e.g. first and third Tuesday
-            $Rec = new RecurDOM($this);
-            break;
-        case EV_RECUR_DAILY:
-            // Recurs daily for a number of days
-            $Rec = new RecurDaily($this);
-            break;
-        case EV_RECUR_WEEKLY:
-            // Recurs on one or more days each week-
-            // e.g. Tuesday and Thursday
-            $Rec = new RecurWeekly($this);
-            break;
-        case EV_RECUR_MONTHLY:
-            // Recurs on the same date(s) each month
-            $Rec = new RecurMonthly($this);
-            break;
-        case EV_RECUR_YEARLY:
-            // Recurs once each year
-            $Rec = new RecurYearly($this);
-            break;
-        }
-
-        $events = $Rec->MakeRecurrences();
-        return $events;
+        return Recurrence::getInstance($this)
+            ->MakeRecurrences();
     }
 
 
@@ -1547,22 +1877,27 @@ class Event
         Cache::clear('repeats', 'event_' . $this->id);
 
         $i = 0;
+        $vals = array();
         foreach($days as $event) {
-            $t_end = $this->split ? $event['tm_end2'] : $event['tm_end1'];
+            $t_end = $this->split ? $this->time_end2 : $this->time_end1;
+            $vals[] = "(
+                '{$this->id}', '{$this->det_id}',
+                '{$event['dt_start']}', '{$event['dt_end']}',
+                '{$this->time_start1}', '{$this->time_end1}',
+                '{$this->time_start2}', '{$this->time_end2}',
+                '{$event['dt_start']} {$this->time_start1}',
+                '{$event['dt_end']} {$t_end}'
+            )";
+        }
+        if (!empty($vals)) {
+            $vals = implode(',', $vals);
             $sql = "INSERT INTO {$_TABLES['evlist_repeat']} (
                         rp_ev_id, rp_det_id, rp_date_start, rp_date_end,
                         rp_time_start1, rp_time_end1,
                         rp_time_start2, rp_time_end2,
                         rp_start, rp_end
-                    ) VALUES (
-                        '{$this->id}', '{$this->det_id}',
-                        '{$event['dt_start']}', '{$event['dt_end']}',
-                        '{$event['tm_start1']}', '{$event['tm_end1']}',
-                        '{$event['tm_start2']}', '{$event['tm_end2']}',
-                        '{$event['dt_start']} {$event['tm_start1']}',
-                        '{$event['dt_end']} {$t_end}'
-                    )";
-            //echo $sql;
+                    ) VALUES $vals";
+            //echo $sql;die;
             DB_query($sql, 1);
         }
         return true;
@@ -1633,12 +1968,13 @@ class Event
             $this->perm_owner, $this->perm_group,
             $this->perm_members, $this->perm_anon
         );
-        $cal_access = SEC_hasAccess(
-            $this->Calendar->owner_id, $this->Calendar->group_id,
-            $this->Calendar->perm_owner, $this->Calendar->perm_group,
-            $this->Calendar->perm_members, $this->Calendar->perm_anon
-        );
-        return ($ev_access >= $level && $cal_access >= $level) ? true : false;
+        if (
+            $ev_access < $level ||
+            $this->Calendar->getSecAccess() < $level
+        ) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -1661,7 +1997,7 @@ class Event
         foreach ($this->categories as $cat_id) {
             $retval[] = array(
                 'id'    => $cat_id,
-                'name'  => $Cats[$cat_id]->cat_name,
+                'name'  => $Cats[$cat_id]->getName(),
             );
         }
         return $retval;
@@ -1679,7 +2015,7 @@ class Event
     public function saveCategory($cat_name)
     {
         $Cat = new Category();
-        $Cat->cat_name = $cat_name;
+        $Cat->setName($cat_name);
         $id = $Cat->Save();
         return $id;
     }
@@ -1699,25 +2035,26 @@ class Event
     {
         // Just check each relevant value in $A against our value.
         // If any matches, return true
-        if ($this->old_schedule['date_start1'] != $this->date_start1)
+        if (
+            $this->old_schedule['date_start1'] != $this->date_start1 ||
+            $this->old_schedule['date_end1'] != $this->date_end1 ||
+            $this->old_schedule['time_start1'] != $this->time_start1 . ':00' ||
+            $this->old_schedule['time_end1'] != $this->time_end1 . ':00'
+        ) {
             return true;
-        if ($this->old_schedule['date_end1'] != $this->date_end1)
-            return true;
-        if ($this->old_schedule['time_start1'] != $this->time_start1)
-            return true;
-        if ($this->old_schedule['time_end1'] != $this->time_end1)
-            return true;
+        }
 
         if ($this->time_start2 == '') $this->time_start2 = self::MIN_TIME;
         if ($this->time_end2 == '') $this->time_end2 = self::MAX_TIME;
 
         // Checking split times, this should cover the split checkbox also
-        if ($this->old_schedule['time_start2'] != $this->time_start2)
+        if (
+            $this->old_schedule['time_start2'] != $this->time_start2 ||
+            $this->old_schedule['time_end2'] != $this->time_end2 ||
+            $this->old_schedule['allday'] != $this->allday
+        ) {
             return true;
-        if ($this->old_schedule['time_end2'] != $this->time_end2)
-            return true;
-        if ($this->old_schedule['allday'] != $this->allday)
-            return true;
+        }
 
         // Possibilities:
         //  - was not recurring, is now.  Return true at this point.
@@ -1726,11 +2063,9 @@ class Event
         //      be empty, ignore.
         //  - was recurring, still is.  Have to check old and new rec_data
         //      arrays.
-        if ($this->old_schedule['recurring'] != $this->recurring)
+        if ($this->old_schedule['recurring'] != $this->recurring) {
             return true;
-
-        if (!empty($this->old_schedule['rec_data'])) {
-
+        } elseif (!empty($this->old_schedule['rec_data'])) {
             $old_rec = is_array($this->old_schedule['rec_data']) ?
                 $this->old_schedule['rec_data'] : array();
             $new_rec = is_array($this->rec_data) ?
@@ -1738,15 +2073,21 @@ class Event
 
             // Check the recurring event options
             $diff = self::_arrayDiffAssocRecursive($old_rec, $new_rec);
-            if (!empty($diff)) return true;
+            if (!empty($diff)) {
+                return true;
+            }
 
             // Have to descend into sub-arrays manually.  Old and/or new
             // values may not be arrays if the recurrence type was changed.
             foreach (array('listdays', 'interval', 'custom') as $key) {
-                $oldA = isset($old_rec[$key]) && is_array($old_rec[$key]) ? $old_rec[$key] : array();
-                $newA = isset($new_rec[$key]) && is_array($new_rec[$key]) ? $new_rec[$key] : array();
+                $oldA = isset($old_rec[$key]) && is_array($old_rec[$key]) ?
+                    $old_rec[$key] : array();
+                $newA = isset($new_rec[$key]) && is_array($new_rec[$key]) ?
+                    $new_rec[$key] : array();
                 $diff = self::_arrayDiffAssocRecursive($oldA, $newA);
-                if (!empty($diff)) return true;
+                if (!empty($diff)) {
+                    return true;
+                }
             }
         } else {
             // Even non-recurring events should have some empty array for
@@ -1796,7 +2137,7 @@ class Event
      * This holds the recurrence frequency, type, start, end, etc.
      *
      * @param   array   $A      Array of data, default to $_POST
-     * @return  none        Sets $this->rec_data values
+     * @return  object  $this
      */
     public function MakeRecData($A = '')
     {
@@ -1805,14 +2146,14 @@ class Event
         // Re-initialize the array, and make sure this is really a
         // recurring event
         $this->rec_data = array();
-        if (!isset($A['recurring']) || $A['recurring'] != 1) {
+        if ($this->recurring == 0) {
             $this->rec_data['type'] = 0;
             $this->rec_data['stop'] = EV_MAX_DATE;
             $this->rec_data['freq'] = 1;
-            return;
+            return $this;
         }
 
-        $this->rec_data['type'] = isset($A['format']) ? (int)$A['format'] : 0;
+        $this->rec_data['type'] = $this->recurring;
         $this->rec_data['freq'] = isset($A['rec_freq']) ? (int)$A['rec_freq'] : 1;
         if ($this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
 
@@ -1826,7 +2167,8 @@ class Event
             $this->rec_data['stop'] = EV_MAX_DATE;
         }
 
-        switch ($this->rec_data['type']) {
+                //switch ($this->rec_data['type']) {
+        switch ($this->recurring) {
         case EV_RECUR_WEEKLY:
             if (isset($A['listdays']) && is_array($A['listdays'])) {
                 $this->rec_data['listdays'] = array();
@@ -1865,6 +2207,7 @@ class Event
             // Unknown value, nothing to do
             break;
         }
+        return $this;
     }
 
 
@@ -1953,6 +2296,15 @@ class Event
     }
 
 
+    public function getLink($rp_id=0)
+    {
+        if ($rp_id == 0) {
+            $rp_id = Repeat::getNearest($this->id);
+        }
+        return EVLIST_URL . '/event.php?rp_id=' . $rp_id;
+    }
+
+
     /**
      * Get the admin list of events.
      *
@@ -1971,12 +2323,14 @@ class Event
         $header_arr = array(
             array(
                 'text' => $LANG_EVLIST['edit'],
-                'field' => 'edit', 'sort' => false,
+                'field' => 'edit',
+                'sort' => false,
                 'align' => 'center',
             ),
             array(
                 'text' => $LANG_EVLIST['copy'],
-                'field' => 'copy', 'sort' => false,
+                'field' => 'copy',
+                'sort' => false,
                 'align' => 'center',
             ),
             array(
@@ -2145,6 +2499,203 @@ class Event
             break;
         }
         return $retval;
+    }
+
+
+    /**
+     * Check if comments are allowed and open for this event.
+     *
+     * @return  boolean     True if comments can be viewed and added.
+     */
+    public function commentsAllowed()
+    {
+        return ($this->enable_comments > -1 && plugin_commentsupport_evlist());
+    }
+
+
+    /**
+     * Check if this is a new record.
+     * Used to validate the retrieval of an instance.
+     *
+     * @return  boolean     True if new, False if existing
+     */
+    public function isNew()
+    {
+        return $this->isNew ? true : false;
+    }
+
+
+    /**
+     * Get the related Calendar object.
+     *
+     * @return  object      Calendar object
+     */
+    public function getCalendar()
+    {
+        return $this->Calendar;
+    }
+
+
+    /**
+     * Get the record ID for the detail record.
+     *
+     * @return  integer     Detail record ID
+     */
+    public function getDetailID()
+    {
+        return (int)$this->det_id;
+    }
+
+
+    /**
+     * Get the posting mode.
+     *
+     * @return  string  Posting mode
+     */
+    public function getPostMode()
+    {
+        return $this->postmode;
+    }
+
+
+    /**
+     * Check if this event is split (two parts each day).
+     *
+     * @return  boolean     1 if split, 0 if not
+     */
+    public function isSplit()
+    {
+        return $this->split ? 1 : 0;
+    }
+
+
+    /**
+     * Get the recurrance type for the event (weekly, daily, etc.)
+     *
+     * @return  integer     Recurrance setting
+     */
+    public function getRecurring()
+    {
+        return (int)$this->recurring;
+    }
+
+
+    /**
+     * Set the recurring data for the event.
+     *
+     * @param   string|array    Serizlized string or array
+     * @return  object  $this
+     */
+    public function setRecData($data)
+    {
+        if (is_array($data)) {
+            $this->rec_data = $data;
+        } else {
+            $this->rec_data = @unserialize($data);
+        }
+        if (!is_array($this->rec_data)) {
+            $this->rec_data = array();
+        }
+        return $this;
+    }
+
+
+    /**
+     * Get the recurrance data for the event.
+     *
+     * @return  array       Array of recurring information
+     */
+    public function getRecData()
+    {
+        return $this->rec_data;
+    }
+
+
+    /**
+     * Check if this is an all-day event.
+     *
+     * @return  boolean     1 if all-day, 0 if timed
+     */
+    public function isAllDay()
+    {
+        return $this->allday ? 1 : 0;
+    }
+
+
+    /**
+     * Get the owner's user ID.
+     *
+     * @return  integer     Owner user ID
+     */
+    public function getOwnerID()
+    {
+        return (int)$this->owner_id;
+    }
+
+
+    /**
+     * Get the calendar ID related to this event.
+     *
+     * @return  integer     Calender record ID
+     */
+    public function getCalendarID()
+    {
+        return (int)$this->cal_id;
+    }
+
+
+    /**
+     * Check if reminders are enabled.
+     *
+     * @return  boolean     1 if enabled, 0 if not
+     */
+    public function remindersEnabled()
+    {
+        return $this->enable_reminders ? 1 : 0;
+    }
+
+
+    /**
+     * Check if comments are enabled.
+     *
+     * @return  integer     Enabled status for comments
+     */
+    public function commentsEnabled()
+    {
+        return (int)$this->enable_comments;
+    }
+
+
+    /**
+     * Get the detail information for this event.
+     *
+     * @return  object      Detail object
+     */
+    public function getDetail()
+    {
+        return $this->Detail;
+    }
+
+
+    /**
+     * Get the first starting date.
+     *
+     * @return  object      Starting date object
+     */
+    public function getStartDate1()
+    {
+        return $this->start_date1;
+    }
+
+
+    /**
+     * Get the timezone used for this event.
+     *
+     * @return  string      Timezone identifier
+     */
+    public function getTZID()
+    {
+        return $this->tzid;
     }
 
 }   // class Event

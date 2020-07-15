@@ -1581,7 +1581,7 @@ function plugin_configmanager_select_pi_cal_map_evlist()
 {
     $A = array();
     foreach (\Evlist\Calendar::getAll() as $cal) {
-        $A[$cal->cal_name] = $cal->cal_id;
+        $A[$cal->getName()] = $cal->getID();
     }
     return $A;
 }
@@ -1647,7 +1647,7 @@ function plugin_deletecomment_evlist($cid,$id)
 {
     //USES_class_evlist_repeat();
     $Rp = new Evlist\Repeat($id);
-    if ($Rp->isNew) return false;   // invalid item
+    if ($Rp->isNew()) return false;   // invalid item
 
     if (plugin_ismoderator_evlist() || $Rp->Event->isOwner()) {
         if (CMT_deleteComment($cid, $id, 'evlist') == 0) {
@@ -1692,21 +1692,28 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
 {
     global $LANG_ACCESS, $_USER;
 
-    if (!plugin_commentsupport_evlist())
+    if (!plugin_commentsupport_evlist()) {
         return '';
+    }
 
     $Rp = new Evlist\Repeat($id);
-    if (!$Rp->isNew) {
-        $delete_option = (plugin_ismoderator_evlist() ||
-                $Rp->Event->owner_id = $_USER['uid']);
-        $retval = CMT_userComments($id, $title, 'evlist', $order, $format,
-                                     $cid, $page, $view, $delete_option,
-                                     plugin_commentsupport_evlist());
+    if (!$Rp->isNew()) {
+        $delete_option = (
+            plugin_ismoderator_evlist() ||
+            $Rp->getEvent()->getOwnerID() == $_USER['uid']
+        );
+        $retval = CMT_userComments(
+            $id, $title, 'evlist', $order, $format,
+            $cid, $page, $view, $delete_option,
+            plugin_commentsupport_evlist()
+        );
     } else {
-        $retval = COM_startBlock($LANG_ACCESS['accessdenied'], '',
-                        COM_getBlockTemplate ('_msg_block', 'header'))
-                . $LANG_ACCESS['storydenialmsg']
-                . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
+        $retval = COM_startBlock(
+            $LANG_ACCESS['accessdenied'], '',
+            COM_getBlockTemplate ('_msg_block', 'header')
+        )
+        . $LANG_ACCESS['storydenialmsg']
+        . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
     }
     return $retval;
 }
@@ -1721,12 +1728,7 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
  */
 function plugin_getconfigelementhelp_evlist($element, $doclang )
 {
-    if (version_compare(GVERSION, '1.6.0', '<')) {
-        $file = 'config.legacy.html';
-    } else {
-        $file = 'config.html';
-    }
-
+    $file = 'config.html';
     $doc_url = EVLIST_getDocURL($file, $doclang);
     if (empty($doc_url))
         return false;
@@ -2087,7 +2089,10 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         COM_errorLog(__FUNCTION__ . ": Event $id from $type must have a title");
         return;        // Must have a title
     }
-    if (!$info['year']) $info['year'] = $_EV_CONF['_now']->format('Y');
+
+    if (!$info['year']) {
+        $info['year'] = $_EV_CONF['_now']->format('Y');
+    }
     if ($info['date']) {
         $date = $info['date'];
     } else {
@@ -2123,7 +2128,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'eid' => $ev_id,
         'owner_id' => $info['owner_id'] ? $info['owner_id'] : 2,
         'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
-        'cal_id' => $Cal->cal_id,
+        'cal_id' => $Cal->getID(),
         'title' => $info['title'],
         'summary' => $summary,
         'full_description' => $full_dscp,
@@ -2147,6 +2152,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'perm_members' => array ( 0 => $info['perms']['perm_members'] ),
         'perm_anon' => array ( 0 => $info['perms']['perm_anon'] ),
     );
+
     if ($info['time_start'] && $info['time_end']) {
         // This is a timed event if both start and end times are given.
         // Convert to the same 12-hour variables as the submisison form.
@@ -2177,7 +2183,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         // No times specified = all-day event
         $A['allday'] = 1;
     }
-    $Ev->Save($A, 'evlist_events');
+    $Ev->Save($A, false);
 }
 
 
@@ -2398,7 +2404,7 @@ function EVLIST_getEvents($start='', $end='', $opts=array())
                 $A['rec_data'] = @unserialize($A['rec_data']);
                 // Set a valid foreground and background color
                 if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
-                if (empty($A['bgcolor'])) $A['fgcolor'] = 'inherit';
+                if (empty($A['bgcolor'])) $A['bgcolor'] = 'inherit';
                 if ($A['rp_date_start'] == $A['rp_date_end']) {
                     // Single-day event just gets added to the array
                     $events[$A['rp_date_start']][] = $A;
@@ -2539,9 +2545,10 @@ function EVLIST_getIcon($name, $style='')
     global $_EV_CONF;
 
     if ($name == '') return '';
-    if ($style != '')
+    if ($style != '') {
         $style = ' ev-icon-' . $style;
-    return $_EV_CONF['_iconset'] . '-' . $name . $style;
+    }
+    return 'uk-icon uk-icon-' . $name . $style;
 }
 
 

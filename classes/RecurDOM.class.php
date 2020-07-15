@@ -17,7 +17,7 @@ namespace Evlist;
  * Class for handling recurrence by day of month.
  * @package evlist
  */
-class RecurDOM extends Recur
+class RecurDOM extends Recurrence
 {
     /**
      * Create the recurring dates.
@@ -29,13 +29,13 @@ class RecurDOM extends Recur
     {
         global $_EV_CONF;
 
-        $intervalA = $this->event->rec_data['interval'];
+        $intervalA = $this->rec_data['interval'];
         if (!is_array($intervalA)) {
             $intervalA = array($intervalA);
         }
-
-        if (!isset($this->event->rec_data['weekday']))   // Missing day of week
+        if (!isset($this->rec_data['weekday'])) {   // Missing day of week
             return $this->events;
+        }
 
         $occurrence = $this->dt_start;
         list($y, $m, $d) = explode('-', $occurrence);
@@ -46,9 +46,9 @@ class RecurDOM extends Recur
         $count = 0;
         // reduce the weekday number, since evlist uses Sun=1 while
         // DateFunc uses Sun=0
-        $datecalc_weekday = (int)$this->event->rec_data['weekday'] - 1;
+        $datecalc_weekday = (int)$this->rec_data['weekday'] - 1;
 
-        while ($occurrence <= $this->event->rec_data['stop'] &&
+        while ($occurrence <= $this->rec_data['stop'] &&
                     $occurrence >= '1971-01-01' &&
                     $count < $_EV_CONF['max_repeats']) {
 
@@ -71,7 +71,7 @@ class RecurDOM extends Recur
                 }
 
                 // Stop when we hit the stop date
-                if ($occurrence > $this->event->rec_data['stop']) break;
+                if ($occurrence > $this->rec_data['stop']) break;
 
                 // This occurrence is ok, save it
                 $this->storeEvent($occurrence);
@@ -83,7 +83,7 @@ class RecurDOM extends Recur
 
             // We've gone through all the intervals this month, now
             // increment the month
-            $m += $this->event->rec_data['freq'];
+            $m += $this->rec_data['freq'];
             if ($m > 12) {      // Roll over to next year
                 $y += 1;
                 $m = $m - 12;

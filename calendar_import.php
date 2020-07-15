@@ -114,7 +114,7 @@ function evlist_import_calendar_events()
 
         // Force it to be a new event even though we have an event ID
         $Ev->isNew = true;
-        if ($Ev->Save($E, 'evlist_events', true) !== '') {
+        if ($Ev->Save($E, false, true) !== '') {
             COM_errorLog(sprintf($LANG_EVLIST['err_import_event'], $A['eid']));
             $errors++;
             continue;       // This one failed, keep trying the others

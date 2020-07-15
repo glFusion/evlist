@@ -1,37 +1,28 @@
 {# begin {templatelocation} #}
-<table style="width:100%;border-collapse: collapse;border-spacing:0px solid #CCC; margin-bottom:10px;">
-  <tr style="vertical-align:middle;">
-    <td class="pluginTitle alignleft" style="padding:4px;">
+    <div style="margin-bottom:2px;">
+        <h2 style="font-style:italic;">{$LANG_EVLIST['upcoming_events']}...</h2>
+    </div>
+<div class="uk-grid uk-grid-match uk-width-1-1 uk-match">
+    <div class="uk-hidden-small uk-width-medium-2-6">
         <b>{$LANG_EVLIST['event_title']}</b>
-    </td>
-    <td class="pluginTitle alignleft" style="padding:4px;">
+    </div>
+    <div class="uk-hidden-small uk-width-medium-3-6">
         <b>{$LANG_EVLIST['event_summary']}</b>
-    </td>
-    <td class="pluginTitle alignleft" style="padding:4px;width:12em;">
+    </div>
+    <div  class="uk-hidden-small uk-width-medium-1-6">
         <b>{$LANG_EVLIST['start_date']}</b>
-    </td>
-  </tr>
-
-  <!-- BEGIN eventRow -->
-  <tr class="pluginRow{cssid}">
-    <td class="" style="padding-left:6px; height:20px;">
-        <b>
-{!if is_birthday}
-        {title}
-{!else}
+    </div>
+<!-- BEGIN eventRow -->
+    <div class="uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
         <a data-uk-tooltip title="{summary}::{startdate}"
-            href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
-{!endif}
-        </b>
-    </td>
-    <td class="pluginLinks" style="padding-left:6px; height:20px;">
+                href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
+    </div>
+    <div class="uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
         {summary}
-    </td>
-    <td class="pluginLinks">
+    </div>
+    <div class="uk-width-medium-1-6 uk-width-1-1" style="margin-bottom:10px;">
         {startdate}
-    </td>
-  </tr>
-  <!-- END eventRow -->
-
-</table>
+    </div>
+<!-- END eventRow -->
+</div>
 {# end {templatelocation} #}

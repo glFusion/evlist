@@ -1399,10 +1399,10 @@ function EVLIST_obfuscate($str)
  * - The string length for displayed items, currently 96
  *
  * @param  array   $A      Array of block info
- * @param  string  $catcal Category or calendar id, e.g. "cat:2" or "cat:2:cal:3"
+ * @param  string  $params  Parameters, e.g. 'limit:3 cat:2 cal:5'
  * @return string  HTML for the block, empty if no qualifying events
  */
-function phpblock_evlist_upcoming($A='', $catcal='')
+function phpblock_evlist_upcoming($A='', $params='')
 {
     global $_EV_CONF, $_CONF;
 
@@ -1423,25 +1423,25 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     // Set the start & ending periods.
     $dt = new Date($_EV_CONF['_today_ts'] + (86400 * $max_days));
     $end = $dt->format('Y-m-d', true);
-    $limit = (int)$_EV_CONF['limit_block'];
 
     // Figure out the selected category & calendar.  Only one supported now,
     // defaults to category.
     $cal = 0;
     $cat = 0;
-    if (is_numeric($catcal)) {
-        $cat = (int)$catcal;
+    $limit = (int)$_EV_CONF['limit_block'];
+    if (is_numeric($params)) {
+        // backward compatibility, default to only the category.
+        $cat = (int)$params;
     } else {
-        $catcalA = explode(':', $catcal);
-        if (!empty($catcalA)) {
-            $c = count($catcalA);
-            for ($i = 0; $i < $c; $i += 2) {
-                $val = isset($catcalA[$i + 1]) ? (int)$catcalA[$i + 1] : 0;
-                if ($val < 1) continue;
-                switch ($catcalA[$i]) {
+        $parms = explode(' ', $params);
+        foreach ($parms as $part) {
+            $parts = explode(':', $part);
+            foreach ($parts as $key=>$val) {
+                switch ($key) {
                 case 'cat':
                 case 'cal':
-                    $$catcalA[$i] = $val;
+                case 'limit':
+                    $$key = (int)$val;
                     break;
                 }
             }
@@ -1449,14 +1449,16 @@ function phpblock_evlist_upcoming($A='', $catcal='')
     }
 
     $opts = array(
-            'cat' => $cat,
-            'cal' => $cal,
-            'show_upcoming' => 1,
-            'limit' => $limit,
-            'upcoming' => true,
+        'cat' => $cat,
+        'cal' => $cal,
+        'show_upcoming' => 1,
+        'limit' => $limit,
+        'upcoming' => true,
     );
     $events = EVLIST_getEvents($_EV_CONF['_today'], $end, $opts);
-    if (empty($events)) return $retval;
+    if (empty($events)) {
+        return $retval;
+    }
 
     $T = new Template(EVLIST_PI_PATH . '/templates');
     $T->set_file('block','phpblock.thtml');

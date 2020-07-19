@@ -700,6 +700,11 @@ class Repeat
             'timezone'  => $this->tzid,
             'tz_offset' => sprintf('%+d', $this->dtStart1->getOffsetFromGMT(true)),
             'social_icons'  => $ss,
+            'icon_remove' => Icon::getIcon('delete'),
+            'icon_edit' => Icon::getIcon('edit'),
+            'icon_copy' => Icon::getIcon('copy'),
+            'icon_subscribe' => Icon::getIcon('subscribe'),
+            'icon_print' => Icon::getIcon('print'),
         ) );
 
         $outputHandle = \outputHandler::getInstance();

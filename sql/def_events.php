@@ -54,7 +54,7 @@ $DEFVALUES['evlist_submissions'] = "INSERT INTO {$_TABLES['evlist_submissions']}
         `owner_id`, `group_id`, `perm_owner`, `perm_group`, `perm_members`,
         `perm_anon`, `det_id`, `show_upcoming`, `cal_id`, `options`)
     VALUES
-        ('20070924133400211','2011-02-01','2011-02-01','17:00:00','21:15:00','','',0,'a:2:{s:4:\"type\";i:0;s:4:\"stop\";s:10:\"2037-12-31\";}',0,0,1,'plaintext',2,1,2,2,3,0,0,0,3,1,1,'a:1:{s:11:\"contactlink\";i:1;}')
+        ('20070924133400211','2011-02-01','2011-02-01','17:00:00','21:15:00',NULL,NULL,0,'a:2:{s:4:\"type\";i:0;s:4:\"stop\";s:10:\"2037-12-31\";}',0,0,1,'plaintext',2,1,2,2,3,0,0,0,3,1,1,'a:1:{s:11:\"contactlink\";i:1;}')
 ";
 
 $DEFVALUES['evlist_detail'] = "INSERT INTO {$_TABLES['evlist_detail']}

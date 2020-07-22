@@ -54,17 +54,17 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
         }
         $TT = new Evlist\TicketType($tick_type);
         $Ev = new Evlist\Event($ev_id);
-        if (isset($Ev->options['tickets'][$tick_type])) {
-            $fee = (float)$Ev->options['tickets'][$tick_type]['fee'];
+        $evTickTypes = $Ev->getOption('tickets');
+        if (isset($evTickTypes[$tick_type])) {
+            $fee = (float)$evTickTypes[$tick_type]['fee'];
         } else {
             $fee = 0;
         }
-
-        $short_desc = $TT->getDscp() . ': ' . $Ev->Detail->title;
+        $short_desc = $TT->getDscp() . ': ' . $Ev->getDetail()->getTitle();
         if ($rp_id > 0) {
             $Rp = new Evlist\Repeat($rp_id);
-            if ($Rp->rp_id == $rp_id) { // valid repeat ID
-                $short_desc .= ', ' . $Rp->date_start . ' ' . $Rp->time_start1;
+            if ($Rp->getID() == $rp_id) { // valid repeat ID
+                $short_desc .= ', ' . $Rp->getDateStart1()->format('Y-m-d') . ' ' . $Rp->getTimeStart1();
                 $output['url'] = $Ev->getLink($rp_id);
             } else {
                 return PLG_RET_ERROR;

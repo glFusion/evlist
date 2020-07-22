@@ -21,7 +21,7 @@ evList has the following system requirements:
 
     * PHP 7.0 and higher.
     * glFusion v1.7.0 or newer
-    * lgLib plugin
+    * lgLib plugin v1.0.10 or newer
     * Shop Plugin 0.7.0 or higher, if used.
 
 evList makes use of the lgLib plugin to handle messages and PDF creation.

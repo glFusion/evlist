@@ -531,7 +531,6 @@ class Ticket
         ) {
             return "There are no tickets available to print";
         }
-        USES_lglib_class_fpdf();
 
         // Track when the event information is read to avoid duplicate
         // reading.
@@ -540,7 +539,7 @@ class Ticket
         // create params array for qrcode, if used
         $params = array('module_size'=>5);
 
-        $pdf = new \FPDF();
+        $pdf = new \TCPDF();
         $pdf->SetLeftMargin(20);
         $pdf->AddPage();
 

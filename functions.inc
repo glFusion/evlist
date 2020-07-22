@@ -755,11 +755,10 @@ function EVLIST_cb_content($format)
                     $summary = $summary . '...';
                 }
             }
-
-            $s_ts1 = strtotime($A['rp_date_start'].' '.$A['rp_time_start1']);
-            $e_ts1= strtotime($A['rp_date_end'].' '.$A['rp_time_end1']);
+            $s_ts1 = strtotime($A['rp_start']);
+            $e_ts1 = strtotime($A['rp_end']);
             $email = isset($A['email']) ? EVLIST_obfuscate($A['email']) : '';
-            $cssid = ($cssid ==1) ? 2: 1;
+            $cssid = ($cssid == 1) ? 2: 1;
 
             if (isset($A['postmode']) && $A['postmode'] != 'plaintext') {
                 $full_dscp = PLG_replaceTags($A['full_description']);
@@ -2247,6 +2246,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
     $opt_join = '';
     $opt_where = '';
     $opt_order = 'ASC';
+    $orderby = 'rep.rp_start';
     $grp_by = 'rep.rp_id';
     $limit = 0;
     $page = 0;
@@ -2351,7 +2351,7 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             COM_getPermSQL('AND', 0, 2, 'cal') .
             " $opt_where
             GROUP BY $grp_by ASC
-            ORDER BY rep.rp_start $opt_order";
+            ORDER BY $orderby $opt_order";
             //ORDER BY rep.rp_date_start $opt_order,
             //        rep.rp_time_start1 $opt_order";
     if ($limit > 0) {

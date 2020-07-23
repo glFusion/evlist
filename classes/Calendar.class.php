@@ -792,7 +792,7 @@ class Calendar
                     '&nbsp;' . Icon::getHTML(
                     'question-circle', 'tooltip',
                         array('title' => $LANG_EVLIST_HELP['del_hdr1'])
-                    ),,
+                    ),
                 'field' => 'delete',
                 'sort'  => 'false',
                 'align' => 'center',

@@ -902,12 +902,11 @@ function toggleRSVPdetail(val)
 
     <p style="text-align:left;">
       <button type="submit" class="uk-button uk-button-success" name="{saveaction}" value="{$LANG_ADMIN['save']}" />{$LANG_ADMIN['save']}</button>
-      <button type="reset" class="uk-button" name="reset" value="{$LANG_EVLIST['reset']}" />{$LANG_EVLIST['reset']}</button>
+      <button type="reset" class="uk-button uk-button-primary" name="reset" value="{$LANG_EVLIST['reset']}" />{$LANG_EVLIST['reset']}</button>
       {!if del_button}
         <button type="submit" class="uk-button uk-button-danger" name="{delaction}" value="{$LANG_ADMIN['delete']}" />{$LANG_ADMIN['delete']}</button>
       {!endif}
-      <button type="reset" class="uk-button uk-button-primary" name="cancel" value="{$LANG_ADMIN['cancel']}"
-           onclick="javascript: document.location.href='{cancel_url}'" />{$LANG_ADMIN['cancel']}</button>
+      <a class="uk-button" href="{cancel_url}">{$LANG_ADMIN['cancel']}</a>
     </p>
 
     <div class="uk-margin-right-small uk-hidden-small tm-admin-save" data-uk-scrollspy="{cls:'uk-animation-slide-bottom', delay:900}">
@@ -918,10 +917,8 @@ function toggleRSVPdetail(val)
           </button>
         </li>
         <li>
-          <button class="uk-button uk-button-primary tm-admin-save-button-width" type="reset" value="{$LANG_ADMIN['reset']" name="reset" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['cancel']}"
-           onclick="javascript: document.location.href='{cancel_url}'" />
-            <i class="uk-icon-undo"></i>
-          </button>
+          <a class="uk-button tm-admin-save-button-width" data-uk-tooltip="{pos:'left'}" title="{$LANG_ADMIN['cancel']}"
+           href="{cancel_url}"><i class="uk-icon-undo"></i></a>
         </li>
 {!if del_button}
         <li>

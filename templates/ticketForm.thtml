@@ -29,9 +29,8 @@
   </div>
   <div class="uk-form-controls">
     <button type="submit" class="uk-button uk-button-success" name="saveticket" value="{$LANG_ADMIN['save']}">{$LANG_ADMIN['save']}</button>
-    <button type="reset" class="uk-button" value="{$LANG_EVLIST['reset']}">{$LANG_EVLIST['reset']}</button>
-    <button type="reset" class="uk-button uk-button-primary" value="{$LANG_ADMIN['cancel']}" name="cancel" 
-        onclick="javascript: document.location.href='{site_admin_url}/plugins/evlist/index.php?tickettypes'">{$LANG_ADMIN['cancel']}</button>
+    <button type="reset" class="uk-button uk-button-primary" value="{$LANG_EVLIST['reset']}">{$LANG_EVLIST['reset']}</button>
+    <a class="uk-button" href="{site_admin_url}/plugins/evlist/index.php?tickettypes">{$LANG_ADMIN['cancel']}</a>
       <button type="submit" class="uk-button uk-button-danger" name="delticket" value="{$LANG_ADMIN['delete']}">{$LANG_ADMIN['delete']}</button>
   </div>
 </form>

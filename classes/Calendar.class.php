@@ -343,7 +343,6 @@ class Calendar
                         $this->perm_members, $this->perm_anon),
             'stat_chk'      => $this->cal_status == 1 ? EVCHECKED : '',
             'ical_chk'      => $this->cal_ena_ical == 1 ? EVCHECKED : '',
-            'cancel_url'    => EVLIST_ADMIN_URL. '/index.php?admin=cal',
             'can_delete'    => $this->cal_id > 1 ? 'true' : '',
             'doc_url'       => EVLIST_getDocUrl('calendar', 'evlist'),
             'colorpicker_js' => LGLIB_colorpicker(array(

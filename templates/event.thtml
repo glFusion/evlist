@@ -231,7 +231,7 @@
 {!if show_reminderform}
 <div class="evEventItem">
   <div id="reminder_no" class="evdata uk-alert" style="display:none;">
-    <form id="evRemAdd" onsubmit="updateReminder(this);return false;">
+    <form class="uk-form" id="evRemAdd" onsubmit="updateReminder(this);return false;">
       {$LANG_EVLIST['email']}
       <input type="text" size="32" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
       <input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
@@ -269,37 +269,41 @@
 
 {!if register_link}
 <div style="clear:both;" class="evEventRegInfo">
-  <label>{$LANG_EVLIST['signup']}</label>
   <div id="regdiv" class="evdata" style="margin-top:15px;"></div>
 
-  <form id="rsvp" action="{site_url}/evlist/event.php" method="post">
-    <input type="hidden" name="rp_id" value="{rp_id}" />
-    {$LANG_EVLIST['quantity']}:
+  <form class="uk-form uk-form-horizontal" id="rsvp" action="{site_url}/evlist/event.php" method="post">
+    <div class="uk-form-row">
+        <label class="uk-form-label">{$LANG_EVLIST['signup']}</label>
+        <div class="uk-form-controls">
+            <input type="hidden" name="rp_id" value="{rp_id}" />
+            {$LANG_EVLIST['quantity']}:
 {!if register_unltd}
-    <input type="text" size="3" name="tick_count" value="1" />
+            <input type="text" size="3" name="tick_count" value="1" />
 {!elseif register_multi}
-    <select name="tick_count">
-      <!-- BEGIN tickCntBlk -->
-      <option value="{tick_cnt}">{tick_cnt}</option>
-      <!-- END tickCntBlk -->
-    </select>
+            <select name="tick_count">
+<!-- BEGIN tickCntBlk -->
+                <option value="{tick_cnt}">{tick_cnt}</option>
+<!-- END tickCntBlk -->
+            </select>
 {!else}
-    <input type="hidden" name="tick_count" value="1" />1
+            <input type="hidden" name="tick_count" value="1" />1
 {!endif}
 
 {!if ticket_types_multi}
-    <select name="tick_type">
-      <!-- BEGIN tickTypeBlk -->
-      <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
-      <!-- END tickTypeBlk -->
-    </select>
+            <select name="tick_type">
+<!-- BEGIN tickTypeBlk -->
+                <option value="{tick_type}">{tick_descr} - {tick_fee}</option>
+<!-- END tickTypeBlk -->
+            </select>
 {!else}
-    <input type="hidden" name="tick_type" value="{tick_type}" />
-    {tick_descr} - {tick_fee}
+            <input type="hidden" name="tick_type" value="{tick_type}" />
+            {tick_descr} - {tick_fee}
 {!endif}
 
-    <input type="submit" class="uk-button uk-button-success uk-button-small" name="register"
-        value="{$LANG_EVLIST['register']}" />
+            <button type="submit" class="lgButton orange" name="register"
+                value="{$LANG_EVLIST['register']}">{$LANG_EVLIST['register']}</button>
+        </div>
+    </div>
   </form>
 
 </div>

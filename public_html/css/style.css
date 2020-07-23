@@ -162,6 +162,9 @@
     clear:both;
     margin-top:15px;
 }
+form#rsvp label {
+    width: inherit;
+}
 
 .evlistRedNote {
     font-size: small;
@@ -738,4 +741,7 @@ div.evPrtDataItem div.evdata {
 .ev-social {
     clear: both;
     margin-bottom: 5px;
+}
+div.uk-grid.ev-cb-table {
+    margin-top: 5px;
 }

@@ -1446,11 +1446,11 @@ class Repeat
             'item_number' => 'evlist:eventfee:' . $this->Event->getID() . '/' .
                     $tick_type . '/' . $rp_id,
             'item_name' => $TickType->getDscp() . ': ' . $LANG_EVLIST['fee'] . ' - ' .
-                    $this->Event->getDetail()->getTitle() . ' ' . $this->start_date1 .
-                    ' ' . $this->start_time1,
+                    $this->Event->getDetail()->getTitle() . ' ' . $this->date_start.
+                    ' ' . $this->time_start1,
             'short_description' => $TickType->getDscp() . ': ' .
-                    $this->Event->getDetail()->getTitle() . ' ' . $this->start_date1 .
-                    ' ' . $this->start_time1,
+                    $this->Event->getDetail()->getTitle() . ' ' . $this->date_start .
+                    ' ' . $this->time_start1,
 
             'amount' => number_format((float)$fee, 2, '.', ''),
             'quantity' => $qty,

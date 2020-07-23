@@ -450,7 +450,7 @@ case 'tickets':
     break;
 
 case 'editcat':
-    $C = new Evlist\Category($_GET['id']);
+    $C = new Evlist\Category($actionval);
     $content .= $C->Edit();
     break;
 

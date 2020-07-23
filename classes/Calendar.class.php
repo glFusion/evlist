@@ -789,8 +789,10 @@ class Calendar
             ),
             array(
                 'text'  => $LANG_ADMIN['delete'] .
-                    '&nbsp;<i class="uk-icon-question-circle tooltip" title="' .
-                    $LANG_EVLIST_HELP['del_hdr1'] . '"></i>',
+                    '&nbsp;' . Icon::getHTML(
+                    'question-circle', 'tooltip',
+                        array('title' => $LANG_EVLIST_HELP['del_hdr1'])
+                    ),,
                 'field' => 'delete',
                 'sort'  => 'false',
                 'align' => 'center',
@@ -890,7 +892,7 @@ class Calendar
             $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
                 ';">' . $fieldvalue;
             if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
-                $retval .= '&nbsp;<i class="uk-icon uk-icon-' . $A['cal_icon'] . '"></i>';
+                $retval .= '&nbsp;' . Icon::getHTML($A['cal_icon']);
             }
             $retval .= '</span>';
             break;

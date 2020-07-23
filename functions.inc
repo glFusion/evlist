@@ -301,7 +301,7 @@ function plugin_getmenuitems_evlist()
     }
 
     if ($_EV_CONF['enable_menuitem'] == '1') {
-        $icon = '&nbsp;<i class="' . EVLIST_getIcon('calendar', ''). '"></i>';
+        $icon = '&nbsp;' . Evlist\Icon::gethTML('calendar');
         $menuitems[$LANG_EVLIST['pi_title'] . $icon] = EVLIST_URL . '/index.php';
     }
     return $menuitems;
@@ -2550,7 +2550,7 @@ function EVLIST_getIcon($name, $style='')
     if ($style != '') {
         $style = ' ev-icon-' . $style;
     }
-    return 'uk-icon uk-icon-' . $name . $style;
+    return 'uk-icon-' . $name . $style;
 }
 
 

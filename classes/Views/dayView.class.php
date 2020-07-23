@@ -11,6 +11,7 @@
  * @filesource
  */
 namespace Evlist\Views;
+use Evlist\Icon;
 
 
 /**
@@ -86,7 +87,7 @@ class dayView extends \Evlist\View
                     'cal_id'        => $A['cal_id'],
                     'br'            => $i < $alldaycount ? '<br />' : '',
                     'show'      => self::getCalShowPref($A['cal_id']) ? 'block' : 'none',
-                    'icon'      => EVLIST_getIcon($A['cal_icon']),
+                    'icon'      => Icon::getIcon($A['cal_icon']),
                 ) );
                 switch ($A['cal_id']) {
                 case -1:
@@ -149,7 +150,7 @@ class dayView extends \Evlist\View
                     'cal_id'        => $A['data']['cal_id'],
                     'event_time'    => $start_time . ' - ' . $end_time,
                     'show'      => self::getCalShowPref($A['data']['cal_id']) ? 'block' : 'none',
-                    'icon'      => EVLIST_getIcon($A['data']['cal_icon']),
+                    'icon'      => Icon::getIcon($A['data']['cal_icon']),
                 ) );
                 // Only evlist and meetup events are hourly, birthdays are
                 // handled as allday events above.

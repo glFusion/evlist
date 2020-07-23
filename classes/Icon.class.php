@@ -22,24 +22,24 @@ class Icon
     /** Icon key-value pairs.
      * @var array */
     static $icons = array(
-        'edit'      => 'uk-icon uk-icon-edit',
-        'delete'    => 'uk-icon uk-icon-remove uk-text-danger',
-        'delete-disabled' => 'uk-icon uk-icon-remove uk-text-disabled',
-        'copy'      => 'uk-icon uk-icon-clone',
-        'edit'      => 'uk-icon uk-icon-edit',
-        'arrow-up'  => 'uk-icon uk-icon-arrow-up',
-        'arrow-down'=> 'uk-icon uk-icon-arrow-down',
-        'reset'     => 'uk-icon uk-icon-refresh',
-        'trash'     => 'uk-icon uk-icon-trash uk-icon-danger',
-        'envelope'  => 'uk-icon uk-icon-envelope',
-        'checked'   => 'uk-icon uk-icon-check uk-text-success',
-        'question'  => 'uk-icon uk-icon-question-circle',
-        'blocked'   => 'uk-icon uk-icon-minus-circle uk-text-danger',
-        'alert'     => 'uk-icon uk-icon-exclamation-triangle uk-text-danger',
-        'toggle-on' => 'uk-icon uk-icon-toggle-on uk-text-success',
-        'toggle-off' => 'uk-icon uk-icon-toggle-off',
-        'subscribe' => 'uk-icon uk-icon-calendar',
-        'print' => 'uk-icon uk-icon-print',
+        'edit'      => 'uk-icon-edit',
+        'delete'    => 'uk-icon-remove uk-text-danger',
+        'delete-disabled' => 'uk-icon-remove uk-text-disabled',
+        'copy'      => 'uk-icon-clone',
+        'edit'      => 'uk-icon-edit',
+        'arrow-up'  => 'uk-icon-arrow-up',
+        'arrow-down'=> 'uk-icon-arrow-down',
+        'reset'     => 'uk-icon-refresh',
+        'trash'     => 'uk-icon-trash uk-icon-danger',
+        'envelope'  => 'uk-icon-envelope',
+        'checked'   => 'uk-icon-check uk-text-success',
+        'question'  => 'uk-icon-question-circle',
+        'blocked'   => 'uk-icon-minus-circle uk-text-danger',
+        'alert'     => 'uk-icon-exclamation-triangle uk-text-danger',
+        'toggle-on' => 'uk-icon-toggle-on uk-text-success',
+        'toggle-off' => 'uk-icon-toggle-off',
+        'subscribe' => 'uk-icon-calendar',
+        'print' => 'uk-icon-print',
     );
 
 
@@ -55,7 +55,7 @@ class Icon
         if (array_key_exists($str, self::$icons)) {
             return self::$icons[$str];
         } else {
-            return '';
+            return 'uk-icon-' . $str;
         }
     }
 
@@ -73,18 +73,16 @@ class Icon
     public static function getHTML($str, $cls = '', $extra = array())
     {
         $icon = self::getIcon($str);
-        if ($icon != '') {
-            if ($cls != '') {
-                // If addition class values are included, add them
-                $icon .= ' ' . $cls;
-            }
-            $extras = '';
-            // Assemble the extra HTML, if any, into the string
-            foreach ($extra as $key=>$val) {
-                $extras .= ' ' . $key . '="' . $val . '"';
-            }
-            $icon = '<i class="' . $icon . '" ' . $extras . '></i>';
+        if ($cls != '') {
+            // If addition class values are included, add them
+            $icon .= ' ' . $cls;
         }
+        $extras = '';
+        // Assemble the extra HTML, if any, into the string
+        foreach ($extra as $key=>$val) {
+            $extras .= ' ' . $key . '="' . $val . '"';
+        }
+        $icon = '<i class="' . $icon . '" ' . $extras . '></i>';
         return $icon;
     }
 

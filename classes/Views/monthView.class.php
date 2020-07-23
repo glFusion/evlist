@@ -12,6 +12,7 @@
  */
 namespace Evlist\Views;
 use Evlist\DateFunc;
+use Evlist\Icon;
 
 /**
  * Display a monthly calendar.
@@ -180,7 +181,7 @@ class monthView extends \Evlist\View
                         'bgcolor'   => $event['bgcolor'],
                         'pi_url'    => EVLIST_URL,
                         'show'      => $this->getCalShowPref($event['cal_id']) ? 'block' : 'none',
-                        'icon'      => EVLIST_getIcon($event['cal_icon']),
+                        'icon'      => Icon::getIcon($event['cal_icon']),
                     ) );
                     switch ($event['cal_id']) {
                     case -1:

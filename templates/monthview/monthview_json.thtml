@@ -1,13 +1,13 @@
 {# begin {templatelocation} #}
 <div class="evlist_header uk-width-1-1">
   <div class="uk-width-1-3 floatleft" style="text-align:right;">
-    <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, 1, 'month');" href="#!"><i class="uk-icon uk-icon-backward ev-icon-info"></i></a>
+    <a id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, 1, 'month');" href="#!"><i class="uk-icon-backward ev-icon-info"></i></a>
   </div>
   <div class="uk-width-1-3 floatleft">
     <span id="date_range">{thismonth_str}, {thisyear}</span>
   </div>
   <div class="uk-width-1-3 floatleft" style="text-align:left;">
-    <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#!"><i class="uk-icon uk-icon-forward ev-icon-info"></i></a>
+    <a id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, 1, 'month');" href="#!"><i class="uk-icon-forward ev-icon-info"></i></a>
   </div>
 </div>
 {cal_checkboxes}
@@ -42,7 +42,7 @@
 <div id="evlistCalendarPrintLink">
   <p>
     <a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="Print">
-      <i class="uk-icon uk-icon-print"></i>
+      <i class="uk-icon-print"></i>
     </a>
   </p>
 </div>

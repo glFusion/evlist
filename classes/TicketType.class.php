@@ -337,16 +337,22 @@ class TicketType
             ),
             array(
                 'text' => $LANG_EVLIST['event_pass'] .
-                    ' <i class="tooltip uk-icon uk-icon-question-circle" title="' .
-                    $LANG_EVLIST_HELP['event_pass'] . '"></i>',
+                    '&nbsp;' . Icon::getHTML(
+                        'question-circle',
+                        'tooltip',
+                        array('title' => $LANG_EVLIST_HELP['event_pass'])
+                    ),
                 'field' => 'event_pass',
                 'sort' => false,
                 'align' => 'center',
             ),
             array(
                 'text'  => $LANG_ADMIN['delete'] .
-                    '&nbsp;<i class="uk-icon-question-circle tooltip" title="' .
-                    $LANG_EVLIST_HELP['del_hdr1'] . '"></i>',
+                    '&nbsp;' . Icon::getHTML(
+                        'question-circle',
+                        'tooltip',
+                        array('title' => $LANG_EVLIST_HELP['del_hdr1'])
+                    ),
                 'field' => 'delete',
                 'sort' => false,
                 'align' => 'center',
@@ -405,7 +411,7 @@ class TicketType
         switch($fieldname) {
         case 'edit':
             $retval = COM_createLInk(
-                '<i class="uk-icon-edit"></i>',
+                Icon::getHTML('edit'),
                 EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['tt_id'],
                 array(
                     'title' => $LANG_ADMIN['edit'],
@@ -432,9 +438,10 @@ class TicketType
         case 'delete':
             if (!self::isUsed($A['tt_id'])) {
                 $retval = COM_createLink(
-                    $_EV_CONF['icons']['delete'],
+                    Icon::getHTML('delete'),
                     EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['tt_id'],
                     array(
+                        'class' => 'tooltip',
                         'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                         'title' => $LANG_ADMIN['delete'],
                     )

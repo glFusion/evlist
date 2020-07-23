@@ -12,6 +12,7 @@
  */
 namespace Evlist\Views;
 use Evlist\DateFunc;
+use Evlist\Icon;
 
 /**
  * Create a weekly view calendar.
@@ -170,7 +171,7 @@ class weekView extends \Evlist\View
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
                     'show'      => $this->getCalShowPref($A['cal_id']) ? 'block' : 'none',
-                    'icon'      => EVLIST_getIcon($A['cal_icon']),
+                    'icon'      => Icon::getIcon($A['cal_icon']),
                 ) );
                 switch ($A['cal_id']) {
                 case -1:

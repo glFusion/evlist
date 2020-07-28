@@ -112,7 +112,7 @@ function ChangeDate(year, month, day, view)
     <input type="hidden" name="jumpdate" id="f_jumpdate" value="{curdate}" data-uk-datepicker onchange="jump2date(this.value);"/>
     <script type="text/javascript">
         $( "#f_jumpdate" ).datepicker({
-          buttonText: '<i class="uk-icon-calendar tooltip"></i>',
+          buttonText: '<i class="uk-icon-calendar"></i>',
           showOn: "button",
           dateFormat: "yy-mm-dd",
           changeMonth: true,

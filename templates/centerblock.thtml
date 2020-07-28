@@ -1,30 +1,32 @@
 {# begin {templatelocation} #}
-<div style="margin-bottom:2px;">
-    <h2 style="font-style:italic;">{$LANG_EVLIST['upcoming_events']}...</h2>
-</div>
-<div class="uk-grid uk-grid-match uk-width-1-1 uk-match uk-hidden-small">
-    <div class="uk-width-medium-2-6">
-        <b>{$LANG_EVLIST['event_title']}</b>
+<div class="evCBouter">
+    <div class="evCBheader">
+        <h2>{$LANG_EVLIST['upcoming_events']}...</h2>
     </div>
-    <div class="uk-width-medium-3-6">
-        <b>{$LANG_EVLIST['event_summary']}</b>
+    <div class="uk-grid uk-grid-match uk-width-1-1 uk-match uk-hidden-small evCBtitle">
+        <div class="uk-width-medium-2-6 evCBname">
+            <b>{$LANG_EVLIST['event_title']}</b>
+        </div>
+        <div class="uk-width-medium-3-6 evCBsummary">
+            <b>{$LANG_EVLIST['event_summary']}</b>
+        </div>
+        <div  class="uk-width-medium-1-6 evCBdate">
+            <b>{$LANG_EVLIST['start_date']}</b>
+        </div>
     </div>
-    <div  class="uk-width-medium-1-6">
-        <b>{$LANG_EVLIST['start_date']}</b>
-    </div>
-</div>
 <!-- BEGIN eventRow -->
-<div class="uk-grid uk-grid-match uk-width-1-1 uk-match ev-cb-table">
-    <div class="uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
-        <a data-uk-tooltip title="{summary}::{startdate}"
+    <div class="uk-grid uk-grid-match uk-width-1-1 uk-match ev-cb-table evCBcontent">
+        <div class="uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
+            <a data-uk-tooltip title="{summary}::{startdate}"
                 href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
+        </div>
+        <div class="uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
+            {summary}
+        </div>
+        <div class="uk-width-medium-1-6 uk-width-1-1" style="margin-bottom:10px;">
+            {startdate}
+        </div>
     </div>
-    <div class="uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
-        {summary}
-    </div>
-    <div class="uk-width-medium-1-6 uk-width-1-1" style="margin-bottom:10px;">
-        {startdate}
-    </div>
-</div>
 <!-- END eventRow -->
+</div>
 {# end {templatelocation} #}

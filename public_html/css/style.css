@@ -125,9 +125,16 @@
     float: right;
     margin: 15px;
     width: 400px;
+    height: 300px;
+}
+.evMapWrapper {
     height: 250px;
 }
-
+#directions {
+    width: 100%;
+    margin-top: 10px;
+    height: 50px;
+}
 #action_dialog,
 #subscribe_dialog {
     position: absolute;
@@ -745,3 +752,26 @@ div.evPrtDataItem div.evdata {
 div.uk-grid.ev-cb-table {
     margin-top: 5px;
 }
+
+div.uk-grid.ev-cb-table {
+    margin-top: 5px;
+}
+div.evCBouter {
+}
+.evCBheader h2 {
+    font-style: italic;
+}
+.evCBheader {
+    margin-bottom: 2px;
+}
+
+.uk-width-1-7,
+.uk-grid-width-1-7 > * {
+    width: 14.28%;
+}
+@media (min-width: 768px) {
+    .uk-grid-width-medium-1-7 > * {
+        width: 14.28%;
+    }
+}
+

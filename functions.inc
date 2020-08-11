@@ -646,6 +646,15 @@ function EVLIST_cb_content($format)
     $range    = $_EV_CONF['range_centerblock'];
     $limit    = (int)$_EV_CONF['limit_block'];
     $length   = $_EV_CONF['limit_summary'];
+    $_dt = clone($_CONF['_now']);
+    $interval = (int)$_EV_CONF['cb_max_days'];
+    if ($interval > 0) {
+        $cb_max_date = $_dt->add(new \DateInterval("P{$interval}D"))
+            ->toMySQL(true);
+    } else {
+        // no limit by days.
+        $cb_max_date = '9999-12-31';
+    }
 
     $opts = array(
         'limit' => $limit,
@@ -728,7 +737,10 @@ function EVLIST_cb_content($format)
     $count = 0;
     $T->set_var('adblock_0', PLG_displayAdBlock('evlist_centerblock', 0));
     foreach ($events as $date=>$day) {
-
+        if ($date > $_cb_max_date) {
+            // Reached the maximum date to show
+            break;
+        }
         if ($date == '_empty_') continue;
         foreach ($day as $A) {
             // Don't display birthdays as story items

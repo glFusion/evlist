@@ -167,7 +167,8 @@ $_SQL['evlist_rsvp'] = "CREATE TABLE {$_TABLES['evlist_rsvp']} (
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
-  `tic_id` varchar(128) NOT NULL,
+  `tic_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `tic_num` varchar(128) NOT NULL,
   `tic_type` int(11) unsigned NOT NULL DEFAULT '0',
   `ev_id` varchar(128) NOT NULL,
   `rp_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -178,9 +179,18 @@ $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
   `dt` int(11) unsigned DEFAULT '0',
   `waitlist` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`tic_id`),
+  UNIQUE KEY `tic_num` (`tic_num`),
   KEY `evt_rep` (`ev_id`,`rp_id`),
   KEY `user` (`uid`,`ev_id`),
   KEY `ev_dt` (`ev_id`,`dt`)
+) ENGINE=MyISAM";
+
+$_SQL['evlist_tickettypes'] = "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
+  `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `dscp` varchar(255) NOT NULL DEFAULT '',
+  `event_pass` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`tt_id`)
 ) ENGINE=MyISAM";
 
 $_EV_UPGRADE = array(
@@ -358,9 +368,12 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `id` `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `description` `dscp` varchar(255) NOT NULL DEFAULT ''",
+    "ALTER TABLE {$_TABLES['evlist_tickets']} DROP PRIMARY KEY",
+    "ALTER TABLE {$_TABLES['evlist_tickets']} CHANGE tic_id tic_num varchar(128)",
+    "ALTER TABLE {$_TABLES['evlist_tickets']} ADD tic_id int(11) unsigned not null auto_increment primary key first",
+    "ALTER TABLE {$_TABLES['evlist_tickets']} ADD UNIQUE `tic_num` (`tic_num`)",
     ),
 );
-$_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];
 
 ?>

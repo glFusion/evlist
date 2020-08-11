@@ -399,7 +399,7 @@ $evlistConfigData = array(
     ),
     array(
         'name' => 'ticket_format',
-        'default_value' => 'EV%s',
+        'default_value' => '10000',
         'type' => 'text',
         'subgroup' => 10,
         'fieldset' => 0,

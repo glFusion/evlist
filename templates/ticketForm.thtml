@@ -1,14 +1,14 @@
 {# begin {templatelocation} #}
 <form id="ticketedit" method="post" class="uk-form uk-form-horizontal"
     action="{site_admin_url}/plugins/evlist/index.php">
-  <input type="hidden" name="id" value="{id}" />
+  <input type="hidden" name="tt_id" value="{tt_id}" />
   <div class="uk-form-row">
     <label class="uk-form-label">{$LANG_EVLIST['description']}:
         <span id="hlp_dscp" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input required type="text" id="description"
-            name="description" length="50" size="20" value="{description}" />
+            name="dscp" length="50" size="20" value="{dscp}" />
     </div>
   </div>
   <div class="uk-form-row">

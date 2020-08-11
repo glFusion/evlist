@@ -3,7 +3,7 @@
  * Class to manage tickets and registrations.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
  * @version     v1.4.6
  * @since       v1.4.0
@@ -21,7 +21,7 @@ class Ticket
 {
     /** Ticket record ID.
      * @var string */
-    private $tic_id = '';
+    private $tic_id = 0;
 
     /** Ticket type record ID.
      * @var integer */
@@ -66,13 +66,13 @@ class Ticket
      *
      * @param   string  $tic_id     Ticket ID to load, or empty string
      */
-    public function __construct($tic_id = '')
+    public function __construct($tic_id = 0)
     {
         if (is_array($tic_id)) {
             $this->setVars($tic_id);
         } else {
-            $this->tic_id = $tic_id;
-            if ($this->tic_id != '') {
+            $this->tic_id = (int)$tic_id;
+            if ($this->tic_id > 0) {
                 $this->Read($this->tic_id);
             }
         }
@@ -84,12 +84,13 @@ class Ticket
      *
      * @param   string  $tic_id Optional ticket ID, $this->id used if empty
      */
-    public function Read($tic_id = '')
+    public function Read($tic_id = 0)
     {
         global $_TABLES;
 
-        if ($tic_id != '')
-            $this->tic_id = $tic_id;
+        if ($tic_id > 0) {
+            $this->tic_id = (int)$tic_id;
+        }
 
         $sql = "SELECT * FROM {$_TABLES['evlist_tickets']}
             WHERE tic_id='{$this->tic_id}'";
@@ -97,7 +98,7 @@ class Ticket
         $result = DB_query($sql);
 
         if (!$result || DB_numRows($result) == 0) {
-            $this->tic_id = '';
+            $this->tic_id = 0;
             return false;
         } else {
             $row = DB_fetchArray($result, false);
@@ -114,7 +115,7 @@ class Ticket
      */
     public function getID()
     {
-        return $this->tic_id;
+        return (int)$this->tic_id;
     }
 
 
@@ -202,7 +203,7 @@ class Ticket
      */
     public function setVars($A)
     {
-        $this->tic_id = $A['tic_id'];
+        $this->tic_id = (int)$A['tic_id'];
         $this->tic_type = $A['tic_type'];
         $this->ev_id = $A['ev_id'];
         $this->rp_id = (int)$A['rp_id'];
@@ -221,15 +222,15 @@ class Ticket
      * @param   array   $A      Array of values, non-indexed
      * @return  string          Ticket ID
      */
-    public static function MakeTicketId($A = array())
+    public static function XMakeTicketId($A = array())
     {
         global $_EV_CONF;
 
         if (function_exists('CUSTOM_evlist_MakeTicketId')) {
             $retval = CUSTOM_evlist_MakeTicketId($A);
         } else {
-            // Make sure a default format is defined if not in the config
             if (strstr($_EV_CONF['ticket_format'], '%s') === false) {
+            // Make sure a default format is defined if not in the config
                 $_EV_CONF['ticket_format'] = 'EV%s';
             }
 
@@ -264,10 +265,8 @@ class Ticket
         $fee = (float)$fee;
         $type = (int)$type;
         $wl = $wl == 0 ? 0 : 1;
-        $tic_id = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
 
         $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
-            tic_id = '" . DB_escapeString($tic_id) . "',
             tic_type = $type,
             ev_id = '" . DB_escapeString($ev_id) . "',
             rp_id = $rp_id,
@@ -281,7 +280,7 @@ class Ticket
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
-            return $tic_id;
+            return DB_insertId();
         } else {
             return NULL;
         }
@@ -302,17 +301,16 @@ class Ticket
         $fee = (float)$fee;
         $type = (int)$type;
 
-        if ($this->tic_id == '') {
+        if ($this->tic_id == 0) {
             $this->tic_id = self::MakeTicketId(
                 array($this->ev_id, $this->rp_id, $this->fee, $this->uid)
             );
             $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET
-                tic_id = '" . DB_escapeString($this->tic_id) . "',
                 dt = UNIX_TIMESTAMP(), ";
             $sql3 = '';
         } else {
             $sql1 = "UPDATE {$_TABLES['evlist_tickets']} SET ";
-            $sql3 = " WHERE tic_id = '{$this->tic_id}'";
+            $sql3 = " WHERE tic_id = {$this->getID()}";
         }
 
         $sql2 = "tic_type = {$this->tic_type},
@@ -327,7 +325,10 @@ class Ticket
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
-            return $tic_id;
+            if ($this->tic_id == 0) {
+                $this->tic_id = DB_insertId();
+            }
+            return $this->tic_id;
         } else {
             return NULL;
         }
@@ -495,7 +496,7 @@ class Ticket
         }
     }
 
-    
+
     /**
      * Print tickets as PDF documents.
      * Tickets can be printed for an event, a single occurrence,
@@ -767,7 +768,7 @@ class Ticket
         $this->used = time();
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
             SET used = {$this->used}
-            WHERE tic_id = '{$this->tic_id}'";
+            WHERE tic_id = {$this->getID()}";
         /*$sql = "INSERT INTO {$_TABLES['evlist_tickets_used']} SET
                 tic_id = '" . DB_escapeString($this->tic_id) . "',
                 rp_id = {$rp_id},
@@ -789,7 +790,7 @@ class Ticket
 
         // Use US floating point format for MySQL
         $amt = number_format((float)$amt, 2, '.', '');
-        $tick_id = DB_escapeString($tick_id);
+        $tick_id = (int)$tick_id;
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
                 SET paid = paid + $amt
                 WHERE tic_id = '$tick_id'";
@@ -1086,7 +1087,8 @@ class Ticket
 
         $header_arr = array(
             array(
-                'text'  => $LANG_EVLIST['rsvp_date'],
+                'text'  => $LANG_EVLIST['rsvp_date'] . ' ( ' .
+                    $_CONF['_now']->format('T', true) . ')',
                 'field' => 'dt',
                 'sort'  => true,
             ),
@@ -1188,11 +1190,15 @@ class Ticket
         case 'dt':
         case 'used':
             if ($fieldvalue > 0) {
-                $d = new \Date($fieldvalue);
-                $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
+                $d = new \Date($fieldvalue, $_CONF['timezone']);
+                $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], true);
             } else {
                 $retval = '';
             }
+            break;
+
+        case 'tic_id':
+            $retval = self::_getTicketNumber($fieldvalue);
             break;
 
         default:
@@ -1219,6 +1225,54 @@ class Ticket
             $bytes = md5(time() . rand(1,1000));
         }
         return substr(bin2hex($bytes), 0, $len);
+    }
+
+
+    /**
+     * Wrapper to get the fomatted ticket number for the current ticket.
+     *
+     * @return  string      Ticket number
+     */
+    public function getTicketNumber()
+    {
+        return self::_getTicketNumber($this->tic_id);
+    }
+
+
+    /**
+     * Get the ticket number based on the configured starting number.
+     * Always returns a string for consistency.
+     *
+     * @access  private Only needed by getAdminField()
+     * @since   v1.4.6
+     * @return  string      Invoice number
+     */
+    private static function _getTicketNumber($tic_id)
+    {
+        global $_EV_CONF;
+
+        if ($tic_id < 1) {
+            $tic = '';
+        } elseif (function_exists('CUSTOM_evlist_ticketNumber')) {
+            $tic = CUSTOM_evlist_ticketNumber($tic_id);
+        } elseif (
+            isset($_EV_CONF['ticket_format']) &&
+            !empty($_EV_CONF['ticket_format'])
+        ) {
+            if (is_numeric($_EV_CONF['ticket_format'])) {
+                // just add the prefix number, e.g. "10001"
+                $tic = $_EV_CONF['ticket_format'] + $tic_id;
+            } elseif (strpos($_EV_CONF['ticket_format'], '%') !== false) {
+                // formatted string, e.g. "INV-0001-2020"
+                $tic = sprintf($_EV_CONF['ticket_format'], $tic_id);
+            } else {
+                // prefix string, e.g. "INV-1"
+                $tic = (string)$_EV_CONF['ticket_format'] . (string)$tic_id;
+            }
+       } else {
+            $tic = $tic_id;
+        }
+        return (string)$tic;
     }
 
 }   // class Ticket

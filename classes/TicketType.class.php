@@ -102,13 +102,24 @@ class TicketType
 
 
     /**
+     * Check if this ticket type is enabled.
+     *
+     * @return  boolean     1 if enabled, 0 if not
+     */
+    public function isEnabled()
+    {
+        return $this->enabled ? 1 : 0;
+    }
+
+
+    /**
      * Check if this ticket type is an event pass or for a single instance.
      *
-     * @return  boolean     True if it is a pass, False for single
+     * @return  boolean     1 if it is an event pass, 0 if not
      */
     public function isEventPass()
     {
-        return $this->event_pass;
+        return $this->event_pass ? 1 : 0;
     }
 
 
@@ -167,8 +178,8 @@ class TicketType
         }
 
         $fld_sql = "dscp = '" . DB_escapeString($this->dscp) ."',
-            enabled = '{$this->enabled}',
-            event_pass = '{$this->event_pass}'";
+            enabled = '{$this->isEnabled()}',
+            event_pass = '{$this->isEventPass()}'";
 
         if ($this->isNew) {
             $sql = "INSERT INTO {$_TABLES['evlist_tickettypes']} SET
@@ -209,7 +220,7 @@ class TicketType
             // Can't delete the default type, or one that has been used.
             return false;
         } else {
-            DB_delete($_TABLES['evlist_tickettypes'], 'id', $id);
+            DB_delete($_TABLES['evlist_tickettypes'], 'tt_id', $id);
             return true;
         }
     }
@@ -326,7 +337,7 @@ class TicketType
             ),
             array(
                 'text' => $LANG_EVLIST['description'],
-                'field' => 'description',
+                'field' => 'dscp',
                 'sort' => true,
             ),
             array(
@@ -373,7 +384,7 @@ class TicketType
         $query_arr = array(
             'table' => 'evlist_tickettypes',
             'sql' => $sql,
-            'query_fields' => array('description'),
+            'query_fields' => array('dscp'),
         );
 
         $retval .= COM_createLink(

@@ -281,12 +281,17 @@ case 'savecat':
 
 case 'saveticket':
     if ($_EV_CONF['enable_rsvp']) {
-        $TT = new Evlist\TicketType($_POST['id']);
+        $TT = new Evlist\TicketType($_POST['tt_id']);
         $status = $TT->Save($_POST);
         $view = 'tickettypes';
     } else {
         $view = '';
     }
+    break;
+
+case 'deltickettype':
+    Evlist\TicketType::Delete($actionval);
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?tickettypes');
     break;
 
 case 'delcat':

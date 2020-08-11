@@ -466,6 +466,7 @@ class Repeat
             WHERE rp_id='{$this->rp_id}'";
             DB_query($sql);
             Cache::clear();
+            PLG_itemSaved($this->rp_id, 'evlist');
         }
     }
 
@@ -1512,10 +1513,13 @@ class Repeat
     {
         global $_TABLES;
 
-        return DB_getItem($_TABLES['evlist_repeat'], 'rp_id',
-                "rp_ev_id = '" . DB_escapeString($ev_id) . "'
+        return (int)DB_getItem(
+            $_TABLES['evlist_repeat'],
+            'rp_id',
+            "rp_ev_id = '" . DB_escapeString($ev_id) . "'
                 ORDER BY rp_start ASC
-                LIMIT 1");
+                LIMIT 1"
+            );
     }
 
 

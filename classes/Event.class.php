@@ -1104,7 +1104,7 @@ class Event
         if (empty($this->Errors)) {
             if (!$this->isSubmission()) {
                 Cache::clear('events');
-                PLG_itemSaved($this->id, 'evlist');
+                PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');
             }
             return '';
         } else {

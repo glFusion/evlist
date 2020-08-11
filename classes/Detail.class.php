@@ -577,6 +577,16 @@ class Detail
         return $addr;
     }
 
+
+    public static function getIndexRecords($fields)
+    {
+        global $_TABLES;
+
+        if (isset($fields['id']) && !empty($fields['id'])) {
+            $ev_id = $fields['id'];
+        }
+    }
+
 }   // class Detail
 
 ?>

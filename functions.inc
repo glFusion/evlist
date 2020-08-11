@@ -641,13 +641,20 @@ function EVLIST_cb_content($format)
 {
     global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
-    USES_evlist_functions();
-
     $retval = '';
     // Retrieve Centerblock Settings
     $range    = $_EV_CONF['range_centerblock'];
     $limit    = (int)$_EV_CONF['limit_block'];
     $length   = $_EV_CONF['limit_summary'];
+    $_dt = clone($_CONF['_now']);
+    $interval = (int)$_EV_CONF['cb_max_days'];
+    if ($interval > 0) {
+        $cb_max_date = $_dt->add(new \DateInterval("P{$interval}D"))
+            ->toMySQL(true);
+    } else {
+        // no limit by days.
+        $cb_max_date = '9999-12-31';
+    }
 
     $opts = array(
         'limit' => $limit,
@@ -728,7 +735,12 @@ function EVLIST_cb_content($format)
     $T->set_block('centerblock', 'eventRow', 'eRow');
     $rp_shown = array();    // Array to hold repeat id's to avoid dups
     $count = 0;
+    $T->set_var('adblock_0', PLG_displayAdBlock('evlist_centerblock', 0));
     foreach ($events as $date=>$day) {
+        if ($date > $_cb_max_date) {
+            // Reached the maximum date to show
+            break;
+        }
         if ($date == '_empty_') continue;
         foreach ($day as $A) {
             // Don't display birthdays as story items
@@ -787,6 +799,7 @@ function EVLIST_cb_content($format)
                 'enddate'   => EVLIST_formattedDate($e_ts1),
                 'starttime1' => EVLIST_formattedTime($s_ts1),
                 'endtime1'  => EVLIST_formattedTime($e_ts1),
+                'adblock'   => PLG_displayAdBlock('evlist_centerblock', $count),
             ) );
             if (isset($A['split']) && $A['split'] == 1) {
                 $s_ts2 = strtotime($A['rp_date_start'] . ' ' . $A['rp_time_start2']);
@@ -1946,6 +1959,10 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             $fields[] = 'UNIX_TIMESTAMP(r.rp_start) AS unixtime';
             break;
         case 'search_index':
+            $fields[] = "group_concat(' ', d.title) as idx_title";
+            $fields[] = "group_concat(' ', d.summary) as idx_summary";
+            $fields[] = "group_concat(' ', d.full_description) as idx_dscp";
+            $fields[] = "group_concat(' ', d.location) as idx_location";
             $buildingIndex = true;
             break;
         case 'perms':
@@ -1993,7 +2010,11 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
         foreach ($properties as $p) {
             switch ($p) {
             case 'title':
-                $props[$p] = $A['title'];
+                if ($buildingIndex) {
+                    $props[$p] = $A['idx_title'];
+                } else {
+                    $props[$p] = $A['title'];
+                }
                 break;
             case 'introtext':
                 $props[$p] = $A['summary'];
@@ -2003,8 +2024,12 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
                 break;
             case 'searchidx':
             case 'content':
-                $props[$p] = $A['title'] . ' ' .
-                    $A['summary'] . ' ' . $A['full_description'];
+                if ($buildingIndex) {
+                    $props[$p] = $A['idx_title'] . ' ' . $A['idx_summary'] . ' ' . $A['idx_dscp'];
+                } else {
+                    $props[$p] = $A['title'] . ' ' .
+                        $A['summary'] . ' ' . $A['full_description'];
+                }
                 break;
             case 'description':
                 $props[$p] = $A['summary'] . ' ' . $A['full_description'];
@@ -2062,7 +2087,7 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
  */
 function plugin_supportadblock_evlist()
 {
-    return array('evlist_event');
+    return array('evlist_event', 'evlist_centerblock');
 }
 
 

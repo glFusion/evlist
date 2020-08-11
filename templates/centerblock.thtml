@@ -14,11 +14,11 @@
             <b>{$LANG_EVLIST['start_date']}</b>
         </div>
     </div>
+    {adblock}
 <!-- BEGIN eventRow -->
     <div class="uk-grid uk-grid-match uk-width-1-1 uk-match ev-cb-table evCBcontent">
         <div class="uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
-            <a data-uk-tooltip title="{summary}::{startdate}"
-                href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
+            <a href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
         </div>
         <div class="uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
             {summary}
@@ -27,6 +27,7 @@
             {startdate}
         </div>
     </div>
+    {adblock}
 <!-- END eventRow -->
 </div>
 {# end {templatelocation} #}

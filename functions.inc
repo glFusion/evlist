@@ -383,7 +383,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $q = '&query=' . urlencode($query);
     $sql = "SELECT e.id, d.title, d.summary as description,
                 UNIX_TIMESTAMP(e.date_start1) AS date,
-                e.hits, e.owner_id AS uid, gl.username,
+                e.owner_id AS uid, gl.username,
                 CONCAT('$url',e.id,'$q') AS url
             FROM {$_TABLES['evlist_detail']} d
             LEFT JOIN {$_TABLES['evlist_events']} e
@@ -1873,23 +1873,23 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             $fields[] = 'e.id';
             break;
         case 'title':
-            $fields[] = 'd.title';
+            $fields[] = 'MAX(d.title) AS title';
             break;
         case 'excerpt':
         case 'introtext':
         case 'description':
-            $fields[] = 'd.summary';
+            $fields[] = 'MAX(d.summary) AS summary';
         case 'bodytext':
-            $fields[] = 'd.full_description';
+            $fields[] = 'MAX(d.full_description) AS full_description';
             break;
         case 'searchidx':
         case 'content':
-            $fields[] = 'd.title';
-            $fields[] = 'd.summary';
-            $fields[] = 'd.full_description';
+            $fields[] = 'MAX(d.title) AS title';
+            $fields[] = 'MAX(d.summary) AS summary';
+            $fields[] = 'MAX(d.full_description) AS full_description';
             break;
         case 'date':
-            $fields[] = 'UNIX_TIMESTAMP(r.rp_start) AS unixtime';
+            $fields[] = 'UNIX_TIMESTAMP(MAX(r.rp_start)) AS unixtime';
             break;
         case 'search_index':
             $fields[] = "group_concat(' ', d.title) as idx_title";
@@ -1899,12 +1899,12 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             $buildingIndex = true;
             break;
         case 'perms':
-            $fields[] = 'e.owner_id';
-            $fields[] = 'e.group_id';
-            $fields[] = 'e.perm_owner';
-            $fields[] = 'e.perm_group';
-            $fields[] = 'e.perm_members';
-            $fields[] = 'e.perm_anon';
+            $fields[] = 'MAX(e.owner_id) AS owner_id';
+            $fields[] = 'MAX(e.group_id) AS group_id';
+            $fields[] = 'MAX(e.perm_owner) AS perm_owner';
+            $fields[] = 'MAX(e.perm_group) AS perm_group';
+            $fields[] = 'MAX(e.perm_members) AS perm_members';
+            $fields[] = 'MAX(e.perm_anon) AS perm_anon';
             break;
         }
     }
@@ -2043,7 +2043,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'time_start,time_end,enable_comments,perms'
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
-    if (!$info['is_event']) return;   // not an event
+    if (!isset($info['is_event']) || !$info['is_event']) return;   // not an event
     if (!$info['title'])  {
         COM_errorLog(__FUNCTION__ . ": Event $id from $type must have a title");
         return;        // Must have a title

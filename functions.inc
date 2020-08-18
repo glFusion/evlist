@@ -309,73 +309,6 @@ function plugin_getmenuitems_evlist()
 
 
 /**
- * Show plugin statistics on the user profile page.
- * if $showsitestats is 1 then we are to only print the overall stats in the 'site
- * statistics' box otherwise we show the detailed stats for the plugin
- *
- * @param   boolean $showsitestats  Not used
- * @return  string      HTML for stats section
- */
-function plugin_showstats_evlist($showsitestats)
-{
-    global $_CONF, $_EV_CONF, $_TABLES, $LANG_EVLIST;
-
-    $retval = '';
-
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
-        return false;
-    }
-
-    if (plugin_isadmin_evlist()) {
-        $permSQL = '';
-    } else {
-        $permSQL = COM_getPermSQL('AND');
-    }
-
-    $result = DB_query("SELECT ev.id, det.title, ev.hits
-            FROM {$_TABLES['evlist_events']} ev
-            LEFT JOIN {$_TABLES['evlist_detail']} det
-                ON ev.id = det.ev_id
-            WHERE ev.hits > 0 $permSQL
-            ORDER BY ev.hits DESC LIMIT 10");
-    $nrows  = DB_numRows ($result);
-    if ($nrows > 0) {
-        USES_lib_admin();
-        $header_arr = array(
-            array('text' => $LANG_EVLIST['event_title'],
-                    'field' => 'eid',
-                    'header_class' => 'stats-header-title',
-            ),
-            array(  'text' => $LANG_EVLIST['hits'],
-                    'field' => 'hits',
-                    'header_class' => 'stats-header-count',
-                    'field_class' => 'stats-list-count',
-            ),
-        );
-        $data_arr = array();
-        $text_arr = array('has_menu'     => false,
-                          'title'        => $LANG_EVLIST['top_ten'],
-        );
-        for ($i = 0; $i < $nrows; $i++) {
-            $A = DB_fetchArray ($result);
-            $A['title'] = COM_stripslashes($A['title']);
-            $A['eid'] = '<a href="' .
-                    COM_buildUrl(EVLIST_URL . '/event.php?eid=' . $A['id']) .
-                    '">' . $A['title'] . '</a>';
-            $A['hits'] = COM_NumberFormat($A['hits']);
-            $data_arr[$i] = $A;
-        }
-        $retval .= ADMIN_simpleList("", $header_arr, $text_arr, $data_arr);
-    } else {
-        $retval .= COM_startBlock($LANG_EVLIST['top_ten']);
-        $retval .= $LANG_EVLIST['no_events_viewable'];
-        $retval .= COM_endBlock();
-    }
-    return $retval;
-}
-
-
-/**
  * Get summary stats for the user profile page.
  *
  * @return  array   Array of text=>number
@@ -737,7 +670,7 @@ function EVLIST_cb_content($format)
     $count = 0;
     $T->set_var('adblock_0', PLG_displayAdBlock('evlist_centerblock', 0));
     foreach ($events as $date=>$day) {
-        if ($date > $_cb_max_date) {
+        if ($date > $cb_max_date) {
             // Reached the maximum date to show
             break;
         }

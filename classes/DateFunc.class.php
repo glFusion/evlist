@@ -1065,32 +1065,32 @@ class DateFunc
      * Calculates the date of the Nth weekday of the month.
      * Example: the second Saturday of January 2000.
      *
-     * @param   string  $occurence      Occurence: 1=first, 2=second, 3=third, etc.
+     * @param   string  $occurrence      Occurence: 1=first, 2=second, 3=third, etc.
      * @param   string  $dayOfWeek      0=Sunday, 1=Monday, etc.
      * @param   string  $month          Month in format MM
      * @param   string  $year           Year in format CCYY
      * @param   string  $format         Format for returned date
      * @return  string              Date in given format
      */
-    public static function NWeekdayOfMonth($occurence, $dayOfWeek, $month, $year, $format='')
+    public static function NWeekdayOfMonth($occurrence, $dayOfWeek, $month, $year, $format='')
     {
         $year = (int)$year;
         $month = (int)$month;
         $occurrence = (int)$occurrence;
 
-        $DOW1day = ($occurence - 1) * 7 + 1;
+        $DOW1day = ($occurrence - 1) * 7 + 1;
         $DOW1 = self::dayOfWeek($DOW1day, $month, $year);
 
-        $wdate = ($occurence - 1) * 7 + 1 +
+        $wdate = ($occurrence - 1) * 7 + 1 +
                 (7 + $dayOfWeek - $DOW1) % 7;
 
         if ($wdate > self::daysInMonth($month, $year)) {
-            if ($occurence == 5) {
+            if ($occurrence == 5) {
                 // Getting the last day overshot the month, go back a week
                 $wdate -= 7;
                 return self::dateFormat($wdate, $month, $year, $format);
             } else {
-                // For $occurence === 1 through 4 this is an error
+                // For $occurrence === 1 through 4 this is an error
                 return -1;
             }
         } else {
@@ -1457,7 +1457,14 @@ class DateFunc
         if (empty($curtime)) {
             $curtime = $_CONF['_now']->format('H:i:s', true);
         }
-        list($hour, $minute, $second) = explode(':', $curtime);
+        $parts = explode(':', $curtime);
+        $hour = $parts[0];
+        $minute = $parts[1];
+        if (isset($parts[2])) {
+            $second = $parts[2];
+        } else {
+            $second = 0;
+        }
 
         // Set up the time if we're using 12-hour mode
         if ($_CONF['hour_mode'] == 12) {

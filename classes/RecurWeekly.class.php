@@ -35,7 +35,7 @@ class RecurWeekly extends Recurrence
         $days_on = $this->rec_data['listdays'];
         if (empty($days_on)) return false;
 
-        $occurrence = $this->dt_start;
+        $occurrence = $this->date_start;
 
         //$num_intervals = count($days_on);
         //$last_interval = $days_on[$num_intervals - 1];
@@ -71,7 +71,7 @@ class RecurWeekly extends Recurrence
 
         }   // while not at stop date
 
-        return $this->events;
+        return $this;
     }
 
 }   // class RecurWeekly

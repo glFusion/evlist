@@ -30,10 +30,6 @@ class Event
      * @var string */
     private $id = '';
 
-    /** Page views for this event.
-     * @var integer */
-    private $hits = 0;
-
     /** Owner user ID.
      * @var integer */
     private $owner_id = 2;
@@ -363,7 +359,6 @@ class Event
             $this->properties[$var] = COM_SanitizeID($value, false);
             break;
 
-        case 'hits':
         case 'owner_id':
         case 'group_id':
         case 'perm_owner':
@@ -673,10 +668,16 @@ class Event
 
         if (!is_array($row)) return;
 
-        $this->date_start1 = (isset($row['date_start1']) &&
-            !empty($row['date_start1'])) ? $row['date_start1'] : date('Y-m-d');
-        $this->date_end1 = (isset($row['date_end1']) &&
-            !empty($row['date_end1'])) ? $row['date_end1'] : $this->date_start1;
+        if (isset($row['date_start1']) && !empty($row['date_start1'])) {
+            $this->date_start1 = $row['date_start1'];
+        } else {
+            $this->date_start1 = $_CONF['_now']->format('Y-m-d', true);
+        }
+        if (isset($row['date_end1']) && !empty($row['date_end1'])) {
+            $this->date_end1 = $row['date_end1'];
+        } else {
+            $this->date_end1 = $this->date_start1;
+        }
         $this->cal_id = $row['cal_id'];
         $this->show_upcoming = isset($row['show_upcoming']) ? (int)$row['show_upcoming'] : 0;
         $this->recurring = (int)$row['recurring'];
@@ -713,7 +714,6 @@ class Event
             $this->setID(isset($row['id']) ? $row['id'] : '');
             $this->setRecData($row['rec_data']);
             $this->det_id = (int)$row['det_id'];
-            $this->hits = (int)$row['hits'];
             $this->setPermOwner($row['perm_owner'])
                 ->setPermGroup($row['perm_group'])
                 ->setPermMembers($row['perm_members'])
@@ -758,8 +758,8 @@ class Event
                 $this->time_end2 = sprintf('%02d:%02d:00',
                     $tmp, $row['endminute2']);*/
             } else {
-                $this->time_start2 = NULL;
-                $this->time_end2 = NULL;
+                $this->time_start2 = self::MIN_TIME;
+                $this->time_end2 = self::MIN_TIME;
             }
 
             if (isset($row['perm_owner'])) {
@@ -1078,6 +1078,7 @@ class Event
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
+            COM_errorLog($sql);
         } elseif (
             $this->isSubmission() &&
             isset($_CONF['notification']) &&
@@ -1843,7 +1844,8 @@ class Event
     public function MakeRecurrences()
     {
         return Recurrence::getInstance($this)
-            ->MakeRecurrences();
+            ->MakeRecurrences()
+            ->getEvents();
     }
 
 
@@ -1859,8 +1861,10 @@ class Event
     {
         global $_TABLES;
 
-        if ($this->rec_data['stop'] == '' ||
-            $this->rec_data['stop'] > EV_MAX_DATE) {
+        if (
+            $this->rec_data['stop'] == '' ||
+            $this->rec_data['stop'] > EV_MAX_DATE
+        ) {
             $this->rec_data['stop'] = EV_MAX_DATE;
         }
         if ((int)$this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
@@ -1939,7 +1943,14 @@ class Event
 
             //no time if no date
             if ($time != '') {
-                list($hour, $minute, $second) = explode(':', $time);
+                $parts = explode(':', $time);
+                $hour = $parts[0];
+                $minute = $parts[1];
+                if (isset($parts[2])) {
+                    $second = $parts[2];
+                } else {
+                    $second = 0;
+                }
             } else {
                 $hour = '';
                 $minute = '';

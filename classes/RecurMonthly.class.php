@@ -30,9 +30,10 @@ class RecurMonthly extends Recurrence
         global $_EV_CONF;
 
         $days_on = $this->rec_data['listdays'];
+
         if (!is_array($days_on)) return false;
 
-        $occurrence = $this->dt_start;
+        $occurrence = $this->date_start;
 
         //$num_intervals = count($days_on);
         //$last_interval = $days_on[$num_intervals - 1];
@@ -41,13 +42,14 @@ class RecurMonthly extends Recurrence
         // loop can handle all the events.
         list($y, $m, $d) = explode('-', $occurrence);
         $count = 0;
-        while ($occurrence <= $this->rec_data['stop'] &&
+        while (
+            $occurrence <= $this->rec_data['stop'] &&
             //$occurrence >= '1971-01-01' &&
-            $count < $_EV_CONF['max_repeats']) {
+            $count < $_EV_CONF['max_repeats']
+        ) {
             $lastday = cal_days_in_month(CAL_GREGORIAN, $m, $y);
 
             foreach ($days_on as $dom) {
-
                 if ($dom == 32) {
                     $dom = $lastday;
                 } elseif ($dom > $lastday) {
@@ -57,7 +59,7 @@ class RecurMonthly extends Recurrence
                 $occurrence = sprintf("%d-%02d-%02d", $y, $m, $dom);
 
                 // We might pick up some earlier instances, skip them
-                if ($occurrence < $this->dt_start) continue;
+                if ($occurrence < $this->date_start) continue;
 
                 // Stop when we hit the stop date
                 if ($occurrence > $this->rec_data['stop']) break;
@@ -83,7 +85,7 @@ class RecurMonthly extends Recurrence
 
         }   // while not at stop date
 
-        return $this->events;
+        return $this;
     }   // function MakeRecurrences
 
 

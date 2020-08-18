@@ -37,7 +37,7 @@ class RecurDOM extends Recurrence
             return $this->events;
         }
 
-        $occurrence = $this->dt_start;
+        $occurrence = $this->date_start;
         list($y, $m, $d) = explode('-', $occurrence);
 
         //$num_intervals = count($intervalA);
@@ -61,7 +61,7 @@ class RecurDOM extends Recurrence
                 );
 
                 // Skip any dates earlier than the starting date
-                if ($occurrence < $this->dt_start) continue;
+                if ($occurrence < $this->date_start) continue;
 
                 // If the new date goes past the end of month, and we're looking
                 // for the last (5th) week, then re-adjust to use the 4th week.
@@ -91,8 +91,7 @@ class RecurDOM extends Recurrence
 
         }   // while not at stop date
 
-        return $this->events;
-
+        return $this;
     }   // function MakeRecurrences
 
 }   // class RecurDOM

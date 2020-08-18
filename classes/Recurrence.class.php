@@ -252,7 +252,7 @@ class Recurrence
             }
             list($year, $month, $day) = explode('-', $occurrence[0]);
         }
-        return $this->Events;
+        return $this;
     }
 
 
@@ -285,8 +285,20 @@ class Recurrence
             'tm_start2'  => $this->Event->getTimeStart2(),
             'tm_end2'    => $this->Event->getTimeEnd2(),
         );
+        return $this;
     }
 
-}   // class Recur
+
+    /**
+     * Return the array of event dates & times.
+     *
+     * @return  array   Array of event dates and times
+     */
+    public function getEvents()
+    {
+        return $this->Events;
+    }
+
+}   // class Recurrence
 
 ?>

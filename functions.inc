@@ -2098,7 +2098,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'date_start1' => $date,
         'date_end1' => $date,
         'tz_local' => 'on',
-        'recurring' => $info['recur_type'] > 0 ? '1' : '0',
+        'recurring' => isset($info['recur_type']) ? (int)$info['recur_type'] : 0,
         'format' => $info['recur_type'] !== NULL ? $info['recur_type'] : 0,
         'stopdate' => '',
         'skipnext' => '0',

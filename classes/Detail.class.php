@@ -66,6 +66,10 @@ class Detail
      * @var string */
     private $postal = '';
 
+    /** Event location - country.
+     * @var string */
+    private $country = '';
+
     /** Contact name.
      * @var string */
     private $contact = '';
@@ -326,7 +330,7 @@ class Detail
      */
     public function getCountry()
     {
-        return '';
+        return $this->country;
     }
 
 

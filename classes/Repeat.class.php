@@ -1063,13 +1063,19 @@ class Repeat
         // Show the "manage reservations" link to the event owner
         if (
             $_EV_CONF['enable_rsvp'] == 1 &&
-            $this->Event->getOption('use_rsvp') > 0 &&
-            ($this->isAdmin || $this->Event->isOwner())
+            $this->Event->getOption('use_rsvp') > 0
         ) {
-            $T->set_var(array(
-                'admin_rsvp'    => Ticket::adminList_RSVP($this->rp_id),
-                'rsvp_count'    => $this->TotalRegistrations(),
-            ) );
+            if ($this->isAdmin || $this->Event->isOwner()) {
+                $T->set_var(array(
+                    'admin_rsvp'    => Ticket::adminList_RSVP($this->rp_id),
+                    'rsvp_count'    => $this->TotalRegistrations(),
+                ) );
+            } elseif (SEC_inGroup($this->Event->getOption('rsvp_view_grp'))) {
+                $T->set_var(array(
+                    'admin_rsvp'    => Ticket::userList_RSVP($this->rp_id),
+                    'rsvp_count'    => $this->TotalRegistrations(),
+                ) );
+            }
         }
 
         $T->set_var('adblock', PLG_displayAdBlock('evlist_event', 0));

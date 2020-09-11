@@ -59,6 +59,10 @@ class Ticket
      * @var boolean */
     private $waitlist = 0;
 
+    /** Comment, if any.
+     * @var string */
+    private $comment = '';
+
 
     /**
      * Constructor.
@@ -212,6 +216,7 @@ class Ticket
         $this->used = (int)$A['used'];
         $this->dt = (int)$A['dt'];
         $this->waitlist = isset($A['waitlist']) && $A['waitlist'] ? 1 : 0;
+        $this->comment = $A['comment'];
     }
 
 
@@ -321,7 +326,8 @@ class Ticket
             fee = {$this->fee},
             paid = {$this->paid},
             uid = {$this->uid},
-            used = {$this->used}";
+            used = {$this->used},
+            comment = '" . DB_escapeString($this->comment) . "'";
 
         $sql = $sql1 . $sql2 . $sql3;
         //echo $sql;die;
@@ -1038,6 +1044,80 @@ class Ticket
 
 
     /**
+     * Show the public-facing RSVP list, if enabled.
+     * Same as adminList_RSVP() but with limited fields and no actions.
+     *
+     * @param   integer $rp_id  Repeat ID being viewed or checked
+     * @return  string          HTML for admin list
+     */
+    public static function userList_RSVP($rp_id)
+    {
+        global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
+
+        USES_lib_admin();
+        $Ev = \Evlist\Repeat::getInstance($rp_id);
+        if ($Ev->getID() == 0) return '';
+
+        $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
+                    tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
+                    u.fullname,
+                    {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
+            FROM {$_TABLES['evlist_tickets']} tk
+            LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
+                ON tt.tt_id = tk.tic_type
+            LEFT JOIN {$_TABLES['users']} u
+                ON u.uid = tk.uid
+            WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
+
+        $title = $LANG_EVLIST['admin_rsvp'] .
+            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '/index.php?view=printtickets&eid=' . $Ev->getEventID() .
+            '" class="uk-button uk-button-primary uk-button-small" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
+            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
+            '/index.php?view=exporttickets&eid=' . $Ev->getID() .
+            '" class="uk-button uk-button-primary uk-button-small">' . $LANG_EVLIST['export_list'] . '</a>';
+
+        if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
+            $sql .= " AND rp_id = '{$Ev->getID()}' ";
+        }
+
+        $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
+        $text_arr = array(
+        'has_menu'     => false,
+        'has_extras'   => false,
+        'title'        => $title,
+        'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
+        'help_url'     => '',
+        );
+
+        $header_arr = array(
+            array(
+                'text'  => $LANG_EVLIST['name'],
+                'field' => 'fullname',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => 'Comment',
+                'field' => 'comment',
+                'sort'  => false,
+            ),
+        );
+
+        $options_arr = array();
+        $query_arr = array(
+            'sql'       => $sql,
+        );
+
+        return ADMIN_list(
+            'evlist_adminlist_rsvp',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            '', '', $options_arr
+        );
+    }
+
+
+    /**
      * Administer user registrations.
      * This will appear in the admin area for administrators, and as part of
      * the event detail for event owners.  Owners can delete registrations.
@@ -1054,7 +1134,8 @@ class Ticket
         if ($Ev->getID() == 0) return '';
 
         $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                    tk.uid, tk.used, tt.dscp, tk.waitlist, u.fullname,
+                    tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
+                    u.fullname,
                     {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
             FROM {$_TABLES['evlist_tickets']} tk
             LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
@@ -1118,6 +1199,11 @@ class Ticket
             array(
                 'text'  => $LANG_EVLIST['waitlisted'],
                 'field' => 'waitlist',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => 'Comment',
+                'field' => 'comment',
                 'sort'  => false,
             ),
         );

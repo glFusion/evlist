@@ -2308,9 +2308,9 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
             COM_getPermSQL('AND', 0, 2, 'cal') .
             " $opt_where
-            GROUP BY $grp_by ASC
             ORDER BY $orderby $opt_order";
             //ORDER BY rep.rp_date_start $opt_order,
+            //GROUP BY $grp_by ASC
             //        rep.rp_time_start1 $opt_order";
     if ($limit > 0) {
         if ($page > 1) {

@@ -314,6 +314,7 @@ class Event
                     // Normal, load our own detail object
                     $this->Detail = Detail::getInstance($this->det_id);
                 }
+                $this->isNew = 0;
             }
         }
         $this->isAdmin = plugin_isadmin_evlist();
@@ -1103,7 +1104,7 @@ class Event
         }
 
         if (empty($this->Errors)) {
-            if (!$this->isNew) {
+            if ($this->isNew) {
                 $this->id = DB_insertID();
             }
             if (!$this->isSubmission()) {

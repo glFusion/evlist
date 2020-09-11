@@ -731,6 +731,21 @@ function toggleRSVPdetail(val)
         </table>
         </div>
       </div>
+
+        <div class="uk-form-row">
+            <label class="uk-form-label">Ticket Comments Allowed?</label>
+            <div class="uk-form-controls">
+                <input type="checkbox" name="rsvp_comments" value="1" {rsvp_cmt_chk} />
+            </div>
+        </div>
+
+        <div class="uk-form-row">
+            <label class="uk-form-label">{$LANG_ACCESS['group']}:</label>
+            <div class="uk-form-controls">
+                {rsvp_view_grp_dropdown}
+            </div>
+        </div>
+
 {!if 0}
       <div class="uk-form-row">
         <label class="uk-form-label">{$LANG_EVLIST['txt_fields']}</label>

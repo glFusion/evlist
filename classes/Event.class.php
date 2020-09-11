@@ -1103,6 +1103,9 @@ class Event
         }
 
         if (empty($this->Errors)) {
+            if (!$this->isNew) {
+                $this->id = DB_insertID();
+            }
             if (!$this->isSubmission()) {
                 Cache::clear('events');
                 PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');

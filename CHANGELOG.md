@@ -1,6 +1,6 @@
 # evList plugin for glFusion - Changelog
 
-## v1.4.6
+## v1.5.0
 Release TBD
 - Retire support for non-UIkit themes
 - Clear category lookup cache when an event is updated.
@@ -16,6 +16,7 @@ Release TBD
 - Remove support for Meetup.com API
 - Remove hit counter, was never used.
 - Switch from Paypal plugin to Shop.
+- Limit centerblock display to a number of days as well as events.
 
 ## v1.4.5
 Release 2018-04-14

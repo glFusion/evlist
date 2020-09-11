@@ -39,7 +39,7 @@ class RecurOnetime extends Recurrence
                 'tm_end2'   => $this->time_end2,
             ),
         );
-        return $this->events;
+        return $this;
     }
 
 }

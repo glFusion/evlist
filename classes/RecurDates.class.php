@@ -27,7 +27,7 @@ class RecurDates extends Recurrence
     public function MakeRecurrences()
     {
         if (!is_array($this->rec_data['custom'])) {
-            return $this->events;
+            return $this;
         }
 
         foreach($this->rec_data['custom'] as $occurrence) {
@@ -36,7 +36,7 @@ class RecurDates extends Recurrence
                 $this->storeEvent($occurrence);
             }
         }
-        return $this->events;
+        return $this;
     }
 
 }   // class RecurDates

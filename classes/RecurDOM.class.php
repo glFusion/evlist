@@ -34,7 +34,7 @@ class RecurDOM extends Recurrence
             $intervalA = array($intervalA);
         }
         if (!isset($this->rec_data['weekday'])) {   // Missing day of week
-            return $this->events;
+            return $this;
         }
 
         $occurrence = $this->date_start;

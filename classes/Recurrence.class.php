@@ -89,7 +89,6 @@ class Recurrence
         $this->rec_data = $this->Event->getRecData();
 
         // Initialize array of events to be loaded
-        $this->Events = array();
         $this->freq = isset($this->rec_data['freq']) ?
                 (int)$this->rec_data['freq'] : 1;
         if ($this->freq < 1) {
@@ -277,7 +276,7 @@ class Recurrence
 
         // Add this occurance to our array.  The first selected date is
         // always added
-        $this->Events[$start] = array(
+        $this->events[$start] = array(
             'dt_start'  => $start,
             'dt_end'    => $enddate,
             'tm_start1'  => $this->Event->getTimeStart1(),
@@ -296,7 +295,7 @@ class Recurrence
      */
     public function getEvents()
     {
-        return $this->Events;
+        return $this->events;
     }
 
 }   // class Recurrence

@@ -312,6 +312,13 @@
             {tick_descr} - {tick_fee}
 {!endif}
 
+{!if rsvp_comments}
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">Comment</label>
+            <div class="uk-form-controls">
+                <input type="text" name="rsvp_comment" value="" size="40"/>
+{!endif}
             <button type="submit" class="lgButton orange" name="register"
                 value="{$LANG_EVLIST['register']}">{$LANG_EVLIST['register']}</button>
         </div>

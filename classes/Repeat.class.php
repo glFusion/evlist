@@ -810,6 +810,9 @@ class Repeat
                         $total_tickets < $this->Event->getOption('max_user_rsvp')
                     )
                 ) {
+                    if ($this->Event->getOption('rsvp_comments')) {
+                        $T->set_var('rsvp_comments',  true);
+                    }
                     $Ticks = TicketType::GetTicketTypes();
                     if (!empty($Ticks)) {
                         if ($this->Event->getOption('max_user_rsvp') > 0) {
@@ -1091,9 +1094,10 @@ class Repeat
      * @param   integer $num_attendees  Number of attendees, default 1
      * @param   integer $tick_type      Id of ticket type
      * @param   integer $uid    User ID to register, 0 for current user
+     * @param   string  $cmt    User-supplied comment for the ticket
      * @return  integer         Message code, zero for success
      */
-    public function Register($num_attendees = 1, $tick_type = 0, $uid = 0)
+    public function Register($num_attendees = 1, $tick_type = 0, $uid = 0, $cmt='')
     {
         global $_TABLES, $_USER, $_EV_CONF, $LANG_EVLIST;
 
@@ -1104,8 +1108,10 @@ class Repeat
         // Make sure that registrations are enabled and that the current user
         // has access to this event.  If $uid > 0, then this is an admin
         // registering another user, don't check access
-        if ($this->Event->getOption('use_rsvp') == 0 ||
-            ($uid == 0 && !$this->Event->hasAccess(2))) {
+        if (
+            $this->Event->getOption('use_rsvp') == 0 ||
+            ($uid == 0 && !$this->Event->hasAccess(2))
+        ) {
             COM_setMsg($LANG_EVLIST['messages'][20]);
             return 20;
         } elseif ($this->Event->getOption('use_rsvp') == 1) {
@@ -1188,7 +1194,7 @@ class Repeat
             if ($max_rsvp > 0) {
                 $wl = ($total_reg + $i) <= $max_rsvp ? 0 : 1;
             }
-            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl);
+            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl, $cmt);
         }
         return 0;
     }

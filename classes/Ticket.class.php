@@ -3,15 +3,16 @@
  * Class to manage tickets and registrations.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.0
  * @since       v1.4.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+
 
 /**
  * Class for event tickets.
@@ -226,12 +227,12 @@ class Ticket
      * @param   array   $A      Array of values, non-indexed
      * @return  string          Ticket ID
      */
-    public static function MakeTicketId($A = array())
+    public static function makeTicketId($A = array())
     {
         global $_EV_CONF;
 
-        if (function_exists('CUSTOM_evlist_MakeTicketId')) {
-            $retval = CUSTOM_evlist_MakeTicketId($A);
+        if (function_exists('CUSTOM_evlist_makeTicketId')) {
+            $retval = CUSTOM_evlist_makeTicketId($A);
         } else {
             // Make sure a default format is defined if not in the config
             if (strstr($_EV_CONF['ticket_format'], '%s') === false) {
@@ -257,9 +258,10 @@ class Ticket
      * @param   float   $fee    Optional Ticket Fee, default = 0 (free)
      * @param   integer $uid    Optional User ID, default = current user
      * @param   integer $wl     Waitlisted ? 1 = yes, 0 = no
+     * @param   string  $cmt    User-supplied comment
      * @return  string      Ticket identifier
      */
-    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0)
+    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0, $cmt='')
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
@@ -269,10 +271,9 @@ class Ticket
         $fee = (float)$fee;
         $type = (int)$type;
         $wl = $wl == 0 ? 0 : 1;
-        $tic_id = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
-
+        $tic_num = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
         $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
-            tic_id = '" . DB_escapeString($tic_id) . "',
+            tic_num = '" . DB_escapeString($tic_num) . "',
             tic_type = $type,
             ev_id = '" . DB_escapeString($ev_id) . "',
             rp_id = $rp_id,
@@ -281,16 +282,16 @@ class Ticket
             uid = $uid,
             used = 0,
             dt = UNIX_TIMESTAMP(),
-            waitlist = $wl";
-
+            waitlist = $wl,
+            comment = '" . DB_escapeString($cmt) . "'";
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
-            return $tic_id;
+            return DB_insertId();
         } else {
             return NULL;
         }
-    }   // function Create()
+    }
 
 
     /**
@@ -308,7 +309,7 @@ class Ticket
         $type = (int)$type;
 
         if ($this->tic_id == '') {
-            $this->tic_id = self::MakeTicketId(
+            $this->tic_id = self::makeTicketId(
                 array($this->ev_id, $this->rp_id, $this->fee, $this->uid)
             );
             $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET
@@ -337,7 +338,7 @@ class Ticket
         } else {
             return NULL;
         }
-    }   // function Create()
+    }
 
 
     /**

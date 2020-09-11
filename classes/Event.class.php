@@ -293,6 +293,8 @@ class Event
                 'ticket_types' => array(),
                 'contactlink' => '',
                 'max_user_rsvp' => 1,
+                'rsvp_comments' => 0,
+                'rsvp_view_grp' => 1,
             );
             if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
                 $this->options['rsvp_print'] = 0;
@@ -1602,7 +1604,7 @@ class Event
             'ts_start'      => strtotime($this->date_start1),
             'ts_end'        => strtotime($this->date_end1),
             'cal_select'    => $cal_select,
-            'contactlink_chk' => $this->options['contactlink'] == 1 ?
+            'contactlink_chk' => $this->getOption('contactlink') == 1 ?
                                 EVCHECKED : '',
             'lat'           => EVLIST_coord2str($this->Detail->getLatitude()),
             'lng'           => EVLIST_coord2str($this->Detail->getLongitude()),
@@ -1653,7 +1655,7 @@ class Event
             }
 
             if ($_EV_CONF['rsvp_print'] > 0) {
-                $rsvp_print_chk  = 'rsvp_print_chk' . $this->options['rsvp_print'];
+                $rsvp_print_chk  = 'rsvp_print_chk' . (int)$this->getOption('rsvp_print');
                 $rsvp_print = 'true';
             } else {
                 $rsvp_print = '';
@@ -1662,14 +1664,14 @@ class Event
 
             $T->set_var(array(
                 'enable_rsvp' => 'true',
-                'reg_chk'.$this->options['use_rsvp'] => EVCHECKED,
-                'rsvp_wait_chk' => $this->options['rsvp_waitlist'] == 1 ?
+                'reg_chk'.(int)$this->getOption('use_rsvp') => EVCHECKED,
+                'rsvp_wait_chk' => $this->getOption('rsvp_waitlist') == 1 ?
                                 EVCHECKED : '',
-                'max_rsvp'   => $this->options['max_rsvp'],
-                'max_user_rsvp' => $this->options['max_user_rsvp'],
-                'rsvp_cutoff' => $this->options['rsvp_cutoff'],
-                'use_rsvp' => $this->options['use_rsvp'], // for javascript
-                'rsvp_waitlist' => $this->options['rsvp_waitlist'],
+                'max_rsvp'   => $this->getOption('max_rsvp'),
+                'max_user_rsvp' => $this->getOption('max_user_rsvp'),
+                'rsvp_cutoff' => $this->getOption('rsvp_cutoff'),
+                'use_rsvp' => $this->getOption('use_rsvp'), // for javascript
+                'rsvp_waitlist' => $this->getOption('rsvp_waitlist'),
                 'tick_opts'     => $tick_opts,
                 'rsvp_print'    => $rsvp_print,
                 $rsvp_print_chk => 'checked="checked"',

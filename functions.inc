@@ -2262,13 +2262,13 @@ function EVLIST_getEvents_sql($start='', $end='', $opts=array())
                     $dt_sql = "rep.rp_start >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 2:     // include if start date has not passed
-                    $dt_sql = "rep.rp_start >= '$start'";
+                    $dt_sql = "rep.rp_start >= '{$_EV_CONF['_today']}'";
                     break;
                 case 3:     // include if end time has not passed
                     $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
                     break;
                 case 4:     // include if end date has not passed
-                    $dt_sql = "rep.rp_end >= '{$_EV_CONF['_today']} 23:59:59'";
+                    $dt_sql = "rep.rp_end >= '{$_EV_CONF['_today']}'";
                     break;
                 }
                 // Always limit to events starting before the specified end date

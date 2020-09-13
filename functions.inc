@@ -87,7 +87,7 @@ if ($_CONF['loginrequired'] == 1) {
 $langpath = __DIR__ . '/language';
 $langfile = $_CONF['language'] . '.php';
 if (!is_file("$langpath/$langfile")) {
-    $langfile = 'english.php';
+    $langfile = 'english_utf-8.php';
 }
 require_once "$langpath/$langfile";
 if (is_file("$langpath/custom/$langfile")) {

@@ -740,7 +740,14 @@ function toggleRSVPdetail(val)
         </div>
 
         <div class="uk-form-row">
-            <label class="uk-form-label">{$LANG_ACCESS['group']}:</label>
+            <label class="uk-form-label">Ticket Comment Prompts?</label>
+            <div class="uk-form-controls">
+                <input type="text" name="rsvp_cmt_prompts" value="{rsvp_cmt_prompts}" />
+            </div>
+        </div>
+
+        <div class="uk-form-row">
+            <label class="uk-form-label">Comment View Group:</label>
             <div class="uk-form-controls">
                 {rsvp_view_grp_dropdown}
             </div>

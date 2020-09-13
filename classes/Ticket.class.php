@@ -272,6 +272,10 @@ class Ticket
         $type = (int)$type;
         $wl = $wl == 0 ? 0 : 1;
         $tic_num = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
+        if (!is_array($cmt) || empty($cmt)) {
+            $cmt = array();
+        }
+        $cmt = DB_escapeString(json_encode($cmt));
         $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
             tic_num = '" . DB_escapeString($tic_num) . "',
             tic_type = $type,
@@ -283,7 +287,7 @@ class Ticket
             used = 0,
             dt = UNIX_TIMESTAMP(),
             waitlist = $wl,
-            comment = '" . DB_escapeString($cmt) . "'";
+            comment = '$cmt'";
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
@@ -1108,12 +1112,12 @@ class Ticket
         $query_arr = array(
             'sql'       => $sql,
         );
-
+        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
         return ADMIN_list(
             'evlist_adminlist_rsvp',
             array(__CLASS__, 'getAdminField'),
             $header_arr, $text_arr, $query_arr, $defsort_arr,
-            '', '', $options_arr
+            '', $extra, $options_arr
         );
     }
 
@@ -1208,6 +1212,8 @@ class Ticket
                 'sort'  => false,
             ),
         );
+        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+
         $options_arr = array(
             'chkdelete' => true,
             'chkfield'  => 'tic_id',
@@ -1230,12 +1236,11 @@ class Ticket
         $query_arr = array(
             'sql'       => $sql,
         );
-
         return ADMIN_list(
             'evlist_adminlist_rsvp',
             array(__CLASS__, 'getAdminField'),
             $header_arr, $text_arr, $query_arr, $defsort_arr,
-            '', '', $options_arr
+            '', $extra, $options_arr
         );
     }
 
@@ -1247,9 +1252,10 @@ class Ticket
      * @param   mixed   $fieldvalue     Value of field
      * @param   array   $A              Array of all fields ($name=>$value)
      * @param   array   $icon_arr       Handy array of icon images
+     * @param   array   $extra          Extra values passed in verbatim
      * @return  string                  Field value formatted for display
      */
-    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr, $extra=array())
     {
         global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
 
@@ -1279,6 +1285,17 @@ class Ticket
                 $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
             } else {
                 $retval = '';
+            }
+            break;
+
+        case 'comment':
+            $data = json_decode($fieldvalue, true);
+            if (is_array($data)) {
+                $comments = array();
+                foreach ($data as $prompt=>$val) {
+                    $comments[] = $prompt . ': ' . $val;
+                }
+                $retval .= implode(', ', $comments);
             }
             break;
 

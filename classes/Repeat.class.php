@@ -812,6 +812,15 @@ class Repeat
                 ) {
                     if ($this->Event->getOption('rsvp_comments')) {
                         $T->set_var('rsvp_comments',  true);
+                        $prompts = $this->Event->getOption('rsvp_cmt_prompts');
+                        if (empty($prompts)) {
+                            $prompts = array('Comment');
+                        }
+                        $T->set_block('event', 'rsvpComments', 'rsvpC');
+                        foreach ($prompts as $prompt) {
+                            $T->set_var('rsvp_cmt_prompt', $prompt);
+                            $T->parse('rsvpC', 'rsvpComments', true);
+                        }
                     }
                     $Ticks = TicketType::GetTicketTypes();
                     if (!empty($Ticks)) {
@@ -1130,6 +1139,22 @@ class Repeat
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
         $num_attendees = (int)$num_attendees;
         $fee = (float)$this->Event->getOption('tickets')[$tick_type]['fee'];
+        $prompts = $this->Event->getOption('rsvp_cmt_prompts', array());
+        if (empty($prompts)) {
+            $prompts = array('Comment');
+        }
+        $comments = array();
+        if (!is_array($cmt) || empty($cmt)) {
+            $cmt = array();
+        }
+        foreach ($prompts as $key=>$prompt) {
+            if (isset($cmt[$key]) && !empty($cmt[$key])) {
+                $val = $cmt[$key];
+            } else {
+                $val.= 'n/a';
+            }
+            $comments[$prompt] = $val;
+        }
 
         // Check that the current user isn't already registered
         // TODO: Allow registrations up to max count, or to waitlist
@@ -1194,7 +1219,7 @@ class Repeat
             if ($max_rsvp > 0) {
                 $wl = ($total_reg + $i) <= $max_rsvp ? 0 : 1;
             }
-            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl, $cmt);
+            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl, $comments);
         }
         return 0;
     }

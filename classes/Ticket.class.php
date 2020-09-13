@@ -239,9 +239,7 @@ class Ticket
                 $_EV_CONF['ticket_format'] = 'EV%s';
             }
 
-            // md5 makes a long value to put in a qrcode url.
-            // makeSid() should be sufficient since it includes some
-            // random characters.
+            // make a unique value.
             $token = dechex(date('y')) . dechex(date('m')) . self::createToken();
             $retval = sprintf($_EV_CONF['ticket_format'], $token);
         }
@@ -271,7 +269,7 @@ class Ticket
         $fee = (float)$fee;
         $type = (int)$type;
         $wl = $wl == 0 ? 0 : 1;
-        $tic_num = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
+        $tic_num = self::makeTicketId(array($ev_id, $rp_id, $fee, $uid));
         if (!is_array($cmt) || empty($cmt)) {
             $cmt = array();
         }
@@ -1095,6 +1093,12 @@ class Ticket
         'help_url'     => '',
         );
 
+        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        if (empty($extra) || count($extra) > 1) {
+            $cmt_title = $LANG_EVLIST['comment'];
+        } else {
+            $cmt_title = $extra[0];
+        }
         $header_arr = array(
             array(
                 'text'  => $LANG_EVLIST['name'],
@@ -1102,7 +1106,7 @@ class Ticket
                 'sort'  => false,
             ),
             array(
-                'text'  => 'Comment',
+                'text'  => $cmt_title,
                 'field' => 'comment',
                 'sort'  => false,
             ),
@@ -1112,7 +1116,6 @@ class Ticket
         $query_arr = array(
             'sql'       => $sql,
         );
-        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
         return ADMIN_list(
             'evlist_adminlist_rsvp',
             array(__CLASS__, 'getAdminField'),
@@ -1170,6 +1173,12 @@ class Ticket
         'help_url'     => '',
         );
 
+        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        if (empty($extra) || count($extra) > 1) {
+            $cmt_title = $LANG_EVLIST['comment'];
+        } else {
+            $cmt_title = $extra[0];
+        }
         $header_arr = array(
             array(
                 'text'  => $LANG_EVLIST['rsvp_date'],
@@ -1207,7 +1216,7 @@ class Ticket
                 'sort'  => false,
             ),
             array(
-                'text'  => 'Comment',
+                'text'  => $cmt_title,
                 'field' => 'comment',
                 'sort'  => false,
             ),

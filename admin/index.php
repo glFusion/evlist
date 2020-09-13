@@ -491,7 +491,7 @@ case 'import':
 
 case 'edit':
     $eid = isset($_REQUEST['eid']) ? $_REQUEST['eid'] : '';
-    $Ev = new Evlist\Event($eid);
+    $Ev = Evlist\Event::getInstance($eid);
     $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? $_POST['rp_id'] : '';
     $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
     break;

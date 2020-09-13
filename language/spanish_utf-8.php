@@ -380,6 +380,12 @@ You may either move existing events to a new calendar, or delete those events.',
 'first'         => 'First',
 'ev_not_found'  => 'The requested event was not found.',
 'jump'          => 'Jump',
+'no_tickets_print' => 'There are no tickets qualified for printing.',
+'comment' => 'Comment',
+'enter_comments' => 'Enter Comments',
+'tic_cmt_allowed' => 'Ticket Comments Allowed',
+'tic_cmt_prompts' => 'Ticket Comment Prompts',
+'tic_cmt_view_grp' => 'Comment View Group',
 );
 
 $LANG_EVLIST_HELP = array(

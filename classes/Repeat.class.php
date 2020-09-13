@@ -825,7 +825,7 @@ class Repeat
                         $T->set_var('rsvp_comments',  true);
                         $prompts = $this->Event->getOption('rsvp_cmt_prompts');
                         if (empty($prompts)) {
-                            $prompts = array('Comment');
+                            $prompts = array($LANG_EVLIST['comment']);
                         }
                         $T->set_block('event', 'rsvpComments', 'rsvpC');
                         foreach ($prompts as $prompt) {

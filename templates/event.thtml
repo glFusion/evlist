@@ -315,7 +315,7 @@
 {!if rsvp_comments}
         </div>
         <div class="uk-form-row">
-            <label class="uk-form-label">Enter Comments:</label>
+            <label class="uk-form-label">{$LANG_EVLIST['enter_comments']}:</label>
             <div class="uk-form-controls">
                 <table>
 <!-- BEGIN rsvpComments -->

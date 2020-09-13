@@ -38,7 +38,7 @@
     border: none !important;
     padding: 10px 6px;
     color: #fff;
-    font-size: 13px;
+    /*font-size: 13px;*/
 }
 
 #calendar .days li {
@@ -69,12 +69,12 @@
 #calendar .event {
     clear: both;
     display: block;
-    font-size: 13px;
+    /*font-size: 13px;*/
+    /*line-height: 14px;*/
     /*border-radius: 4px;*/
     /*padding: 5px;*/
     /*margin-top: 40px;*/
     margin-bottom: 5px;
-    line-height: 14px;
     /*background: #e4f2f2;
     border: 1px solid #b5dbdc;
     color: #009aaf;*/

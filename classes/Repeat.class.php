@@ -224,6 +224,17 @@ class Repeat
 
 
     /**
+     * Check if the current user is an administrator.
+     *
+     * @return  boolean     True for administrators, False for regular users
+     */
+    public function isAdmin()
+    {
+        return $this->isAdmin ? true : false;
+    }
+
+
+    /**
      * Set the first starting date/time object.
      *
      * @param   string  $dt_tm  MySQL-formatted datetime string

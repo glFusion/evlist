@@ -267,7 +267,7 @@ case 'tickdelete_x':
 case 'tickdelete':
     // Delete one or more tickets, if admin or owner
     $rp = Evlist\Repeat::getInstance($_GET['rp_id']);
-    if ($rp->isAdmin) {
+    if ($rp->isAdmin()) {
         if (isset($_POST['delrsvp']) && is_array($_POST['delrsvp'])) {
             Evlist\Ticket::Delete($_POST['delrsvp']);
         }

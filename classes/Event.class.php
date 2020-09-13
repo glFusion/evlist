@@ -185,7 +185,7 @@ class Event
     /** Recurring event data
      * @var array */
     private $rec_data = array();
-    
+
     /** Other miscelaneous options
      * @var array */
     private $options = array();
@@ -449,6 +449,17 @@ class Event
 
 
     /**
+     * Check if the current user is an administrator.
+     *
+     * @return  boolean     True for administrators, False for regular users
+     */
+    public function isAdmin()
+    {
+        return $this->isAdmin ? true : false;
+    }
+
+
+    /**
      * Sanitize and set the event ID property.
      *
      * @param   string  $id     Event record ID
@@ -460,7 +471,7 @@ class Event
         return $this;
     }
 
-    
+
     /**
      * Get the event record ID.
      *

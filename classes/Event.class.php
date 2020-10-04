@@ -295,7 +295,7 @@ class Event
                 'max_user_rsvp' => 1,
                 'rsvp_comments' => 0,
                 'rsvp_view_grp' => 1,
-                'rsvp_cmt_prompts' => '',
+                'rsvp_cmt_prompts' => array(),
             );
             if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
                 $this->options['rsvp_print'] = 0;

@@ -129,6 +129,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'deleting_cal'      => 'Borrando Calendario',
 
 'rec_formats'       => array (
+    0   => 'Does not recur',
     1   => 'Daily by date, e.g., April 4 thru April 7 (sequential)',
     2   => 'Monthly by date, e.g., the first of each month',
     3   => 'Yearly by date, e.g., December 25th year after year',
@@ -138,6 +139,7 @@ You may either move existing events to a new calendar, or delete those events.',
     ),
 
 'rec_periods'       => array(
+    0 => '',
     1 => 'día',
     2 => 'mes',
     3 => 'año',

@@ -352,7 +352,7 @@
 
 {!if user_signups}
 <div id="evlist_signups">
-    <h2>Signups</h2>
+    <h2>{$LANG_EVLIST['signup_list']}</h2>
     {user_signups}
 </div>
 {!endif}

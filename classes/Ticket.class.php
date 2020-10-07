@@ -1051,15 +1051,21 @@ class Ticket
      * Same as adminList_RSVP() but with limited fields and no actions.
      *
      * @param   integer $rp_id  Repeat ID being viewed or checked
+     * @param   string  $title  Optional title to show with the list
      * @return  string          HTML for admin list
      */
-    public static function userList_RSVP($rp_id)
+    public static function userList_RSVP($rp_id, $title='')
     {
         global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
 
         USES_lib_admin();
         $Ev = \Evlist\Repeat::getInstance($rp_id);
-        if ($Ev->getID() == 0) return '';
+        if (
+            $Ev->getID() == 0 ||
+            !SEC_inGroup($Ev->getEvent()->getOption('rsvp_view_grp'))
+        ) {
+            return '';
+        }
 
         $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
                     tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
@@ -1116,10 +1122,16 @@ class Ticket
         }
 
         $options_arr = array();
-        return ADMIN_simpleList(
+
+        $retval = '';
+        if (!empty($title)) {
+            $retval .= '<h2>' . $title . '</h2>';
+        }
+        $retval .= ADMIN_simpleList(
             array(__CLASS__, 'getAdminField'),
             $header_arr, $text_arr, $data_arr, $options_arr
         );
+        return $retval;
     }
 
 

@@ -84,15 +84,29 @@ if ($_CONF['loginrequired'] == 1) {
 }
 
 // Include the user's language file, if found.  Default to englsh.
+
 $langpath = __DIR__ . '/language';
-$langfile = $_CONF['language'] . '.php';
-if (!is_file("$langpath/$langfile")) {
-    $langfile = 'english_utf-8.php';
+require_once "$langpath/english_utf-8.php";
+if (file_exists("$langpath/custom/english_utf-8.php")) {
+    include_once "$langpath/custom/english_utf-8.php";
 }
-require_once "$langpath/$langfile";
-if (is_file("$langpath/custom/$langfile")) {
-    /** Include the custom language file, if any */
-    include_once "$langpath/custom/$langfile";
+$langfile = "{$_CONF['language']}.php";
+if (
+    $lang_file != 'english_utf-8.php' &&
+    file_exists("$langpath/$langfile")
+) {
+    $save = $LANG_EVLIST;
+    unset($LANG_EVLIST);
+    include_once "$langpath/$langfile";
+    if (file_exists("$langpath/custom/$langfile")) {
+        include_once "$langpath/custom/$langfile";
+    }
+    if ($LANG_EVLIST !== NULL) {
+        $LANG_EVLIST = array_merge($save, $LANG_EVLIST);
+    } else {
+        $LANG_EVLIST = $save;
+    }
+    unset($save);
 }
 
 // Define values for whether RSVP can be per repeat or only for a whole event
@@ -426,21 +440,48 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
 {
     global $_CONF, $_TABLES;
 
-    if ($op == 'tagname') {
-        return 'event';
-    } elseif ($op == 'parse') {
-        $eid = COM_applyFilter($autotag['parm1']);
-        $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $eid);
-        if (empty($autotag['parm2'])) {
-            $text = COM_stripslashes(
-                DB_getItem($_TABLES['evlist_detail'], 'title', "ev_id='$eid'")
-            );
-        } else {
-            $text = $autotag['parm2'];
+    switch ($op) {
+    case 'tagname':
+        return array('event', 'evlist_signups');
+        break;
+    case 'tagusage':
+        return array(
+            'namespace' => 'evlist',
+            'usage' => 'description',
+        );
+        break;
+    case 'desc':
+        switch ($content) {
+        case 'event':
+        case 'evlist_signups':
+            return $LANG_EVLIST['at_dscp_' . $content];
+            break;
+        default:
+            return '';
+            break;
         }
-        $link = '<a href="' . $url . '">' . $text . '</a>';
-        $content = str_replace($autotag['tagstr'], $link, $content);
+        break;
+    case 'parse':
+        $HTML = '';
+        switch ($autotag['tag']) {
+        case 'event':
+            $eid = COM_applyFilter($autotag['parm1']);
+            $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $eid);
+            if (empty($autotag['parm2'])) {
+                $text = COM_stripslashes(
+                    DB_getItem($_TABLES['evlist_detail'], 'title', "ev_id='$eid'")
+                );
+            } else {
+                $text = $autotag['parm2'];
+            }
+            $HTML = '<a href="' . $url . '">' . $text . '</a>';
+            break;
+        case 'evlist_signups':
+            $HTML .= Evlist\Ticket::userList_RSVP($autotag['parm1'], $autotag['parm2']);
+            break;
+        }
 
+        $content = str_replace($autotag['tagstr'], $HTML, $content);
         return $content;
     }
 }

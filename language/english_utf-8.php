@@ -383,6 +383,9 @@ You may either move existing events to a new calendar, or delete those events.',
 'tic_cmt_allowed' => 'Ticket Comments Allowed',
 'tic_cmt_prompts' => 'Ticket Comment Prompts',
 'tic_cmt_view_grp' => 'Comment View Group',
+'signup_list' => 'Signup List',
+'at_dscp_event' => 'Create a link to an event or the closest upcoming instance.',
+'at_dscp_evlist_signups' => 'Show a table of signups to authorized users.',
 );
 
 $LANG_EVLIST_HELP = array(

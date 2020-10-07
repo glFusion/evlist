@@ -1072,55 +1072,53 @@ class Ticket
                 ON u.uid = tk.uid
             WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
 
-        $title = $LANG_EVLIST['admin_rsvp'] .
-            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=printtickets&eid=' . $Ev->getEventID() .
-            '" class="uk-button uk-button-primary uk-button-small" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
-            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=exporttickets&eid=' . $Ev->getID() .
-            '" class="uk-button uk-button-primary uk-button-small">' . $LANG_EVLIST['export_list'] . '</a>';
-
         if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
             $sql .= " AND rp_id = '{$Ev->getID()}' ";
         }
 
-        $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
         $text_arr = array(
-        'has_menu'     => false,
-        'has_extras'   => false,
-        'title'        => $title,
-        'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
-        'help_url'     => '',
+            'has_menu'     => false,
+            'has_extras'   => false,
+            'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
+            'help_url'     => '',
         );
 
-        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
-        if (empty($extra) || count($extra) > 1) {
-            $cmt_title = $LANG_EVLIST['comment'];
-        } else {
-            $cmt_title = $extra[0];
-        }
         $header_arr = array(
             array(
                 'text'  => $LANG_EVLIST['name'],
                 'field' => 'fullname',
-                'sort'  => false,
-            ),
-            array(
-                'text'  => $cmt_title,
-                'field' => 'comment',
-                'sort'  => false,
+                'sort'  => true,
             ),
         );
+        $prompts = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        $c = 0;
+        foreach ($prompts as $prompt) {
+            $header_arr[] = array(
+                'text' => $prompt,
+                'field' => 'cmt_' . $c++,
+                'sort' => false,
+            );
+        }
+
+        $data_arr = array();
+        $res = DB_query($sql);
+        $i = 0;
+        while ($A = DB_fetchArray($res, false)) {
+            $data_arr[$i] = array(
+                'fullname' => $A['fullname'],
+            );
+            $cmts = json_decode($A['comment'], true);
+            $j = 0;
+            foreach ($cmts as $p=>$val) {
+                $data_arr[$i]['cmt_' . $j++] = $val;
+            }
+            $i++;
+        }
 
         $options_arr = array();
-        $query_arr = array(
-            'sql'       => $sql,
-        );
-        return ADMIN_list(
-            'evlist_adminlist_rsvp',
+        return ADMIN_simpleList(
             array(__CLASS__, 'getAdminField'),
-            $header_arr, $text_arr, $query_arr, $defsort_arr,
-            '', $extra, $options_arr
+            $header_arr, $text_arr, $data_arr, $options_arr
         );
     }
 
@@ -1173,11 +1171,11 @@ class Ticket
         'help_url'     => '',
         );
 
-        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
-        if (empty($extra) || count($extra) > 1) {
+        $prompts = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        if (empty($prompts) || count($prompts) > 1) {
             $cmt_title = $LANG_EVLIST['comment'];
         } else {
-            $cmt_title = $extra[0];
+            $cmt_title = $prompts[0];
         }
         $header_arr = array(
             array(
@@ -1221,7 +1219,10 @@ class Ticket
                 'sort'  => false,
             ),
         );
-        $extra = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        $extra = array(
+            'cmt_prompts' => $prompts,
+            'cmt_count' => count($prompts),
+        );
 
         $options_arr = array(
             'chkdelete' => true,
@@ -1299,12 +1300,17 @@ class Ticket
 
         case 'comment':
             $data = json_decode($fieldvalue, true);
+            $item_count = max(count($data), count($extra['cmt_prompts']));
             if (is_array($data)) {
-                $comments = array();
-                foreach ($data as $prompt=>$val) {
-                    $comments[] = $prompt . ': ' . $val;
+                if ($item_count == 1) {
+                    $retval .= array_pop($data);
+                } else {
+                    $comments = array();
+                    foreach ($data as $prompt=>$val) {
+                        $comments[] = $prompt . ': ' . $val;
+                    }
+                    $retval .= implode(', ', $comments);
                 }
-                $retval .= implode(', ', $comments);
             }
             break;
 

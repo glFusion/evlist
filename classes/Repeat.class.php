@@ -872,6 +872,11 @@ class Repeat
                 }
             }
 
+            // Show the user signups on the event page if authorized.
+            if (SEC_inGroup($this->Event->getOption('rsvp_view_grp'))) {
+                $T->set_var('user_signups', Ticket::userList_RSVP($this->rp_id));
+            }
+
             // If ticket printing is enabled for this event, see if the
             // current user has any tickets to print.
             if ($this->Event->getOption('rsvp_print') > 0) {
@@ -1160,11 +1165,10 @@ class Repeat
         }
         foreach ($prompts as $key=>$prompt) {
             if (isset($cmt[$key]) && !empty($cmt[$key])) {
-                $val = $cmt[$key];
+                $comments[$prompt] = $cmt[$key];
             } else {
-                $val.= 'n/a';
+                $comments[$prompt] = 'n/a';
             }
-            $comments[$prompt] = $val;
         }
 
         // Check that the current user isn't already registered

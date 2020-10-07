@@ -127,6 +127,7 @@ $LANG_EVLIST = array(
 'none_delete'           => 'None- supprimer les événements',
 'deleting_cal'          => 'Suppression de calendrier',
 'rec_formats'           => array (
+0   => 'Does not recur',
 1               => 'quotidiennement par date, par ex., Avril 4 thru 7 avril (séquentiel) ',
 2               => 'Mensuellement par date (les mêmes dates chaque mois) ',
 3               => 'chaque année, par date, par ex., décembre 25e année après année',
@@ -135,6 +136,7 @@ $LANG_EVLIST = array(
 6               => 'dates personnalisées : une liste délimitée par des virgules, des dates du calendrier', ),
 
 'rec_periods'           => array(
+0 => '',
 1               => 'jour',
 2               => 'mois',
 3               => 'Année',

@@ -188,15 +188,15 @@
             {map}
         </div>
         <div id="directions">
-            <form action="https://maps.google.com/maps" method="GET" target="_blank">
-                <input onfocus="this.value='';" type="text"
-                    name="saddr" id="saddr" value="{$LANG_GEO['start_addr']}" />
+            <form action="https://www.google.com/maps/dir/" method="GET" target="_blank">
+                <input type="hidden" name="api" value="1" />
+                <input type="text" name="origin" id="saddr" placeholder="{$LANG_GEO['start_addr']}" />
 {!if is_uikit}
                 <input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
 {!else}
                 <input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
 {!endif}
-                <input type="hidden" name="daddr" value="{lat},{lng}" />
+                <input type="hidden" name="destination" value="{lat},{lng}" />
             </form>
         </div>
     </div>

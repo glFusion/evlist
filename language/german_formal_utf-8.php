@@ -245,6 +245,7 @@ $LANG_EVLIST = array(
         'tickettypes'    => '<ul><li>Eintrittskarten können für kostenlose oder kostenpflichtige Eintritte erstellt werden und entweder für eine Veranstaltung oder für all seine Wiederholungen (Saisonkarte) vergeben werden.</li><li>Tickets werden nur verwendet, wenn die globale Einstellung "Tickets und Reservierung" aktiviert ist.</li><li>Ticket-Kategorien können nur gelöscht werden, wenn sie nicht für Veranstaltungen verwendet wurden.</li></ul>',
     ),
 'rec_formats'       => array(
+                    0   => 'Does not recur',
                     1   => 'Täglich NEU von - bis          (z.B. von 4. Mai bis 7. Mai jeden Tag NEU)',
                     2   => 'Bestimmte Tage im Monat        (z.B. der 1. und 15. Tag jedes Monats)',
                     3   => 'Bestimmter Tag im Jahr         (z.B. der 25. Dezember jedes Jahres)',
@@ -253,6 +254,7 @@ $LANG_EVLIST = array(
                     6   => 'Eine Liste mit Kalenderdaten   (z.B. 2017-11-23,2018-05-01,......)',
     ),
 'rec_periods'       => array(
+                    0 => '',
                     1    => 'Tag(e)',
                     2    => 'Monat(e)',
                     3    => 'Jahr(e)',

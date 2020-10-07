@@ -266,19 +266,19 @@ class Event
                 $startyear1, $startmonth1, $startday1
             );
             $this->time_start1 = sprintf(
-                "%02d:%02d:00",
+                "%02d:%02d",
                 $starthour1, $startminute1
             );
             $this->time_start2 = sprintf(
-                "%02d:%02d:00",
+                "%02d:%02d",
                 $starthour2, $startminute2
             );
             $this->date_end1 = sprintf(
                 "%4d-%02d-%02d",
                 $endyear1, $endmonth1, $endday1
             );
-            $this->time_end1 = sprintf("%02d:%02d:00", $endhour1, $endminute1);
-            $this->time_end2 = sprintf("%02d:%02d:00", $endhour2, $endminute2);
+            $this->time_end1 = sprintf("%02d:%02d", $endhour1, $endminute1);
+            $this->time_end2 = sprintf("%02d:%02d", $endhour2, $endminute2);
 
             $this->perm_owner   = $_EV_CONF['default_permissions'][0];
             $this->perm_group   = $_EV_CONF['default_permissions'][1];
@@ -1117,9 +1117,9 @@ class Event
         }
 
         if (empty($this->Errors)) {
-            if ($this->isNew) {
+            /*if ($this->isNew) {
                 $this->id = DB_insertID();
-            }
+            }*/
             if (!$this->isSubmission()) {
                 Cache::clear('events');
                 PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');

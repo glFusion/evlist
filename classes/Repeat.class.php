@@ -1050,7 +1050,7 @@ class Repeat
             'owner_link' => $ownerlink,
             'reminder_set' => $hasReminder ? 'true' : 'false',
             'reminder_email' => isset($_USER['email']) ? $_USER['email'] : '',
-            'notice' => 1,
+            'notice' => (int)$_EV_CONF['reminder_days'],
             'rp_id' => $this->rp_id,
             'eid' => $this->ev_id,
             'show_reminderform' => $show_reminders ? 'true' : '',

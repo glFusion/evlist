@@ -2,7 +2,11 @@
 <p>{msg1}</p>
 {!endif}
 {!if what}
-<p>{lang_what}: {what}</p>
+<p>{lang_what}: {what}
+{!if summary}
+<br />{summary}
+{!endif}
+</p>
 {!endif}
 {!if when}
 <p>{lang_when}: {when}</p>
@@ -11,9 +15,6 @@
 <p>{lang_where}:<br />
 {address_info}
 </p>
-{!endif}
-{!if summary}
-<p>{summary}</p>
 {!endif}
 {!if url}
 <p>{url}</p>

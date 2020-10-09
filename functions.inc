@@ -1652,7 +1652,7 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
         $retval = CMT_userComments(
             $id, $title, 'evlist', $order, $format,
             $cid, $page, $view, $delete_option,
-            plugin_commentsupport_evlist()
+            $Rp->getEvent()->commentsEnabled()
         );
     } else {
         $retval = COM_startBlock(

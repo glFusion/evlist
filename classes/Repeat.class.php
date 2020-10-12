@@ -724,7 +724,7 @@ class Repeat
         $outputHandle->addMeta(
             'property',
             'og:site_name',
-            urlencode($_CONF['site_name']),
+            $_CONF['site_name'],
             HEADER_PRIO_NORMAL
         );
         $outputHandle->addMeta(

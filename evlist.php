@@ -45,6 +45,8 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
+global $_DB_table_prefix, $_TABLES;
+
 /**
 *   Define global variables.
 *   The arrays have already been created; these are effectively overrides

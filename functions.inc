@@ -112,7 +112,7 @@ if (!defined('DATE_CALC_FORMAT')) {
 
 // The services file only has functions for event signups and payments.
 // No need to include if RSVP is disabled.
-if ($_EV_CONF['enable_rsvp']) {
+if (isset($_EV_CONF['enable_rsvp']) && $_EV_CONF['enable_rsvp']) {
     include_once __DIR__ . '/services.inc.php';
 }
 
@@ -1168,13 +1168,17 @@ function plugin_enablestatechange_evlist($enable)
                     SET is_enabled = $is_enabled
                     WHERE (type = 'phpblock')
                     AND (phpblockfn LIKE 'phpblock_evlist_%')");
+        // Notify other plugins, e.g. Searcher, to delete all items.
+        PLG_itemDeleted('*', 'evlist');
     }
+
     return $enable;
 }
 
 
 /**
  * Receives notification of anothe plugin's deletion.
+ * This handles removing events from other plugins like birthdays.
  *
  * @param   mixed   $id     Item ID
  * @param   string  $type   Plugin Name
@@ -2160,8 +2164,11 @@ function EVLIST_isCurrentVersion()
     static $isCurrent = -1;     // static var to minimize DB calls
 
     if ($isCurrent === -1) {
-        $installed = DB_getItem($_TABLES['plugins'], 'pi_version',
-                "pi_name = 'evlist'");
+        $installed = DB_getItem(
+            $_TABLES['plugins'],
+            'pi_version',
+            "pi_name = 'evlist'"
+        );
         $isCurrent = COM_checkVersion($installed, $_EV_CONF['pi_version']);
     }
     return $isCurrent;

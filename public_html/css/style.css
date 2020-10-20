@@ -210,6 +210,10 @@ h2.evlist_header {
     padding: .25em;
     position: relative;
 }
+div.evlist_header {
+    padding-bottom: 2em;
+}
+
 .evlist_header span.evlist_eid {
     position: absolute;
     top: 0;
@@ -220,6 +224,9 @@ h2.evlist_header {
     margin: 2px;
     padding: .2em;
     border: 1px solid #cccccc;
+}
+.evlist_header .cal_checkboxes {
+    font-size:10pt;
 }
 h2.evlist_header a {
     font-size: 14pt;
@@ -774,4 +781,6 @@ div.evCBouter {
         width: 14.28%;
     }
 }
-
+div#evlist_signups {
+    margin-top: 15px;
+}

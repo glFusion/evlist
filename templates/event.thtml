@@ -256,7 +256,7 @@
 
   <div id="reminder_yes" class="evdata uk-alert" style="display:none;">
     <form id="evRemDel" onsubmit="updateReminder(this);return false;">
-      {$LANG_EVLIST['you_are_subscribed']}
+      <span id="remIsSubscribed"></span>
       <input type="submit" name="delreminder" class="uk-button uk-button-danger uk-button-small" value="{$LANG_ACCESS['remove']}" />
       <input type="hidden" name="eid" value="{eid}" />
       <input type="hidden" name="rp_id" value="{rp_id}" />
@@ -393,13 +393,14 @@ function EV_toggleRegDiv() {
 }
 
 // Show the add-reminder or remove-reminder form
-function showReminder(status) {
+function showReminder(msg) {
     var addform = document.getElementById('reminder_no');
     var remform = document.getElementById('reminder_yes');
-    if (status) {
+    if (msg) {
       // have a reminder set, show the "delete" form
       remform.style.display = "";
       addform.style.display = "none";
+      $("#remIsSubscribed").html(msg);
     } else {
       // don't have a reminder set, show the "add" form
       addform.style.display = "";
@@ -424,7 +425,7 @@ var updateReminder = function(el) {
         data: data,
         success: function(result) {
             try {
-                showReminder(result.reminder_set);
+                showReminder(result.message);
             }
             catch(err) {
             }
@@ -436,7 +437,7 @@ var updateReminder = function(el) {
 {!if show_reminderform}
 $(document).ready(function() {
   // update the add/del reminder section depending on whether one is set
-  showReminder({reminder_set});
+  showReminder("{reminder_msg}");
 });
 {!endif}
 

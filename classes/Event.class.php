@@ -800,7 +800,11 @@ class Event
             $this->options['tickets'] = array();
             if ($_EV_CONF['enable_rsvp']) {
                 $this->options['rsvp_comments'] = isset($row['rsvp_comments']) ? (int)$row['rsvp_comments'] : 0;
-                $this->options['rsvp_cmt_prompts'] = isset($row['rsvp_cmt_prompts']) ? explode('|', $row['rsvp_cmt_prompts']) : array();
+                if (isset($row['rsvp_cmt_prompts']) && !empty($row['rsvp_cmt_prompts'])) {
+                    $this->options['rsvp_cmt_prompts'] = explode('|', $row['rsvp_cmt_prompts']);
+                } else {
+                    $this->options['rsvp_cmt_prompts'] = array();
+                }
                 $this->options['rsvp_view_grp'] = isset($row['rsvp_view_grp']) ? (int)$row['rsvp_view_grp'] : 2;
                 $this->options['use_rsvp'] = isset($row['use_rsvp']) ? (int)$row['use_rsvp'] : 0;
                 $this->options['max_rsvp'] = isset($row['max_rsvp']) ? (int)$row['max_rsvp'] : 0;

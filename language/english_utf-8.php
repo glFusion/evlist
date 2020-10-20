@@ -183,7 +183,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'rem_msg1'  => "You are receiving this event reminder because your address was submitted to {$_CONF['site_name']}.",
 'rem_msg2'  => 'This is a one-time message. You will not receive another message unless you subscribe to other events.',
 'rem_url'   => 'For more information please visit %s',
-'you_are_subscribed' => 'You are subscribed to this event.',
+'you_are_subscribed' => 'You will receive an email %d days prior to this event.',
 'topic_all'         => 'All',
 'topic_home'        => 'Homepage only',
 'recur_desc'        => array(

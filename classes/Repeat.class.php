@@ -1018,7 +1018,7 @@ class Repeat
             $_EV_CONF['reminder_days'] = 1;
         }
 
-        $hasReminder = 0;
+        $reminder_msg = '';
         if (
             !COM_isAnonUser() &&
             $_EV_CONF['enable_reminders'] == '1' &&
@@ -1033,7 +1033,8 @@ class Repeat
 
             // Let's see if we have already asked for a reminder...
             if ($_USER['uid'] > 1) {
-                $hasReminder = Reminder::countReminders($this->ev_id, $this->rp_id);
+                $Reminder = new Reminder($this->rp_id, $_USER['uid']);
+                $reminder_msg = sprintf($LANG_EVLIST['you_are_subscribed'], $Reminder->getDays());
             }
         } else {
             $show_reminders = false;
@@ -1048,7 +1049,7 @@ class Repeat
         }
         $T->set_var(array(
             'owner_link' => $ownerlink,
-            'reminder_set' => $hasReminder ? 'true' : 'false',
+            'reminder_msg' => $reminder_msg,
             'reminder_email' => isset($_USER['email']) ? $_USER['email'] : '',
             'notice' => (int)$_EV_CONF['reminder_days'],
             'rp_id' => $this->rp_id,

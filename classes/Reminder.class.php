@@ -141,6 +141,28 @@ class Reminder
 
 
     /**
+     * See if this is a new record, or was not found.
+     *
+     * @return  boolean     1 if new, 0 if not
+     */
+    public function isNew()
+    {
+        return $this->isNew ? 1 : 0;
+    }
+
+
+    /**
+     * Get the days notice for this reminder.
+     *
+     * @return  integer     Days notice value
+     */
+    public function getDays()
+    {
+        return (int)$this->days_notice;
+    }
+
+
+    /**
      * Add or update a reminder record.
      * The event form doesn't show the reminder form if a reminder exists,
      * so normally the update isn't needed.

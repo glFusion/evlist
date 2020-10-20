@@ -71,6 +71,11 @@ case 'addreminder':
     $status = array();
     $R = new Evlist\Reminder($_POST['rp_id']);
     $status['reminder_set'] = $R->Add($_POST['notice'], $_POST['rem_email']);
+    if ($status['reminder_set']) {
+        $status['message'] = sprintf($LANG_EVLIST['you_are_subscribed'], $_POST['notice']);
+    } else {
+        $status['message'] = '';
+    }
     echo json_encode($status);
     exit;
     break;

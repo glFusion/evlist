@@ -781,3 +781,6 @@ div.evCBouter {
         width: 14.28%;
     }
 }
+div#evlist_signups {
+    margin-top: 15px;
+}

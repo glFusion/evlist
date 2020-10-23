@@ -356,8 +356,8 @@ class Repeat
                         $row['endminute2']
                     );*/
                 } else {
-                    $this->time_start2 = NULL;
-                    $this->time_end2   = NULL;
+                    $this->time_start2 = '00:00:00';
+                    $this->time_end2   = '00:00:00';
                 }
             }
         }
@@ -1034,7 +1034,9 @@ class Repeat
             // Let's see if we have already asked for a reminder...
             if ($_USER['uid'] > 1) {
                 $Reminder = new Reminder($this->rp_id, $_USER['uid']);
-                $reminder_msg = sprintf($LANG_EVLIST['you_are_subscribed'], $Reminder->getDays());
+                if (!$Reminder->isNew()) {
+                    $reminder_msg = sprintf($LANG_EVLIST['you_are_subscribed'], $Reminder->getDays());
+                }
             }
         } else {
             $show_reminders = false;

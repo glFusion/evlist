@@ -35,27 +35,42 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-$DEFVALUES['evlist_events'] = "INSERT INTO {$_TABLES['evlist_events']}
-        (`id`, `date_start1`, `date_end1`, `time_start1`, `time_end1`,
+$DEFVALUES['evlist_events'] = "INSERT INTO {$_TABLES['evlist_events']} (
+        `id`, `date_start1`, `date_end1`, `time_start1`, `time_end1`,
         `time_start2`, `time_end2`, `recurring`, `rec_data`,
-        `allday`, `split`, `status`, `postmode`, `hits`, `enable_reminders`,
-        `owner_id`, `group_id`, `perm_owner`, `perm_group`, `perm_members`,
-        `perm_anon`, `det_id`, `show_upcoming`, `cal_id`, `options`)
-    VALUES
-        ('20070924175337252','2011-02-14','2011-02-14','00:00:00','23:59:59',NULL,NULL,1,'a:3:{s:4:\"type\";i:3;s:4:\"stop\";s:10:\"2037-12-31\";s:4:\"skip\";i:0;}',1,0,1,'plaintext',0,1,2,1,3,3,0,0,1,1,1,'a:1:{s:11:\"contactlink\";i:0;}'),
-        ('20070922110402423','2011-12-16','2011-12-16','17:00:00','19:00:00',NULL,NULL,0,'a:2:{s:4:\"type\";i:0;s:4:\"stop\";s:10:\"2037-12-31\";}',0,0,1,'plaintext',0,1,2,1,3,3,0,0,2,1,1,'a:1:{s:11:\"contactlink\";i:1;}'),
-        ('20070924140852285','2011-03-02','2011-03-02','10:00:00','12:00:00','17:00:00','19:00:00',1,'a:2:{s:4:\"type\";i:1;s:4:\"stop\";s:10:\"2011-03-12\";}',0,1,1,'plaintext',0,1,2,1,3,3,0,0,4,1,1,'a:1:{s:11:\"contactlink\";i:1;}')
+        `allday`, `split`, `status`, `postmode`, `enable_reminders`,
+        `owner_id`, `group_id`, `perm_owner`, `perm_group`, `perm_members`, `perm_anon`,
+        `det_id`, `show_upcoming`, `cal_id`, `options`
+    ) VALUES
+        ('20070924175337252','2011-02-14','2011-02-14','00:00:00','23:59:59',
+        '00:00:00','00:00:00',1,'a:3:{s:4:\"type\";i:3;s:4:\"stop\";s:10:\"2037-12-31\";s:4:\"skip\";i:0;}',
+        1,0,1,'plaintext',1,
+        2,1,3,3,0,0,
+        1,1,1,'a:1:{s:11:\"contactlink\";i:0;}'),
+        ('20070922110402423','2011-12-16','2011-12-16','17:00:00','19:00:00',
+        '00:00:00','00:00:00',0,'a:2:{s:4:\"type\";i:0;s:4:\"stop\";s:10:\"2037-12-31\";}',
+        0,0,1,'plaintext',1,
+        2,1,3,3,0,0,
+        2,1,1,'a:1:{s:11:\"contactlink\";i:1;}'),
+        ('20070924140852285','2011-03-02','2011-03-02','10:00:00','12:00:00',       '17:00:00','19:00:00',1,'a:2:{s:4:\"type\";i:1;s:4:\"stop\";s:10:\"2011-03-12\";}',
+        0,1,1,'plaintext',1,
+        2,1,3,3,0,0,
+        4,1,1,'a:1:{s:11:\"contactlink\";i:1;}')
 ";
 
-$DEFVALUES['evlist_submissions'] = "INSERT INTO {$_TABLES['evlist_submissions']}
-        (`id`, `date_start1`, `date_end1`, `time_start1`, `time_end1`,
-        `time_start2`, `time_end2`, `recurring`, `rec_data`,
-        `allday`, `split`, `status`, `postmode`, `hits`, `enable_reminders`,
-        `owner_id`, `group_id`, `perm_owner`, `perm_group`, `perm_members`,
-        `perm_anon`, `det_id`, `show_upcoming`, `cal_id`, `options`)
-    VALUES
-        ('20070924133400211','2011-02-01','2011-02-01','17:00:00','21:15:00',NULL,NULL,0,'a:2:{s:4:\"type\";i:0;s:4:\"stop\";s:10:\"2037-12-31\";}',0,0,1,'plaintext',2,1,2,2,3,0,0,0,3,1,1,'a:1:{s:11:\"contactlink\";i:1;}')
-";
+$DEFVALUES['evlist_submissions'] = "INSERT INTO {$_TABLES['evlist_submissions']} (
+    `id`, `date_start1`, `date_end1`, `time_start1`, `time_end1`,
+    `time_start2`, `time_end2`, `recurring`, `rec_data`,
+    `allday`, `split`, `status`, `postmode`, `enable_reminders`,
+    `owner_id`, `group_id`, `perm_owner`, `perm_group`, `perm_members`, `perm_anon`,
+    `det_id`, `show_upcoming`, `cal_id`, `options`
+    ) VALUES (
+    '20070924133400211','2011-02-01','2011-02-01','17:00:00','21:15:00',
+    '00:00:00','00:00:00',0,'a:2:{s:4:\"type\";i:0;s:4:\"stop\";s:10:\"2037-12-31\";}',
+    0,0,1,'plaintext',1,
+    2,2,3,0,0,0,
+    3,1,1,'a:1:{s:11:\"contactlink\";i:1;}'
+    )";
 
 $DEFVALUES['evlist_detail'] = "INSERT INTO {$_TABLES['evlist_detail']}
         (`det_id`, `ev_id`, `title`, `summary`, `full_description`, `url`,

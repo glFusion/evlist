@@ -310,9 +310,15 @@ class Reminder
             }
         }
 
-        $T = new \Template(EVLIST_PI_PATH . '/templates/');
+        $T = new \Template(array(
+            $_CONF['path_layout'] . 'email/',
+            __DIR__ . '/../templates/notify/',
+            __DIR__ . '/../templates/',
+        ) );
         $T->set_file(array(
-            'msg' => 'reminder_mail.thtml',
+            'html_msg' => 'mailtemplate_html.thtml',
+            'text_msg' => 'mailtemplate_text.thtml',
+            'msg' => 'rem_message.thtml',
             'addr' => 'address.thtml',
         ) );
 
@@ -334,17 +340,42 @@ class Reminder
             'country'   => $Detail->getCountry(),
             'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
             'summary'   => COM_stripSlashes($Detail->getSummary()),
-            'msg1'      => $LANG['rem_msg1'],
-            'msg2'      => $LANG['rem_msg2'],
+            //'msg1'      => $LANG['rem_msg1'],
+            //'msg2'      => $LANG['rem_msg2'],
         ) );
-        $T->parse('address_info', 'addr', true);
+        $T->parse('address_info', 'addr');
+        $T->set_block('html_msg', 'content', 'contentblock');
         $T->parse('output', 'msg');
-        $message = $T->finish($T->get_var('output'));
-        $mailto = COM_formatEmailAddress($this->name, $this->email);
-        //mail reminder
-        COM_mail($mailto, $subject, $message, '', true);
+        $html_content = $T->finish($T->get_var('output'));
+        $T->set_var('content_text', $html_content);
+        $T->parse('contentblock', 'content',true);
+
+        $html2TextConverter = new \Html2Text\Html2Text($html_content);
+        $text_content = $html2TextConverter->getText();
+        $T->set_block('text_msg', 'contenttext', 'contenttextblock');
+        $T->set_var('content_text', $text_content);
+        $T->parse('contenttextblock', 'contenttext',true);
+
+        $T->parse('output', 'html_msg');
+        $html_msg = $T->finish($T->get_var('output'));
+        $T->parse('textoutput', 'text_msg');
+        $text_msg = $T->finish($T->get_var('textoutput'));
+
+        $msgData = array(
+            'htmlmessage' => $html_msg,
+            'textmessage' => $text_msg,
+            'subject' => $LANG_EVLIST['rem_title'],
+            'from' => array(
+                'name' => $_CONF['site_name'],
+                'email' => $_CONF['noreply_mail'],
+            ),
+            'to' => array(
+                'name' => $this->name,
+                'email' => $this->email,
+            ),
+        );
+        COM_emailNotification($msgData);
     }
 
 }   // class Reminder
 
-?>

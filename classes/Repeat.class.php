@@ -398,6 +398,7 @@ class Repeat
             $this->time_end2    = $A['rp_time_end2'];
             // This is used by Reminders so make sure it's set:
             $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
+            $this->setDateEnd1($this->date_end . ' ' . $this->time_end1);
 
             $this->Event = Event::getInstance($this->ev_id, $this->det_id);
             $this->tzid = $this->Event->getTZID();

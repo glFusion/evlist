@@ -344,9 +344,9 @@ class Reminder
             //'msg2'      => $LANG['rem_msg2'],
         ) );
         $T->parse('address_info', 'addr');
-        $T->set_block('html_msg', 'content', 'contentblock');
         $T->parse('output', 'msg');
         $html_content = $T->finish($T->get_var('output'));
+        $T->set_block('html_msg', 'content', 'contentblock');
         $T->set_var('content_text', $html_content);
         $T->parse('contentblock', 'content',true);
 

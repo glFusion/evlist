@@ -676,7 +676,7 @@ class Event
      * @param   array   $row        Array of values, from DB or $_POST
      * @param   boolean $fromDB     True if read from DB, false if from $_POST
      */
-    public function SetVars($row, $fromDB=false)
+    public function setVars($row, $fromDB=false)
     {
         global $_EV_CONF;
 
@@ -1262,11 +1262,13 @@ class Event
             $T->set_var('show_htmleditor', true);
             PLG_requestEditor('evlist','evlist_entry','ckeditor_evlist.thtml');
             PLG_templateSetVars('evlist_entry', $T);
+            $this->postmode = 'html';
             break;
         case 'tinymce' :
             $T->set_var('show_htmleditor',true);
             PLG_requestEditor('evlist','evlist_entry','tinymce_evlist.thtml');
             PLG_templateSetVars('evlist_entry', $T);
+            $this->postmode = 'html';
             break;
         default :
             // don't support others right now
@@ -1446,12 +1448,15 @@ class Event
         $summary = $this->Detail->getSummary();
         $full_description = $this->Detail->getDscp();
         $location = $this->Detail->getLocation();
-        if (($this->isAdmin ||
-                ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1))
-                && $this->postmode == 'html') {
-            $postmode = '2';      //html
+        if (
+            ($this->isAdmin ||
+            ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)
+            )
+            && $this->postmode == 'html'
+        ) {
+            $postmode = 'html';      //html
         } else {
-            $postmode = '1';            //plaintext
+            $postmode = 'plaintext';            //plaintext
             $summary = htmlspecialchars(
                 COM_undoClickableLinks(
                     COM_undoSpecialChars(
@@ -1757,16 +1762,21 @@ class Event
 
         // Enable the post mode selector if we allow HTML and the user is
         // logged in, or if this user is an authorized editor
-        if ($this->isAdmin ||
-                ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)) {
+        if (
+            $this->isAdmin ||
+            ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)
+        ) {
             $T->set_var(array(
                 'postmode_options' => EVLIST_GetOptions($LANG_EVLIST['postmodes'], $postmode),
                 'allowed_html' => COM_allowedHTML('evlist.submit'),
-            ));
-
+                'postmode' => 'html',
+            ) );
             if ($postmode == 'plaintext') {
                 // plaintext, hide postmode selector
-                $T->set_var('postmode_show', ' style="display:none"');
+                $T->set_var(array(
+                    'postmode_show' => ' style="display:none"',
+                    'postmode' => 'html',
+                ) );
             }
             $T->parse('event_postmode', 'edit_postmode');
         }

@@ -299,6 +299,7 @@ function toggleRSVPdetail(val)
       name="eventeditor" id="eventeditor" class="evlisteditor">
     <input type="hidden" name="src" value="{src}" />
     <input type="hidden" name="owner_id" value="{owner_id}" />
+    <input type="hidden" name="postmode" value="{postmode}" />
 
     <div id="ev_info" class="jsenabled_show">
     <fieldset class="evForm">

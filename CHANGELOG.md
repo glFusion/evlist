@@ -17,6 +17,7 @@ Release TBD
 - Remove hit counter, was never used.
 - Switch from Paypal plugin to Shop.
 - Limit centerblock display to a number of days as well as events.
+- Use layout-based mail templates for consistency.
 
 ## v1.4.5
 Release 2018-04-14

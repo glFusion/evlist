@@ -1934,7 +1934,7 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             $fields[] = 'MAX(d.full_description) AS full_description';
             break;
         case 'date':
-            $fields[] = 'UNIX_TIMESTAMP(MAX(r.rp_start)) AS unixtime';
+            $fields[] = 'UNIX_TIMESTAMP(MIN(r.rp_start)) AS unixtime';
             break;
         case 'search_index':
             $fields[] = "group_concat(' ', d.title) as idx_title";
@@ -1950,6 +1950,9 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             $fields[] = 'MAX(e.perm_group) AS perm_group';
             $fields[] = 'MAX(e.perm_members) AS perm_members';
             $fields[] = 'MAX(e.perm_anon) AS perm_anon';
+            break;
+        case 'author':
+            $fields[] = 'e.owner_id';
             break;
         }
     }
@@ -1969,6 +1972,9 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
                 ON c.cal_id = e.cal_id";
     if ($id == '*') {
         $where = ' WHERE 1 = 1 ';
+    } elseif ($buildingIndex) {
+        // If building the index, the repeat ID is passed in.
+        $where = " WHERE (r.rp_id = '" . DB_escapeString($id) . "') ";
     } else {
         $where = " WHERE (e.id = '" . DB_escapeString($id) . "') ";
     }
@@ -2024,6 +2030,12 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
                     'perm_members' => $A['perm_members'],
                     'perm_anon' => $A['perm_anon'],
                 );
+                break;
+            case 'author':
+                $props[$p] = $A['owner_id'];
+                break;
+            case 'author_name':
+                $props[$p] = COM_getDisplayName($A['owner_id']);
                 break;
             default:
                 $props[$p] = isset($A[$p]) ? $A[$p] : NULL;
@@ -2084,7 +2096,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     $info = PLG_getItemInfo(
         $type, $id,
         'id,is_event,date,year,month,day,title,summary,description,' .
-        'owner_id,group_id,recur_type,recur_interval,url,' .
+        'owner_id,group_id,recur_type,recur_interval,url,show_upcoming,' .
         'time_start,time_end,enable_comments,perms'
     );
     if (!is_array($info) || count($info) == 0) return;  // No data received
@@ -2149,7 +2161,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'skipnext' => '0',
         'weekday' => '1',
         'rec_freq' => $info['recur_interval'],
-        'show_upcoming' => '1',
+        'show_upcoming' => isset($info['show_upcoming']) && $info['show_upcoming'] ? '1' : '0',
         'use_rsvp' => '0',
         'perm_owner' => array ( 0 => $info['perms']['perm_owner'] ),
         'perm_group' => array ( 0 => $info['perms']['perm_group'] ),

@@ -178,8 +178,8 @@ $LANG_EVLIST = array(
 'more_info'             => 'plus d informations',
 'contact_us'            => 'Veuillez <a href="%s">nous contacter< /a> pour plus d informations.',
 'rem_subject'           => "un rappel d événement de {$_CONF['site_name']}",
-'rem_msg1'          => "Vous recevez ce Rappel de l'événement parce que votre adresse a été présenté à {$_CONF['site_name']}.",
-'rem_msg2'  => 'This is a one-time message. You will not receive another message unless you subscribe to other events.',
+'rem_footer1'          => "Vous recevez ce Rappel de l'événement parce que votre adresse a été présenté à {$_CONF['site_name']}.",
+'rem_footer2'  => 'This is a one-time message. You will not receive another message unless you subscribe to other events.',
 
 'rem_url'           => "Pour plus d'informations, consultez %s",
 'you_are_subscribed'        => 'Vous êtes abonné à cet événement. ',

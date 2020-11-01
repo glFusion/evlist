@@ -1000,7 +1000,7 @@ class Ticket
         );
 
         $retval .= ADMIN_list(
-            'evlist_ticket_admin',
+            'evlist_ticket_user',
             array(__CLASS__, 'getUserField'),
             $header_arr, $text_arr, $query_arr, $defsort_arr
         );

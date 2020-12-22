@@ -18,11 +18,12 @@ Release TBD
 - Switch from Paypal plugin to Shop.
 - Limit centerblock display to a number of days as well as events.
 - Use layout-based mail templates for consistency.
+- Enable signups with custom fields, may be used instead of the forms plugin.
 
 ## v1.4.5
 Release 2018-04-14
 - Allow `%site_url%` in event URL to reference the site base URL.
-- Supports calls to PLG_itemSaved() to allow plugins to submit and update events.
+- Supports calls to `PLG_itemSaved()` to allow plugins to submit and update events.
 - Added plugin->calendar mapping in the configuration (Integration section)
 - Add multiple event deletion
 - Add icons to calendars

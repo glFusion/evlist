@@ -822,6 +822,18 @@ class Repeat
                         $total_tickets < $this->Event->getOption('max_user_rsvp')
                     )
                 ) {
+                    if ($this->Event->getOption('rsvp_comments')) {
+                        $T->set_var('rsvp_comments',  true);
+                        $prompts = $this->Event->getOption('rsvp_cmt_prompts');
+                        if (empty($prompts)) {
+                            $prompts = array($LANG_EVLIST['comment']);
+                        }
+                        $T->set_block('event', 'rsvpComments', 'rsvpC');
+                        foreach ($prompts as $prompt) {
+                            $T->set_var('rsvp_cmt_prompt', $prompt);
+                            $T->parse('rsvpC', 'rsvpComments', true);
+                        }
+                    }
                     $Ticks = TicketType::GetTicketTypes();
                     if (!empty($Ticks)) {
                         if ($this->Event->getOption('max_user_rsvp') > 0) {
@@ -859,6 +871,11 @@ class Repeat
                         ) );
                     }
                 }
+            }
+
+            // Show the user signups on the event page if authorized.
+            if (SEC_inGroup($this->Event->getOption('rsvp_view_grp'))) {
+                $T->set_var('user_signups', Ticket::userList_RSVP($this->rp_id));
             }
 
             // If ticket printing is enabled for this event, see if the
@@ -1078,13 +1095,19 @@ class Repeat
         // Show the "manage reservations" link to the event owner
         if (
             $_EV_CONF['enable_rsvp'] == 1 &&
-            $this->Event->getOption('use_rsvp') > 0 &&
-            ($this->isAdmin || $this->Event->isOwner())
+            $this->Event->getOption('use_rsvp') > 0
         ) {
-            $T->set_var(array(
-                'admin_rsvp'    => Ticket::adminList_RSVP($this->rp_id),
-                'rsvp_count'    => $this->TotalRegistrations(),
-            ) );
+            if ($this->isAdmin || $this->Event->isOwner()) {
+                $T->set_var(array(
+                    'admin_rsvp'    => Ticket::adminList_RSVP($this->rp_id),
+                    'rsvp_count'    => $this->TotalRegistrations(),
+                ) );
+            } elseif (SEC_inGroup($this->Event->getOption('rsvp_view_grp'))) {
+                $T->set_var(array(
+                    'admin_rsvp'    => Ticket::userList_RSVP($this->rp_id),
+                    'rsvp_count'    => $this->TotalRegistrations(),
+                ) );
+            }
         }
 
         $T->set_var('adblock', PLG_displayAdBlock('evlist_event', 0));
@@ -1100,9 +1123,10 @@ class Repeat
      * @param   integer $num_attendees  Number of attendees, default 1
      * @param   integer $tick_type      Id of ticket type
      * @param   integer $uid    User ID to register, 0 for current user
+     * @param   string  $cmt    User-supplied comment for the ticket
      * @return  integer         Message code, zero for success
      */
-    public function Register($num_attendees = 1, $tick_type = 0, $uid = 0)
+    public function Register($num_attendees = 1, $tick_type = 0, $uid = 0, $cmt='')
     {
         global $_TABLES, $_USER, $_EV_CONF, $LANG_EVLIST;
 
@@ -1113,8 +1137,10 @@ class Repeat
         // Make sure that registrations are enabled and that the current user
         // has access to this event.  If $uid > 0, then this is an admin
         // registering another user, don't check access
-        if ($this->Event->getOption('use_rsvp') == 0 ||
-            ($uid == 0 && !$this->Event->hasAccess(2))) {
+        if (
+            $this->Event->getOption('use_rsvp') == 0 ||
+            ($uid == 0 && !$this->Event->hasAccess(2))
+        ) {
             COM_setMsg($LANG_EVLIST['messages'][20]);
             return 20;
         } elseif ($this->Event->getOption('use_rsvp') == 1) {
@@ -1133,6 +1159,21 @@ class Repeat
         $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
         $num_attendees = (int)$num_attendees;
         $fee = (float)$this->Event->getOption('tickets')[$tick_type]['fee'];
+        $prompts = $this->Event->getOption('rsvp_cmt_prompts', array());
+        if (empty($prompts)) {
+            $prompts = array('Comment');
+        }
+        $comments = array();
+        if (!is_array($cmt) || empty($cmt)) {
+            $cmt = array();
+        }
+        foreach ($prompts as $key=>$prompt) {
+            if (isset($cmt[$key]) && !empty($cmt[$key])) {
+                $comments[$prompt] = $cmt[$key];
+            } else {
+                $comments[$prompt] = 'n/a';
+            }
+        }
 
         // Check that the current user isn't already registered
         // TODO: Allow registrations up to max count, or to waitlist
@@ -1197,7 +1238,7 @@ class Repeat
             if ($max_rsvp > 0) {
                 $wl = ($total_reg + $i) <= $max_rsvp ? 0 : 1;
             }
-            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl);
+            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl, $comments);
         }
         return 0;
     }

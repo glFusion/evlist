@@ -3,15 +3,16 @@
  * Class to manage tickets and registrations.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.0
  * @since       v1.4.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+
 
 /**
  * Class for event tickets.
@@ -58,6 +59,10 @@ class Ticket
     /** Flag indicating that this ticket is waitlisted.
      * @var boolean */
     private $waitlist = 0;
+
+    /** Comment, if any.
+     * @var string */
+    private $comment = '';
 
 
     /**
@@ -212,6 +217,7 @@ class Ticket
         $this->used = (int)$A['used'];
         $this->dt = (int)$A['dt'];
         $this->waitlist = isset($A['waitlist']) && $A['waitlist'] ? 1 : 0;
+        $this->comment = $A['comment'];
     }
 
 
@@ -221,21 +227,19 @@ class Ticket
      * @param   array   $A      Array of values, non-indexed
      * @return  string          Ticket ID
      */
-    public static function MakeTicketId($A = array())
+    public static function makeTicketId($A = array())
     {
         global $_EV_CONF;
 
-        if (function_exists('CUSTOM_evlist_MakeTicketId')) {
-            $retval = CUSTOM_evlist_MakeTicketId($A);
+        if (function_exists('CUSTOM_evlist_makeTicketId')) {
+            $retval = CUSTOM_evlist_makeTicketId($A);
         } else {
             // Make sure a default format is defined if not in the config
             if (strstr($_EV_CONF['ticket_format'], '%s') === false) {
                 $_EV_CONF['ticket_format'] = 'EV%s';
             }
 
-            // md5 makes a long value to put in a qrcode url.
-            // makeSid() should be sufficient since it includes some
-            // random characters.
+            // make a unique value.
             $token = dechex(date('y')) . dechex(date('m')) . self::createToken();
             $retval = sprintf($_EV_CONF['ticket_format'], $token);
         }
@@ -252,9 +256,10 @@ class Ticket
      * @param   float   $fee    Optional Ticket Fee, default = 0 (free)
      * @param   integer $uid    Optional User ID, default = current user
      * @param   integer $wl     Waitlisted ? 1 = yes, 0 = no
+     * @param   string  $cmt    User-supplied comment
      * @return  string      Ticket identifier
      */
-    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0)
+    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0, $cmt='')
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
@@ -264,10 +269,13 @@ class Ticket
         $fee = (float)$fee;
         $type = (int)$type;
         $wl = $wl == 0 ? 0 : 1;
-        $tic_id = self::MakeTicketId(array($ev_id, $rp_id, $fee, $uid));
-
+        $tic_num = self::makeTicketId(array($ev_id, $rp_id, $fee, $uid));
+        if (!is_array($cmt) || empty($cmt)) {
+            $cmt = array();
+        }
+        $cmt = DB_escapeString(json_encode($cmt));
         $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
-            tic_id = '" . DB_escapeString($tic_id) . "',
+            tic_num = '" . DB_escapeString($tic_num) . "',
             tic_type = $type,
             ev_id = '" . DB_escapeString($ev_id) . "',
             rp_id = $rp_id,
@@ -276,16 +284,16 @@ class Ticket
             uid = $uid,
             used = 0,
             dt = UNIX_TIMESTAMP(),
-            waitlist = $wl";
-
+            waitlist = $wl,
+            comment = '$cmt'";
         //echo $sql;die;
         DB_query($sql, 1);
         if (!DB_error()) {
-            return $tic_id;
+            return DB_insertId();
         } else {
             return NULL;
         }
-    }   // function Create()
+    }
 
 
     /**
@@ -303,7 +311,7 @@ class Ticket
         $type = (int)$type;
 
         if ($this->tic_id == '') {
-            $this->tic_id = self::MakeTicketId(
+            $this->tic_id = self::makeTicketId(
                 array($this->ev_id, $this->rp_id, $this->fee, $this->uid)
             );
             $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET
@@ -321,7 +329,8 @@ class Ticket
             fee = {$this->fee},
             paid = {$this->paid},
             uid = {$this->uid},
-            used = {$this->used}";
+            used = {$this->used},
+            comment = '" . DB_escapeString($this->comment) . "'";
 
         $sql = $sql1 . $sql2 . $sql3;
         //echo $sql;die;
@@ -331,7 +340,7 @@ class Ticket
         } else {
             return NULL;
         }
-    }   // function Create()
+    }
 
 
     /**
@@ -991,7 +1000,7 @@ class Ticket
         );
 
         $retval .= ADMIN_list(
-            'evlist_ticket_admin',
+            'evlist_ticket_user',
             array(__CLASS__, 'getUserField'),
             $header_arr, $text_arr, $query_arr, $defsort_arr
         );
@@ -1038,6 +1047,95 @@ class Ticket
 
 
     /**
+     * Show the public-facing RSVP list, if enabled.
+     * Same as adminList_RSVP() but with limited fields and no actions.
+     *
+     * @param   integer $rp_id  Repeat ID being viewed or checked
+     * @param   string  $title  Optional title to show with the list
+     * @return  string          HTML for admin list
+     */
+    public static function userList_RSVP($rp_id, $title='')
+    {
+        global $LANG_EVLIST, $LANG_ADMIN, $_TABLES, $_CONF, $_EV_CONF;
+
+        USES_lib_admin();
+        $Ev = \Evlist\Repeat::getInstance($rp_id);
+        if (
+            $Ev->getID() == 0 ||
+            !SEC_inGroup($Ev->getEvent()->getOption('rsvp_view_grp'))
+        ) {
+            return '';
+        }
+
+        $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
+                    tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
+                    u.fullname,
+                    {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
+            FROM {$_TABLES['evlist_tickets']} tk
+            LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
+                ON tt.tt_id = tk.tic_type
+            LEFT JOIN {$_TABLES['users']} u
+                ON u.uid = tk.uid
+            WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
+
+        if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
+            $sql .= " AND rp_id = '{$Ev->getID()}' ";
+        }
+
+        $text_arr = array(
+            'has_menu'     => false,
+            'has_extras'   => false,
+            'form_url'     => EVLIST_URL . '/event.php?rp_id=' . $rp_id,
+            'help_url'     => '',
+        );
+
+        $header_arr = array(
+            array(
+                'text'  => $LANG_EVLIST['name'],
+                'field' => 'fullname',
+                'sort'  => true,
+            ),
+        );
+        $prompts = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        $c = 0;
+        foreach ($prompts as $prompt) {
+            $header_arr[] = array(
+                'text' => $prompt,
+                'field' => 'cmt_' . $c++,
+                'sort' => false,
+            );
+        }
+
+        $data_arr = array();
+        $res = DB_query($sql);
+        $i = 0;
+        while ($A = DB_fetchArray($res, false)) {
+            $data_arr[$i] = array(
+                'fullname' => $A['fullname'],
+            );
+            $cmts = json_decode($A['comment'], true);
+            $j = 0;
+            foreach ($cmts as $p=>$val) {
+                $data_arr[$i]['cmt_' . $j++] = $val;
+            }
+            $i++;
+        }
+
+        $options_arr = array();
+
+        $retval = '';
+        if (!empty($title)) {
+            $retval .= '<h2>' . $title . '</h2>';
+        }
+        $retval .= ADMIN_simpleList(
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $data_arr, $options_arr
+        );
+        return $retval;
+    }
+
+
+    /**
      * Administer user registrations.
      * This will appear in the admin area for administrators, and as part of
      * the event detail for event owners.  Owners can delete registrations.
@@ -1054,7 +1152,8 @@ class Ticket
         if ($Ev->getID() == 0) return '';
 
         $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                    tk.uid, tk.used, tt.dscp, tk.waitlist, u.fullname,
+                    tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
+                    u.fullname,
                     {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
             FROM {$_TABLES['evlist_tickets']} tk
             LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
@@ -1084,6 +1183,12 @@ class Ticket
         'help_url'     => '',
         );
 
+        $prompts = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+        if (empty($prompts) || count($prompts) > 1) {
+            $cmt_title = $LANG_EVLIST['comment'];
+        } else {
+            $cmt_title = $prompts[0];
+        }
         $header_arr = array(
             array(
                 'text'  => $LANG_EVLIST['rsvp_date'],
@@ -1120,7 +1225,17 @@ class Ticket
                 'field' => 'waitlist',
                 'sort'  => false,
             ),
+            array(
+                'text'  => $cmt_title,
+                'field' => 'comment',
+                'sort'  => false,
+            ),
         );
+        $extra = array(
+            'cmt_prompts' => $prompts,
+            'cmt_count' => count($prompts),
+        );
+
         $options_arr = array(
             'chkdelete' => true,
             'chkfield'  => 'tic_id',
@@ -1143,12 +1258,11 @@ class Ticket
         $query_arr = array(
             'sql'       => $sql,
         );
-
         return ADMIN_list(
             'evlist_adminlist_rsvp',
             array(__CLASS__, 'getAdminField'),
             $header_arr, $text_arr, $query_arr, $defsort_arr,
-            '', '', $options_arr
+            '', $extra, $options_arr
         );
     }
 
@@ -1160,9 +1274,10 @@ class Ticket
      * @param   mixed   $fieldvalue     Value of field
      * @param   array   $A              Array of all fields ($name=>$value)
      * @param   array   $icon_arr       Handy array of icon images
+     * @param   array   $extra          Extra values passed in verbatim
      * @return  string                  Field value formatted for display
      */
-    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr, $extra=array())
     {
         global $_CONF, $LANG_ACCESS, $LANG_ADMIN, $LANG_EVLIST;
 
@@ -1192,6 +1307,22 @@ class Ticket
                 $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
             } else {
                 $retval = '';
+            }
+            break;
+
+        case 'comment':
+            $data = json_decode($fieldvalue, true);
+            $item_count = max(count($data), count($extra['cmt_prompts']));
+            if (is_array($data)) {
+                if ($item_count == 1) {
+                    $retval .= array_pop($data);
+                } else {
+                    $comments = array();
+                    foreach ($data as $prompt=>$val) {
+                        $comments[] = $prompt . ': ' . $val;
+                    }
+                    $retval .= implode(', ', $comments);
+                }
             }
             break;
 

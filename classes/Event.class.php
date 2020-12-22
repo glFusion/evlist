@@ -226,6 +226,7 @@ class Event
 
         $this->isNew = true;
 
+        $this->options['rsvp_view_grp'] = 1;
         if ($ev_id == '') {
             $this->owner_id = $_USER['uid'];
             $this->enable_comments = $_EV_CONF['commentsupport'] ? 0 : 2;
@@ -294,6 +295,7 @@ class Event
                 'max_user_rsvp' => 1,
                 'rsvp_comments' => 0,
                 'rsvp_view_grp' => 1,
+                'rsvp_cmt_prompts' => array(),
             );
             if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
                 $this->options['rsvp_print'] = 0;
@@ -601,12 +603,16 @@ class Event
     /**
      * Get a single option value, NULL if not set.
      *
+     * @param   string  $key    Key to retrieve
+     * @param   mixed   $default    Default value to return if not set
      * @return  mixed   Single value from the options array
      */
-    public function getOption($key)
+    public function getOption($key, $default=NULL)
     {
         if (array_key_exists($key, $this->options)) {
             return $this->options[$key];
+        } elseif ($default !== NULL) {
+            return $default;
         } else {
             return NULL;
         }
@@ -793,6 +799,13 @@ class Event
 
             $this->options['tickets'] = array();
             if ($_EV_CONF['enable_rsvp']) {
+                $this->options['rsvp_comments'] = isset($row['rsvp_comments']) ? (int)$row['rsvp_comments'] : 0;
+                if (isset($row['rsvp_cmt_prompts']) && !empty($row['rsvp_cmt_prompts'])) {
+                    $this->options['rsvp_cmt_prompts'] = explode('|', $row['rsvp_cmt_prompts']);
+                } else {
+                    $this->options['rsvp_cmt_prompts'] = array();
+                }
+                $this->options['rsvp_view_grp'] = isset($row['rsvp_view_grp']) ? (int)$row['rsvp_view_grp'] : 2;
                 $this->options['use_rsvp'] = isset($row['use_rsvp']) ? (int)$row['use_rsvp'] : 0;
                 $this->options['max_rsvp'] = isset($row['max_rsvp']) ? (int)$row['max_rsvp'] : 0;
                 $this->options['rsvp_waitlist'] = isset($row['rsvp_waitlist']) ? 1 : 0;
@@ -1418,6 +1431,8 @@ class Event
                         $LANG_EVLIST['dates'], ''),
                 'datestart_note' => $LANG_EVLIST['datestart_note'],
                 'help_url' => EVLIST_getDocURL('event'),
+                'rsvp_cmt_chk' => $this->getOption('rsvp_comments') ? EVCHECKED : '',
+                'rsvp_cmt_prompts' => implode('|', $this->getOption('rsvp_cmt_prompts', array())),
             ) );
         }
 
@@ -1795,7 +1810,10 @@ class Event
                 'owner_username' => COM_stripslashes($ownerusername),
                 'owner_dropdown' => COM_optionList($_TABLES['users'],
                         'uid,username', $this->owner_id, 1),
-                'group_dropdown' => SEC_getGroupDropdown ($this->group_id, 3),
+                 'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
+                 'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
+                     (int)$this->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
+                 ),
             ) );
             if ($rp_id == 0) {  // can only change permissions on main event
                 $T->set_var('permissions_editor', SEC_getPermissionsHTML(

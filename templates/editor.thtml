@@ -732,6 +732,28 @@ function toggleRSVPdetail(val)
         </table>
         </div>
       </div>
+
+        <div class="uk-form-row">
+            <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_allowed']}?</label>
+            <div class="uk-form-controls">
+                <input type="checkbox" name="rsvp_comments" value="1" {rsvp_cmt_chk} />
+            </div>
+        </div>
+
+        <div class="uk-form-row">
+            <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_prompts']}</label>
+            <div class="uk-form-controls">
+                <input type="text" name="rsvp_cmt_prompts" value="{rsvp_cmt_prompts}" />
+            </div>
+        </div>
+
+        <div class="uk-form-row">
+            <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_view_grp']}:</label>
+            <div class="uk-form-controls">
+                {rsvp_view_grp_dropdown}
+            </div>
+        </div>
+
 {!if 0}
       <div class="uk-form-row">
         <label class="uk-form-label">{$LANG_EVLIST['txt_fields']}</label>

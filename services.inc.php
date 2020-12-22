@@ -89,7 +89,7 @@ function service_productinfo_evlist($args, &$output, &$svc_msg)
  */
 function service_handlePurchase_evlist($args, &$output, &$svc_msg)
 {
-    global $_TABLES, $LANG_PHOTO, $_CONF;
+    global $_CONF;
 
     $item = EV_getVar($args, 'item', 'array');
     $ipn_data = EV_getVar($args, 'ipn_data', 'array');
@@ -112,14 +112,13 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
             'download' => 0,
             'file' => '',
     );
-
-    $custom = EV_getVar($ipn_data, 'custom', 'array');
-    $uid = EV_getVar($custom, 'uid', 'int', 1);
+    $uid = $args['order']->getUid();
+    $pmt_dt = isset($ipn_data['sql_date']) ? $ipn_data['sql_date'] : $_CONF['_now']->toMySQL(true);
 
     // Initialize an array of payment info to log
     $pmt_info = array(
         'type'          => 'payment',
-        'payment_date'  => $ipn_data['sql_date'],
+        'payment_date'  => $pmt_dt,
         'txn_id'        => $ipn_data['txn_id'],
         'amount'        => (float)$item['price'],
     );
@@ -141,21 +140,26 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
             $repeats[] = $rp_id;
             // Ticket to a single occurrence
             $Rp = new Evlist\Repeat($rp_id);
-            $Ev = $Rp->Event;
-            $dt_info = $Rp->start_date1 . ' ' . $Rp->start_time1;
+            $Ev = $Rp->getEvent();
+            $dt_info = $Rp->getDateStart1() . ' ' . $Rp->getTimeStart1();
         } else {
             // rp_id = 0, make sure it's an event pass
             if ($TT->isEventPass()) {
                 $Ev = new Evlist\Event($ev_id);
-                $dt_info = $Ev->date_start1 . ' ' . $Ev->time_start1;
+                $dt_info = $Ev->getDateStart1() . ' ' . $Ev->getTimeStart1();
             } else {
                 return PLG_RET_ERROR;
             }
         }
-        $ev_fee = (float)$Ev->options['tickets'][$tick_type]['fee'];
+        $tickets = $Ev->getOption('tickets');
+        if (isset($tickets[$tick_type])) {
+            $ev_fee = (float)$tickets[$tick_type]['fee'];
+        } else {
+            $ev_fee = 0;
+        }
 
         $output['price'] = $ev_fee;
-        $output['name'] = $TT->getDscp(). ': ' . $Ev->Detail->title .
+        $output['name'] = $TT->getDscp(). ': ' . $Ev->getDetail()->getTitle() .
                 ', ' . $dt_info;
         $output['short_description'] = $output['name'];
 
@@ -211,7 +215,8 @@ function service_handleRefund_evlist($args, &$output, &$svc_msg)
             return PLG_RET_ERROR;
         }
 
-        DB_delete($_TABLES['evlist_payments'],
+        DB_delete(
+            $_TABLES['evlist_payments'],
             array('uid', 'event_id', 'section_id', 'entry_id'),
             array($uid, $event_id, 0, 0));
         DB_query("UPDATE {$_TABLES['evlist_entry']}

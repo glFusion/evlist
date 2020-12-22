@@ -426,21 +426,48 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
 {
     global $_CONF, $_TABLES;
 
-    if ($op == 'tagname') {
-        return 'event';
-    } elseif ($op == 'parse') {
-        $eid = COM_applyFilter($autotag['parm1']);
-        $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $eid);
-        if (empty($autotag['parm2'])) {
-            $text = COM_stripslashes(
-                DB_getItem($_TABLES['evlist_detail'], 'title', "ev_id='$eid'")
-            );
-        } else {
-            $text = $autotag['parm2'];
+    switch ($op) {
+    case 'tagname':
+        return array('event', 'evlist_signups');
+        break;
+    case 'tagusage':
+        return array(
+            'namespace' => 'evlist',
+            'usage' => 'description',
+        );
+        break;
+    case 'desc':
+        switch ($content) {
+        case 'event':
+        case 'evlist_signups':
+            return $LANG_EVLIST['at_dscp_' . $content];
+            break;
+        default:
+            return '';
+            break;
         }
-        $link = '<a href="' . $url . '">' . $text . '</a>';
-        $content = str_replace($autotag['tagstr'], $link, $content);
-
+        break;
+    case 'parse':
+        $HTML = '';
+        switch ($autotag['tag']) {
+        case 'event':
+            $eid = COM_applyFilter($autotag['parm1']);
+            $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $eid);
+            if (empty($autotag['parm2'])) {
+                $text = COM_stripslashes(
+                    DB_getItem($_TABLES['evlist_detail'], 'title', "ev_id='$eid'")
+                );
+            } else {
+                $text = $autotag['parm2'];
+            }
+            $HTML = '<a href="' . $url . '">' . $text . '</a>';
+            break;
+        case 'evlist_signups':
+            $AT = new Evlist\Autotags\signups;
+            $HTML = $AT->parse($autotag);
+            break;
+        }
+        $content = str_replace($autotag['tagstr'], $HTML, $content);
         return $content;
     }
 }

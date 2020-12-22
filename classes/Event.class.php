@@ -1263,6 +1263,15 @@ class Event
             PLG_requestEditor('evlist','evlist_entry','ckeditor_evlist.thtml');
             PLG_templateSetVars('evlist_entry', $T);
             $this->postmode = 'html';
+            SEC_setCookie(
+                $_CONF['cookie_name'].'adveditor',
+                SEC_createTokenGeneral('advancededitor'),
+                time() + 1200,
+                $_CONF['cookie_path'],
+                $_CONF['cookiedomain'],
+                $_CONF['cookiesecure'],
+                false
+            );
             break;
         case 'tinymce' :
             $T->set_var('show_htmleditor',true);

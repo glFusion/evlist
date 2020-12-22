@@ -1,0 +1,29 @@
+<h2>
+    {$LANG_EVLIST['rem_title']}
+</h2>
+{!if msg1}
+<p>{msg1}</p>
+{!endif}
+{!if what}
+<p>
+{lang_what}: {what}
+{!if summary}
+<br />{summary}
+{!endif}
+</p>
+{!endif}
+{!if when}
+<p>{lang_when}: {when}</p>
+{!endif}
+{!if have_address}
+<p>{lang_where}:<br />
+{address_info}
+</p>
+{!endif}
+{!if url}
+<p>{url}</p>
+{!endif}
+<p>
+    {$LANG_EVLIST['rem_footer1']}<br />
+    {$LANG_EVLIST['rem_footer2']}
+</p>

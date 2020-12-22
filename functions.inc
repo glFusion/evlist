@@ -481,8 +481,6 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
             $HTML = $AT->parse($autotag);
             break;
         }
-=======
-        }
         break;
     case 'parse':
         $HTML = '';

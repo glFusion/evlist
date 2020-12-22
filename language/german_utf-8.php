@@ -134,7 +134,8 @@ $LANG_EVLIST = array(
 'more_info'         => 'Mehr Informationen',
 'click_here'        => '<a href="%s" %s>Klicken hier</a> für weitere Informationen',
 'contact_us'        => 'Bitte <a href="%s">kontaktieren uns</a> für weitere Informationen',
-'rem_subject'       => "Eine Veranstaltungs-Erinnerung von {$_CONF['site_name']}",
+'rem_title'         => 'Event Reminder',
+'rem_subject'       => 'Reminder: %s', 
 'rem_footer1'          => "Du erhältst diese Erinnerung, weil Du Deine E-Mail Adresse auf {$_CONF['site_name']} eingetragen hast.",
 'rem_footer2'            => 'Dies ist eine einmalige Nachricht. Du erhälst keine weitere Nachricht mehr sofern Du dich für keine weiteren Veranstaltungen eingetragen hast.',
 'rem_url'           => 'Für mehr Informationen besuche bitte %s',
@@ -385,6 +386,9 @@ $LANG_EVLIST = array(
 'tic_cmt_allowed' => 'Ticket Comments Allowed',
 'tic_cmt_prompts' => 'Ticket Comment Prompts',
 'tic_cmt_view_grp' => 'Comment View Group',
+'signup_list' => 'Signup List',
+'at_dscp_event' => 'Create a link to an event or the closest upcoming instance.',
+'at_dscp_evlist_signups' => 'Show a table of signups to authorized users.',
 );
 
 $LANG_EVLIST_HELP = array(

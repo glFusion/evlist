@@ -3,9 +3,9 @@
  * Class to manage event reminders for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2017-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -364,7 +364,7 @@ class Reminder
         $msgData = array(
             'htmlmessage' => $html_msg,
             'textmessage' => $text_msg,
-            'subject' => $LANG_EVLIST['rem_title'],
+            'subject' => sprintf($LANG_EVLIST['rem_subject'], $Detail->getTitle()),
             'from' => array(
                 'name' => $_CONF['site_name'],
                 'email' => $_CONF['noreply_mail'],
@@ -377,5 +377,4 @@ class Reminder
         COM_emailNotification($msgData);
     }
 
-}   // class Reminder
-
+}

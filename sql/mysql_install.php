@@ -45,14 +45,14 @@ $event_table =
   `time_end1` time DEFAULT NULL,
   `time_start2` time DEFAULT NULL,
   `time_end2` time DEFAULT NULL,
-  `recurring` tinyint(1) NOT NULL DEFAULT '0',
-  `rec_data` text,
-  `allday` tinyint(1) NOT NULL DEFAULT '0',
-  `split` tinyint(1) NOT NULL DEFAULT '0',
-  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `recurring` tinyint(1) NOT NULL DEFAULT 0,
+  `rec_data` text DEFAULT NULL,
+  `allday` tinyint(1) NOT NULL DEFAULT 0,
+  `split` tinyint(1) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
   `postmode` varchar(10) NOT NULL DEFAULT 'plaintext',
-  `enable_reminders` tinyint(1) NOT NULL DEFAULT '1',
-  `enable_comments` tinyint(1) NOT NULL DEFAULT '0',
+  `enable_reminders` tinyint(1) NOT NULL DEFAULT 1,
+  `enable_comments` tinyint(1) NOT NULL DEFAULT 0,
   `owner_id` mediumint(8) DEFAULT NULL,
   `group_id` mediumint(8) DEFAULT NULL,
   `perm_owner` tinyint(1) DEFAULT NULL,
@@ -60,9 +60,9 @@ $event_table =
   `perm_members` tinyint(1) DEFAULT NULL,
   `perm_anon` tinyint(1) DEFAULT NULL,
   `det_id` int(10) NOT NULL,
-  `show_upcoming` tinyint(1) NOT NULL DEFAULT '1',
-  `cal_id` int(11) NOT NULL DEFAULT '1',
-  `options` text,
+  `show_upcoming` tinyint(1) NOT NULL DEFAULT 1,
+  `cal_id` int(10) NOT NULL DEFAULT 1,
+  `options` text DEFAULT NULL,
   `tzid` varchar(125) NOT NULL DEFAULT 'local',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM";
@@ -83,49 +83,50 @@ $_SQL['evlist_repeat'] = "CREATE TABLE {$_TABLES['evlist_repeat']} (
   `rp_time_end1` time DEFAULT NULL,
   `rp_time_start2` time DEFAULT NULL,
   `rp_time_end2` time DEFAULT NULL,
-  `rp_start` DATETIME,
-  `rp_end` DATETIME,
+  `rp_start` datetime DEFAULT NULL,
+  `rp_end` datetime DEFAULT NULL,
   PRIMARY KEY (`rp_id`),
   KEY `event` (`rp_ev_id`),
-  KEY `start` (`rp_start`),
-  KEY `end` (`rp_end`)
+  KEY `start` (`rp_date_start`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_categories'] = "CREATE TABLE {$_TABLES['evlist_categories']} (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) DEFAULT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `status` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE KEY `Name` (`name`(10))
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_lookup'] = "CREATE TABLE {$_TABLES['evlist_lookup']} (
-  eid VARCHAR(128) NOT NULL,
-  cid INT UNSIGNED NOT NULL,
-  status TINYINT(1) NOT NULL default '1',
-  PRIMARY KEY(eid,cid)
+  `eid` varchar(128) NOT NULL,
+  `cid` int(10) unsigned NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`eid`,`cid`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_remlookup'] = "CREATE TABLE {$_TABLES['evlist_remlookup']} (
+  `rem_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `eid` varchar(128) NOT NULL,
-  `rp_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `rp_id` int(10) unsigned NOT NULL DEFAULT 0,
   `date_start` int(10) unsigned NOT NULL,
   `timestamp` int(10) unsigned DEFAULT NULL,
-  `uid` mediumint(8) NOT NULL DEFAULT '1',
+  `uid` mediumint(8) NOT NULL DEFAULT 1,
   `name` varchar(40) NOT NULL DEFAULT 'nobody',
   `email` varchar(96) NOT NULL,
-  `days_notice` smallint(3) NOT NULL DEFAULT '7',
+  `days_notice` smallint(3) NOT NULL DEFAULT 7,
+  PRIMARY KEY (`rem_id`),
   UNIQUE KEY `eid` (`eid`,`rp_id`,`email`,`days_notice`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
   `det_id` int(10) NOT NULL AUTO_INCREMENT,
   `ev_id` varchar(128) NOT NULL,
-  `title` tinytext,
-  `summary` text,
-  `full_description` text,
+  `title` tinytext DEFAULT NULL,
+  `summary` text DEFAULT NULL,
+  `full_description` text DEFAULT NULL,
   `url` varchar(255) DEFAULT NULL,
-  `location` text,
+  `location` text DEFAULT NULL,
   `street` varchar(64) DEFAULT NULL,
   `city` varchar(64) DEFAULT NULL,
   `province` varchar(64) DEFAULT NULL,
@@ -142,45 +143,36 @@ $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
 $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `cal_id` int(11) NOT NULL AUTO_INCREMENT,
   `cal_name` varchar(255) NOT NULL DEFAULT '',
-  `cal_status` tinyint(1) unsigned DEFAULT '1',
-  `cal_ena_ical` tinyint(1) unsigned DEFAULT '1',
+  `cal_status` tinyint(1) unsigned DEFAULT 1,
+  `cal_ena_ical` tinyint(1) unsigned DEFAULT 1,
   `bgcolor` varchar(7) NOT NULL DEFAULT '#FFFFFF',
   `fgcolor` varchar(7) NOT NULL DEFAULT '#000000',
   `owner_id` int(10) unsigned NOT NULL,
   `group_id` int(10) unsigned NOT NULL,
-  `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT '3',
-  `perm_group` tinyint(1) unsigned NOT NULL DEFAULT '2',
-  `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '2',
-  `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '2',
-  `cal_icon` varchar(40) DEFAULT '',
+  `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT 3,
+  `perm_group` tinyint(1) unsigned NOT NULL DEFAULT 2,
+  `perm_members` tinyint(1) unsigned NOT NULL DEFAULT 2,
+  `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT 2,
+  `cal_icon` varchar(40) DEFAULT NULL,
   `orderby` int(5) NOT NULL DEFAULT 9999,
   PRIMARY KEY (`cal_id`)
-) ENGINE=MyISAM";
-
-$_SQL['evlist_rsvp'] = "CREATE TABLE {$_TABLES['evlist_rsvp']} (
-  `ev_id` varchar(128) NOT NULL DEFAULT '',
-  `rp_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `uid` int(11) unsigned NOT NULL DEFAULT '0',
-  `num_attendees` int(4) unsigned NOT NULL DEFAULT '1',
-  `dt_reg` int(11) DEFAULT '0',
-  PRIMARY KEY (`ev_id`,`rp_id`,`uid`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
   `tic_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `tic_num` varchar(128) NOT NULL,
-  `tic_type` int(11) unsigned NOT NULL DEFAULT '0',
+  `tic_type` int(11) unsigned NOT NULL DEFAULT 0,
   `ev_id` varchar(128) NOT NULL,
-  `rp_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `fee` float(6,2) unsigned NOT NULL DEFAULT '0.00',
-  `paid` float(6,2) unsigned NOT NULL DEFAULT '0.00',
+  `rp_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `fee` float(6,2) unsigned NOT NULL DEFAULT 0.00,
+  `paid` float(6,2) unsigned NOT NULL DEFAULT 0.00,
   `uid` int(11) unsigned NOT NULL,
-  `used` int(11) unsigned NOT NULL DEFAULT '0',
-  `dt` int(11) unsigned DEFAULT '0',
-  `waitlist` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `used` int(11) unsigned NOT NULL DEFAULT 0,
+  `dt` int(11) unsigned DEFAULT 0,
+  `waitlist` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`tic_id`),
-  UNIQUE KEY `idx_tic_num` (`tic_num`),
+  UNIQUE KEY `tic_num` (`tic_num`),
   KEY `evt_rep` (`ev_id`,`rp_id`),
   KEY `user` (`uid`,`ev_id`),
   KEY `ev_dt` (`ev_id`,`dt`)
@@ -356,10 +348,12 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_events']}
         CHANGE cal_id cal_id int(10) not null DEFAULT 1",
     ),
-'1.4.6' => array(
+'1.5.0' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE options options text",
+    "ALTER TABLE {$_TABLES['evlist_events']} CHANGE rec_data rec_data text DEFAULT NULL",
+    "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE rec_data rec_data text DEFAULT NULL",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `id` `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `description` `dscp` varchar(255) NOT NULL DEFAULT ''",
     "ALTER TABLE {$_TABLES['evlist_tickets']} CHANGE tic_id tic_num varchar(128) NOT NULL",
@@ -367,7 +361,12 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD UNIQUE KEY `idx_tic_num` (tic_num)",
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD tic_id int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY",
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD comment varchar(255) NOT NULL DEFAULT ''",
+    "ALTER TABLE {$_TABLES['evlist_repeat']} DROP KEY IF EXISTS `end`",
+    "ALTER TABLE {$_TABLES['evlist_remlookup']}
+        ADD `rem_id` int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST",
+    "DROP TABLE IF EXISTS {$_TABLES['evlist_rsvp']}",
     ),
+
 );
 $_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];

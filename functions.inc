@@ -181,18 +181,30 @@ function plugin_chkVersion_evlist()
 function plugin_autouninstall_evlist()
 {
     $out = array (
-        'tables'    => array ('evlist_calendars', 'evlist_categories',
-                        'evlist_detail', 'evlist_events',
-                        'evlist_lookup','evlist_remlookup',
-                        'evlist_repeat', 'evlist_submissions',
-                        'evlist_tickets', 'evlist_tickettypes',
-                        'evlist_cache',
+        'tables'    => array (
+            'evlist_events',
+            'evlist_submissions',
+            'evlist_calendars',
+            'evlist_categories',
+            'evlist_detail',
+            'evlist_lookup',
+            'evlist_remlookup',
+            'evlist_repeat',
+            'evlist_tickets',
+            'evlist_tickettypes',
+            'evlist_cache',
         ),
-        'groups'    => array('evlist Admin'),
-        'features'  => array('evlist.admin', 'evlist.submit'),
-
-        'php_blocks' => array('phpblock_evlist_upcoming',
-                        'phpblock_evlist_smallmonth'),
+        'groups'    => array(
+            'evlist Admin',
+        ),
+        'features'  => array(
+            'evlist.admin',
+            'evlist.submit',
+        ),
+        'php_blocks' => array(
+            'phpblock_evlist_upcoming',
+            'phpblock_evlist_smallmonth',
+        ),
     );
     Evlist\Cache::clear();
     return $out;

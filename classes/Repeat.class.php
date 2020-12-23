@@ -18,10 +18,6 @@ namespace Evlist;
  */
 class Repeat
 {
-    /** Property fields accessed via `__set()` and `__get()`.
-     * @var array */
-    //var $properties = array();
-
     /** Event record ID.
      * @var string */
     private $ev_id = '';
@@ -161,81 +157,6 @@ class Repeat
             }
         }
         return $repeats[$rp_id];
-    }
-
-
-    /**
-     * Set a property's value.
-     *
-     * @param   string  $var    Name of property to set.
-     * @param   mixed   $value  New value for property.
-     */
-    public function X__set($var, $value='')
-    {
-        global $_USER, $_CONF;
-
-        switch ($var) {
-        case 'ev_id':
-            $this->properties[$var] = COM_sanitizeId($value, false);
-            break;
-
-        case 'rp_id':
-        case 'det_id':
-        case 'uid':
-            $this->properties[$var] = (int)$value;
-            break;
-
-        case 'date_start':
-        case 'date_end':
-        case 'tzid':
-            // String values
-            $this->properties[$var] = trim(COM_checkHTML($value));
-            break;
-
-        case 'time_start1':
-        case 'time_end1':
-        case 'time_start2':
-        case 'time_end2':
-            $this->properties[$var] = empty($value) ? '00:00:00' : trim($value);
-            break;
-
-        case 'dtStart1':
-        case 'dtEnd1':
-        case 'dtStart2':
-        case 'dtEnd2':
-            // Date objects to track starting and ending timestamps
-            //$this->properties[$var] = new Date($value, $this->tzid);
-            $this->properties[$var] = new \Date($value, $_CONF['timezone']);
-            break;
-
-        default:
-            // Undefined values (do nothing)
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property.
-     *
-     * @param   string  $var    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
-     */
-    public function X__get($var)
-    {
-        switch($var) {
-        case 'use_tz':
-            return true;
-            //return $this->Event->tzid == 'local' ? false : true;
-            break;
-        default:
-            if (array_key_exists($var, $this->properties)) {
-                return $this->properties[$var];
-            } else {
-                return NULL;
-            }
-            break;
-        }
     }
 
 

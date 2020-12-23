@@ -3,9 +3,9 @@
  * Class to manage calendars.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -18,10 +18,6 @@ namespace Evlist;
  */
 class Calendar
 {
-    /** Properties accessed via `__set()` and `__get()`.
-     * @var array */
-    private $properties = array();
-
     /** Flag to indicate a new record.
      * @var boolean */
     private $isNew = true;
@@ -152,57 +148,6 @@ class Calendar
             $row = DB_fetchArray($result, false);
             $this->setVars($row, true);
             return true;
-        }
-    }
-
-
-    /**
-     * Set a property's value.
-     *
-     * @param   string  $key    Property name
-     * @param   mixed   $value  Value to set
-     */
-    public function X__set($key, $value)
-    {
-        switch ($key) {
-        case 'cal_id':
-        case 'perm_owner':
-        case 'perm_group':
-        case 'perm_members':
-        case 'perm_anon':
-        case 'owner_id':
-        case 'group_id':
-        case 'orderby':
-            $this->properties[$key] = (int)$value;
-            break;
-
-        case 'cal_status':
-        case 'cal_ena_ical':
-            $this->properties[$key] = $value == 1 ? 1 : 0;
-            break;
-
-        case 'cal_name':
-        case 'fgcolor':
-        case 'bgcolor':
-        case 'cal_icon':
-            $this->properties[$key] = trim($value);
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property.
-     *
-     * @param   string  $key    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
-     */
-    public function X__get($key)
-    {
-        if (array_key_exists($key, $this->properties)) {
-            return $this->properties[$key];
-        } else {
-            return NULL;
         }
     }
 

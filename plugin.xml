@@ -2,9 +2,9 @@
     <id>evlist</id>
     <name>evList</name>
     <description>evList is a calendar solution for glFusion, supporting recurring events, categories, multiple calendars, and event reminders.</description>
-    <version>1.4.6</version>
+    <version>1.5.0</version>
     <glfusionversion>1.7.8</glfusionversion>
-    <phpversion>7.0.0</phpversion>
+    <phpversion>7.2.0</phpversion>
     <url>http://www.glfusion.org</url>
     <maintainer>Lee Garner</maintainer>
     <requires>lglib,1.0.11</requires>

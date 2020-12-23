@@ -4,9 +4,9 @@
  *
  * @author     Mark R. Evans mark AT glfusion DOT org
  * @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright  Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2010 - 2020 Lee Garner <lee@leegarner.com>
  * @package    evlist
- * @version    v1.4.6
+ * @version    v1.5.0
  * @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -53,22 +53,21 @@ global $_DB_table_prefix, $_TABLES;
 */
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.4.6';
-$_EV_CONF['gl_version']      = '1.7.0';
+$_EV_CONF['pi_version']      = '1.5.0';
+$_EV_CONF['gl_version']      = '1.7.8';
 $_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 
 
 $_TABLES['evlist_events']       = $_DB_table_prefix . 'evlist_events';
+$_TABLES['evlist_submissions']  = $_DB_table_prefix . 'evlist_submissions';
+$_TABLES['evlist_calendars']    = $_DB_table_prefix . 'evlist_calendars';
 $_TABLES['evlist_categories']   = $_DB_table_prefix . 'evlist_categories';
+$_TABLES['evlist_detail']       = $_DB_table_prefix . 'evlist_detail';
 $_TABLES['evlist_lookup']       = $_DB_table_prefix . 'evlist_lookup';
 $_TABLES['evlist_remlookup']    = $_DB_table_prefix . 'evlist_remlookup';
-$_TABLES['evlist_submissions']  = $_DB_table_prefix . 'evlist_submissions';
 $_TABLES['evlist_repeat']       = $_DB_table_prefix . 'evlist_repeat';
-$_TABLES['evlist_detail']       = $_DB_table_prefix . 'evlist_detail';
-$_TABLES['evlist_calendars']    = $_DB_table_prefix . 'evlist_calendars';
 $_TABLES['evlist_tickettypes']  = $_DB_table_prefix . 'evlist_tickettypes';
 $_TABLES['evlist_tickets']      = $_DB_table_prefix . 'evlist_tickets';
-$_TABLES['evlist_tickets_used'] = $_DB_table_prefix . 'evlist_tickets_used';
 $_TABLES['evlist_cache']        = $_DB_table_prefix . 'evlist_cache';
 
 // Deprecated tables, but needed to do the upgrade

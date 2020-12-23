@@ -6,7 +6,7 @@
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
  * @copyright   Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.1
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -259,7 +259,7 @@ function evlist_upgrade($dvlp = false)
             if (!EVLIST_do_set_version($currentVersion)) return false;
 
         case '1.4.5':
-            $currentVersion = '1.4.6';
+            $currentVersion = '1.5.0';
             if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
             // Order the calendars, initially by name;
             Evlist\Calendar::reOrder('cal_name');
@@ -495,13 +495,13 @@ function EVLIST_do_upgrade_sql($version='', $dvlp = false)
     // Execute SQL now to perform the upgrade
     COM_errorLOG("--Updating {$_EV_CONF['pi_name']} to version $version");
     foreach($_EV_UPGRADE[$version] as $sql) {
-        COM_errorLOG("{$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
+        COM_errorLog("{$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
         DB_query($sql, '1');
         if (DB_error()) {
             COM_errorLog("SQL Error during {$_EV_CONF['pi_name']} Plugin update", 1);
-            if (!$dvlp) {
+            /*if (!$dvlp) {
                 return false;
-            }
+            }*/
         }
     }
     return true;

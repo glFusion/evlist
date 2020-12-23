@@ -1095,7 +1095,7 @@ class Repeat
             if (isset($cmt[$key]) && !empty($cmt[$key])) {
                 $comments[$prompt] = $cmt[$key];
             } else {
-                $comments[$prompt] = 'n/a';
+                $comments[$prompt] = '';
             }
         }
 

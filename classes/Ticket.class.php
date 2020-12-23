@@ -1096,14 +1096,19 @@ class Ticket
                 'sort'  => true,
             ),
         );
-        $prompts = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
-        $c = 0;
-        foreach ($prompts as $prompt) {
-            $header_arr[] = array(
-                'text' => $prompt,
-                'field' => 'cmt_' . $c++,
-                'sort' => false,
-            );
+        if ($Ev->getEvent()->getOption('use_rsvp')) {
+            $prompts = $Ev->getEvent()->getOption('rsvp_cmt_prompts');
+            if (empty($prompts)) {
+                $prompts = array($LANG_EVLIST['comment']);
+            }
+            $c = 0;
+            foreach ($prompts as $prompt) {
+                $header_arr[] = array(
+                    'text' => $prompt,
+                    'field' => 'cmt_' . $c++,
+                    'sort' => false,
+                );
+            }
         }
 
         $data_arr = array();

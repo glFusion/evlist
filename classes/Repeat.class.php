@@ -3,9 +3,9 @@
  * Class to manage event repeats or single instances for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2017 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -93,6 +93,22 @@ class Repeat
     /** Indicate if admin access is granted to this event/repeat.
      * @var boolean */
     private $isAdmin = false;
+
+    /** Query string used in search.
+     * @var string */
+    private $_qs = '';
+
+    /** Template name for rendering the event view.
+     * @var string */
+    private $_tpl = '';
+
+    /** Comment mode used for event display.
+     * @var string */
+    private $_cmtmode = 'nested';
+
+    /** Comment ordering for event display.
+     * @var string */
+    private $_cmtorder = 'ASC';
 
 
     /**
@@ -511,14 +527,9 @@ class Repeat
     /**
      * Display the detail page for the event occurrence.
      *
-     * @param   integer $rp_id  ID of the repeat to display
-     * @param   string  $query  Optional query string, for highlighting
-     * @param   string  $tpl    Optional template filename, e.g. 'event_print'
-     * @param   string  $cmtmode    Comment Mode
-     * @param   string  $cmtorder   Comment order
      * @return  string      HTML for the page.
      */
-    public function Render($rp_id=0, $query='', $tpl='', $cmtmode='nested', $cmtorder='ASC')
+    public function Render()
     {
         global $_CONF, $_USER, $_EV_CONF, $LANG_EVLIST, $LANG_WEEK,
                 $LANG_LOCALE, $_SYSTEM;
@@ -536,22 +547,13 @@ class Repeat
         $email = '';
         $phone = '';
 
-        if ($rp_id != 0) {
-            $this->Read($rp_id);
-        }
-
         if ($this->rp_id == 0) {
             return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
         }
 
-        // Print or other template modifier can be passed in.
-        $template = 'event';
-        if (!empty($tpl)) {
-            $template .= '_' . $tpl;
-        }
         $T = new \Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
-            'event' => $template . '.thtml',
+            'event' => $this->_tpl . '.thtml',
             //'editlinks' => 'edit_links.thtml',
             'datetime' => 'date_time.thtml',
             'address' => 'address.thtml',
@@ -578,16 +580,16 @@ class Repeat
             $full_description = PLG_replaceTags($full_description);
             $location = $location != '' ? PLG_replaceTags($location) : '';
         }
-        if ($query != '') {
-            $title = COM_highlightQuery($title, $query);
+        if ($this->_qs != '') {
+            $title = COM_highlightQuery($title, $this->_qs);
             if (!empty($summary)) {
-                $summary  = COM_highlightQuery($summary, $query);
+                $summary  = COM_highlightQuery($summary, $this->_qs);
             }
             if (!empty($full_description)) {
-                $full_description = COM_highlightQuery($full_description, $query);
+                $full_description = COM_highlightQuery($full_description, $this->_qs);
             }
             if (!empty($location)) {
-                $location = COM_highlightQuery($location, $query);
+                $location = COM_highlightQuery($location, $this->_qs);
             }
         }
         $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
@@ -774,8 +776,8 @@ class Repeat
                     $this->rp_id,
                     $Detail->getTitle(),
                     'evlist',
-                    $cmtorder,
-                    $cmtmode,
+                    $this->_cmtorder,
+                    $this->_cmtmode,
                     0,
                     1,
                     false,
@@ -1739,6 +1741,59 @@ class Repeat
         return $this->rp_id == 0;
     }
 
-}   // class Repeat
 
-?>
+    /**
+     * Set the query string received to highlight words in the event.
+     *
+     * @param   string  $qs     Query string
+     * @return  object  $this
+     */
+    public function withQuery($qs)
+    {
+        $this->qs = $qs;
+        return $this;
+    }
+
+    /**
+     * Set the override to use a different template for the event.
+     * The parameter should be the part of the template name following `event_`.
+     *
+     * @param   string  $tpl    Templage name (partial), empty to reset
+     * @return  object  $this
+     */
+    public function withTemplate($tpl = '')
+    {
+        $this->_tpl = 'event';
+        if ($tpl != '') {
+            $this->_tpl .= '_' . $tpl;
+        }
+        return $this;
+    }
+
+
+    /**
+     * Set the comment mode to use with the event display.
+     *
+     * @param   string  $cmtmode    Comment mode (nested, etc.)
+     * @return  object  $this
+     */
+    public function withCommentMode($cmtmode)
+    {
+        $this->_cmtmode = $cmtmode;
+        return $this;
+    }
+
+
+    /**
+     * Set the comment ordering for event display.
+     *
+     * @param   string  $cmtorder   Comment order (ASC or DESC)
+     * @return  object  $this
+     */
+    public function withCommentOrder($cmtorder)
+    {
+        $this->_cmtorder = $cmtorder;
+        return $this;
+    }
+
+}

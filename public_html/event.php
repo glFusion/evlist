@@ -363,7 +363,7 @@ case 'print':
     if (!empty($rp_id)) {
         $Rep = Evlist\Repeat::getInstance($rp_id);
         $pagetitle = COM_stripslashes($Rep->getEvent()->getDetail()->getTitle());
-        echo $Rep->Render('', '', 'print');
+        echo $Rep->withTemplate('print')->Render();
         exit;
     } else {
         // Shouldn't be in this file without an event ID to display or edit
@@ -420,7 +420,11 @@ default:
             $query = '';
         }
         $query = isset($_GET['query']) ? $_GET['query'] : '';
-        $content .= $Rep->Render('', $query, $template, $mode, $order);
+        $content .= $Rep->withQuery($query)
+                        ->withTemplate($template)
+                        ->withCommentMode($mode)
+                        ->withCommentOrder($order)
+                        ->Render();
     } else {
         // Shouldn't be in this file without an event ID to display or edit
         echo COM_refresh(EVLIST_URL . '/index.php');

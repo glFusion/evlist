@@ -103,6 +103,7 @@ $LANG_EVLIST = array(
 'fee'               => 'Fee',
 'new_ticket_type'   => 'New Ticket Type',
 'print_tickets'     => 'Print Tickets',
+'print_my_tickets'  => 'Print My Tickets',
 'required'          => 'Required',
 'import'            => 'Import',
 'import_calendar'       => 'Importer à partir de Calendrier',

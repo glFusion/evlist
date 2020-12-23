@@ -104,6 +104,7 @@ $LANG_EVLIST = array(
 'fee'               => 'Fee',
 'new_ticket_type'   => 'New Ticket Type',
 'print_tickets'     => 'Print Tickets',
+'print_my_tickets'  => 'Print My Tickets',
 'required'          => 'Required',
 'import'            => 'Import',
 'import_calendar'   => 'Import from Calendar',
@@ -414,6 +415,7 @@ $LANG_EVLIST_HELP = array(
 'event_pass' => 'Checked if this ticket type is a full event pass.',
 'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
 'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 
 $PLG_evlist_MESSAGE1 = 'This event doesn\'t allow registrations, or you do not have access to it.';

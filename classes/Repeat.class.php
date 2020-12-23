@@ -453,7 +453,7 @@ class Repeat
     public function Render()
     {
         global $_CONF, $_USER, $_EV_CONF, $LANG_EVLIST, $LANG_WEEK,
-                $LANG_LOCALE, $_SYSTEM;
+                $LANG_LOCALE, $_SYSTEM, $LANG_EVLIST_HELP;
 
         $retval = '';
 
@@ -641,6 +641,7 @@ class Repeat
             'icon_copy' => Icon::getIcon('copy'),
             'icon_subscribe' => Icon::getIcon('subscribe'),
             'icon_print' => Icon::getIcon('print'),
+            'lang_prt_title' => $LANG_EVLIST_HELP['prt_tickets_btn'],
         ) );
 
         $outputHandle = \outputHandler::getInstance();

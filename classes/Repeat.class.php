@@ -606,7 +606,11 @@ class Repeat
         }
 
         $T->set_var(array(
-            'pi_url' => EVLIST_URL,
+            'lang_locale' => $_CONF['iso_lang'],
+            'charset'   => COM_getCharset(),
+            'direction' => (empty($LANG_DIRECTION) ? 'ltr' : $LANG_DIRECTION),
+            'page_site_splitter' => empty($title) ? '' : ' - ',
+            'pi_url'    => EVLIST_URL,
             'webcal_url' => EVLIST_URL,
             'rp_id'     => $this->rp_id,
             'ev_id'     => $this->ev_id,

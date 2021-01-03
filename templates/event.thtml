@@ -85,19 +85,19 @@
         </a>
         <br />
         {!if is_recurring}
-        <a href="{webcal_url}/ical.php?eid={ev_id}"
+        <a href="{webcal_url}/ical.php?eid={ev_id}" rel="nofollow"
             id="sub_all_instance" style="text-decoration:none;">
             <i title="{$LANG_EVLIST['sub_all_instances']}" class="{icon_subscribe} ev-icon-info tooltip"></i>
             {$LANG_EVLIST['sub_all_instances']}
         </a>
         <br />
         {!endif}
-        <a href="{webcal_url}/ical.php?cal={cal_id}" id="sub_this_calendar">
+        <a href="{webcal_url}/ical.php?cal={cal_id}" id="sub_this_calendar" rel="nofollow">
             <i title="{$LANG_EVLIST['calendar']}" class="{icon_subscribe} ev-icon-info tooltip"></i>
             {$LANG_EVLIST['calendar']}
         </a>
         <br />
-        <a href="{webcal_url}/ical.php"
+        <a href="{webcal_url}/ical.php" rel="nofollow"
             id="sub_all_calendars">
             <i title="{$LANG_EVLIST['all_calendars']}" class="{icon_subscribe} ev-icon-info tooltip"></i>
             {$LANG_EVLIST['all_calendars']}
@@ -106,7 +106,7 @@
       </div>
     </div>
     {!endif}
-    <a href="{pi_url}/event.php?print=x&amp;rp_id={rp_id}" target="_blank">
+    <a href="{pi_url}/event.php?print=x&amp;rp_id={rp_id}" target="_blank" rel="nofollow">
       <i title="{$LANG_EVLIST['print']}" class="{icon_print} ev-icon-info tooltip"></i>
     </a>
   </div>

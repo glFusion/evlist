@@ -1,7 +1,11 @@
-{# begin {templatelocation} #}
-<html>
+<!DOCTYPE html>
+<html lang="{lang_locale}" dir="{direction}" class="uk-height-1-1">
 <head>
-<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
+    <meta charset="{charset}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>{title}{page_site_splitter}{site_name}</title>
+    <link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
 </head>
 <body>
   <div class="evlist" id="evlistEventHeader">
@@ -97,4 +101,3 @@
 </div>
 </body>
 </html>
-{# end {templatelocation} #}

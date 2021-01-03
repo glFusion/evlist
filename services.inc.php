@@ -112,7 +112,7 @@ function service_handlePurchase_evlist($args, &$output, &$svc_msg)
             'download' => 0,
             'file' => '',
     );
-    $uid = $args['order']->getUid();
+    $uid = $ipn_data['uid'];
     $pmt_dt = isset($ipn_data['sql_date']) ? $ipn_data['sql_date'] : $_CONF['_now']->toMySQL(true);
 
     // Initialize an array of payment info to log

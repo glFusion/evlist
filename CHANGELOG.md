@@ -19,6 +19,7 @@ Release TBD
 - Limit centerblock display to a number of days as well as events.
 - Use layout-based mail templates for consistency.
 - Enable signups with custom fields, may be used instead of the forms plugin.
+- Add nofollow and noindex tags to subscription and print links/pages.
 
 ## v1.4.5
 Release 2018-04-14

@@ -450,7 +450,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
  */
 function plugin_autotags_evlist($op, $content = '', $autotag = '')
 {
-    global $_CONF, $_TABLES;
+    global $_CONF, $_TABLES, $LANG_EVLIST;
 
     switch ($op) {
     case 'tagname':
@@ -458,8 +458,10 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
         break;
     case 'tagusage':
         return array(
-            'namespace' => 'evlist',
-            'usage' => 'description',
+            array(
+                'namespace' => 'evlist',
+                'usage' => 'description',
+            ),
         );
         break;
     case 'desc':

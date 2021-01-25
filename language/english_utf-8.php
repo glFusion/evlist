@@ -464,6 +464,8 @@ $LANG_confignames['evlist'] = array(
     'commentsupport'        => 'Enable Comments?',
     'ticket_format'         => 'Ticket Format String',
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
+    'cb_max_days'           => 'Max future/past days to show',
+    'cb_dup_chk'            => 'Key to hide duplicate instances',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',
@@ -508,6 +510,11 @@ $LANG_configselects['evlist'] = array(
     7 => array('Top of page'=>1,'After featured story'=>2,'Bottom of page'=>3,'Entire page'=>0),
     8 => array('past'=>1,'upcoming'=>2,'this week'=>3,'this month'=>4),
     9 => array('Disabled' => 0, 'Table' => 1, 'Story' => 2, 'Calendar' => 3),
+    10 => array(
+        'Show all occurrences' => '',
+        'Master Event Record' => 'rp_ev_id',
+        'Recurring Event Instance' => 'rp_id',
+    ),
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
     14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),

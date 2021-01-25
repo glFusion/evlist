@@ -20,12 +20,13 @@ Release TBD
 - Use layout-based mail templates for consistency.
 - Enable signups with custom fields, may be used instead of the forms plugin.
 - Add nofollow and noindex tags to subscription and print links/pages.
+- Configurable key to hide repeating events from centerblock.
 
 ## v1.4.5
 Release 2018-04-14
 - Allow `%site_url%` in event URL to reference the site base URL.
 - Supports calls to `PLG_itemSaved()` to allow plugins to submit and update events.
-- Added plugin->calendar mapping in the configuration (Integration section)
+- Added plugin to calendar mapping in the configuration (Integration section).
 - Add multiple event deletion
 - Add icons to calendars
 - Add waitlist status to ticket table, update when tickets are removed

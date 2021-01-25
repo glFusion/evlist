@@ -362,6 +362,17 @@ $evlistConfigData = array(
         'set' => true,
         'group' => 'evlist',
     ),
+    array(
+        'name' => 'cb_dup_chk',
+        'default_value' => 'rp_ev_id',
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 10,
+        'sort' => 70,
+        'set' => true,
+        'group' => 'evlist',
+    ),
 
     // Subgroup: RSVP
     array(

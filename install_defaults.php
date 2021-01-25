@@ -341,17 +341,6 @@ $evlistConfigData = array(
         'group' => 'evlist',
     ),
     array(
-        'name' => 'cb_max_days',
-        'default_value' => '120',
-        'type' => 'text',
-        'subgroup' => 0,
-        'fieldset' => 20,
-        'selection_array' => 0,
-        'sort' => 50,
-        'set' => true,
-        'group' => 'evlist',
-    ),
-    array(
         'name' => 'limit_summary',
         'default_value' => '128',
         'type' => 'text',

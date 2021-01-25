@@ -464,7 +464,6 @@ $LANG_confignames['evlist'] = array(
     'commentsupport'        => 'Enable Comments?',
     'ticket_format'         => 'Ticket Format String',
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
-    'cb_max_days'           => 'Max future/past days to show',
     'cb_dup_chk'            => 'Key to hide duplicate instances',
 );
 $LANG_configsubgroups['evlist'] = array(

@@ -580,7 +580,6 @@ function plugin_getheadercss_evlist()
 /**
  * Create the centerblock.
  *
- * @uses    EVLIST_cb_content()
  * @param   string  $where  Position (top, etc.)
  * @param   string  $page   Page currently being displayed
  * @param   string  $topic  Topic currently being displayed

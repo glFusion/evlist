@@ -118,7 +118,7 @@ class DateFunc
      */
     public static function isValidDate($day, $month, $year)
     {
-        return checkdate($month, $day, $year);
+        return checkdate((int)$month, (int)$day, (int)$year);
     }
 
 

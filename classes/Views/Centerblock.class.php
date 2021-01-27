@@ -57,11 +57,6 @@ class Centerblock
             }
         }
 
-        // Try first to get from cache
-        $cache_key = 'evlistcb_' . $_EV_CONF['enable_centerblock'] . '_' .
-            $_EV_CONF['cb_dup_chk'];
-        $display = Cache::get($cache_key);
-
         if (empty($display)) {  // not found in cache
             // overloading the previously-boolean enable_centerblock option to
             // indicate the centerblock format.
@@ -78,7 +73,6 @@ class Centerblock
                 default:
                 $display = '';
             }
-            Cache::set($cache_key, $display, 'evlistcb');
         }
         if (!empty($display)) {
             if ($where == 0) {      // replacing home page
@@ -100,25 +94,6 @@ class Centerblock
         global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
         $retval = '';
-        // Retrieve Centerblock Settings
-        $range    = $_EV_CONF['range_centerblock'];
-        $limit    = (int)$_EV_CONF['limit_block'];
-        $length   = $_EV_CONF['limit_summary'];
-        $_dt = clone($_CONF['_now']);
-        $interval = (int)$_EV_CONF['max_upcoming_days'];
-        if ($interval > 0) {
-            $cb_max_date = $_dt
-                ->add(new \DateInterval("P{$interval}D"))
-                ->toMySQL(true);
-            } else {
-            // no limit by days.
-            $cb_max_date = '9999-12-31';
-        }
-
-        $opts = array(
-            'limit' => $limit,
-            'show_upcoming' => 1,
-        );
 
         switch ($format) {
         case 1:     // table format
@@ -130,6 +105,27 @@ class Centerblock
         default:
             return '';
         }
+
+        $range    = $_EV_CONF['range_centerblock'];
+        $limit    = (int)$_EV_CONF['limit_block'];
+        $length   = $_EV_CONF['limit_summary'];
+        // Retrieve Centerblock Settings
+        $_dt = clone($_CONF['_now']);
+        $interval = (int)$_EV_CONF['max_upcoming_days'];
+        if ($interval > 0) {
+            $cb_max_date = $_dt
+                ->add(new \DateInterval("P{$interval}D"))
+                ->toMySQL(true);
+        } else {
+            // no limit by days.
+            $cb_max_date = '9999-12-31';
+        }
+
+        $opts = array(
+            'limit' => $limit,
+            'show_upcoming' => 1,
+        );
+
         $dup_chk = $_EV_CONF['cb_dup_chk'];
         $Y = $_CONF['_now']->format('Y');
         $D = $_CONF['_now']->format('d');
@@ -157,7 +153,15 @@ class Centerblock
             break;
         }
 
-        $events = EVLIST_getEvents($start, $end, $opts);
+
+        // Try first to get from cache
+        $cache_key = 'evlistcb_' . $_EV_CONF['enable_centerblock'] . '_' .
+            $_EV_CONF['cb_dup_chk'];
+        $events = Cache::get($cache_key);
+        if ($events === NULL) {
+            $events = EVLIST_getEvents($start, $end, $opts);
+            Cache::set($cache_key, $events, 'evlistcb');
+        }
         if (empty($events) || !is_array($events)) {
             return '';
         }

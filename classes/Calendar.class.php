@@ -465,14 +465,41 @@ class Calendar
      * @param   integer $cal_id     ID number of element to modify
      * @return         New value, or old value upon failure
      */
-    public static function toggleEnabled($oldvalue, $cal_id = 0)
+    public static function toggleEnabled($oldvalue, $cal_id)
+    {
+        return self::_toggle('cal_status', $oldvalue, $cal_id);
+    }
+
+
+    /**
+     * Toggle the "cal_ena_ical" field based on the existing value.
+     *
+     * @param   integer $oldvalue   Original value to be changed
+     * @param   integer $cal_id     ID number of element to modify
+     * @return         New value, or old value upon failure
+     */
+    public static function toggleIcal($oldvalue, $cal_id)
+    {
+        return self::_toggle('cal_ena_ical', $oldvalue, $cal_id);
+    }
+
+
+    /**
+     * Toggle a boolean field based on the existing value.
+     *
+     * @param   string  $fld        Field name
+     * @param   integer $oldvalue   Original value to be changed
+     * @param   integer $cal_id     ID number of element to modify
+     * @return         New value, or old value upon failure
+     */
+    private static function _toggle($fld, $oldvalue, $cal_id)
     {
         global $_TABLES;
 
         $cal_id = (int)$cal_id;
         $newvalue = $oldvalue == 0 ? 1 : 0;
         $sql = "UPDATE {$_TABLES['evlist_calendars']}
-                SET cal_status=$newvalue
+                SET $fld = $newvalue
                 WHERE cal_id='$cal_id'";
         DB_query($sql, 1);
         if (DB_error()) {
@@ -733,6 +760,12 @@ class Calendar
                 'align' => 'center',
             ),
             array(
+                'text'  => $LANG_EVLIST['ical_enabled'],
+                'field' => 'cal_ena_ical',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(
                 'text'  => $LANG_ADMIN['delete'] .
                     '&nbsp;' . Icon::getHTML(
                     'question-circle', 'tooltip',
@@ -810,6 +843,7 @@ class Calendar
             );
             break;
         case 'cal_status':
+        case 'cal_ena_ical':
             if ($fieldvalue == '1') {
                 $switch = EVCHECKED;
                 $enabled = 1;
@@ -817,9 +851,9 @@ class Calendar
                 $switch = '';
                 $enabled = 0;
             }
-            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"cal_check\"
-                id=\"togenabled{$A['cal_id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"enabled\",".
+            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"{$fieldname}_check\"
+                id=\"tog{$fieldname}enabled{$A['cal_id']}\"
+                onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"{$fieldname}\",".
                 '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
             break;
         case 'delete':
@@ -849,5 +883,3 @@ class Calendar
     }
 
 }
-
-?>

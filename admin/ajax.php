@@ -1,15 +1,15 @@
 <?php
 /**
-*   Common AJAX functions.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
-*   @package    evlist
-*   @version    1.3.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Common AJAX functions.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
+ * @package     evlist
+ * @version     v1.5.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /** Include required glFusion common functions */
 require_once '../../../lib-common.php';
@@ -38,10 +38,12 @@ case 'toggle':
 
     case 'calendar':
         switch ($_POST['type']) {
-        case 'enabled':
+        case 'cal_status':
             $newval = Evlist\Calendar::toggleEnabled($oldval, $_POST['id']);
             break;
-
+        case 'cal_ena_ical':
+            $newval = Evlist\Calendar::toggleIcal($oldval, $_POST['id']);
+            break;
          default:
             exit;
         }
@@ -86,5 +88,3 @@ case 'toggle':
     echo json_encode($response);
     break;
 }
-
-?>

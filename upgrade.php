@@ -580,6 +580,8 @@ function EVLIST_remove_old_files()
             'templates/ticketForm.uikit.thtml',
             'css',
             'templatest/centerblock_item.thtml',
+            // 1.5.0
+            'evlist_views.inc.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

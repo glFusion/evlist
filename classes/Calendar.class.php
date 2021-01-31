@@ -532,6 +532,54 @@ class Calendar
 
 
     /**
+     * Get all the enabled ICal links.
+     *
+     * @param   boolean $incl_all   True to include the All Calendars link
+     * @return  array   Array of active Ical links
+     */
+    public static function getIcalLinks($incl_all=true)
+    {
+        global $LANG_EVLIST;
+
+        $retval = array();
+        if ($incl_all) {
+            $retval[] = COM_createLink(
+                $LANG_EVLIST['all_calendars'],
+                EVLIST_URL . '/ical.php',
+                array(
+                    'rel' => 'nofollow',
+                )
+            );
+        }
+        $Cals = self::getAll(true);
+        foreach ($Cals as $Cal) {
+            if ($Cal->isIcalEnabled()) {
+                $retval[] = $Cal->icalUrl();
+            }
+        }
+        return $retval;
+    }
+
+
+    /**
+     * Get the ICal link for this calendar.
+     * Does not consider whether Ical is enabled.
+     *
+     * @return  string  URL string for the ICal link
+     */
+    public function icalUrl()
+    {
+        return COM_createLink(
+            $this->getName(),
+            EVLIST_URL . '/ical.php?cal=' . $this->getID(),
+            array(
+                'rel' => 'nofollow',
+            )
+        );
+    }
+
+
+    /**
      * Get the options for a calendar selection list.
      * Leverages self::getAll() to re-use the database query.
      *
@@ -564,7 +612,7 @@ class Calendar
      * $param   boolean $enabled    True to get only enabled calendars
      * return   array       Array of calendar objects
      */
-    public static function getAll()
+    public static function getAll($enabled=false)
     {
         global $_TABLES;
 
@@ -572,8 +620,11 @@ class Calendar
         if ($cals === NULL) {
                 // Still nothing? Then read from the DB
             $cals = array();
-            $sql = "SELECT * FROM {$_TABLES['evlist_calendars']}
-                    ORDER BY orderby ASC";
+            $sql = "SELECT * FROM {$_TABLES['evlist_calendars']} ";
+            if ($enabled) {
+                $sql .= "WHERE cal_status = 1 ";
+            }
+            $sql .= "ORDER BY orderby ASC";
             $res = DB_query($sql);
             while ($A = DB_fetchArray($res, false)) {
                 $cals[$A['cal_id']] = new self($A);

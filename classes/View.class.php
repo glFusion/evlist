@@ -320,22 +320,11 @@ class View
             }
         }
 
-        // Get ical options for displayed calendars
-        $ical_links = '';
-        $webcal_url = EVLIST_URL;
-        if (is_array($this->cal_used)) {
-            foreach ($this->cal_used as $cal) {
-                if ($cal['cal_ena_ical']) {
-                    $ical_links .= '<a href="' . $webcal_url . '/ical.php?cal=' .
-                        $cal['cal_id'] . '">' . $cal['cal_name'] .
-                        '</a>&nbsp;&nbsp;';
-                }
-            }
-        }
+        // Get ical options for all calendars
+        $ical_links = implode('&nbsp;&nbsp;', Calendar::getIcalLinks());
 
         $T->set_var(array(
             'pi_url'        => EVLIST_URL,
-            'webcal_url'    => $webcal_url,
             'feed_links'    => $rss_links,
             'ical_links'    => $ical_links,
         ) );
@@ -529,9 +518,10 @@ class View
 
     /**
      * Add calender info to the cal_used array.
-     * Used later to build the calendar checkboxes and subscription links.
+     * Used later to build the calendar checkboxes.
      *
      * @param   array   $event  Array of event info
+     * @return  void
      */
     protected function addCalUsed($event)
     {

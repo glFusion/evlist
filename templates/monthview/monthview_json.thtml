@@ -28,7 +28,7 @@
         <!-- BEGIN dayBlock -->
       <li class="day {cal_day_style}"
       ondblclick="window.location.href='{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}';">
-        <div class="date">{day}</div>
+        <div class="date"><a href="{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}">{day}</a></div>
         {!if cal_day_entries}
           {cal_day_entries}
         {!endif}

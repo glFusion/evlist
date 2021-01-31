@@ -20,14 +20,13 @@
     width:14.342%;
     padding: 5px;
     box-sizing:border-box;
-    border: 1px solid #ccc;
+    border: 1px solid #999;
     margin-right: -1px;
     margin-bottom: -1px;
 }
 
 #calendar ul.weekdays {
     height: 40px;
-    /*background: #8e352e;*/
     background: #325482;
 }
 
@@ -64,8 +63,11 @@
     width: 20px;
     border-radius: 50%;
     float: right;
+    cursor: default;
 }
-
+#calendar > ul.days > li > div.date > a {
+    color:white;
+}
 #calendar .event {
     clear: both;
     display: block;
@@ -106,7 +108,7 @@
 
     #calendar li {
         height: auto !important;
-        border: 1px solid #ededed;
+        border: 1px solid #999;
         width: 100%;
         padding: 10px;
         margin-bottom: -1px;

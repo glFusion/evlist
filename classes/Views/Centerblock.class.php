@@ -153,7 +153,6 @@ class Centerblock
             break;
         }
 
-
         // Try first to get from cache
         $cache_key = 'evlistcb_' . $_EV_CONF['enable_centerblock'] . '_' .
             $_EV_CONF['cb_dup_chk'];

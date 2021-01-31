@@ -79,7 +79,7 @@
       <a href="#"><i title="{$LANG_EVLIST['subscribe']}" class="{icon_subscribe} ev-icon-info tooltip"></i></a>
       <div class="uk-dropdown uk-dropdown-bottom">
         {$LANG_EVLIST['subscribe_to']} ...<br />
-        <a href="{webcal_url}/ical.php?rp_id={rp_id}" id="sub_instance">
+        <a href="{webcal_url}/ical.php?rp_id={rp_id}" id="sub_instance" rel="nofollow">
             <i title="{$LANG_EVLIST['sub_this_instance']}" class="{icon_subscribe} ev-icon-info tooltip"></i>
             {$LANG_EVLIST['sub_this_instance']}
         </a>

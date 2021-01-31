@@ -39,61 +39,71 @@ foreach ($events as $day) {
 
         // Check if this repeat is already shown.  We only want multi-day
         // events included once instead of each day
-        if (array_key_exists($event['rp_id'], $rp_shown))
+        if (array_key_exists($event['rp_id'], $rp_shown)) {
             continue;
+        }
         $rp_shown[$event['rp_id']] = 1;
-
-        $start_time = gmstrftime('%Y%m%dT%H%M%SZ', 
-                strtotime($event['rp_date_start'] . ' ' . 
-                    $event['rp_time_start1']));
-        $end_time = gmstrftime('%Y%m%dT%H%M%SZ', 
-                strtotime($event['rp_date_end'] . ' ' . 
-                    $event['rp_time_end1']));
+        $dtstart = (new \Date($event['rp_start'], $_CONF['timezone']))
+            ->format('Ymd\THis\Z', false);
+        $dtend = (new \Date($event['rp_end'], $_CONF['timezone']))
+            ->format('Ymd\THis\Z', false);
         $summary = $event['title'];
-        $permalink = COM_buildURL(EVLIST_URL . '/event.php?eid='.
-                $event['rp_id']);
+        $permalink = COM_buildURL(EVLIST_URL . '/event.php?eid='. $event['rp_id']);
+        $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'];
 
-        if (!empty($event['full_description'])) {
-            $description = $event['full_description'];
-        } elseif (!empty($event['summary'])) {
+        // Get the description. Prefer the text Summary, then HTML fulltext
+        // Since a description is required, re-use the title if nothing else.
+        if (!empty($event['summary'])) {
             $description = $event['summary'];
+        } elseif (!empty($event['full_description'])) {
+            // Strip HTML
+            $description = strip_tags($event['full_description']);
         } else {
             $description = $summary;    // Event title is required
         }
-        $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'];
-    	//$description = str_replace(",", "\,", $description);
-        // TODO: the following 3 lines commented out 2011-02-17 to see if
-        // they're necessary for google calendar
-    	//$description = str_replace("\\", "\\\\", $description);
-    	//$description = str_replace("\n", $space, strip_tags($description));
-    	//$description = str_replace("\r", $space, strip_tags($description));
+        // Sanitize certain characters
+        $description = 'DESCRIPTION:' . str_replace(
+            array("\n", "\r"),
+            array(' ', ' '),
+            $description
+        );
+        if (strlen($description) > 70) {
+            // Break into chunks according to
+            // https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
+            $description = rtrim(chunk_split($description, 70, "\r\n "));
+        }
+
         $ical .= "BEGIN:VEVENT\r\n" .
             "UID:{$uuid}\r\n" .
-            "DTSTAMP:$start_time\r\n" .
-            "DTSTART:$start_time\r\n" .
-            "DTEND:$end_time\r\n" .
+            "DTSTAMP:$dtstart\r\n" .
+            "DTSTART:$dtstart\r\n" .
+            "DTEND:$dtend\r\n" .
             "URL:$permalink\r\n" .
             "SUMMARY:$summary\r\n" .
             "DESCRIPTION:$description\r\n" .
             "END:VEVENT\r\n";
     }
 }
-
+if (isset($opts['cal'])) {
+    $Cal = Evlist\Calendar::getInstance($opts['cal']);
+    $dscp = $Cal->getName();
+} else {
+    $dscp = $LANG_EVLIST['events'];
+}
 $content = "BEGIN:VCALENDAR\r\n" .
     "VERSION:2.0\r\n" .
     "PRODID:-//{$_CONF['site_name']}\r\n" .    //NONSGML v1.0//EN
-    "X-WR-CALNAME:{$_CONF['site_name']} Events\r\n" .
+    "X-WR-CALNAME:{$_CONF['site_name']} $dscp\r\n" .
     "X-WR-TIMEZONE:{$_CONF['timezone']}\r\n" .
     "X-ORIGINAL-URL:{$_CONF['site_url']}\r\n" .
     "X-WR-CALDESC:Events from {$_CONF['site_name']} \r\n" .
     "CALSCALE:GREGORIAN\r\n" .
     "METHOD:PUBLISH\r\n" .
     $ical .
-    "END:VCALENDAR\r\n" .
-    "CONTENT\r\n";
+    "END:VCALENDAR\r\n";
 
 header('Content-Type: text/calendar');
-header('Content-Length: ' . sizeof($content));
+header('Content-Length: ' . strlen($content));
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header("Pragma: no-cache");
 header('Expires: ' . gmdate ('D, d M Y H:i:s', time()));

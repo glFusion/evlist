@@ -9,7 +9,7 @@
 {!if ical_links}
   <div style="clear:both;">
     <i class="uk-icon-calendar"></i>
-    ICal:&nbsp;<a href="{webcal_url}/ical.php">{$LANG_EVLIST['all_calendars']}</a>&nbsp;&nbsp;
+    ICal:&nbsp;<a href="{webcal_url}/ical.php" rel="nofollow">{$LANG_EVLIST['all_calendars']}</a>&nbsp;&nbsp;
     {ical_links}
   </div>
 {!endif}

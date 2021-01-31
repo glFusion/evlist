@@ -1605,6 +1605,17 @@ class Repeat
 
 
     /**
+     * Get the first starting date/time object.
+     *
+     * @return  object      Starting date object
+     */
+    public function getDateEnd1()
+    {
+        return $this->dtEnd1;
+    }
+
+
+    /**
      * Get the first starting time.
      *
      * @return  string      Starting time HH:MM:SS

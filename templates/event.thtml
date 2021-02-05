@@ -1,10 +1,11 @@
 {# begin {templatelocation} #}
+<div id="evEventButtons" style="margin-bottom:15px;">
 {!if admin_rsvp}
-<div id="evEventButtons">
     <button id="btn_event" class="uk-button uk-button-primary" onclick="changeView('event')">{$LANG_EVLIST['event']}</button>
     <button id="btn_rsvp" class="uk-button" onclick="changeView('rsvp')">RSVP ({rsvp_count})</button>
-</div>
 {!endif}
+    <a class="floatright uk-button uk-button-primary" href="{site_url}/evlist/index.php">{$LANG_EVLIST['back_to_cal']}</a>
+</div>
 
 <div id="evlistEventHeader">
   <h2 class="evlist_header">

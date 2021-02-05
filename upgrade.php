@@ -588,6 +588,26 @@ function EVLIST_remove_old_files()
             'js/colorpicker.js',
             // 1.4.6
             'docs/english/config.legacy.html',
+            // 1.5.0
+            'images/colors.png',
+            'images/day_off.png',
+            'images/day_on.png',
+            'images/downarrow.png',
+            'images/evList.gif',
+            'images/ical.png',
+            'images/list_off.png',
+            'images/list_on.png',
+            'images/menuarrow.gif',
+            'images/month_off.png',
+            'images/month_on.png',
+            'images/new.png',
+            'images/reset.png',
+            'images/today_off.png',
+            'images/today_on.png',
+            'images/week_off.png',
+            'images/week_on.png',
+            'images/year_off.png',
+            'images/year_on.png',
         ),
     );
 

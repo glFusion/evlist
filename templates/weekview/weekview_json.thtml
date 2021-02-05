@@ -2,17 +2,14 @@
 <table style="width:100%;">
 <!-- BEGIN dayBlock -->
   <tr class="{dayclass}">
-    <td style="width:80%;" class="cal-weekview-dayformat">{dayinfo}</td>
-    <td class="cal-weekview-addevent">
-      {!if can_add}
-        <a href="{site_url}/evlist/event.php?edit=x&amp;type=calendar&amp;day={curday}&amp;month={curmonth}&amp;year={curyear}">
-        <img data-uk-tooltip src="{layout_url}/images/admin/add.png"
-            title="{$LANG_EVLIST['add_event']}"
-            alt="{$LANG_EVLIST['add_event']}"
-            width="16" height="16"
-            />
-        </a>
-      {!endif}
+    <td style="width:80%;" class="cal-weekview-dayformat">{dayinfo}
+{!if can_add}
+        <span style="float:right;">
+            <a href="{site_url}/evlist/event.php?edit=x&amp;type=calendar&amp;day={curday}&amp;month={curmonth}&amp;year={curyear}">
+                <i class="uk-icon-plus uk-text-success tooltip" title="{$LANG_EVLIST['add_event']}"></i>
+            </a>
+        </span>
+{!endif}
     </td>
   </tr>
   <tr>

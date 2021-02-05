@@ -13,11 +13,15 @@ function ChangeDate(year, month, day, view)
 {
     var action;
     switch (view) {
-        case 'year': action = "year"; break;
-        case 'month': action = "month"; break;
-        case 'week': action = "week"; break;
-        case 'day': action = "day"; break;
-        default: return;
+    case 'year':
+    case 'month':
+    case 'week':
+    case 'day':
+    case 'list':
+        action = view;
+        break;
+    default:
+        return;
     }
     newyear = year;
     newmonth = month;

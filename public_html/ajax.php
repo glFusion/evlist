@@ -91,6 +91,7 @@ case 'day':
 case 'week':
 case 'month':
 case 'year':
+case 'list':
     $day = isset($_POST['day']) ? (int)$_POST['day'] : 0;
     $month = isset($_POST['month']) ? (int)$_POST['month'] : 0;
     $year = isset($_POST['year']) ? (int)$_POST['year'] : 0;

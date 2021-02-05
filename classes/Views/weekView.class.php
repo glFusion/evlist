@@ -3,9 +3,9 @@
  * Weekly View functions for the evList plugin.
  *
  * @author      Lee P. Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @copyright   Copyright (c) 2017-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -78,9 +78,9 @@ class weekView extends \Evlist\View
             )
         );
 
-        $start_mname = $LANG_MONTH[(int)$sMonth];
+        $start_mname = $LANG_MONTH[(int)$sMonth+12];
         $last_date = getdate($dtStart->toUnix() + (86400 * 6));
-        $end_mname = $LANG_MONTH[$last_date['mon']];
+        $end_mname = $LANG_MONTH[$last_date['mon']+12];
         $end_ynum = $last_date['year'];
         $end_dnum = sprintf('%02d', $last_date['mday']);
         $date_range = $start_mname . ' ' . $sDay;
@@ -93,7 +93,8 @@ class weekView extends \Evlist\View
             $date_range .= $end_mname . ' ';
         }
         $date_range .= "$end_dnum, $end_ynum";
-        $T->set_var('date_range', $date_range);
+        $this->today_str = $date_range;
+        //$T->set_var('date_range', $date_range);
 
         $T->set_block('week', 'dayBlock', 'dBlk');
         foreach($calendarView as $idx=>$weekData) {
@@ -188,16 +189,20 @@ class weekView extends \Evlist\View
             $T->parse('dBlk', 'dayBlock', true);
         }
 
+        $this->prev_date = array(
+            'month'     => $dtPrev->format('n', false),
+            'day'       => $dtPrev->format('j', false),
+            'year'      => $dtPrev->format('Y', false),
+        );
+        $this->next_date = array(
+            'month'     => $dtNext->format('n', false),
+            'day'       => $dtNext->format('j', false),
+            'year'      => $dtNext->format('Y', false),
+        );
         $T->set_var(array(
             'pi_url'        => EVLIST_URL,
             'cal_header'    => $this->Header(),
             'cal_footer'    => $this->Footer(),
-            'prevmonth'     => $dtPrev->format('n', false),
-            'prevday'       => $dtPrev->format('j', false),
-            'prevyear'      => $dtPrev->format('Y', false),
-            'nextmonth'     => $dtNext->format('n', false),
-            'nextday'       => $dtNext->format('j', false),
-            'nextyear'      => $dtNext->format('Y', false),
             'urlfilt_cat'   => $this->cat,
             'urlfilt_cal'   => $this->cal,
             'cal_checkboxes' => $this->getCalCheckboxes(),
@@ -211,5 +216,3 @@ class weekView extends \Evlist\View
         return $T->finish($T->get_var('output'));
     }
 }
-
-?>

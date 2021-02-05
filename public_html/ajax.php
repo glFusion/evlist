@@ -98,7 +98,11 @@ case 'year':
     $cal = isset($_POST['cal']) ? (int)$_POST['cal'] : 0;
     $opt = isset($_POST['opt']) ? $_POST['opt'] : '';
     $V = Evlist\View::getView($_POST['action'], $year, $month, $day, $cat, $cal, $opt);
-    echo $V->Content();
+    $retval = array(
+        'content' => $V->Content(),
+        'header' => $V->Header(),
+    );
+    echo json_encode($retval);
     exit;
     break;
 

@@ -1,16 +1,4 @@
 {# begin {templatelocation} #}
-<div class="evlist_header">
-  <div class="uk-width-1-3 floatleft" style="text-align:right;">
-    <a id="prev_href" onclick="javascript:ChangeDate({prevyear},{prevmonth},{prevday},'day');" href="#!"><i class="uk-icon-backward ev-icon-info"></i></a>
-  </div>
-  <div class="uk-width-1-3 floatleft">
-    <span id="currentday">{currentday}</span>
-  </div>
-  <div class="uk-width-1-3 floatleft" style="text-align:left;">
-    <a id="next_href" onclick="javascript:ChangeDate({nextyear},{nextmonth},{nextday},'day');" href="#!"><i class="uk-icon-forward ev-icon-info"></i></a>
-  </div>
-</div>
-{cal_checkboxes}
 <table class="cal-dayx-body">
     <tr>
         <td class="cal-dayx-weekevent"><div align="right"><?php global $LANG_EVLIST; echo $LANG_EVLIST['periods']['week'];?> {week_num}</div></td>

@@ -3,9 +3,9 @@
  * Daily View functions for the evList plugin.
  *
  * @author      Lee P. Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @copyright   Copyright (c) 2017-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -178,16 +178,26 @@ class dayView extends \Evlist\View
             }
             $T->parse ($i . '_cols', 'column', true);
         }
+        $this->prev_date = array(
+            'month'     => $dtPrev->format('n', false),
+            'day'       => $dtPrev->format('j', false),
+            'year'      => $dtPrev->format('Y', false),
+        );
+        $this->next_date = array(
+            'month'     => $dtNext->format('n', false),
+            'day'       => $dtNext->format('j', false),
+            'year'      => $dtNext->format('Y', false),
+        );
         $T->set_var(array(
             'month'         => $today->month,
             'day'           => $today->day,
             'year'          => $today->year,
-            'prevmonth'     => $dtPrev->format('n', false),
+            /*'prevmonth'     => $dtPrev->format('n', false),
             'prevday'       => $dtPrev->format('j', false),
             'prevyear'      => $dtPrev->format('Y', false),
             'nextmonth'     => $dtNext->format('n', false),
             'nextday'       => $dtNext->format('j', false),
-            'nextyear'      => $dtNext->format('Y', false),
+            'nextyear'      => $dtNext->format('Y', false),*/
             'urlfilt_cal'   => $this->cal,
             'urlfilt_cat'   => $this->cat,
             'cal_header'    => $this->Header(),
@@ -306,5 +316,3 @@ class dayView extends \Evlist\View
     }
 
 }
-
-?>

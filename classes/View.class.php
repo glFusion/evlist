@@ -4,9 +4,9 @@
  * Creates daily, weekly, monthly and yearly calendar views
  *
  * @author      Lee P. Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @copyright   Copyright (c) 2017-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -62,6 +62,10 @@ class View
      * @var string */
     protected $today_sql;
 
+    /** The calendar header string showing today's date, month, etc.
+     * @var string */
+    protected $today_str = '';
+
     /** View type (month, year, etc).
      * @var string */
     protected $type;
@@ -73,6 +77,20 @@ class View
     /** True to include date/range opt.
      * @var boolean */
     protected $inc_dt_sel= true;
+
+    protected $prev_date = array(
+        'year' => 0,
+        'month' => 0,
+        'day' => 0,
+    );
+
+    protected $next_date = array(
+        'year' => 0,
+        'month' => 0,
+        'day' => 0,
+    );
+
+    protected $disp_date = NULL;
 
 
     /**
@@ -120,7 +138,10 @@ class View
             $view = new $class($year, $month, $day, $cat, $cal, $opts);
         } else {
             // last-ditch error if $type isn't valid
-            COM_errorLog(__NAMESPACE__ . '\\' . __CLASS__ . '::' .__FUNCTION__ . "(): Unable to locate view  $class, using Month view");
+            COM_errorLog(
+                __NAMESPACE__ . '\\' . __CLASS__ . '::' .__FUNCTION__ .
+                "(): Unable to locate view  $class, using Month view"
+            );
             $view = new \Evlist\Views\monthView();
         }
         return $view;
@@ -150,6 +171,9 @@ class View
         $this->cal = (int)$cal;
         $this->opts = is_array($opts) ? $opts : array();
         $this->setSession();
+        $this->disp_date = new \Date(
+            sprintf('%d-%02d-%02d 00:00:00', $this->year, $this->month, $this->day)
+        );
     }
 
 
@@ -206,20 +230,36 @@ class View
         $range_options = EVLIST_GetOptions($LANG_EVLIST['ranges'], $this->range);
 
         // Figure out the add event link, depending on the view.
+            /*switch ($this->type) {
+            case 'day':         // Add the current day
+                $this->today_str = $this->today->format('F j, Y');
+                $T->set_var('addlink_day', $this->day);
+                break;
+            case 'week':
+                if (empty($this->today_str)) {
+                    // should be set by the weekView class
+                    $this->today_str = 'Week ' . $this->today->format('W');
+                }
+                break;
+            case 'month':
+                $this->today_str = $this->today->format('F, Y');
+                $T->set_var('addlink_month', $this->month);
+                break;
+            case 'year':
+                $this->today_str = $this->year;
+                $T->set_var('addlink_year', $this->year);
+                break;
+            case 'list':
+                $T->set_var('today_str', 'Upcoming Events');
+                break;
+        }*/
         if ($add_link && EVLIST_canSubmit()) {
             $add_event_link = EVLIST_URL . '/event.php';
-            switch ($this->type) {
-            case 'day':         // Add the current day
-                $T->set_var('addlink_day', $this->day);
-            case 'week':
-            case 'month':
-                $T->set_var('addlink_month', $this->month);
-            case 'year':
-                $T->set_var('addlink_year', $this->year);
-            }
         } else {
             $add_event_link = '';
         }
+        $T->set_var('today_str', $this->getDisplayDate());
+
         $T->set_var(array(
             'pi_url'    => EVLIST_URL,
             'year'      => $this->year,
@@ -228,6 +268,12 @@ class View
             'thisyear'  => $thisyear,
             'thismonth' => $thismonth,
             'thisday'   => $thisday,
+            'prevyear'  => $this->prev_date['year'],
+            'prevmonth' => $this->prev_date['month'],
+            'prevday'   => $this->prev_date['day'],
+            'nextyear'  => $this->next_date['year'],
+            'nextmonth' => $this->next_date['month'],
+            'nextday'   => $this->next_date['day'],
             'thisview'  => $this->type,
             'add_event_link' => $add_event_link,
             'add_event_text' => $LANG_EVLIST['add_event'],
@@ -240,7 +286,10 @@ class View
             'urlfilt_cat' => (int)$this->cat,
             'use_json' => 'true',
             'view'  => $this->type,
+            $this->type . '_sel' => 'selected="selected"',
+            'cal_checkboxes' => $this->getCalCheckboxes(),
         ) );
+
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
         $T->set_var('cal_select', Calendar::optionList($cal_selected, true, 2));
 
@@ -414,6 +463,35 @@ class View
     }
 
 
+    public function getDisplayDate()
+    {
+        global $LANG_EVLIST;
+
+        switch ($this->type) {
+        case 'day':         // Add the current day
+            $this->today_str = $this->disp_date->format('F j, Y');
+            break;
+        case 'week':
+            if (empty($this->today_str)) {
+                // Should be set in weekView class
+                $this->today_str = $LANG_EVLIST['periods']['week'] . ' ' .
+                    $this->disp_date->format('W');
+            }
+            break;
+        case 'month':
+            $this->today_str = $this->disp_date->format('F, Y');
+            break;
+        case 'year':
+            $this->today_str = $this->year;
+            break;
+        case 'list':
+            $this->today_str = 'Upcoming Events';
+            break;
+        }
+        return $this->today_str;
+    }
+
+
     /**
      * Render a complete calendar page.
      *
@@ -442,8 +520,8 @@ class View
         ) );
 
         $T->set_var(array(
-            'cal_header'    => $this->Header(),
             'calendar_content' => $this->Content(),
+            'cal_header'    => $this->Header(),
         ) );
         $T->parse('output', 'view');
         return $T->finish($T->get_var('output'));
@@ -528,15 +606,13 @@ class View
         if (!isset($event['cal_id'])) return;   // invalid calendar info
         if (!array_key_exists($event['cal_id'], $this->cal_used)) {
             $this->cal_used[$event['cal_id']] = array(
-                    'cal_name' => $event['cal_name'],
-                    'cal_ena_ical' => $event['cal_ena_ical'],
-                    'cal_id' => $event['cal_id'],
-                    'fgcolor' => $event['fgcolor'],
-                    'bgcolor' => $event['bgcolor'],
-                );
+                'cal_name' => $event['cal_name'],
+                'cal_ena_ical' => $event['cal_ena_ical'],
+                'cal_id' => $event['cal_id'],
+                'fgcolor' => $event['fgcolor'],
+                'bgcolor' => $event['bgcolor'],
+            );
         }
     }
 
 }
-
-?>

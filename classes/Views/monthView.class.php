@@ -3,9 +3,9 @@
  * Monthly View functions for the evList plugin.
  *
  * @author      Lee P. Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @copyright   Copyright (c) 2017-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -220,20 +220,31 @@ class monthView extends \Evlist\View
             $T->clear_var('dBlock');
         }
 
+        $this->prev_date = array(
+            'year' => $prevyear,
+            'month' => $prevmonth,
+            'day' => 1,
+        );
+        $this->next_date = array(
+            'year' => $nextyear,
+            'month' => $nextmonth,
+            'day' => 1,
+        );
         $T->set_var(array(
             'pi_url'        => EVLIST_URL,
             'thisyear'      => $this->year,
             'thismonth'     => $this->month,
-            'thismonth_str' => $LANG_MONTH[(int)$this->month],
-            'prevmonth'     => $prevmonth,
+            'thisday'       => $this->day,
+            //'thismonth_str' => $LANG_MONTH[(int)$this->month],
+            /*'prevmonth'     => $prevmonth,
             'prevyear'      => $prevyear,
             'nextmonth'     => $nextmonth,
-            'nextyear'      => $nextyear,
+            'nextyear'      => $nextyear,*/
             'urlfilt_cat'   => $this->cat,
             'urlfilt_cal'   => $this->cal,
-            'cal_header'    => $this->Header(),
+            //'cal_header'    => $this->Header(),
             'cal_footer'    => $this->Footer(),
-            'cal_checkboxes' => $this->getCalCheckboxes(),
+            //'cal_checkboxes' => $this->getCalCheckboxes(),
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
         ) );
@@ -243,5 +254,3 @@ class monthView extends \Evlist\View
     }
 
 }
-
-?>

@@ -72,7 +72,7 @@ class View
 
     /** Template option. `print` to create a printable view.
      * @var string */
-    protected $tpl_opt;
+    protected $tpl_opt = '';
 
     /** True to include date/range opt.
      * @var boolean */
@@ -181,10 +181,14 @@ class View
      * Set the 'print' value to be used in template selection.
      *
      * @param   boolean $on     True to use print template
+     * @return  object  $this
      */
     public function setPrint($on = true)
     {
-        $this->tpl_opt = $on ? 'print' : '';
+        if ($on) {
+            $this->tpl_opt = 'print';
+        }
+        return $this;
     }
 
 

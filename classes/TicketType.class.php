@@ -205,11 +205,11 @@ class TicketType
         global $_TABLES;
 
         $id = (int)$id;
-        if ($id <= 2 || self::isUsed($id)) {
+        if ($id < 2 || self::isUsed($id)) {
             // Can't delete the default type, or one that has been used.
             return false;
         } else {
-            DB_delete($_TABLES['evlist_tickettypes'], 'id', $id);
+            DB_delete($_TABLES['evlist_tickettypes'], 'tt_id', $id);
             return true;
         }
     }
@@ -326,7 +326,7 @@ class TicketType
             ),
             array(
                 'text' => $LANG_EVLIST['description'],
-                'field' => 'description',
+                'field' => 'dscp',
                 'sort' => true,
             ),
             array(
@@ -373,7 +373,7 @@ class TicketType
         $query_arr = array(
             'table' => 'evlist_tickettypes',
             'sql' => $sql,
-            'query_fields' => array('description'),
+            'query_fields' => array('dscp'),
         );
 
         $retval .= COM_createLink(

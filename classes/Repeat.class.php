@@ -856,8 +856,10 @@ class Repeat
                 // Try coordinates first, if present
                 if (!empty($lat) && !empty($lng)) {
                     $loc = array(
-                        'lat' => $lat,
-                        'lng' => $lng,
+                        'parts' => array(
+                            'lat' => $lat,
+                            'lng' => $lng,
+                        ),
                     );
                 } else {
                     // The postal code works best, but not internationally.
@@ -1040,6 +1042,15 @@ class Repeat
 
         $T->set_var('adblock', PLG_displayAdBlock('evlist_event', 0));
         $T->parse ('output','event');
+        PLG_callFunctionForOnePlugin(
+            'plugin_registerSmartResizer_lglib',
+            array(
+                1 => 'evlist_event',
+                2 => 'output',
+            )
+        );
+        PLG_templateSetVars('evlist_event', $T);
+
         $retval .= $T->finish($T->get_var('output'));
         return $retval;
     }

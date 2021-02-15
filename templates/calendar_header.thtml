@@ -6,8 +6,8 @@
     <a class="uk-button uk-button-primary" style="margin-right: 30px;" href="{pi_url}/index.php?view=today&amp;cal={urlfilt_cal}&amp;cat={urlfilt_cat}" title="{$LANG_EVLIST['jump_today']}">{$LANG_EVLIST['today']}</a>
     </div>
     <div class="uk-width-medium-2-6 uk-width-2-3" style="text-align:left;">
-    <i id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, {prevday}, '{view}');" style="margin-right:15px;" class="uk-icon-backward ev-icon-info"></i>
-    <i id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, {nextday}, '{view}');" style="margin-right:15px;" class="uk-icon-forward ev-icon-info"></i>
+    <i id="prev_href" onclick="javascript:ChangeDate({prevyear}, {prevmonth}, {prevday}, '{view}');" style="margin-right:15px;cursor:pointer;" class="uk-icon-backward ev-icon-info"></i>
+    <i id="next_href" onclick="javascript:ChangeDate({nextyear}, {nextmonth}, {nextday}, '{view}');" style="margin-right:15px;cursor:pointer;" class="uk-icon-forward ev-icon-info"></i>
     <span id="today_str" style="margin-top:3px;">{today_str}</span>
     </div>
     <div class="uk-width-medium-1-6 uk-width-1-3">

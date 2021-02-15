@@ -284,8 +284,11 @@ function plugin_getuseroption_evlist()
 
     $retval = array();
 
-    $add_option = array($LANG_EVLIST['add_event'],
-                EVLIST_URL . '/event.php?edit=x', 0);
+    $add_option = array(
+        $LANG_EVLIST['add_event'],
+        EVLIST_URL . '/event.php?edit=x',
+        0
+    );
 
     switch ($_EV_CONF['can_add']) {
     case 0:     // only admins can add events
@@ -303,9 +306,15 @@ function plugin_getuseroption_evlist()
         break;
     }
 
-    if (!COM_isAnonUser() &&
-        DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']) > 0) {
-        $retval[] = array('My Events', EVLIST_URL . '/index.php?view=myevents');
+    if (!COM_isAnonUser()) {
+        $count = DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']);
+        if ($count > 0) {
+            $retval[] = array(
+                $LANG_EVLIST['my_events'],
+                EVLIST_URL . '/index.php?view=myevents',
+                $count
+            );
+        }
     }
 
     return $retval;

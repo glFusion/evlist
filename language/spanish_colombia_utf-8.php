@@ -393,6 +393,10 @@ You may either move existing events to a new calendar, or delete those events.',
 'signup_list' => 'Signup List',
 'at_dscp_event' => 'Create a link to an event or the closest upcoming instance.',
 'at_dscp_evlist_signups' => 'Show a table of signups to authorized users.',
+'today' => 'Today',
+'back_to_cal' => 'Back to Calendar',
+'my_events' => 'My Events',
+'print_cal' => 'Print Calendar',
 );
 
 $LANG_EVLIST_HELP = array(

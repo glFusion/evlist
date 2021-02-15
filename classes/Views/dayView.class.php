@@ -208,6 +208,7 @@ class dayView extends \Evlist\View
             'cal_checkboxes'=> $this->getCalCheckboxes(),
             'site_name'     => $_CONF['site_name'],
             'site_slogan'   => $_CONF['site_slogan'],
+            'today_str'     => $this->getDisplayDate(),
         ) );
         return $T->parse('output', 'dayview');
     }

@@ -1,12 +1,13 @@
-{# begin {templatelocation} #}
+<!DOCTYPE html>
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
+<meta name="robots" content="noindex">
 </head>
 <body>
 <h2>{site_name}</h2>
 <center>
-  <h2 class="evlist_header">{date_range}</h2>
+  <h2 class="evlist_header">{today_str}</h2>
 </center>
 <table width="100%" cellspacing="0" border="0">
 <!-- BEGIN dayBlock -->
@@ -35,4 +36,3 @@
 {site_slogan}
 </body>
 </html>
-{# end {templatelocation} #}

@@ -1,13 +1,13 @@
-{# begin {templatelocation} #}
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="uk-height-1-1">
 <head>
-<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css"
-    media="print" />
+<link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" media="print" />
+<meta name="robots" content="noindex">
 </head>
 <body>
 <h2>{site_name}</h2>
 <center>
-  <h2 class="evlist_header">{currentday}</h2>
+  <h2 class="evlist_header">{today_str}</h2>
 </center>
 <table cellpadding="2" cellspacing="1" border="0" width="100%" class="cal-dayx-body">
     <tr>
@@ -116,4 +116,3 @@
 <i>{site_slogan}</i>
 </body>
 </html>
-{# end {templatelocation} #}

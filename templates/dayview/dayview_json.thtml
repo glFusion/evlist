@@ -105,7 +105,7 @@
 {quickadd_form}
 <div id="evlistCalendarPrintLink">
   <p>
-    <a href="{pi_url}/index.php?view=pday&amp;year={year}&amp;month={month}&amp;day={day}" target="_blank" title="Print">
+    <a href="{pi_url}/index.php?view=pday&amp;year={year}&amp;month={month}&amp;day={day}" target="_blank" title="{$LANG_EVLIST['print_cal']}" rel="nofollow noindex">
       <i class="uk-icon-print"></i>
     </a>
   </p>

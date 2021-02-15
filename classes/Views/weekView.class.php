@@ -211,6 +211,7 @@ class weekView extends \Evlist\View
             'year'          => $this->year,
             'month'         => $this->month,
             'day'           => $this->day,
+            'today_str'     => $this->getDisplayDate(),
         ) );
         $T->parse('output','week');
         return $T->finish($T->get_var('output'));

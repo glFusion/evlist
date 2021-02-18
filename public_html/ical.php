@@ -80,7 +80,7 @@ foreach ($events as $day) {
             "DTEND:$dtend\r\n" .
             "URL:$permalink\r\n" .
             "SUMMARY:$summary\r\n" .
-            "DESCRIPTION:$description\r\n" .
+            "$description\r\n" .    // already includes the DESCRIPTION tag
             "END:VEVENT\r\n";
     }
 }

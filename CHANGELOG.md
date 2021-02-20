@@ -22,6 +22,7 @@ Release TBD
 - Add nofollow and noindex tags to subscription and print links/pages.
 - Configurable key to hide repeating events from centerblock.
 - Condense header, better for small screens.
+- Fix iCal format for long descriptions.
 
 ## v1.4.5
 Release 2018-04-14

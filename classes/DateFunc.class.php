@@ -697,34 +697,33 @@ class DateFunc
      * @param   string  $year   Year in format CCYY, default current local year
      * @return  integer         Number of weeks or partial weeks
      */
-    public static function weeksInMonth($month=0, $year=0)
+    public static function weeksInMonth($month="",$year="")
     {
-        global $_CONF;
-
-        list($day, $month, $year) = self::validateParams(1, $month, $year);
-
-        // Set $dt to the beginning of the month and get the ISO week where it falls.
-        $dt = new \Date(sprintf('%d-%02d-%02d', $year, $month, 1), $_CONF['timezone']);
-        $startWeek = $dt->format('W');
-        if ($dt->format('w') == 0 && DATE_CALC_BEGIN_WEEKDAY == 0) {
-            // If the month starts on Sunday, and we're using Sunday as the
-            // week start, then increment startWeek (reducing the total weeks)
-            // since the W format assumes monday start.
-            $startWeek++;
+        if (empty($year)) {
+            $year = self::dateNow("%Y");
         }
-
-        // Set $dt to the end of the month and get the ISO week
-        $y = $dt->format('Y');
-        $m = $dt->format('m');
-        $dt->setDate($y, $m, cal_days_in_month(self::CAL, $m, $y));
-        $endWeek = $dt->format('W');
-
-        if ($startWeek > $endWeek) {    // wrapping around newyear
-            $weeks = (52 - $startWeek) + $endWeek + 1;
+        if (empty($month)) {
+            $month = self::dateNow("%m");
+        }
+        if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+            // starts on monday
+            if (self::firstOfMonthWeekday($month,$year) == 0) {
+                $first_week_days = 1;
+            } else {
+                $first_week_days = 7 - (self::firstOfMonthWeekday($month,$year) - 1);
+            }
+        } elseif (DATE_CALC_BEGIN_WEEKDAY == 6) {
+            // starts on saturday
+            if (self::firstOfMonthWeekday($month,$year) == 0) {
+                $first_week_days = 6;
+            } else {
+                $first_week_days = 7 - (self::firstOfMonthWeekday($month,$year) + 1);
+            }
         } else {
-            $weeks = $endWeek - $startWeek + 1;
+            // starts on sunday
+            $first_week_days = 7 - self::firstOfMonthWeekday($month,$year);
         }
-        return $weeks;
+        return ceil(((self::daysInMonth($month,$year) - $first_week_days) / 7) + 1);
     }
 
 

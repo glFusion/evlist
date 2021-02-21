@@ -233,32 +233,8 @@ class View
         $cat_options = Category::optionList($this->cat);
         $range_options = EVLIST_GetOptions($LANG_EVLIST['ranges'], $this->range);
 
-        // Figure out the add event link, depending on the view.
-            /*switch ($this->type) {
-            case 'day':         // Add the current day
-                $this->today_str = $this->today->format('F j, Y');
-                $T->set_var('addlink_day', $this->day);
-                break;
-            case 'week':
-                if (empty($this->today_str)) {
-                    // should be set by the weekView class
-                    $this->today_str = 'Week ' . $this->today->format('W');
-                }
-                break;
-            case 'month':
-                $this->today_str = $this->today->format('F, Y');
-                $T->set_var('addlink_month', $this->month);
-                break;
-            case 'year':
-                $this->today_str = $this->year;
-                $T->set_var('addlink_year', $this->year);
-                break;
-            case 'list':
-                $T->set_var('today_str', 'Upcoming Events');
-                break;
-        }*/
         if ($add_link && EVLIST_canSubmit()) {
-            $add_event_link = EVLIST_URL . '/event.php';
+            $add_event_link = EVLIST_URL . '/event.php?edit';
         } else {
             $add_event_link = '';
         }

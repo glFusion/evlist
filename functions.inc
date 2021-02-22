@@ -1549,6 +1549,7 @@ function EVLIST_getDocURL($file='', $doclang='english')
     $doc_url = '';
 
     if ($file != '') {
+        $file .= '.html';
         if (!file_exists($doc_path . $file)) {
             $doclang = 'english';
         }

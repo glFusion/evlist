@@ -608,6 +608,8 @@ function EVLIST_remove_old_files()
             'images/week_on.png',
             'images/year_off.png',
             'images/year_on.png',
+            'docs/english/event.legacy.html',
+            'docs/english/tickettype.legacy.html',
         ),
     );
 

@@ -223,8 +223,15 @@ class Ticket
 
     /**
      * Create a unique ticket ID.
+     * Takes an array of arguments that may contain some or all of:
+     * - event_id
+     * - repeat_id
+     * - fee
+     * - uid
+     * These are not used by this function, but if `CUSTOM_evlist_makeTicketId`
+     * is defined they are passed to it.
      *
-     * @param   array   $A      Array of values, non-indexed
+     * @param   array   $A      Array of indexed values.
      * @return  string          Ticket ID
      */
     public static function makeTicketId($A = array())
@@ -269,7 +276,14 @@ class Ticket
         $fee = (float)$fee;
         $type = (int)$type;
         $wl = $wl == 0 ? 0 : 1;
-        $tic_num = self::makeTicketId(array($ev_id, $rp_id, $fee, $uid));
+        $tic_num = self::makeTicketId(
+            array(
+                'event_id' => $ev_id,
+                'repeat_id' => $rp_id,
+                'fee' => $fee,
+                'uid' => $uid,
+            )
+        );
         if (!is_array($cmt) || empty($cmt)) {
             $cmt = array();
         }
@@ -312,7 +326,12 @@ class Ticket
 
         if ($this->tic_id == '') {
             $this->tic_id = self::makeTicketId(
-                array($this->ev_id, $this->rp_id, $this->fee, $this->uid)
+                array(
+                    'event_id' => $this->ev_id,
+                    'repeat_id' => $this->rp_id,
+                    'fee' => $this->fee,
+                    'uid' => $this->uid,
+                )
             );
             $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET
                 tic_id = '" . DB_escapeString($this->tic_id) . "',

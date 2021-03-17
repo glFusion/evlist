@@ -2,7 +2,7 @@
 <div class="monthview_allday show_cal{cal_id} event" 
     style="background-color:{bgcolor};display:{show}">
 {!if icon}
-  <i class="{icon}"></i>
+  <i class="{icon}" style="color:{fgcolor};"></i>
 {!endif}
 {!if ev_url}
   <a href="{ev_url}" target="_blank"

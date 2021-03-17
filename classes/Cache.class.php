@@ -123,6 +123,4 @@ class Cache
         return $retval;
     }
 
-}   // class Evlist\Cache
-
-?>
+}

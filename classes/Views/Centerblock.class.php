@@ -262,6 +262,7 @@ class Centerblock
                     'enddate'   => EVLIST_formattedDate($e_ts1),
                     'starttime1' => EVLIST_formattedTime($s_ts1),
                     'endtime1'  => EVLIST_formattedTime($e_ts1),
+                    'allday'    => $A['allday'],
                     'adblock'   => PLG_displayAdBlock('evlist_centerblock', $count),
                 ) );
                 if (isset($A['split']) && $A['split'] == 1) {

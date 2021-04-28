@@ -1,0 +1,7 @@
+{# begin {templatelocation} #}
+{$LANG_EVLIST['admin_rsvp']}&nbsp;&nbsp;
+{!if can_print}
+<a href="{site_url}/evlist/index.php?view=printtickets&eid={ev_id}" class="uk-button uk-button-primary uk-button-small" target="_blank">{$LANG_EVLIST['print_tickets']}</a>&nbsp;&nbsp;
+{!endif}
+<a href="{site_url}/evlist/index.php?view=exporttickets&eid={rp_id}" class="uk-button uk-button-primary uk-button-small">{$LANG_EVLIST['export_list']}</a>
+{# end {templatelocation} #}

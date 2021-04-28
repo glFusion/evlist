@@ -1,0 +1,13 @@
+{# begin {templatelocation} #}
+<button type="submit" class="uk-button uk-button-mini uk-button-danger"
+	onclick="return confirm('{$LANG_EVLIST['conf_del_item']}');"
+	name="tickdelete">{$LANG_ADMIN['delete']}</button>&nbsp;&nbsp;
+<button type="submit" class="uk-button uk-button-mini"
+	onclick="return confirm('{$LANG_EVLIST['conf_reset']}');"
+	name="tickreset">{$LANG_EVLIST['reset_usage']}</button>&nbsp;&nbsp;
+{!if can_print}
+<button type="submit" class="uk-button uk-button-mini uk-button-primary"
+	name="tickprint">{$LANG_EVLIST['print']}</button>
+{!endif}
+<input type="hidden" name="ev_id" value="{rp_id}"/>
+{# end {templatelocation} #}

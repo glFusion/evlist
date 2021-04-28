@@ -3,7 +3,7 @@
  * Class to manage tickets and registrations.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
  * @version     v1.5.0
  * @since       v1.4.0
@@ -512,14 +512,17 @@ class Ticket
      */
     public static function printSelected($tic_ids)
     {
-        foreach ($tic_ids as $id) {
-            $tic = new self($id);
-            if ($tic->getID() != '') {
-                $tickets[$tic->getID()] = $tic;
+        if (is_array($tic_ids)) {
+            // Could be NULL if no tickets selected
+            foreach ($tic_ids as $id) {
+                $tic = new self($id);
+                if ($tic->getID() != '') {
+                    $tickets[$tic->getID()] = $tic;
+                }
             }
-        }
-        if (!empty($tickets)) {
-            return self::_printTickets($tickets);
+            if (!empty($tickets)) {
+                return self::_printTickets($tickets);
+            }
         }
     }
 
@@ -1186,19 +1189,21 @@ class Ticket
                 ON u.uid = tk.uid
             WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
 
-        $title = $LANG_EVLIST['admin_rsvp'] .
-            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=printtickets&eid=' . $Ev->getEventID() .
-            '" class="uk-button uk-button-primary uk-button-small" target="_blank">' . $LANG_EVLIST['print_tickets'] . '</a>' .
-            '&nbsp;&nbsp;<a href="'.EVLIST_URL .
-            '/index.php?view=exporttickets&eid=' . $Ev->getID() .
-            '" class="uk-button uk-button-primary uk-button-small">' . $LANG_EVLIST['export_list'] . '</a>';
-
         if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
             $sql .= " AND rp_id = '{$Ev->getID()}' ";
         }
 
         $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
+
+        $T = new \Template(EVLIST_PI_PATH . '/templates');
+        $T->set_file('rsvp_header', 'rsvp_header.thtml');
+        $T->set_var(array(
+            'can_print' => $Ev->getEvent()->getOption('rsvp_print'),
+            'ev_id' => $Ev->getEventID(),
+            'rp_id' => $Ev->getID(),
+        ) );
+        $T->parse('output', 'rsvp_header');
+        $title = $T->finish($T->get_var('output'));
         $text_arr = array(
         'has_menu'     => false,
         'has_extras'   => false,
@@ -1260,25 +1265,20 @@ class Ticket
             'cmt_count' => count($prompts),
         );
 
+        $T = new \Template(EVLIST_PI_PATH . '/templates');
+        $T->set_file('rsvp_footer', 'rsvp_footer.thtml');
+        $T->set_var(array(
+            'can_print' => $Ev->getEvent()->getOption('rsvp_print'),
+            'rp_id' => $Ev->getID(),
+        ) );
+        $T->parse('output', 'rsvp_footer');
+        $chkactions = $T->finish($T->get_var('output'));
         $options_arr = array(
             'chkdelete' => true,
             'chkfield'  => 'tic_id',
             'chkname'   => 'delrsvp',
-            'chkactions' =>
-                '<button type="submit" '
-                . 'class="uk-button uk-button-mini uk-button-danger" '
-                . 'onclick="return confirm(\'' . $LANG_EVLIST['conf_del_item'] . '\');" '
-                . 'name="tickdelete">' . $LANG_ADMIN['delete'] . '</button>'
-                . '&nbsp;&nbsp;<button type="submit" '
-                . 'class="uk-button uk-button-mini" '
-                . 'onclick="return confirm(\'' . $LANG_EVLIST['conf_reset'] . '\');" '
-                . 'name="tickreset">' . $LANG_EVLIST['reset_usage'] . '</button>'
-                . '&nbsp;&nbsp;<button type="submit" '
-                . 'class="uk-button uk-button-mini uk-button-primary" '
-                . 'name="tickprint">' . $LANG_EVLIST['print'] . '</button>'
-                . '<input type="hidden" name="ev_id" value="' . $rp_id . '"/>',
+            'chkactions' => $chkactions,
         );
-
         $query_arr = array(
             'sql'       => $sql,
         );
@@ -1376,6 +1376,4 @@ class Ticket
         return substr(bin2hex($bytes), 0, $len);
     }
 
-}   // class Ticket
-
-?>
+}

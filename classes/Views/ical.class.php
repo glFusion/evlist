@@ -12,6 +12,7 @@
  * @filesource
  */
 namespace Evlist\Views;
+use Evlist\Calendar;
 
 
 /**
@@ -132,7 +133,7 @@ class ical extends \Evlist\View
             }
         }
         if (isset($opts['cal'])) {
-            $Cal = Evlist\Calendar::getInstance($opts['cal']);
+            $Cal = Calendar::getInstance($opts['cal']);
             $dscp = $Cal->getName();
         } else {
             $dscp = $LANG_EVLIST['events'];

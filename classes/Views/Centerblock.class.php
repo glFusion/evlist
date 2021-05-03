@@ -120,13 +120,15 @@ class Centerblock
             // no limit by days.
             $cb_max_date = '9999-12-31';
         }
+        $dup_chk = $_EV_CONF['cb_dup_chk'];
 
+        // If checking for duplicates, get all events in the range since
+        // we don't know how many dups there will be.
         $opts = array(
-            'limit' => $limit,
+            'limit' => empty($dup_chk) ? $limit : 0,
             'show_upcoming' => 1,
         );
 
-        $dup_chk = $_EV_CONF['cb_dup_chk'];
         $Y = $_CONF['_now']->format('Y');
         $D = $_CONF['_now']->format('d');
         $M = $_CONF['_now']->format('m');

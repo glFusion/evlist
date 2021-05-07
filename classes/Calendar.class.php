@@ -3,9 +3,9 @@
  * Class to manage calendars.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.0
+ * @version     v1.5.1
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -299,8 +299,8 @@ class Calendar
             ) ),
             'fg_inherit_chk' => $this->fgcolor == '' ? EVCHECKED : '',
             'bg_inherit_chk' => $this->bgcolor == '' ? EVCHECKED : '',
-            'icon'              => $this->cal_icon,
-            'disp_icon'          => EVLIST_getIcon($this->cal_icon),
+            'icon'          => $this->cal_icon,
+            'disp_icon'     => Icon::getIcon($this->cal_icon),
             'orderby_sel'   => $orderby_sel,
             'orderby'       => $this->orderby,
         ) );

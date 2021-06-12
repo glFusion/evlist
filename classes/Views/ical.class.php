@@ -13,6 +13,7 @@
  */
 namespace Evlist\Views;
 use Evlist\Calendar;
+use Evlist\Models\EventSet;
 
 
 /**
@@ -62,20 +63,24 @@ class ical extends \Evlist\View
         // Set up the period to export- now + 1 year
         $start = sprintf('%d-%02d-%02d', $this->year-1, $this->month, $this->day);
         $end = sprintf('%d-%02d-%02d', $this->year+1, $this->month, $this->day);
+        $EventSet = EventSet::create()
+            ->withStart($start)
+            ->withEnd($end);
+
         $opts = array('ical' => 1);
         if (isset($_GET['cal']) && !empty($_GET['cal'])) {
             // Get only a specific calendar
-            $opts['cal'] = (int)$_GET['cal'];
+            $EventSet->withCalendar($_GET['cal']);
         }
         if (isset($_GET['rp_id']) && !empty($_GET['rp_id'])) {
             // Get a single event
-            $opts['rp_id'] = (int)$_GET['rp_id'];
+            $EventSet->withRepeat($_GET['rp_id']);
         }
 
         $domain = preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
         $this->rev .= '@' . $domain;
 
-        $events = EVLIST_getEvents($this->today, $end, $opts);
+        $events = $EventSet->getEvents();
         $ical = '';
         $rp_shown = array();
         foreach ($events as $day) {

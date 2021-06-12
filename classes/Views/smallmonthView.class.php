@@ -12,6 +12,8 @@
  */
 namespace Evlist\Views;
 use Evlist\DateFunc;
+use Evlist\Models\EventSet;
+
 
 /**
  * Class to create a small single-month claender view.
@@ -41,8 +43,12 @@ class smallmonthView extends \Evlist\View
         $starting_date = $calendarView[0][0];
         $ending_date = $calendarView[$x][$y];
 
-        $events = EVLIST_getEvents($starting_date, $ending_date,
-                array('cat'=>$this->cat, 'cal'=>$this->cal));
+        $events = EventSet::create()
+            ->withStart($starting_date)
+            ->withEnd($ending_date)
+            ->withCategory($this->cat)
+            ->withCalendar($this->cal)
+            ->getEvents();
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
         $T->set_file(array(

@@ -1,44 +1,12 @@
 <?php
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | event.php                                                                |
-// |                                                                          |
-// | Event management routines                                                |
-// +--------------------------------------------------------------------------+
-// | Copyright (C) 2008=2010 by the following authors:                        |
-// |                                                                          |
-// | Mark R. Evans          mark AT glfusion DOT org                          |
-// |                                                                          |
-// | Based on the evList Plugin for Geeklog CMS                               |
-// | Copyright (C) 2007 by the following authors:                             |
-// |                                                                          |
-// | Authors: Alford Deeley     - ajdeeley AT summitpages.ca                  |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
 /**
-*   Event display function for the evList plugin
+*   Event display function for the evList plugin.
 *
 *   @author     Mark R. Evans mark AT glfusion DOT org
 *   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2010 - 2017 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
 *   @package    evlist
-*   @version    1.4.3
+*   @version    1.5.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -335,11 +303,11 @@ case 'clone':
     if (isset($_GET['eid'])) {
         EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
         $Ev = Evlist\Event::getInstance($_GET['eid']);
-        if ($Ev->id == '' || !$Ev->canEdit())      // Event not found
+        if ($Ev->getID() == '' || !$Ev->canEdit())      // Event not found
             break;
         // Now prep it to be saved as a new record
-        $Ev->id = '';
-        $Ev->isNew = true;
+        $Ev->setID('');
+        $Ev->forceNew();
         $add_link = false;
         $content .= $Ev->Edit();
     }

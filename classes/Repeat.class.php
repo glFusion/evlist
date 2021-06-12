@@ -482,7 +482,7 @@ class Repeat
         ) );
 
         USES_lib_social();
-        $permalink = COM_buildUrl(EVLIST_URL . '/event.php?view=event&eid=' . $this->Event->getID());
+        $permalink = COM_buildUrl(EVLIST_URL . '/view.php?&rid=0&eid=' . $this->Event->getID());
         $ss = $this->getShareIcons($permalink);
 
         $Detail = $this->Event->getDetail();
@@ -1374,12 +1374,28 @@ class Repeat
     }   // function DeleteFuture()
 
 
+    /**
+     * Updates all future repeates from this one.
+     * Sets the times to new values, but leaves the dates alone.
+     *
+     * @return  object  $this
+     */
     public function updateFuture()
     {
         global $_TABLES;
 
-        $sql = "UPDATE {$_TABLES['evlist_repeat']}
-            SET rp_det_id = '{$this->getDetailID()}'
+        $time_end1 = DB_escapeString($this->time_end1);
+        $time_end2 = DB_escapeString($this->time_end2);
+        $t_end = $this->Event->isSplit() ? $time_end2 : $time_end1;
+
+        $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+            rp_det_id = '{$this->getDetailID()}',
+            rp_time_start1 = '{$this->time_start1}',
+            rp_time_end1 = '{$this->time_end1}',
+            rp_time_start2 = '{$this->time_start2}',
+            rp_time_end2 = '{$this->time_end2}',
+            rp_start = CONCAT(rp_date_start, ' ', '{$this->time_start1}'),
+            rp_end = CONCAT(rp_date_end, ' ', '{$t_end}')
             WHERE rp_date_start >= '{$this->getDateStart1()->toMySQL(true)}'
             AND rp_ev_id = '{$this->getEventID()}'";
         DB_query($sql);

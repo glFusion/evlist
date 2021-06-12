@@ -126,10 +126,11 @@
 </div>
 
 <div class="uk-grid" style="clear:both;padding-top:10px;">
+	<div id="evlistEventDetail"
 {!if map}
-	<div id="evlistEventDetail" class="uk-width-1-1 uk-width-medium-1-2 uk-width-large-3-5">
+		class="uk-width-1-1 uk-width-medium-1-2 uk-width-large-3-5">
 {!else}
-	<div class="uk-width-1-1">
+		class="uk-width-1-1">
 {!endif}
 
 {# event detail elements #}

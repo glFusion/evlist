@@ -13,6 +13,8 @@
 namespace Evlist\Views;
 use Evlist\DateFunc;
 use Evlist\Menu;
+use Evlist\Models\EventSet;
+
 
 /**
  * Create a list of events.
@@ -70,16 +72,21 @@ class listView extends \Evlist\View
         ) );
 
         $page = empty($_GET['page']) ? 1 : (int)$_GET['page'];
-        $opts = array(
+        $EventSet = EventSet::create()
+            ->withCategory($this->cat)
+            ->withCalendar($this->cal)
+            ->withPage($this->page);
+
+        /*$opts = array(
                 'cat'   => $this->cat,
                 'page'  => $page,
                 'cal'   => $this->cal,
-            );
+        );*/
         switch ($this->range) {
         case 1:         // past
             $start = EV_MIN_DATE;
             $end = $_EV_CONF['_now']->toMySQL(true);
-            $opts['order'] = 'DESC';
+            $EventSet->withOrder('DESC');
             break;
         case 3:         //this week
             $start = DateFunc::beginOfWeek();
@@ -94,17 +101,18 @@ class listView extends \Evlist\View
             break;
         case 2:         //upcoming
         default:
-            $opts['upcoming'] = true;
+            $EventSet->withUpcoming(true);
             $start = $_EV_CONF['_today'];
             $dt = new \Date($_EV_CONF['_today_ts'] + (86400 * $_EV_CONF['max_upcoming_days']), $_CONF['timezone']);
             $end = $dt->format('Y-m-d', true);
             break;
         }
 
-        $events = EVLIST_getEvents($start, $end, $opts);
+        $events = $EventSet->withStart($start)
+                           ->withEnd($end)
+                           ->withLimit($_EV_CONF['limit_list'])
+                           ->getEvents();
         $total_events = count($events);
-        $opts['limit'] = $_EV_CONF['limit_list'];
-        $events = EVLIST_getEvents($start, $end, $opts);
 
         if (!empty($this->cat)) {
             $andcat = '&amp;cat=' . $this->cat;
@@ -139,21 +147,8 @@ class listView extends \Evlist\View
 
                     // Prepare the link to the event, internal for internal
                     // events, new window for meetup events
-                    $url = '';
                     $url_attr = array();
-                    switch ($A['cal_id']) {
-                    case -1:
-                        if (!empty($A['url'])) {
-                            // This is a meetup event with a URL
-                            $url = COM_buildURL($A['url']);
-                            $url_attr = array('target' => '_blank');
-                        }
-                        break;
-                    default:
-                        $url = COM_buildURL(EVLIST_URL . '/event.php?view=repeat&eid=' .
-                            $A['rp_id'] . $andcat);
-                        $url_attr = array();
-                    }
+                    $url = COM_buildURL(EVLIST_URL . '/view.php?&rid=' . $A['rp_id']);
                     $title = COM_stripslashes($A['title']);
                     if (!empty($url)) {
                         $titlelink = COM_createLink($title, $url, $url_attr);

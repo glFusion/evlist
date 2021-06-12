@@ -255,8 +255,7 @@ function service_emailReceiptInfo_evlist($args, &$output, &$svc_msg)
     $item_num = $args['item_id'][1];
     $item_parts = explode('/', $item_num);
 
-    $url = EVLIST_URL . '/event.php?view=instance&eid=' . $item_parts[2];
+    $url = EVLIST_URL . '/view.php?rid=' . $item_parts[2];
+    $url = COM_buildUrl($url);
     $output = 'You can print your tickets at <a href="' . $url . '">' . $url . '</a>.';
 }
-
-?>

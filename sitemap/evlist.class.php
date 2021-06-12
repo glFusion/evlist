@@ -83,7 +83,8 @@ class sitemap_evlist extends sitemap_base
                 'id'        => $A['id'],
                 'title'     => $A['title'],
                 'uri'       => COM_buildURL(
-                    $_CONF['site_url'] . '/evlist/event.php?view=event&eid=' . $A['id']),
+                    $_CONF['site_url'] . '/evlist/view.php?rid=0&eid=' . $A['id']
+                ),
                 'date'      => $A['day'],
                 'image_uri' => false,
             );

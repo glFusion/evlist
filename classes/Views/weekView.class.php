@@ -13,6 +13,8 @@
 namespace Evlist\Views;
 use Evlist\DateFunc;
 use Evlist\Icon;
+use Evlist\Models\EventSet;
+
 
 /**
  * Create a weekly view calendar.
@@ -70,13 +72,12 @@ class weekView extends \Evlist\View
         ) );
 
         $daynames = self::DayNames();
-        $events = EVLIST_getEvents(
-            $start_date, $end_date,
-            array(
-                'cat'=>$this->cat,
-                'cal'=>$this->cal,
-            )
-        );
+        $events = EventSet::create()
+            ->withStart($start_date)
+            ->withEnd($end_date)
+            ->withCategory($this->cat)
+            ->withCalendar($this->cal)
+            ->getEvents();
 
         $start_mname = $LANG_MONTH[(int)$sMonth+12];
         $last_date = getdate($dtStart->toUnix() + (86400 * 6));
@@ -173,16 +174,8 @@ class weekView extends \Evlist\View
                     'fgcolor'       => $A['fgcolor'],
                     'show'      => $this->getCalShowPref($A['cal_id']) ? 'block' : 'none',
                     'icon'      => Icon::getIcon($A['cal_icon']),
+                    'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?id=' . $A['rp_id']),
                 ) );
-                switch ($A['cal_id']) {
-                case -1:
-                    $T->set_var('ev_url', $A['url']);
-                    break;
-                default:
-                    $T->clear_var('ev_url');
-                    $T->set_var('bgcolor', '');
-                    break;
-                }
                 $T->parse('event', 'event', false);
                 $T->parse('eBlk', 'eventBlock', true);
             }

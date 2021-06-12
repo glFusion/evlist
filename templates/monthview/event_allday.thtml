@@ -1,14 +1,8 @@
 {# begin {templatelocation} #}
-<div class="monthview_allday show_cal{cal_id} event" 
-    style="background-color:{bgcolor};display:{show}">
+<div class="monthview_allday show_cal{cal_id} event"  style="background-color:{bgcolor};display:{show}">
 {!if icon}
-  <i class="{icon}" style="color:{fgcolor};"></i>
+	<i class="{icon}" style="color:{fgcolor};"></i>
 {!endif}
-{!if ev_url}
-  <a href="{ev_url}" target="_blank"
-{!else}
-  <a href="{pi_url}/event.php?view=instance&eid={eid}&amp;cat={cat_id}&amp;cal={cal_id_url}"
-{!endif}
-    data-uk-tooltip={cls:'evTooltip'} title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
+	<a href="{ev_url}" class="tooltip" title="{ev_hover}" style="color:{fgcolor};">{ev_title}</a>
 </div>
 {# end {templatelocation} #}

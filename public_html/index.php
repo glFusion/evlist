@@ -161,7 +161,7 @@ case 'printtickets':
             exit;
         } else {
             COM_setMsg($LANG_EVLIST['no_tickets_print']);
-            COM_refresh(EVLIST_URL . '/event.php?view=event&eid=' . $eid);
+            COM_refresh(COM_buildUrl(EVLIST_URL . '/view.php?rid=0&eid=' . $eid));
         }
     } else {
         $content .= 'Function not available';
@@ -316,7 +316,7 @@ function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
         $retval = COM_createLink(
             $fieldvalue,
             COM_buildUrl(
-                EVLIST_URL . '/event.php?view=event&eid=' . $fieldvalue
+                EVLIST_URL . '/view.php?&id=0&eid=' . $fieldvalue
             )
         );
         break;

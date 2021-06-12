@@ -71,7 +71,7 @@ class signups
         if ($link) {
             $caption = COM_createLink(
                 $caption,
-                EVLIST_URL . '/event.php?view=instance&eid=' . $autotag['parm1']
+                EVLIST_URL . '/view.php?rid=' . $autotag['parm1']
             );
         }
         $retval = \Evlist\Ticket::userList_RSVP($autotag['parm1'], $caption);

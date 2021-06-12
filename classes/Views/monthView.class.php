@@ -13,6 +13,8 @@
 namespace Evlist\Views;
 use Evlist\DateFunc;
 use Evlist\Icon;
+use Evlist\Models\EventSet;
+
 
 /**
  * Display a monthly calendar.
@@ -57,14 +59,12 @@ class monthView extends \Evlist\View
         $starting_date = $calendarView[0][0];
         $ending_date = $calendarView[$x][$y];
         $daynames = self::DayNames();
-        $events = EVLIST_getEvents(
-            $starting_date,
-            $ending_date,
-            array(
-                'cat'=>$this->cat,
-                'cal'=>$this->cal,
-            )
-        );
+        $events = EventSet::create()
+            ->withStart($starting_date)
+            ->withEnd($ending_date)
+            ->withCategory($this->cat)
+            ->withCalendar($this->cal)
+            ->getEvents();
 
         $nextmonth = $this->month + 1;
         $nextyear = $this->year;
@@ -180,22 +180,14 @@ class monthView extends \Evlist\View
                         'fgcolor'   => $event['fgcolor'],
                         'bgcolor'   => $event['bgcolor'],
                         'pi_url'    => EVLIST_URL,
+                        'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?id=' . $event['rp_id']),
                         'show'      => $this->getCalShowPref($event['cal_id']) ? 'block' : 'none',
                         'icon'      => Icon::getIcon($event['cal_icon']),
                     ) );
-                    switch ($event['cal_id']) {
-                    case -1:
-                        $T->set_var('ev_url', $event['url']);
+                    if ($event['allday'] == 1) {
+                        $dayentries .= $T->parse('output', 'allday_event', true);
+                    } else {
                         $dayentries .= $T->parse('output', 'timed_event', true);
-                        break;
-                    default:
-                        $T->clear_var('ev_url');
-                        if ($event['allday'] == 1) {
-                            $dayentries .= $T->parse('output', 'allday_event', true);
-                        } else {
-                            $dayentries .= $T->parse('output', 'timed_event', true);
-                        }
-                        break;
                     }
                 }
 

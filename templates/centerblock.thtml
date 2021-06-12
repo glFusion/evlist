@@ -18,7 +18,7 @@
 <!-- BEGIN eventRow -->
     <div class="uk-grid uk-grid-match uk-width-1-1 uk-match ev-cb-table evCBcontent">
         <div class="uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
-            <a href="{pi_url}/event.php?view=instance&rp_id={eid}">{title}</a>
+            {ev_link}
         </div>
         <div class="uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
             {summary}

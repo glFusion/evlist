@@ -12,6 +12,7 @@
  */
 namespace Evlist\Views;
 use Evlist\Icon;
+use Evlist\Models\EventSet;
 
 
 /**
@@ -64,10 +65,12 @@ class dayView extends \Evlist\View
             'event'     => 'singleevent.thtml',
             'dayview'   => $tpl . '.thtml',
         ) );
-        $events = EVLIST_getEvents(
-            $today_sql, $today_sql,
-            array('cat'=>$this->cat, 'cal'=>$this->cal)
-        );
+        $events = EventSet::create()
+            ->withStart($today_sql)
+            ->withEnd($today_sql)
+            ->withCategory($this->cat)
+            ->withCalendar($this->cal)
+            ->getEvents();
         list($allday, $hourly) = $this->getViewData($events);
 
         // Get allday events
@@ -88,15 +91,8 @@ class dayView extends \Evlist\View
                     'br'            => $i < $alldaycount ? '<br />' : '',
                     'show'      => self::getCalShowPref($A['cal_id']) ? 'block' : 'none',
                     'icon'      => Icon::getIcon($A['cal_icon']),
+                    'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?id=' . $A['rp_id']),
                 ) );
-                switch ($A['cal_id']) {
-                case -1:
-                    $T->set_var('ev_url', $A['url']);
-                    break;
-                default:
-                    $T->clear_var('ev_url');
-                    break;
-                }
                 $T->parse('allday_events', 'event', true);
                 next($allday);
             }
@@ -151,14 +147,8 @@ class dayView extends \Evlist\View
                     'event_time'    => $start_time . ' - ' . $end_time,
                     'show'      => self::getCalShowPref($A['data']['cal_id']) ? 'block' : 'none',
                     'icon'      => Icon::getIcon($A['data']['cal_icon']),
+                    'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?id=' . $A['data']['rp_id']),
                 ) );
-                // Only evlist and meetup events are hourly, birthdays are
-                // handled as allday events above.
-                if ($A['data']['cal_id'] == -1) {
-                    $T->set_var('ev_url', $A['data']['url']);
-                } else {
-                    $T->clear_var('ev_url');
-                }
 
                 if ($j < $numevents) {
                     $T->set_var('br', '<br />');

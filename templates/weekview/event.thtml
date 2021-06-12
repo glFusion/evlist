@@ -1,21 +1,17 @@
 {# begin {templatelocation} #}
-  <span data-uk-tooltip="{cls:'evTooltip'}" title="{event_summary}">
-  {event_times}
+<span data-uk-tooltip="{cls:'evTooltip'}" title="{event_summary}">
+	{event_times}
 {!if bgcolor}
-  <span style="color:#000;background-color:{bgcolor};">
+	<span style="color:#000;background-color:{bgcolor};">
 {!endif}
-    <a class="cal-event" style="color:{fgcolor};"
-{!if ev_url}
-    href="{ev_url}" target="_blank">
-{!else}
-    href="{site_url}/evlist/event.php?view=instance&eid={event_id}">
-{!endif}
+		<a class="cal-event" style="color:{fgcolor};" href="{ev_url}">
 {!if icon}
-    <i class="{icon}"></i>
+			<i class="{icon}"></i>
 {!endif}
-    {event_title}</a>
+			{event_title}
+		</a>
 {!if bgcolor}
-  </span>
+	</span>
 {!endif}
-  </span>{br}
+</span>{br}
 {# end {templatelocation} #}

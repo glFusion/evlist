@@ -14,6 +14,7 @@
 namespace Evlist\Views;
 use Evlist\View;
 use Evlist\Cache;
+use Evlist\Models\EventSet;
 
 
 /**
@@ -22,7 +23,7 @@ use Evlist\Cache;
  */
 class Centerblock
 {
-    
+
     /**
      * Create the centerblock.
      *
@@ -122,12 +123,16 @@ class Centerblock
         }
         $dup_chk = $_EV_CONF['cb_dup_chk'];
 
-        // If checking for duplicates, get all events in the range since
+        $EventSet = EventSet::create()
+            ->withLimit(empty($dup_chk) ? $limit : 0)
+            ->withUpcoming(1);
+
+        /*// If checking for duplicates, get all events in the range since
         // we don't know how many dups there will be.
         $opts = array(
             'limit' => empty($dup_chk) ? $limit : 0,
             'show_upcoming' => 1,
-        );
+        );*/
 
         $Y = $_CONF['_now']->format('Y');
         $D = $_CONF['_now']->format('d');
@@ -137,11 +142,11 @@ class Centerblock
             $start = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 month"));
             $end = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 day"));
             $limit = 0;     // special, we need to get all events since we can't count back
-            $opts['order'] = 'DESC';
+            $EventSet->withOrder('DESC');
             break;
         case 2:         // upcoming events
         default:
-            $opts['upcoming'] = true;
+            $EventSet->withUpcoming(true);
             $start = $_EV_CONF['_today'];
             $end = $cb_max_date;
             break;
@@ -160,7 +165,10 @@ class Centerblock
             $_EV_CONF['cb_dup_chk'];
         $events = Cache::get($cache_key);
         if ($events === NULL) {
-            $events = EVLIST_getEvents($start, $end, $opts);
+            $events = $EventSet
+                ->withStart($start)
+                ->withEnd($end)
+                ->getEvents();
             Cache::set($cache_key, $events, 'evlistcb');
         }
         if (empty($events) || !is_array($events)) {
@@ -242,6 +250,20 @@ class Centerblock
                 } else {
                     $full_dscp = $A['full_description'];
                 }
+                if (isset($A['url']) && !empty($url)) {
+                    $ev_link = COM_createLink(
+                        $A['title'],
+                        $A['url'],
+                        array(
+                            'target' => '_blank',
+                        )
+                    );
+                } else {
+                    $ev_link = COM_createLink(
+                        $A['title'],
+                        COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id']),
+                    );
+                }
 
                 $T->set_var(array(
                     'cssid'     => $cssid,
@@ -253,7 +275,7 @@ class Centerblock
                     'full_dscp' => $full_dscp,
                     'contact'   => isset($A['contact']) ? $A['contact'] : '',
                     'location'  => isset($A['location']) ? $A['location'] : '',
-                    'ev_url'    => isset($A['url']) ? $A['url'] : '',
+                    'ev_link'   => $ev_link,
                     'street'    => isset($A['street']) ? $A['street'] : '',
                     'city'      => isset($A['city']) ? $A['city'] : '',
                     'province'  => isset($A['province']) ? $A['province'] : '',

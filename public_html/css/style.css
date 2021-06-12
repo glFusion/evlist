@@ -94,7 +94,7 @@
 }
 
 #evlistEvent div.evEventItem {
-    /*padding-top: 15px;*/
+    padding-top: 15px;
     clear: left;
 }
 
@@ -103,6 +103,7 @@
     float: left;
     font-weight: bold;
     width: 100px;
+	padding-right: 1em;
 }
 
 #evlistEvent {
@@ -783,4 +784,10 @@ div.evCBouter {
 }
 div#evlist_signups {
     margin-top: 15px;
+}
+
+/* next and previous links on calendar pages */
+i#next_href, i#prev_href {
+	margin-right: 10px;
+	cursor: pointer;
 }

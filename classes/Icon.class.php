@@ -55,7 +55,7 @@ class Icon
         if (array_key_exists($str, self::$icons)) {
             return self::$icons[$str];
         } else {
-            return 'uk-icon-' . $str;
+            return 'uk-icon uk-icon-' . $str;
         }
     }
 
@@ -87,5 +87,3 @@ class Icon
     }
 
 }
-
-?>

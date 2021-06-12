@@ -11,7 +11,7 @@
  *              GNU Public License v2 or later
  * @filesource
  */
-namespace Evlist;
+namespace Evlist\Models;
 
 
 /**
@@ -20,7 +20,7 @@ namespace Evlist;
  */
 class Syndication
 {
-    
+
     /**
      * Get content for the syndication feeds.
      *
@@ -59,11 +59,12 @@ class Syndication
         }
 
         // Get all upcoming events
-        $events = EVLIST_getEvents(
-            $_EV_CONF['_today'],
-            date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
-            array('cat'=>$F['topic'], 'limit'=>$limit)
-        );
+        $events = EventSet::create()
+            ->withStart($_EV_CONF['_today'])
+            ->withEnd(date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])))
+            ->withCategory($F['topic'])
+            ->withLimit($limit)
+            ->getEvents();
 
         $rp_shown = array();    // Store repeat ids to avoid dups
         foreach ($events as $daydata) {
@@ -77,7 +78,7 @@ class Syndication
                     continue;
                 }
                 $rp_shown[$event['rp_id']] = 1;
-    
+
                 $url = EVLIST_URL . '/event.php?eid=' . urlencode($event['rp_id']);
                 $postmode = $event['postmode'] == '2' ? 'html' : 'plaintext';
                 if ($event['postmode'] == '1' ) {       //plaintext
@@ -122,7 +123,7 @@ class Syndication
         return $content;
     }
 
-    
+
     /**
      * Get the names of RSS feeds that are provided.
      * For evList this is a list of topics
@@ -172,13 +173,16 @@ class Syndication
 
         // Set a sane limit on the events retrieved to avoid OOM errors
         $limit = (int)$limit;
-        if ($limit > 500) $limit = 500;
+        if ($limit > 500) {
+            $limit = 500;
+        }
+        $sql = EventSet::create()
+            ->withStart($_EV_CONF['_today'])
+            ->withEnd(date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])))
+            ->withCategory($topic)
+            ->withSelection('rep.rp_id')
+            ->getSql();
 
-        $sql = EVLIST_getEvents_sql(
-            $_EV_CONF['_today'],
-            date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
-            array('cat'=>$topic, 'limit'=>$limit, 'select'=>'rep.rp_id')
-        );
         $result = DB_query($sql, 1);
         while ($A = DB_fetchArray($result, false)) {
             $eids[] = $A['rp_id'];
@@ -186,5 +190,81 @@ class Syndication
         $current = implode (',', $eids);
         return ($current != $update_data) ? false : true;
     }
-                
+
+
+    /**
+     * Get the RSS feed links only.
+     *
+     * @return  array   Array of links & titles
+     */
+    public static function getFeedLinks()
+    {
+        global $_EV_CONF, $_TABLES;
+
+        $retval = array();
+
+        if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != 1) {
+            return $retval;
+        }
+
+        // Get the feed info for configured feeds
+        $result = DB_query(
+            "SELECT title, filename
+            FROM {$_TABLES['syndication']}
+            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'"
+        );
+
+        if (DB_numRows($result) > 0) {
+            $feed_url = SYND_getFeedUrl();
+            while ($A = DB_fetchArray($result, false)) {
+                $retval[] = array(
+                    'feed_title'   => $A['title'],
+                    'feed_url'     => $feed_url . $A['filename'],
+                );
+            }
+        }
+        return $retval;
+    }
+
+
+    /**
+     * Get the feed subscription urls & icons.
+     * This returns a ready-to-display set of icons for visitors
+     * to subscribe to RSS feeds
+     *
+     * @return  string  HTML for icons
+     */
+    public static function getFeedIcons()
+    {
+        global $_CONF, $_EV_CONF, $_TABLES;
+
+        $retval = '';
+
+        // Anon access required for feed access anyway
+        if ($_EV_CONF['allow_anon_view'] != 1) {
+            return $retval;
+        }
+
+        // Get the feed info for configured feeds
+        $result = DB_query(
+            "SELECT title, filename FROM {$_TABLES['syndication']}
+            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'"
+        );
+
+        if (DB_numRows($result) > 0) {
+            $T = new \Template(EVLIST_PI_PATH . '/templates');
+            $T->set_file('feed', 'rss_icon.thtml');
+            $feed_url = SYND_getFeedUrl();
+            while ($A = DB_fetchArray($result, false)) {
+                $T->set_var(array(
+                    'feed_title'    => $A['title'],
+                    'feed_url'     => $feed_url . $A['filename'],
+                ) );
+                $T->parse('output', 'feed', true);
+            }
+            $retval = $T->finish($T->get_var('output'));
+        }
+        return $retval;
+    }
+
 }

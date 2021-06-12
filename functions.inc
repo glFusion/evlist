@@ -414,7 +414,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     $query = DB_escapeString(htmlspecialchars(trim($query)));
     $permSQL= COM_getPermSql('AND', 0, 2, 'e') . COM_getPermSql('AND', 0, 2, 'c');
 
-    $url = '/evlist/event.php?view=event&eid=';
+    $url = '/evlist/view.php?rid=0&eid=';
     $q = '&query=' . urlencode($query);
     $sql = "SELECT e.id, d.title, d.summary as description,
                 UNIX_TIMESTAMP(e.date_start1) AS date,
@@ -440,7 +440,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
                     $datestart, $dateend);
     list($sql,$ftsql) = $search->buildSearchSQL($keyType, $query,
                     $columns, $sql);
-    $sql .= ' GROUP BY d.det_id ';
+    //$sql .= ' GROUP BY d.det_id ';
     $search->setSQL($sql);
     $search->setFTSQL($ftsql);
     $search->setRank(5);
@@ -658,22 +658,7 @@ function plugin_geticon_evlist()
  */
 function plugin_getfeednames_evlist()
 {
-    return Evlist\Syndication::getFeedNames();
-
-    global $_TABLES, $LANG_EVLIST;
-
-    $feeds = array(
-        // Always include "All" as an option
-        array('id' => '0', 'name' => $LANG_EVLIST['all_upcoming']),
-    );
-    $result = DB_query("SELECT id, name
-            FROM {$_TABLES['evlist_categories']}
-            WHERE status = 1");
-    while ($A = DB_fetchArray($result, false)) {
-        $feeds[] = array('id' => $A['id'], 'name' => $A['name']);
-    }
-
-    return $feeds;
+    return Evlist\Models\Syndication::getFeedNames();
 }
 
 
@@ -688,7 +673,7 @@ function plugin_getfeednames_evlist()
  */
 function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
 {
-    return Evlist\Syndication::getFeedcontent($feed, $link, $update_data, $feedType);
+    return Evlist\Models\Syndication::getFeedcontent($feed, $link, $update_data, $feedType);
 }
 
 
@@ -703,28 +688,7 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
  */
 function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 {
-    return Evlist\Syndication::feedUpdateCheck($feed, $topic, $update_data, $limit);
-
-    global $_EV_CONF;;
-
-    $eids = array();
-
-    // Set a sane limit on the events retrieved to avoid OOM errors
-    $limit = (int)$limit;
-    if ($limit > 500) $limit = 500;
-
-    $sql = EVLIST_getEvents_sql(
-        $_EV_CONF['_today'],
-        date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])),
-        array('cat'=>$topic, 'limit'=>$limit, 'select'=>'rep.rp_id')
-    );
-    $result = DB_query($sql, 1);
-    while ($A = DB_fetchArray($result, false)) {
-        $eids[] = $A['rp_id'];
-    }
-    $current = implode (',', $eids);
-
-    return ($current != $update_data) ? false : true;
+    return Evlist\Models\Syndication::feedUpdateCheck($feed, $topic, $update_data, $limit);
 }
 
 
@@ -1162,14 +1126,14 @@ function phpblock_evlist_upcoming($A='', $params='')
         }
     }
 
-    $opts = array(
-        'cat' => $cat,
-        'cal' => $cal,
-        'show_upcoming' => 1,
-        'limit' => $limit,
-        'upcoming' => true,
-    );
-    $events = EVLIST_getEvents($_EV_CONF['_today'], $end, $opts);
+    $events = Evlist\Models\EventSet::create()
+        ->withCategory($cat)
+        ->withCalendar($cal)
+        ->withUpcoming(1)
+        ->withLimit($limit)
+        ->withStart($_EV_CONF['_today'])
+        ->withEnd($end)
+        ->getEvents();
     if (empty($events)) {
         return $retval;
     }
@@ -1768,7 +1732,7 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             }
         }
         //$props['url'] = COM_buildUrl(EVLIST_URL . '/event.php?eid=' . $A['id'], 0);
-        $props['url'] = EVLIST_URL . '/event.php?view=event&eid=' . $A['id'];
+        $props['url'] = EVLIST_URL . '/view.php?&eid=' . $A['id'];
         $mapped = array();
         foreach ($props as $key => $value) {
             if ($id == '*') {
@@ -1954,227 +1918,6 @@ function EVLIST_isCurrentVersion()
 
 
 /**
- * Create the SQL query to get all events that fall within a range.
- *
- * The $opts array parameter is used to restrict the result set.
- * The options currently available are:
- *      'cat'   int     Limit to this category ID
- *      'cal'   int     Limit to this calendar ID
- *      'show_upcoming' boolean     Whether this flag is set in the event
- *      'limit' int     Max number of results
- *      'page'  int     Page number, used in the limit clause if > 1
- *
- * @param  string  $start  Starting date, YYYY-MM-DD
- * @param  string  $end    Ending date, YYYY-MM-DD
- * @param  array   $opts   Array of other options (name=>value)
- * @return string          SQL query to retrieve events
- */
-function EVLIST_getEvents_sql($start='', $end='', $opts=array())
-{
-    global $_TABLES, $_EV_CONF, $_CONF, $_USER;
-
-    if ($start == '') $start = $_EV_CONF['_today'];
-    if ($end == '') $end = $start;
-
-    list($y, $m, $d) = explode('-', $start);
-    if (!DateFunc::isValidDate($d, $m, $y)) $start = $_EV_CONF['_today'];
-    list($y, $m, $d) = explode('-', $end);
-    if (!DateFunc::isValidDate($d, $m, $y)) $end = $start;
-    $start = DB_escapeString($start . ' 00:00:00');
-    $end = DB_escapeString($end . ' 23:59:59');
-
-    // Set up other search options.
-    $selection = '';
-    $opt_select = '';
-    $opt_join = '';
-    $opt_where = '';
-    $opt_order = 'ASC';
-    $orderby = 'rep.rp_start';
-    $grp_by = 'rep.rp_id';
-    $limit = 0;
-    $page = 0;
-    $cat_status = '';
-    $cat_join = '';
-    //$cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
-    // default date range for fixed calendars, "upcoming" may be different
-    $dt_sql = "rep.rp_start <= '$end' AND rep.rp_end >= '$start'";
-    if (is_array($opts) && !empty($opts)) {
-        foreach ($opts as $key => $value) {
-            $value = DB_escapeString($value);
-            switch ($key) {
-            case 'cal':
-                if ($value != 0)
-                    $opt_where .= ' AND cal.cal_id = ' . (int)$value;
-                break;
-            case 'eid':
-                $opt_where .= " AND ev.id = '$value'";
-                break;
-            case 'rp_id':
-                $opt_where .= ' AND rep.rp_id = ' . (int)$value;
-                break;
-            case 'ical':
-                $opt_where .= ' AND cal.cal_ena_ical = ' . ($value == 1 ? 1 : 0);
-                break;
-            case 'cat':
-                if ($value > 0) {
-                    //$opt_select .= ', cat.name AS cat_name';
-                    $cat_status = " AND l.cid = '$value' AND cat.status = 1";
-                    $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
-                                "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
-                }
-                break;
-            case 'limit':
-                if ($value > 0)
-                    $limit = (int)$value;
-                break;
-            case 'page':
-                if ($value > 0)
-                    $page = (int)$value;
-                break;
-            case 'order':
-                $opt_order = strtoupper($value) == 'DESC' ? 'DESC' : 'ASC';
-                break;
-            case 'show_upcoming':
-                // This allows for generic key-value pairs.  $value may
-                // or may not be numeric.
-                $opt_where .= " AND ev.{$key} = '$value'";
-                break;
-            case 'upcoming':
-                // Alters the date range based on the setting for upcoming
-                // events.
-                switch ($_EV_CONF['event_passing']) {
-                case 1:     // include if start time has not passed
-                    $dt_sql = "rep.rp_start >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
-                    break;
-                case 2:     // include if start date has not passed
-                    $dt_sql = "rep.rp_start >= '{$_EV_CONF['_today']}'";
-                    break;
-                case 3:     // include if end time has not passed
-                    $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
-                    break;
-                case 4:     // include if end date has not passed
-                    $dt_sql = "rep.rp_end >= '{$_EV_CONF['_today']}'";
-                    break;
-                }
-                // Always limit to events starting before the specified end date
-                $dt_sql .= " AND rep.rp_start <= '$end'";
-                break;
-            case 'select':
-                $selection = $value;
-                break;
-            case 'unique':
-                $grp_by = 'ev.id';
-                break;
-            }
-        }
-    }
-
-    // By default, get all fields that the caller could possibly want.  If
-    // a selection option is specified, then that is used instead.  It's up
-    // to the caller to request the value properly, including table prefix.
-    if ($selection == '')
-        $selection = "rep.*, det.*, cal.*, ev.* $opt_select";
-
-    // All the "*" queries may be ineffecient, but we need to read all
-    // fields that might be wanted by whoever calls this function
-    $sql = "SELECT $selection
-            FROM {$_TABLES['evlist_repeat']} rep
-            LEFT JOIN {$_TABLES['evlist_events']} ev
-                ON ev.id = rep.rp_ev_id
-            LEFT JOIN {$_TABLES['evlist_detail']} det
-                ON det.det_id = rep.rp_det_id
-            LEFT JOIN {$_TABLES['evlist_calendars']} cal
-                ON cal.cal_id = ev.cal_id
-            $cat_join
-            WHERE ev.status = 1
-            AND ($dt_sql)
-            AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
-            $cat_status " .
-            COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
-            COM_getPermSQL('AND', 0, 2, 'cal') .
-            " $opt_where
-            ORDER BY $orderby $opt_order";
-            //ORDER BY rep.rp_date_start $opt_order,
-            //GROUP BY $grp_by ASC
-            //        rep.rp_time_start1 $opt_order";
-    if ($limit > 0) {
-        if ($page > 1) {
-            $sql .= ' LIMIT ' . (($page - 1) * $limit) . ',' . $limit;
-        } else {
-            // page 1 or 0, no starting offset
-            $sql .= " LIMIT $limit";
-        }
-    }
-    //echo $sql;die;
-    return $sql;
-}
-
-
-/**
- * Get all events that fall within a range.
- * This is in functions.inc so it can be used by the feed update
- * functions without having to load evlist_functions.inc.php.
- *
- * The $opts array parameter is used to restrict the result set.
- * The options currently available are:
- *      'cat'   int     Limit to this category ID
- *      'cal'   int     Limit to this calendar ID
- *      'show_upcoming' boolean     Whether this flag is set in the event
- *      'limit' int     Max number of results
- *      'page'  int     Page number, used in the limit clause if > 1
- *
- * @param  string  $start  Starting date, YYYY-MM-DD
- * @param  string  $end    Ending date, YYYY-MM-DD
- * @param  array   $opts   Array of other options (name=>value)
- * @return array           Array of matching events, keyed by date
- */
-function EVLIST_getEvents($start='', $end='', $opts=array())
-{
-    global $_EV_CONF, $_USER;
-
-    $sql = EVLIST_getEvents_sql($start, $end, $opts);
-    //echo $sql;die;
-    $key = md5($sql);
-    $events = Evlist\Cache::get($key);
-
-    if (is_null($events)) {     // not found in cache, read from DB
-        $events = array();
-        $result = DB_query($sql, 1);
-        if ($result && !DB_error()) {
-            while ($A = DB_fetchArray($result, false))  {
-                if (!isset($events[$A['rp_date_start']])) {
-                    $events[$A['rp_date_start']] = array();
-                }
-                $A['options'] = @unserialize($A['options']);
-                $A['rec_data'] = @unserialize($A['rec_data']);
-                // Set a valid foreground and background color
-                if (empty($A['fgcolor'])) $A['fgcolor'] = 'inherit';
-                if (empty($A['bgcolor'])) $A['bgcolor'] = 'inherit';
-                if ($A['rp_date_start'] == $A['rp_date_end']) {
-                    // Single-day event just gets added to the array
-                    $events[$A['rp_date_start']][] = $A;
-                } else {
-                    // Multi-day events get a record for each day up to the event end
-                    // or limit, whichever comes first
-                    $end_date = min($A['rp_date_end'], $end);
-                    $newdate = max($A['rp_date_start'], $start);
-                    while ($newdate <= $end_date) {
-                        if (!isset($events[$newdate]))
-                            $events[$newdate] = array();
-                        $events[$newdate][] = $A;
-                        list($y, $m, $d) = explode('-', $newdate);
-                        $newdate = DateFunc::nextDay($d, $m, $y);
-                    }
-                }
-            }   // while
-        }
-        Evlist\Cache::set($key, $events, 'events');
-    }
-    return $events;
-}
-
-
-/**
  * Replace quotes and apostrophes with HTML entities.
  * This is to prevent quotes from corrupting the HTML display while allowing
  * other HTML in event data to be displayed as intended.
@@ -2285,7 +2028,7 @@ function EVLIST_getReturn()
  * @param   string  $style  Style name from local CSS
  * @return  string      Class names for icon
  */
-function EVLIST_getIcon($name, $style='')
+function XEVLIST_getIcon($name, $style='')
 {
     global $_EV_CONF;
 
@@ -2383,77 +2126,6 @@ function EVLIST_GetOptions($options, $selected = '', $bias=0)
                 $retval .= ' selected="selected"';
         }
         $retval .= ">$name</option>" . LB;
-    }
-    return $retval;
-}
-
-
-/**
- * Get the RSS feed links only.
- *
- * @return  array   Array of links & titles
- */
-function EVLIST_getFeedLinks()
-{
-    global $_EV_CONF, $_TABLES;
-
-    $retval = array();
-
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != 1)
-        return $retval;
-
-    // Get the feed info for configured feeds
-    $result = DB_query("SELECT title, filename
-            FROM {$_TABLES['syndication']}
-            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
-
-    if (DB_numRows($result) > 0) {
-        $feed_url = SYND_getFeedUrl();
-        while ($A = DB_fetchArray($result, false)) {
-            $retval[] = array(
-                'feed_title'   => $A['title'],
-                'feed_url'     => $feed_url . $A['filename'],
-            );
-        }
-    }
-    return $retval;
-}
-
-
-/**
- * Get the feed subscription urls & icons.
- * This returns a ready-to-display set of icons for visitors
- * to subscribe to RSS feeds
- *
- * @return  string  HTML for icons
- */
-function EVLIST_getFeedIcons()
-{
-    global $_CONF, $_EV_CONF, $_TABLES;
-
-    $retval = '';
-
-    // Anon access required for feed access anyway
-    if ($_EV_CONF['allow_anon_view'] != 1)
-        return $retval;
-
-    // Get the feed info for configured feeds
-    $result = DB_query("SELECT title, filename
-            FROM {$_TABLES['syndication']}
-            WHERE type='" . DB_escapeString($_EV_CONF['pi_name']) . "'");
-
-    if (DB_numRows($result) > 0) {
-        $T = new Template(EVLIST_PI_PATH . '/templates');
-        $T->set_file('feed', 'rss_icon.thtml');
-        $feed_url = SYND_getFeedUrl();
-        while ($A = DB_fetchArray($result, false)) {
-            $T->set_var(array(
-                'feed_title'    => $A['title'],
-                'feed_url'     => $feed_url . $A['filename'],
-            ) );
-            $T->parse('output', 'feed', true);
-        }
-        $retval = $T->finish($T->get_var('output'));
     }
     return $retval;
 }

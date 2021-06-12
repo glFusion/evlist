@@ -12,6 +12,7 @@
  * @filesource
  */
 namespace Evlist;
+use Evlist\Models\Syndication;
 
 date_default_timezone_set('UTC');
 
@@ -340,7 +341,7 @@ class View
         $T = new \Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('calendar_footer', 'calendar_footer.thtml');
 
-        $rssA = EVLIST_getFeedLinks();
+        $rssA = Syndication::getFeedLinks();
         $rss_links = '';
         if (!empty($rssA)) {
             foreach ($rssA as $rss) {

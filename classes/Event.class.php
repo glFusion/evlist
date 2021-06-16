@@ -885,7 +885,7 @@ class Event
             // Determine if the schedule has changed so that we need to
             // update the repeat tables.  If we do, any customizations will
             // be lost.
-            if ($this->NeedRepeatUpdate($A)) {
+            if ($this->needRepeatUpdate($A)) {
                 if ($this->old_schedule['recurring'] || $this->recurring) {
                     // If this was, or is now, a recurring event then clear
                     // out the repeats and update with new ones.
@@ -1999,7 +1999,7 @@ class Event
      * @param   array   $A  Array of values (e.g. $_POST)
      * @return  boolean     True if an update is needed, false if not
      */
-    public function NeedRepeatUpdate($A)
+    public function needRepeatUpdate($A)
     {
         // Just check each relevant value in $A against our value.
         // If any matches, return true
@@ -2072,7 +2072,7 @@ class Event
      * Recursively check two arrays for differences.
      * From http://nl3.php.net/manual/en/function.array-diff-assoc.php#73972
      *
-     * @see     self::NeedRepeatUpdate()
+     * @see     self::needRepeatUpdate()
      * @param   array   $array1     First array
      * @param   array   $array2     Second array
      * @return  mixed       Array of differences, or 0 if none.

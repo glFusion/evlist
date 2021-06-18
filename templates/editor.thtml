@@ -710,7 +710,7 @@ function toggleRSVPdetail(val)
 					</div>
 
 					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['ticket_types']}:</label>
+						<label class="uk-form-label">{$LANG_EVLIST['tickettypes']}:</label>
 						<div class="uk-form-controls">
 							<table>
 								<tr>

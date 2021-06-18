@@ -879,7 +879,7 @@ class Calendar
                 $_EV_CONF['icons']['edit'],
                 EVLIST_ADMIN_URL . '/index.php?editcal=' . $A['cal_id'],
                 array(
-                    'title' => $LANG_EVLIST['edit_calendar'],
+                    'title' => $LANG_EVLIST['editcal'],
                 )
             );
             break;

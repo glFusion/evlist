@@ -58,7 +58,7 @@ class Menu
         if ($_EV_CONF['enable_rsvp']) {
             $menu_arr[] = array(
                 'url' => EVLIST_ADMIN_URL . '/index.php?tickettypes',
-                'text' => $LANG_EVLIST['ticket_types'],
+                'text' => $LANG_EVLIST['tickettypes'],
                 'active' => $view == 'tickettypes' ? true : false,
             );
         }
@@ -68,7 +68,7 @@ class Menu
         );
         $title = isset($LANG_EVLIST[$view]) ? $LANG_EVLIST[$view] : $view;
         $retval .= COM_startBlock(
-             $LANG_EVLIST['pi_title'].' v' . $_EV_CONF['pi_version'] . ': ' . $title,
+            $LANG_EVLIST['pi_title'].' v' . $_EV_CONF['pi_version'] . ': ' . $title,
             '',
             COM_getBlockTemplate('_admin_block', 'header')
         );

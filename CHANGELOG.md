@@ -2,18 +2,17 @@
 
 ## v1.5.0
 Release TBD
-- Retire support for non-UIkit themes
+- Retire support for non-UIkit themes.
 - Clear category lookup cache when an event is updated.
-- Provide location address to Locator plugin
-- Leverage list item template to correctly show event date and time in lists
-- Use calendar selector for plugin to calendar mapping config
-- Cleanly abort evMeetup::getEvents() if Curl support is missing
-- Update service functions for compatibility with Paypal 0.6.0
+- Provide location address to Locator plugin.
+- Leverage list item template to correctly show event date and time in lists.
+- Use calendar selector for plugin to calendar mapping config.
+- Update service functions for compatibility with Paypal 0.6.0/Shop 1.0.0
 - Add orderby field to calendars to control order in selection lists.
 - Fix search results not excluding by calendar status or permissions.
 - Consider calendar perms in Event::hasAccess().
 - Request perms in `plugin_itemsaved`, calculate based on owner/group if not supplied.
-- Remove support for Meetup.com API
+- Remove support for Meetup.com API.
 - Remove hit counter, was never used.
 - Switch from Paypal plugin to Shop.
 - Limit centerblock display to a number of days as well as events.
@@ -23,6 +22,7 @@ Release TBD
 - Configurable key to hide repeating events from centerblock.
 - Condense header, better for small screens.
 - Fix iCal format for long descriptions.
+- Use glFusion built-in datetime picker instead of UIkit version.
 
 ## v1.4.5
 Release 2018-04-14

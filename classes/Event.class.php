@@ -19,12 +19,12 @@ namespace Evlist;
  */
 class Event
 {
-    const MIN_DATETIME  = '1970-01-01 00:00:00';
-    const MAX_DATETIME  = '2037-12-31 23:59:59';
+    const MIN_DATETIME  = '1970-01-01 00:00';
+    const MAX_DATETIME  = '2037-12-31 23:59';
     const MIN_DATE      = '1970-01-01';
     const MAX_DATE      = '2037-12-31';
-    const MIN_TIME      = '00:00:00';
-    const MAX_TIME      = '23:59:59';
+    const MIN_TIME      = '00:00';
+    const MAX_TIME      = '23:59';
 
     /** Event record ID.
      * @var string */
@@ -140,7 +140,7 @@ class Event
 
     /** Ending time 1.
      * @var string */
-    private $time_end1 = self::MAX_TIME;
+    private $time_end1 = '';
 
     /** Ending time 2 for split events.
      * @var string */
@@ -337,7 +337,8 @@ class Event
         static $records = array();
         if (!array_key_exists($ev_id, $records)) {
             $key = 'event_' . $ev_id . '_' . $det_id;
-            $records[$ev_id] = Cache::get($key);
+            //$records[$ev_id] = Cache::get($key);
+            $records[$ev_id] = null;
             if ($records[$ev_id] === NULL) {
                 $records[$ev_id] = new self($ev_id, $det_id);
                 $tags = array(
@@ -580,16 +581,19 @@ class Event
 
 
     /**
-     * Sets all variables to the matching values from $rows.
+     * Sets all variables to the matching values from $row.
      *
      * @param   array   $row        Array of values, from DB or $_POST
      * @param   boolean $fromDB     True if read from DB, false if from $_POST
+     * @return  object  $this
      */
     public function setVars($row, $fromDB=false)
     {
         global $_EV_CONF;
 
-        if (!is_array($row)) return;
+        if (!is_array($row)) {
+            return $this;
+        }
 
         if (isset($row['date_start1']) && !empty($row['date_start1'])) {
             $this->date_start1 = $row['date_start1'];
@@ -641,10 +645,10 @@ class Event
                 ->setPermGroup($row['perm_group'])
                 ->setPermMembers($row['perm_members'])
                 ->setPermAnon($row['perm_anon']);
-            $this->time_start1 = $row['time_start1'];
-            $this->time_end1 = $row['time_end1'];
-            $this->time_start2 = $row['time_start2'];
-            $this->time_end2 = $row['time_end2'];
+            $this->time_start1 = substr($row['time_start1'], 0, 5);
+            $this->time_end1 = substr($row['time_end1'], 0, 5);
+            $this->time_start2 = substr($row['time_start2'], 0, 5);
+            $this->time_end2 = substr($row['time_end2'], 0, 5);
             $this->options = @unserialize($row['options']);
             if (!$this->options) {
                 $this->options = array();
@@ -745,6 +749,7 @@ class Event
                 $this->tzid = 'local';
             }
         }
+        return $this;
     }
 
 
@@ -1422,7 +1427,7 @@ class Event
         } else {
             list($startmonth1, $startday1, $startyear1,
                 $starthour1, $startminute1) =
-                $this->DateParts(date('Y-m-d', time()), date('H:i:s', time()));
+                $this->DateParts(date('Y-m-d', time()), date('H:i', time()));
         }
 
         // The end date can't be before the start date

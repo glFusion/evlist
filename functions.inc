@@ -1376,7 +1376,7 @@ function plugin_displaycomment_evlist($id, $cid, $title, $order, $format, $page,
  */
 function plugin_getconfigelementhelp_evlist($element, $doclang )
 {
-    $file = 'config.html';
+    $file = 'config';
     $doc_url = EVLIST_getDocURL($file, $doclang);
     if (empty($doc_url))
         return false;

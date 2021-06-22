@@ -93,9 +93,14 @@
     width: 60%;*/
 }
 
-#evlistEvent div.evEventItem {
-    padding-top: 15px;
+div.evEventItem {
+    /*padding-top: 15px;*/
+	margin-bottom: 10px;
     clear: left;
+}
+* + div.evEventItem {
+	/* Override uk-margin setting */
+	margin-top: 0px !important;
 }
 
 #evlistEventDetail div label,

@@ -24,7 +24,13 @@
             {summary}
         </div>
         <div class="uk-width-medium-1-6 uk-width-1-1" style="margin-bottom:10px;">
-            {startdate} {!if allday}{!else}{starttime1}{!endif}
+            {startdate}
+{!if multiday}
+            - {enddate}
+{!elseif allday}
+{!else}
+            {starttime1}
+{!endif}
         </div>
     </div>
     {adblock}

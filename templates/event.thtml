@@ -116,8 +116,10 @@
 </div>
 {# End header div #}
 
+{!if admin_rsvp}
 <ul class="uk-switcher uk-switcher-container" id="evlistEvent">
 	<li>
+{!endif}
 {!if summary}
 		<div class="evEventItem uk-margin">
 			<label>{$LANG_EVLIST['what']}:</label>
@@ -378,16 +380,16 @@
 		</div>
 {!endif}
 {adblock}
-	</li>
 
 {!if admin_rsvp}
+	</li>
 	<li id="evlistRSVP">
 		<div class="evAdminRSVP">
 			<hr />{admin_rsvp}
 	    </div>
 	</li>
-{!endif}
 </ul>
+{!endif}
 
 <script>
 //var showregdiv = 0;

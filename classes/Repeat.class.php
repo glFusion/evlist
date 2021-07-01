@@ -434,12 +434,18 @@ class Repeat
             return false;
         }
 
-        // If we have our own detail record, then delete it also
-        if ($this->det_id != $this->Event->getDetailID()) {
-            $this->Event->getDetail()->Delete();
+        // Check if the related detail record is used by any other occurrences.
+        // Only check if this is not using the master detail record. In that
+        // case, leave the detail record alone as it will be needed for new
+        // occurrences.
+        if (
+            $this->det_id != $this->Event->getDetailID() &&
+            DB_count($_TABLES['evlist_repeat'], 'rp_det_id', (int)$this->det_id) == 1
+        ) {
+            Detail::getInstance($this->det_id)->Delete();
         }
 
-        DB_delete($_TABLES['evlist_repeat'], 'rp_id', $this->rp_id);
+        DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
         Cache::clear();
         return true;
     }

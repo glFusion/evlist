@@ -1,9 +1,10 @@
 $(document).ready(function(){
-	$('.ev_datepicker').each(function(i, obj) {
+	$('[data-ev-datepicker]').each (function(i, obj) {
 		var id = $(this).attr('id');
 		ev_datetimepicker_datepicker(id);
 	});
-	$('.ev_timepicker').each(function(i, obj) {
+
+	$('[data-ev-timepicker]').each(function(i, obj) {
 		var id = $(this).attr('id');
 		ev_datetimepicker_timepicker(id);
 	});

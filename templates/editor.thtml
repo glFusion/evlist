@@ -380,11 +380,11 @@ function toggleRSVPdetail(val)
 					</label>
 					<div class="uk-form-controls">
 						<input type="text" name="date_start1" id="f_startdate1"
-							size="10" value="{startdate1}" class="ev_datepicker"
+							size="10" value="{startdate1}" data-ev-datepicker
 							onchange="checkDate1();" />
 						&nbsp;&nbsp;
 						<span id="starttime1" {starttime1_show}>
-							<input type="text" id="f_timestart1" name="time_start1" size="10" value="{time_start1}" class="ev_timepicker" />
+							<input type="text" id="f_timestart1" name="time_start1" size="10" value="{time_start1}" data-ev-timepicker />
 						</span>
 					</div>
 				</div>
@@ -395,10 +395,10 @@ function toggleRSVPdetail(val)
 						<span id="hlp_date_end" class="tooltip_cfg tooltipstered"></span>
 					</label>
 					<div class="uk-form-controls">
-						<input type="text" name="date_end1" id="f_enddate1" class="ev_datepicker" size="10" value="{enddate1}" onchange="checkDate2();" />
+						<input type="text" name="date_end1" id="f_enddate1" data-ev-datepicker size="10" value="{enddate1}" onchange="checkDate2();" />
 						&nbsp;&nbsp;
 						<span id="endtime1" {endtime1_show}>
-							<input type="text" id="f_timeend1" class="ev_timepicker" name="time_end1" size="10" value="{time_end1}" />
+							<input type="text" id="f_timeend1" data-ev-timepicker name="time_end1" size="10" value="{time_end1}" />
 						</span>
 					</div>
 				</div>

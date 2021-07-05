@@ -462,7 +462,7 @@ function toggleRSVPdetail(val)
 							<label style="width:50%;text-align:left;">
 								{dailystop_label}:
 							</label>
-							<input type="text" name="stopdate" id="f_stopdate"
+							<input type="text" name="stopdate" id="f_stopdate" data-ev-datepicker
 								size="10" value="{stopdate}" />
 						</p>
 

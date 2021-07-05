@@ -3,8 +3,9 @@
  * Upgrade routines for the evList plugin.
  *
  * @author      Mark R. Evans mark AT glfusion DOT org
+ * @author      Lee Garner lee AT leegarner DOT com
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright   Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
  * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -12,45 +13,12 @@
  * @filesource
  */
 
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | upgrade.php                                                              |
-// |                                                                          |
-// | Upgrade routines                                                         |
-// +--------------------------------------------------------------------------+
-// | Copyright (C) 2009-2010 by the following authors:                        |
-// |                                                                          |
-// | Mark R. Evans          mark AT glfusion DOT org                          |
-// |                                                                          |
-// | Based on the evList Plugin for Geeklog CMS                               |
-// | Copyright (C) 2007 by the following authors:                             |
-// |                                                                          |
-// | Authors: Alford Deeley     - ajdeeley AT summitpages.ca                  |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
-
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-global $_DB_dbms, $c, $_CONF, $CONF_EVLIST_DEFAULT;
+global $_CONF;
 require_once __DIR__ . "/sql/mysql_install.php";
 
 /**
@@ -61,7 +29,7 @@ require_once __DIR__ . "/sql/mysql_install.php";
  */
 function evlist_upgrade($dvlp = false)
 {
-    global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix, $_DB_dbms, $c,
+    global $_TABLES, $_CONF, $_EV_CONF, $_DB_table_prefix,
         $CONF_EVLIST_DEFAULT, $_PLUGIN_INFO;
 
     if (isset($_PLUGIN_INFO[$_EV_CONF['pi_name']])) {
@@ -147,131 +115,145 @@ function evlist_upgrade($dvlp = false)
                 3, 3, 2, 2
             )");
 
-        case '1.2.6' :
-            // Lots of updates
-            $status = evlist_upgrade_1_3_0();
-            if ($status > 0) return false;
-            if (!EVLIST_do_set_version('1.3.0')) return false;
+    }
 
-        case '1.3.0':
-        case '1.3.0.1':
-        case '1.3.0.2':
-        case '1.3.1':
-            $currentVersion = '1.3.2';
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;;
+    if (!COM_checkVersion($currentVersion, '1.3.0')) {
+        // Lots of updates
+        $status = evlist_upgrade_1_3_0();
+        if ($status > 0) return false;
+        if (!EVLIST_do_set_version('1.3.0')) return false;
+    }
+    if (!COM_checkVersion($currentVersion, '1.3.2')) {
+        $currentVersion = '1.3.2';
+        if (!EVLIST_do_upgrade_sql($currentVersion)) return false;;
 
-            // Change the recurring interval type to an array to support
-            // multiple occurrences per month for DOM-type events
-            $sql = "SELECT id, rec_data
-                    FROM {$_TABLES['evlist_events']}
-                    WHERE recurring = 1";
-            $res = DB_query($sql, 1);
-            if (!$res) {
-                COM_errorLog("Error retrieving recurring events");
+        // Change the recurring interval type to an array to support
+        // multiple occurrences per month for DOM-type events
+        $sql = "SELECT id, rec_data
+            FROM {$_TABLES['evlist_events']}
+            WHERE recurring = 1";
+        $res = DB_query($sql, 1);
+        if (!$res) {
+            COM_errorLog("Error retrieving recurring events");
+            return false;
+        }
+        while ($A = DB_fetchArray($res, false)) {
+            $data = @unserialize($A['rec_data']);
+            if (!$data) {
+                // rec_data *should* be a serialized array, but if it isn't
+                // then there's nothing useful here anyway.
+                COM_errorLog("Error unserializing rec_data- id {$A['id']}");
+                continue;
+            }
+            if (isset($data['interval']) && !is_array($data['interval'])) {
+                $data['interval'] = array($data['interval']);
+                $data = DB_escapeString(serialize($data));
+                DB_query("UPDATE {$_TABLES['evlist_events']}
+                        SET rec_data = '$data'
+                        WHERE id = '{$A['id']}'", 1);
+                if (DB_error()) return false;
+            }
+        }
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.3.5')) {
+        $currentVersion = '1.3.5';
+        // This is likely to fail, rec_option has been unused since 1.3.0
+        // but was never removed via upgrading
+        DB_query("ALTER TABLE {$_TABLES['evlist_events']} DROP rec_option", 1);
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.3.6')) {
+        $currentVersion = '1.3.6';
+        DB_query("UPDATE {$_TABLES['conf_values']}
+            SET selectionArray = 9
+            WHERE name = 'enable_centerblock'
+            AND group_name = '{$_EV_CONF['pi_name']}'");
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.3.7')) {
+        $currentVersion = '1.3.7';
+        if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.4.0')) {
+        $currentVersion = '1.4.0';
+
+        // SQL includes moving configuration items under the new sg_integ group,
+        // so execute it last.
+        if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.4.1')) {
+        $currentVersion = '1.4.1';
+        if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.4.2')) {
+        $currentVersion = '1.4.2';
+        if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.4.3')) {
+        $currentVersion = '1.4.3';
+        $config = config::get_instance();
+        $config->del('cal_tmpl', 'evlist');
+        if (!empty($_EV_CONF['meetup_gid'])) {
+            // Changing meetup_gid type to array, first get the current
+            // value and convert it.
+            $meetup_gid = @serialize(array($_EV_CONF['meetup_gid']));
+            DB_query("UPDATE {$_TABLES['conf_values']}
+                SET value = '" . DB_escapeString($meetup_gid) . "'
+                WHERE name = 'meetup_gid' AND group_name = 'evlist'", 1);
+            if (DB_error()) {
+                COM_errorLog("1.4.3 update error: $sql");
                 return false;
             }
-            while ($A = DB_fetchArray($res, false)) {
-                $data = @unserialize($A['rec_data']);
-                if (!$data) {
-                    // rec_data *should* be a serialized array, but if it isn't
-                    // then there's nothing useful here anyway.
-                    COM_errorLog("Error unserializing rec_data- id {$A['id']}");
-                    continue;
-                }
-                if (isset($data['interval']) && !is_array($data['interval'])) {
-                    $data['interval'] = array($data['interval']);
-                    $data = DB_escapeString(serialize($data));
-                    DB_query("UPDATE {$_TABLES['evlist_events']}
-                            SET rec_data = '$data'
-                            WHERE id = '{$A['id']}'", 1);
-                    if (DB_error()) return false;
-                }
-            }
-            if (!EVLIST_do_set_version($currentVersion)) return false;
+        }
 
-        case '1.3.4':
-            // This is likely to fail, rec_option has been unused since 1.3.0
-            // but was never removed via upgrading
-            DB_query("ALTER TABLE {$_TABLES['evlist_events']} DROP rec_option", 1);
-            if (!EVLIST_do_set_version('1.3.5')) return false;
+        // This column should have been there from the beginning, but on
+        // at least one site it was missing. Add it here, but ignore any
+        // SQL error since it's probably already there.
+        DB_query("ALTER TABLE {$_TABLES['evlist_remlookup']}
+            ADD date_start int(10) unsigned AFTER rp_id", 1);
 
-        case '1.3.5':
-            DB_query("UPDATE {$_TABLES['conf_values']}
-                    SET selectionArray = 9
-                    WHERE name = 'enable_centerblock'
-                    AND group_name = '{$_EV_CONF['pi_name']}'");
-            if (!EVLIST_do_set_version('1.3.6')) return false;
+        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
 
-        case '1.3.6':
-            $currentVersion = '1.3.7';
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-            if (!EVLIST_do_set_version($currentVersion)) return false;
+    if (!COM_checkVersion($currentVersion, '1.4.5')) {
+        $currentVersion = '1.4.5';
+        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
 
-        case '1.3.7':
-        case '1.3.8':
-        case '1.3.9':
-            $currentVersion = '1.4.0';
+    if (!COM_checkVersion($currentVersion, '1.5.0')) {
+        $currentVersion = '1.5.0';
+        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
+        // Order the calendars, initially by name;
+        Evlist\Calendar::reOrder('cal_name');
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
 
-            // SQL includes moving configuration items under the new sg_integ group,
-            // so execute it last.
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-            if (!EVLIST_do_set_version($currentVersion)) return false;
-
-        case '1.4.0':
-            $currentVersion = '1.4.1';
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-            if (!EVLIST_do_set_version($currentVersion)) return false;
-
-        case '1.4.1':
-            $currentVersion = '1.4.2';
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-            if (!EVLIST_do_set_version($currentVersion)) return false;
-
-        case '1.4.2':
-            $currentVersion = '1.4.3';
-            $c->del('cal_tmpl', 'evlist');
-            if (!empty($_EV_CONF['meetup_gid'])) {
-                // Changing meetup_gid type to array, first get the current
-                // value and convert it.
-                $meetup_gid = @serialize(array($_EV_CONF['meetup_gid']));
-                DB_query("UPDATE {$_TABLES['conf_values']}
-                    SET value = '" . DB_escapeString($meetup_gid) . "'
-                    WHERE name = 'meetup_gid' AND group_name = 'evlist'", 1);
-                if (DB_error()) {
-                    COM_errorLog("1.4.3 update error: $sql");
-                    return false;
-                }
-            }
-
-            // This column should have been there from the beginning, but on
-            // at least one site it was missing. Add it here, but ignore any
-            // SQL error since it's probably already there.
-            DB_query("ALTER TABLE {$_TABLES['evlist_remlookup']}
-                ADD date_start int(10) unsigned AFTER rp_id", 1);
-
-            if (!EVLIST_do_upgrade_sql($currentVersion)) return false;
-            if (!EVLIST_do_set_version($currentVersion)) return false;
-
-        case '1.4.3':
-        case '1.4.4':
-            $currentVersion = '1.4.5';
-            if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
-            if (!EVLIST_do_set_version($currentVersion)) return false;
-
-        case '1.4.5':
-            $currentVersion = '1.5.0';
-            if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
-            // Order the calendars, initially by name;
-            Evlist\Calendar::reOrder('cal_name');
-            if (!EVLIST_do_set_version($currentVersion)) return false;
-     }
+    // Set the version if not previously set
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
         if (!EVLIST_do_set_version($installed_ver)) return false;
     }
+
+    // Update any configuration item changes
     include_once 'install_defaults.php';
     plugin_updateconfig_evlist();
 
+    // Remove deprecated files
     EVLIST_remove_old_files();
+
     CTL_clearCache();
     Evlist\Cache::clear();
     COM_errorLog("Successfully updated the {$_EV_CONF['pi_display_name']} Plugin", 1);
@@ -288,25 +270,14 @@ function evlist_upgrade($dvlp = false)
  */
 function evlist_upgrade_1_3_0()
 {
-    global $_CONF, $_EV_CONF, $_TABLES, $_DB_dbms, $c, $CONF_EVLIST_DEFAULT;
-
-    $c->add('default_view', $CONF_EVLIST_DEFAULT['default_view'], 'select',
-                0, 1, 14, 90, true, 'evlist');
-    $c->add('max_upcoming_days', $CONF_EVLIST_DEFAULT['max_upcoming_days'], 'text',
-                0, 1, 0, 100, true, 'evlist');
+    global $_CONF, $_EV_CONF, $_TABLES;
 
     // Combine users allowed to add events into one variable
+    $config = config::get_instance();
     $can_add = 0;
-    if ($EV_CONF['allow_anon_add'] > 0) $can_add += EV_ANON_CAN_ADD;
-    if ($EV_CONF['allow_user_add'] > 0) $can_add += EV_USER_CAN_ADD;
+    if ($_EV_CONF['allow_anon_add'] > 0) $can_add += EV_ANON_CAN_ADD;
+    if ($_EV_CONF['allow_user_add'] > 0) $can_add += EV_USER_CAN_ADD;
     $c->add('can_add', $can_add, 'select', 0, 1, 15, 20, true, 'evlist');
-    $c->del('allow_user_add', 'evlist');
-    $c->del('allow_anon_add', 'evlist');
-    // Add new options for plugin integration
-    $c->add('use_locator', $CONF_EVLIST_DEFAULT['use_locator'], 'select',
-            0, 1, 0, 110, true, 'evlist');
-    $c->add('use_weather', $CONF_EVLIST_DEFAULT['use_weather'], 'select',
-            0, 1, 0, 120, true, 'evlist');
 
     // Date & Time formats moved from the DB to simple $_CONF  variables
     $format = DB_getItem($_TABLES['evlist_dateformat'], 'format',
@@ -644,7 +615,3 @@ function EV_rmdir($dir)
         @unlink($dir);
     }
 }
-
-
-
-?>

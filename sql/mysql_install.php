@@ -1,32 +1,4 @@
 <?php
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | mysql_install.php                                                        |
-// |                                                                          |
-// | MySQL SQL for evList                                                     |
-// +--------------------------------------------------------------------------+
-// | Based on the evList Plugin for Geeklog CMS                               |
-// | Copyright (C) 2007 by the following authors:                             |
-// |                                                                          |
-// | Authors: Alford Deeley     - ajdeeley AT summitpages.ca                  |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
 /**
 *   SQL table creation statements used during evList installation
 *   @package    evlist
@@ -353,7 +325,9 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE options options text",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE rec_data rec_data text DEFAULT NULL",
+    "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE options options text",
     "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE rec_data rec_data text DEFAULT NULL",
+    "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE cal_id cal_id int(10) not null DEFAULT 1",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `id` `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `description` `dscp` varchar(255) NOT NULL DEFAULT ''",
     "ALTER TABLE {$_TABLES['evlist_tickets']} CHANGE tic_id tic_num varchar(128) NOT NULL",

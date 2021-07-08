@@ -295,24 +295,21 @@ function toggleRSVPdetail(val)
 </div>
 {!endif}
 
-<ul data-uk-switcher="{connect:'#ev_forms'}" class="uk-tab">
-    <li><a href="">Event Information</a></li>
-    <li><a href="">Location</a></li>
-    <li><a href="">Contact</a></li>
-{!if is_admin}
+<ul uk-switcher="connect: #ev_forms" data-uk-switcher="{connect:'#ev_forms'}" class="uk-tab">
+    <li><a href="#">Event Information</a></li>
+    <li><a href="#">Location</a></li>
+    <li><a href="#">Contact</a></li>
     <li><a href="">Permissions</a></li>
-{!endif}
 </ul>
 {alert_msg}
-<div>
-	<form action="{action_url}" method="post" class="uk-form uk-form-horizontal evForm"
-		name="eventeditor" id="eventeditor" class="evlisteditor">
-		<input type="hidden" name="src" value="{src}" />
-		<input type="hidden" name="owner_id" value="{owner_id}" />
-		<input type="hidden" name="postmode" value="{postmode}" />
+<form action="{action_url}" method="post" class="uk-form uk-form-horizontal evForm"
+	name="eventeditor" id="eventeditor" class="evlisteditor">
+	<input type="hidden" name="src" value="{src}" />
+	<input type="hidden" name="owner_id" value="{owner_id}" />
+	<input type="hidden" name="postmode" value="{postmode}" />
 
-		<ul id="ev_forms" class="uk-switcher">
-			<li>
+	<ul id="ev_forms" class="uk-switcher">
+		<li>
 			<fieldset class="evForm">
 				<legend>{$LANG_EVLIST['gen_evt_info']}</legend>
 
@@ -417,7 +414,7 @@ function toggleRSVPdetail(val)
 					<label class="uk-form-label">{$LANG_EVLIST['timezone']}:
 						<span id="hlp_tzid" class="tooltip_cfg tooltipstered"></span>
 					</label>
-					<div class="uk-form-controls">
+					<div class="uk-form-controls uk-form-controls-text">
 						<input class="uk-checkbox" type="checkbox" id="tz_local" name="tz_local" onclick="showhide_tzselect(this)" {tz_islocal}>&nbsp;{$LANG_EVLIST['tz_local']}<br />
 						<span id="tz_select">{$LANG_EVLIST['tz_select']}: {tz_select}</span>
 					</div>
@@ -442,16 +439,16 @@ function toggleRSVPdetail(val)
 
 				<div {datetime2_show} id="div3">
 					<div class="uk-form-row uk-margin">
-						<label>{$LANG_EVLIST['start_time']}:</label>
+						<label class="uk-form-label">{$LANG_EVLIST['start_time']} 2:</label>
 						<div class="uk-form-controls">
-							<input type="text" id="f_timestart2" name="time_start2" size="10" value="{time_start2}" class="ev_timepicker" />
+							<input class="uk-input uk-form-width-small" type="text" id="f_timestart2" name="time_start2" size="10" value="{time_start2}" class="ev_timepicker" />
 						</div>
 					</div>
 
 					<div class="uk-form-row uk-margin">
-						<label>{$LANG_EVLIST['end_time']}:</label>
+						<label class="uk-form-label">{$LANG_EVLIST['end_time']} 2:</label>
 						<div class="uk-form-controls">
-							<input type="text" name="time_end2" size="10" value="{time_end2}" class="ev_timepicker" />
+							<input  class="uk-input uk-form-width-small" type="text" name="time_end2" size="10" value="{time_end2}" class="ev_timepicker" />
 						</div>
 					</div>
 				</div>
@@ -503,7 +500,7 @@ function toggleRSVPdetail(val)
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="22" {mdchk22} /> 21</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="23" {mdchk23} /> 23</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="24" {mdchk24} /> 24</li>
-								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="25" {mdchk25} /> 25</li>
+								li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="25" {mdchk25} /> 25</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="26" {mdchk26} /> 26</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="27" {mdchk27} /> 27</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="28" {mdchk28} /> 28</li>
@@ -621,7 +618,7 @@ function toggleRSVPdetail(val)
 					<label	class="uk-form-label" style="width:16em;">
 						{$LANG_EVLIST['show_upcoming']}?
 					</label>
-					<div class="uk-form-controls">
+					<div class="uk-form-controls uk-form-controls-text">
 						<input id="show_upcoming" name="show_upcoming" class="uk-checkbox" type="checkbox"
 							value="1" {upcoming_chk} />
 					</div>
@@ -642,7 +639,7 @@ function toggleRSVPdetail(val)
 					<label class="uk-form-label">{$LANG_EVLIST['enabled']}
 						<span id="hlp_enabled" class="tooltip_cfg tooltipstered"></span>
 					</label>
-					<div class="uk-form-controls">
+					<div class="uk-form-controls uk-form-controls-text">
 						<input class="uk-checkbox" type="checkbox" name="status" value="1" id="status" {status_checked} />
 					</div>
 				</div>
@@ -653,7 +650,7 @@ function toggleRSVPdetail(val)
 						{$LANG_EVLIST['enable_reminders_q']}
 						<span id="hlp_reminders" class="tooltip_cfg tooltipstered"></span>
 					</label>
-					<div class="uk-form-controls">
+					<div class="uk-form-controls uk-form-controls-text">
 						<input class="uk-checkbox" type="checkbox" name="enable_reminders" value="1" id="enable_reminders" {rem_status_checked} />
 					</div>
 				</div>
@@ -663,8 +660,8 @@ function toggleRSVPdetail(val)
 					<label class="uk-form-label">{$LANG_EVLIST['enable_comments']}
 						<span id="hlp_comments" class="tooltip_cfg tooltipstered"></span>
 					</label>
-					<div class="uk-form-controls">
-						<select name="enable_comments">
+					<div class="uk-form-controls uk-form-controls-text">
+						<select class="uk-select uk-form-width-small" name="enable_comments">
 							<option value="0" {ena_cmt_0}>{$LANG_EVLIST['yes']}</option>
 							<option value="-1" {ena_cmt_-1}>{$LANG_EVLIST['no']}</option>
 							<option value="1" {ena_cmt_1}>{$LANG_EVLIST['closed']}</option>
@@ -697,7 +694,7 @@ function toggleRSVPdetail(val)
 				<div id="rsvp_detail">
 					<div class="uk-form-row uk-margin">
 						<label class="uk-form-label">{$LANG_EVLIST['max_rsvp']}:</label>
-						<div class="uk-form-controls">
+						<div class="uk-form-controls uk-form-controls-text">
 							<input class="uk-input uk-form-width-small" type="text" id="max_rsvp" name="max_rsvp" maxlength="5" value="{max_rsvp}" />
 							&nbsp;&nbsp;{$LANG_EVLIST['rsvp_waitlist']}
 							<input class="uk-checkbox" type="checkbox" name="rsvp_waitlist" value="1" {rsvp_wait_chk} />
@@ -742,7 +739,7 @@ function toggleRSVPdetail(val)
 
 					<div class="uk-form-row uk-margin">
 						<label class="uk-form-label">{$LANG_EVLIST['tic_cmt_allowed']}?</label>
-						<div class="uk-form-controls">
+						<div class="uk-form-controls uk-form-controls-text">
 							<input class="uk-checkbox" type="checkbox" name="rsvp_comments" value="1" {rsvp_cmt_chk} />
 						</div>
 					</div>
@@ -781,152 +778,148 @@ function toggleRSVPdetail(val)
 {!endif}
 			</fieldset>
 {!endif}
-			</li>
+		</li>
 
-			<li>
-		<fieldset class="evForm">
-			<legend>{$LANG_EVLIST['ev_location']}</legend>
+		<li>
+			<fieldset class="evForm">
+				<legend>{$LANG_EVLIST['ev_location']}</legend>
 {!if use_locator}
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['select_location']}</label>
-				<div class="uk-form-controls">
-					<select id="loc_sel" name="loc_sel"
-						onchange="javascript:EVupdateLoc(this.value);" >
-						<option value=''>{$LANG_EVLIST['select_location']}</option>
-						{loc_selection}
-					</select>&nbsp;<i>{$LANG_EVLIST['instr_sel_loc']}</i>
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['select_location']}</label>
+					<div class="uk-form-controls">
+						<select class="uk-select" id="loc_sel" name="loc_sel"
+							onchange="javascript:EVupdateLoc(this.value);" >
+							<option value=''>{$LANG_EVLIST['select_location']}</option>
+							{loc_selection}
+						</select>&nbsp;<i>{$LANG_EVLIST['instr_sel_loc']}</i>
+					</div>
 				</div>
-			</div>
 {!endif}
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['ev_location']}:</label>
-				<div class="uk-form-controls">
-					<textarea name="location" id="location" style="width:80%;"
-						cols="80" rows="1">{location}</textarea>
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['ev_location']}:</label>
+					<div class="uk-form-controls">
+						<input type="text" class="uk-input" name="location" id="location" value="{location}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['street_address']}:</label>
-				<div class="uk-form-controls">
-					<input type="text" name="street" id="street" style="width:80%;"
-						maxlength="64" value="{street}" />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['street_address']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="street" id="street"
+							maxlength="64" value="{street}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['city']}:</label>
-				<div class="uk-form-controls">
-					<input type="text" name="city" id="city" style="width:80%;"
-						maxlength="64" value="{city}" /><br />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['city']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="city" id="city" maxlength="64" value="{city}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['state']}:</label>
-				<div class="uk-form-controls">
-					<input type="text" name="province" id="province" style="width:80%;"
-						maxlength="64" value="{province}" />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['state']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="province" id="province" maxlength="64" value="{province}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['country']}:</label>
-				<div class="uk-form-controls">
-					<input class="uk-form-label" type="text" name="country" id="country" style="width:80%;"
-						maxlength="64" value="{country}" />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['country']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="country" id="country" maxlength="64" value="{country}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['zip']}:</label>
-				<div class="uk-form-controls">
-					<input type="text" name="postal" id="postal" size="10" maxlength="25"
-						value="{postal}" />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['zip']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input uk-form-width-small" type="text" name="postal" id="postal" size="10" maxlength="25"
+							value="{postal}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['coordinates']}:</label>
-				<div class="uk-form-controls">
-					<input type="text" name="lat" id="lat" size="11" maxlength="11"
-						value="{lat}" /> {$LANG_EVLIST['latitude']},
-					&nbsp;&nbsp;
-					<input type="text" name="lng" id="lng" size="11" maxlength="11"
-						value="{lng}" /> {$LANG_EVLIST['longitude']}
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['coordinates']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input uk-form-width-small" type="text" name="lat" id="lat" maxlength="11"
+							value="{lat}" /> {$LANG_EVLIST['latitude']},
+						&nbsp;&nbsp;
+						<input class="uk-input uk-form-width-small" type="text" name="lng" id="lng" maxlength="11"
+							value="{lng}" /> {$LANG_EVLIST['longitude']}
+					</div>
 				</div>
-			</div>
-		</fieldset>
+			</fieldset>
 		</li>
 
 		<li>
 {!if contact_section}
-		<fieldset class="evForm">
-			<legend>{$LANG_EVLIST['ev_contact']}</legend>
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['for_more_info']}:</label>
-				<div class="uk-form-controls">
-					<input class="uk-input" type="text" name="contact" id="contact" style="width:50%;"
-						maxlength="64" value="{contact}" />
+			<fieldset class="evForm">
+				<legend>{$LANG_EVLIST['ev_contact']}</legend>
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['for_more_info']}:</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="contact" id="contact" style="width:50%;"
+							maxlength="64" value="{contact}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_EVLIST['email']}</label>
-				<div class="uk-form-controls">
-					<input class="uk-input" type="text" name="email" id="email" style="width:50%;"
-						maxlength="64" value="{email}" />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_EVLIST['email']}</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="email" id="email" style="width:50%;"
+							maxlength="64" value="{email}" />
+					</div>
 				</div>
-			</div>
 
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label"">{$LANG_EVLIST['phone']}</label>
-				<div class="uk-form-controls">
-					<input class="uk-input" type="text" name="phone" id="phone" maxlength="32" value="{phone}" />
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label"">{$LANG_EVLIST['phone']}</label>
+					<div class="uk-form-controls">
+						<input class="uk-input" type="text" name="phone" id="phone" maxlength="32" value="{phone}" />
+					</div>
 				</div>
-			</div>
-
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">
-					{$LANG_EVLIST['show_contactlink']}?
-				</label>
-				<div class="uk-form-controls">
-					<input class="uk-checkbox" type="checkbox" name="contactlink" id="contactlink"
-						{contactlink_chk} />
+	
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">
+						{$LANG_EVLIST['show_contactlink']}?
+					</label>
+					<div class="uk-form-controls uk-form-controls-text">
+						<input class="uk-checkbox" type="checkbox" name="contactlink" id="contactlink"
+							{contactlink_chk} />
+					</div>
 				</div>
-			</div>
-		</fieldset>
+			</fieldset>
 {!endif}
 		</li>
 
 		<li>
-{!if permissions_editor}
-		<fieldset>
-			<legend>{$LANG_ACCESS['accessrights']}</legend>
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_ACCESS['owner']}:</label>
-				<div class="uk-form-controls">
-					<select class="uk-select uk-form-small uk-form-width-small" id="owner" name="owner_id">
-					{owner_dropdown}
-					</select>
-				</div>
-			</div>
-			<div class="uk-form-row uk-margin">
-				<label class="uk-form-label">{$LANG_ACCESS['group']}:</label>
-				<div class="uk-form-controls">
-					{group_dropdown}
-				</div>
-			</div>
-			<div class="uk-form-row uk-margin">
-				<p>{$LANG_EVLIST['perms_desc']}</p>
-				{permissions_editor}
-				<p>{perm_msg}</p>
-			</div>
-		</fieldset>
+			<fieldset>
+				<legend>{$LANG_ACCESS['accessrights']}</legend>
+				<div class="uk-form-row uk-margin">
+					<label class="uk-form-label">{$LANG_ACCESS['owner']}:</label>
+					<div class="uk-form-controls">
+{!if is_admin}
+						<select class="uk-select uk-form-small uk-form-width-small" id="owner" name="owner_id">
+						{owner_dropdown}
+						</select>
 {!else}
-		<input type="hidden" name="group_id" value="{group_id}" />
+						{owner_name}
 {!endif}
+					</div>
+				</div>
+				<div class="uk-form-row uk-margin" style="clear:left;">
+					<label class="uk-form-label">{$LANG_ACCESS['group']}:</label>
+					<div class="uk-form-controls">
+						{group_dropdown}
+					</div>
+				</div>
+				<div class="uk-form-row uk-margin">
+					<p>{$LANG_EVLIST['perms_desc']}</p>
+					{permissions_editor}
+					<p>{perm_msg}</p>
+				</div>
+			</fieldset>
 		</li>
 
 		</ul>
@@ -965,8 +958,7 @@ function toggleRSVPdetail(val)
 		</ul>
 	</div>
 
-	</form>
-</div>
+</form>
 
 <script type="text/javascript">
 	function calcdate(cal)
@@ -1023,7 +1015,7 @@ function toggleRSVPdetail(val)
 	}
 
 /* Initially the navbar is hidden - in case JS is disabled. Enable it now */
-document.getElementById('pe_navbar').style.display='';
+/*document.getElementById('pe_navbar').style.display='';
 var eventpanels = new Object;
 var el;
 el=document.getElementsByTagName('div');
@@ -1036,7 +1028,7 @@ for (i = 0; i < el.length; i++) {
 	el[i].style.display = 'none';
 	eventpanels[divname] = 'hidden';
 	}
-}
+}*/
 
 $(document).ready(function() {
 	toggleRSVPdetail({use_rsvp});

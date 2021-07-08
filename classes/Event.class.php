@@ -1374,10 +1374,6 @@ class Event
         }
 
         $retval = '';
-        //$recinterval = '';
-
-        $ownerusername = DB_getItem($_TABLES['users'],
-                    'username', "uid='{$this->owner_id}'");
 
         $retval .= COM_startBlock($LANG_EVLIST['event_editor']);
         $summary = $this->Detail->getSummary();
@@ -1563,6 +1559,7 @@ class Event
             'tz_islocal'    => $this->tzid == 'local' ? EVCHECKED : '',
             'isNew'         => (int)$this->isNew,
             'fomat_opt'     => $this->recurring,
+            'owner_name' => COM_getDisplayName($this->owner_id),
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
@@ -1711,10 +1708,9 @@ class Event
 
         if ($this->isAdmin) {
             $T->set_var(array(
-                'owner_username' => COM_stripslashes($ownerusername),
+                //'owner_username' => COM_stripslashes($ownerusername),
                 'owner_dropdown' => COM_optionList($_TABLES['users'],
                         'uid,username', $this->owner_id, 1),
-                 'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
                  'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
                      (int)$this->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
                  ),
@@ -1724,9 +1720,16 @@ class Event
                         $this->perm_owner, $this->perm_group,
                         $this->perm_members, $this->perm_anon));
             }
+        }
 
-        } else {
-            $T->set_var('group_id', $this->group_id);
+        if ($rp_id == 0) {  // can only change permissions on main event
+            $T->set_var(array(
+                'permissions_editor' => SEC_getPermissionsHTML(
+                    $this->perm_owner, $this->perm_group,
+                    $this->perm_members, $this->perm_anon
+                ),
+                'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
+            ) );
         }
 
         // Latitude & Longitude part of location, if Location plugin is used

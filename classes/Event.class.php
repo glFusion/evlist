@@ -1230,8 +1230,11 @@ class Event
             break;
         case EV_RECUR_WEEKLY:
             //$T->set_var('listdays_val', COM_stripslashes($rec_data[0]));
-            if (is_array($this->rec_data['listdays']) &&
-                    !empty($this->rec_data['listdays'])) {
+            if (
+                isset($this->rec_data['listdays']) &&
+                is_array($this->rec_data['listdays']) &&
+                !empty($this->rec_data['listdays'])
+            ) {
                 foreach($this->rec_data['listdays'] as $day) {
                     $day = (int)$day;
                     if ($day > 0 && $day < 8) {
@@ -1564,34 +1567,28 @@ class Event
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
             $TickTypes = TicketType::GetTicketTypes();
-            //$T->set_block('editor', 'Tickets', 'tTypes');
+            $T->set_block('editor', 'Tickets', 'tTypes');
             $tick_opts = '';
-            foreach ($TickTypes as $tick_id=>$tick_obj) {
+            foreach ($TickTypes as $tick_id=>$TicketType) {
                 // Check enabled tickets. Ticket type 1 enabled by default
                 if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
-                    $checked = 'checked="checked"';
+                    $checked = true;
                     if (isset($this->options['tickets'][$tick_id])) {
                         $fee = (float)$this->options['tickets'][$tick_id]['fee'];
                     } else {
                         $fee = 0;
                     }
                 } else {
-                    $checked = '';
+                    $checked = false;
                     $fee = 0;
                 }
-                $tick_opts .= '<tr><td><input name="tickets[' . $tick_id .
-                    ']" type="checkbox" ' . $checked .
-                    ' value="' . $tick_id . '" /></td>' .
-                    '<td>' . $tick_obj->getDscp() . '</td>' .
-                    '<td><input type="text" name="tick_fees[' . $tick_id .
-                    ']" value="' . $fee . '" size="8" /></td></tr>' . LB;
-                /*$T->set_var(array(
-                    'tick_id' => $tic['id'],
-                    'tick_desc' => $tic['description'],
+                $T->set_var(array(
+                    'tick_id' => $tick_id,
+                    'tick_dscp' => $TicketType->getDscp(),
                     'tick_fee' => $fee,
-                    'tick_enabled' => $enabled ? 'checked="checked"' : '',
+                    'tick_checked' => $checked,
                 ) ) ;
-                //$T->parse('tTypes', 'Tickets', true);*/
+                $T->parse('tTypes', 'Tickets', true);
             }
 
             if ($_EV_CONF['rsvp_print'] > 0) {
@@ -1612,7 +1609,6 @@ class Event
                 'rsvp_cutoff' => $this->getOption('rsvp_cutoff'),
                 'use_rsvp' => $this->getOption('use_rsvp'), // for javascript
                 'rsvp_waitlist' => $this->getOption('rsvp_waitlist'),
-                'tick_opts'     => $tick_opts,
                 'rsvp_print'    => $rsvp_print,
                 $rsvp_print_chk => 'checked="checked"',
             ) );
@@ -2199,7 +2195,7 @@ class Event
     {
         global $LANG_EVLIST;
 
-        if (($freq == '' || $interval == '') && is_object($this)) {
+        if (($freq == '' || $interval == '')) {
             $freq = $this->rec_data['freq'];
             $interval = $this->rec_data['type'];
         }
@@ -2209,18 +2205,19 @@ class Event
         if ($interval < EV_RECUR_DAILY || $interval > EV_RECUR_DATES) {
             $interval = EV_RECUR_DAILY;
         }
-        if ($freq < 1)
+        if ($freq < 1) {
             $freq = 1;
-
+        }
         $freq_str = '';
 
         // Create the recurring description.  Nothing for custom dates
         if ($interval < EV_RECUR_DATES) {
-            $interval_txt = $LANG_EVLIST['rec_periods'][$interval];
-            if ($freq > 1)
+            if ($freq == 1) {
+                $freq_str = $LANG_EVLIST['rec_period_dscp']['single'][$interval];
                 $freq_str = "$freq {$interval_txt}";
-            else
-                $freq_str = $interval_txt;
+            } else {
+                $freq_str = $freq . ' ' . $LANG_EVLIST['rec_period_dscp']['plural'][$interval];
+            }
         }
         return $freq_str;
     }

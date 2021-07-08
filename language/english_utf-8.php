@@ -1,37 +1,9 @@
 <?php
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | english_utf-8.php                                                        |
-// |                                                                          |
-// | English language file for evList                                         |
-// +--------------------------------------------------------------------------+
-// | Based on the evList Plugin for Geeklog CMS                               |
-// | Copyright (C) 2007 by the following authors:                             |
-// |                                                                          |
-// | Authors: Alford Deeley     - ajdeeley AT summitpages.ca                  |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
 /**
 *   English language file for the evList plugin
 *   @package    evlist
 */
-// this file can't be used on its own
+
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
@@ -149,6 +121,27 @@ You may either move existing events to a new calendar, or delete those events.',
     4 => 'week(s)',
     5 => 'month(s)',
     6 => '',
+),
+'rec_period_dscp' => array(
+    // Good reason to switch to gettext()
+    'single' => array(
+        0 => '',
+        1 => 'day',
+        2 => 'month',
+        3 => 'year',
+        4 => 'week',
+        5 => 'month',
+        6 => '',
+    ),
+    'plural' => array(
+        0 => '',
+        1 => 'days',
+        2 => 'months',
+        3 => 'years',
+        4 => 'weeks',
+        5 => 'months',
+        6 => '',
+    ),
 ),
 'postmodes' => array (
     'plaintext' => 'plaintext',

@@ -553,6 +553,9 @@ function EVLIST_remove_old_files()
             'templatest/centerblock_item.thtml',
             // 1.5.0
             'evlist_views.inc.php',
+            'language/english.php',
+            'language/german.php',
+            'language/german_formal.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

@@ -3,9 +3,9 @@
  * Class to create a single recurrences for the evList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2020-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.0
  * @since       v1.4.6
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -43,5 +43,3 @@ class RecurOnetime extends Recurrence
     }
 
 }
-
-?>

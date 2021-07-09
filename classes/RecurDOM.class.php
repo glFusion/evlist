@@ -3,9 +3,9 @@
  * Class to create day-of-month recurrences for the evList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -40,18 +40,16 @@ class RecurDOM extends Recurrence
         $occurrence = $this->date_start;
         list($y, $m, $d) = explode('-', $occurrence);
 
-        //$num_intervals = count($intervalA);
-        //$last_interval = $intervalA[$num_intervals - 1];
-
         $count = 0;
         // reduce the weekday number, since evlist uses Sun=1 while
         // DateFunc uses Sun=0
         $datecalc_weekday = (int)$this->rec_data['weekday'] - 1;
 
-        while ($occurrence <= $this->rec_data['stop'] &&
-                    $occurrence >= '1971-01-01' &&
-                    $count < $_EV_CONF['max_repeats']) {
-
+        while (
+            $occurrence <= $this->rec_data['stop'] &&
+            $occurrence >= '1971-01-01' &&
+            $count < $_EV_CONF['max_repeats']
+        ) {
             foreach ($intervalA as $interval) {
 
                 $occurrence = DateFunc::NWeekdayOfMonth(
@@ -61,7 +59,9 @@ class RecurDOM extends Recurrence
                 );
 
                 // Skip any dates earlier than the starting date
-                if ($occurrence < $this->date_start) continue;
+                if ($occurrence < $this->date_start) {
+                    continue;
+                }
 
                 // If the new date goes past the end of month, and we're looking
                 // for the last (5th) week, then re-adjust to use the 4th week.
@@ -71,7 +71,9 @@ class RecurDOM extends Recurrence
                 }
 
                 // Stop when we hit the stop date
-                if ($occurrence > $this->rec_data['stop']) break;
+                if ($occurrence > $this->rec_data['stop']) {
+                    break;
+                }
 
                 // This occurrence is ok, save it
                 $this->storeEvent($occurrence);
@@ -92,8 +94,6 @@ class RecurDOM extends Recurrence
         }   // while not at stop date
 
         return $this;
-    }   // function MakeRecurrences
+    }
 
-}   // class RecurDOM
-
-?>
+}

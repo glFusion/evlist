@@ -3,9 +3,10 @@
  * Class to create weekly recurrences for the evList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
+ * @since       v1.4.3
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -37,18 +38,16 @@ class RecurWeekly extends Recurrence
 
         $occurrence = $this->date_start;
 
-        //$num_intervals = count($days_on);
-        //$last_interval = $days_on[$num_intervals - 1];
-
         // Start by reducing the starting date by one day. Then the for
         // loop can handle all the events.
         list($y, $m, $d) = explode('-', $occurrence);
         $occurrence = DateFunc::prevDay($d, $m, $y);
         $count = 1;
-        while ($occurrence <= $this->rec_data['stop'] &&
-                    $occurrence >= '1971-01-01' &&
-                    $count < $_EV_CONF['max_repeats']) {
-
+        while (
+            $occurrence <= $this->rec_data['stop'] &&
+            $occurrence >= '1971-01-01' &&
+            $count < $_EV_CONF['max_repeats']
+        ) {
             foreach ($days_on as $dow) {
 
                 list($y, $m, $d) = explode('-', $occurrence);
@@ -74,6 +73,4 @@ class RecurWeekly extends Recurrence
         return $this;
     }
 
-}   // class RecurWeekly
-
-?>
+}

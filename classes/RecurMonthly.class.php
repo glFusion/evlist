@@ -3,9 +3,10 @@
  * Class to create monthly recurrences for the evList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
+ * @since       v1.4.3
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -44,7 +45,6 @@ class RecurMonthly extends Recurrence
         $count = 0;
         while (
             $occurrence <= $this->rec_data['stop'] &&
-            //$occurrence >= '1971-01-01' &&
             $count < $_EV_CONF['max_repeats']
         ) {
             $lastday = cal_days_in_month(CAL_GREGORIAN, $m, $y);
@@ -134,6 +134,4 @@ class RecurMonthly extends Recurrence
         return $newdate;
     }
 
-}   // class RecurMonthly
-
-?>
+}

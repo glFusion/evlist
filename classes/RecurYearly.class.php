@@ -3,9 +3,10 @@
  * Class to create yearly recurrences for the evList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.0
+ * @since       v1.4.3
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -32,6 +33,4 @@ class RecurYearly extends Recurrence
         return $newdate;
     }
 
-}   // class RecurYearly
-
-?>
+}

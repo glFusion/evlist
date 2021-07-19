@@ -349,7 +349,7 @@ function toggleRSVPdetail(val)
 						<span id="summary" class="tooltip_cfg tooltipstered"></span>
 					</label>
 					<div class="uk-form-controls">
-						<textarea class="uk-textarea" name="summary" id="summary" rows="4">{summary}</textarea>
+						<textarea class="uk-textarea uk-width-1-1" name="summary" id="summary" rows="4">{summary}</textarea>
 					</div>
 				</div>
 

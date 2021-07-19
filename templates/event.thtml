@@ -17,9 +17,9 @@
 	<div id="evlistEventEditSelect">
 {!if can_edit}
 	{!if is_recurring}
-		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}" uk-dropdown="mode:click">
 			<a href="#" title="{$LANG_ADMIN['edit']}" class="{icon_edit} tooltip"></a>
-			<div class="uk-dropdown uk-dropdown-bottom">
+			<div class="uk-dropdown uk-dropdown-bottom" uk-dropdown="mode:click">
 				<a href="{pi_url}/event.php?rp_id={rp_id}&amp;eid={ev_id}&amp;edit=repeat" id="edit_repeat">
 					<i class="{icon_edit} ev-icon-info tooltip" title="{$LANG_EVLIST['edit_repeat']}"></i>
 					{$LANG_EVLIST['edit_repeat']}
@@ -43,11 +43,11 @@
 	{!endif}
 
 	{!if is_recurring}
-		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}" uk-dropdown="mode:click">
 			<a href="#">
 				<i title="{$LANG_ADMIN['delete']}" class="{icon_remove} ev-icon-danger tooltip"></i>
 			</a>
-			<div class="uk-dropdown uk-dropdown-bottom">
+			<div class="uk-dropdown uk-dropdown-bottom" uk-dropdown="mode:click">
 				<a href="{pi_url}/event.php?rp_id={rp_id}&amp;delrepeat=x" onclick="return confirm('{$LANG_EVLIST['conf_del_repeat']}')" id="delete_repeat">
 					<i class="{icon_remove} ev-icon-danger"></i>
 					{$LANG_EVLIST['del_repeat']}
@@ -79,9 +79,9 @@
 {!endif}
 
 {!if can_subscribe}
-		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}">
+		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}" uk-dropdown="mode:click">
 			<a href="#"><i title="{$LANG_EVLIST['subscribe']}" class="{icon_subscribe} ev-icon-info tooltip"></i></a>
-			<div class="uk-dropdown uk-dropdown-bottom">
+			<div class="uk-dropdown uk-dropdown-bottom" uk-dropdown="mode:click">
 				{$LANG_EVLIST['subscribe_to']} ...<br />
 				<a href="{webcal_url}/ical.php?rp_id={rp_id}" id="sub_instance" rel="nofollow">
 					<i title="{$LANG_EVLIST['sub_this_instance']}" class="{icon_subscribe} ev-icon-info tooltip"></i>
@@ -249,11 +249,10 @@
 {!if show_reminderform}
 		<div class="uk-width-1-1 uk-width-medium-1-2">
 			<div id="reminder_no" class="evdata uk-alert" style="display:none;">
-				<form class="uk-form" id="evRemAdd" onsubmit="updateReminder(this);return false;">
+				<form uk-form class="uk-form uk-form-horizontal" id="evRemAdd" onsubmit="updateReminder(this);return false;">
 					{$LANG_EVLIST['email']}
-					<input type="text" style="width:80%" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />
-					<br />
-					<input type="text" size="2" maxlength="3" name="notice" id="notice" value="{notice}" />
+					<input class="uk-input uk-form-small uk-form-width-medium" type="text" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />&nbsp;
+					<input class="uk-input uk-form-small uk-form-width-xsmall" type="text" maxlength="3" name="notice" id="notice" value="{notice}" />
 					{$LANG_EVLIST['days_prior']}
 					<button type="submit" name="savereminder" class="uk-button uk-button-success uk-button-small" value="{$LANG_ACCESS['submit']}">{$LANG_ACCESS['submit']}</button>
 					<p>{$LANG_EVLIST['email_private']}</p>
@@ -285,7 +284,6 @@
 			</form>
 		</div>
 {!endif}
-
 {!if register_link}
 		<div style="clear:both;" class="evEventRegInfo">
 			<div id="regdiv" style="margin-top:15px;"></div>
@@ -450,20 +448,5 @@ $(document).ready(function() {
   showReminder("{reminder_msg}");
 });
 {!endif}
-
-/*function changeView(view)
-{
-  if (view == 'event') {
-    document.getElementById("btn_event").className = "uk-button uk-button-primary";
-    document.getElementById("btn_rsvp").className = "uk-button";
-    document.getElementById("evlistEvent").style = "display:''";
-    document.getElementById("evlistRSVP").style = "display:none";
-  } else {
-    document.getElementById("btn_event").className = "uk-button";
-    document.getElementById("btn_rsvp").className = "uk-button uk-button-primary";
-    document.getElementById("evlistEvent").style = "display:none";
-    document.getElementById("evlistRSVP").style = "display:''";
-  }
-}*/
 </script>
 {# end {templatelocation} #}

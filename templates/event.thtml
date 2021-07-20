@@ -279,7 +279,7 @@
 			{$LANG_EVLIST['cancel_free']}<br />
 			<form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
 				<input type="hidden" name="rp_id" value="{rp_id}" />
-				<input type="submit" name="cancelreg" value="Cancel " class="lgButton red" />
+				<input type="submit" name="cancelreg" value="{$LANG_ADMIN['cancel']}" class="uk-button uk-button-mini uk-button-danger" />
 				<input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
 			</form>
 		</div>
@@ -338,7 +338,7 @@
 				<div class="uk-form-row">
 					<label class="uk-form-label"></label>
 					<div class="uk-form-controls">
-						<button type="submit" class="lgButton orange" name="register"
+						<button type="submit" class="uk-button uk-button-mini uk-button-success" name="register"
 							value="{$LANG_EVLIST['register']}">{$LANG_EVLIST['register']}</button>
 					</div>
 				</div>

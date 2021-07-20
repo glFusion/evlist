@@ -2217,7 +2217,6 @@ class Event
         if ($interval < EV_RECUR_DATES) {
             if ($freq == 1) {
                 $freq_str = $LANG_EVLIST['rec_period_dscp']['single'][$interval];
-                $freq_str = "$freq {$interval_txt}";
             } else {
                 $freq_str = $freq . ' ' . $LANG_EVLIST['rec_period_dscp']['plural'][$interval];
             }

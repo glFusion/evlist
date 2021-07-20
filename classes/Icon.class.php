@@ -52,8 +52,10 @@ class Icon
     public static function getIcon($str)
     {
         $str = strtolower($str);
-        if (array_key_exists($str, self::$icons)) {
-            return self::$icons[$str];
+        if (empty($str)) {
+            return '';
+        } elseif (array_key_exists($str, self::$icons)) {
+            return 'uk-icon ' . self::$icons[$str];
         } else {
             return 'uk-icon uk-icon-' . $str;
         }

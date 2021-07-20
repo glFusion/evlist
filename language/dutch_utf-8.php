@@ -468,6 +468,8 @@ $LANG_confignames['evlist'] = array(
     'commentsupport'        => 'Enable Comments?',
     'ticket_format'         => 'Ticket Format String',
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
+    'cb_dup_chk'            => 'Key to hide duplicate instances',
+    'cb_hide_small'         => 'Hide on small screens',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Hoofd Instellingen',

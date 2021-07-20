@@ -1,29 +1,29 @@
 {# begin {templatelocation} #}
-<div class="evCBouter">
+<div class="evCBouter {!if hidesmall}uk-visible@m uk-hidden-small{!endif}">
     <div class="evCBheader">
         <h2>{$LANG_EVLIST['upcoming_events']}...</h2>
     </div>
-    <div class="uk-grid uk-grid-match uk-width-1-1 uk-match uk-hidden-small evCBtitle">
-        <div class="uk-width-medium-2-6 evCBname">
+    <div uk-grid class="uk-grid uk-grid-match uk-width-1-1 uk-match uk-hidden-small evCBtitle">
+        <div class="uk-width-1-3@m uk-width-medium-2-6 evCBname">
             <b>{$LANG_EVLIST['event_title']}</b>
         </div>
-        <div class="uk-width-medium-3-6 evCBsummary">
+        <div class="uk-width-1-2@m uk-width-medium-3-6 evCBsummary">
             <b>{$LANG_EVLIST['event_summary']}</b>
         </div>
-        <div  class="uk-width-medium-1-6 evCBdate">
+        <div  class="uk-width-1-6@m uk-width-medium-1-6 evCBdate">
             <b>{$LANG_EVLIST['start_date']}</b>
         </div>
     </div>
     {adblock}
 <!-- BEGIN eventRow -->
     <div class="uk-grid uk-grid-match uk-width-1-1 uk-match ev-cb-table evCBcontent">
-        <div class="uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
+        <div class="uk-width-1-3@m uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
             {ev_link}
         </div>
-        <div class="uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
+        <div class="uk-width-1-2@m uk-width-medium-3-6 uk-width-1-1" style="margin-bottom:10px;">
             {summary}
         </div>
-        <div class="uk-width-medium-1-6 uk-width-1-1" style="margin-bottom:10px;">
+        <div class="uk-width-1-6@m uk-width-medium-1-6 uk-width-1-1" style="margin-bottom:10px;">
             {startdate}
 {!if multiday}
             - {enddate}

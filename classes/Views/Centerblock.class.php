@@ -57,7 +57,7 @@ class Centerblock
                 return '';
             }
         }
-
+        $display = '';
         if (empty($display)) {  // not found in cache
             // overloading the previously-boolean enable_centerblock option to
             // indicate the centerblock format.
@@ -99,9 +99,11 @@ class Centerblock
         switch ($format) {
         case 1:     // table format
             $tpl_file = 'centerblock.thtml';
+            $hidesmall = $_EV_CONF['cb_hide_small'];
             break;
         case 2:     // story format
             $tpl_file = 'cblock_stories.thtml';
+            $hidesmall = false;
             break;
         default:
             return '';
@@ -199,6 +201,7 @@ class Centerblock
             'endblock' => COM_endBlock(),
             'title_label' => $LANG_EVLIST['event_title'],
             'date_label' => $LANG_EVLIST['start_date'],
+            'hidesmall' => $hidesmall,
         ) );
         $cssid = 0;
 

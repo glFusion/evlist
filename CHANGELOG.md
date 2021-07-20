@@ -23,6 +23,7 @@ Release TBD
 - Condense header, better for small screens.
 - Fix iCal format for long descriptions.
 - Use glFusion built-in datetime picker instead of UIkit version.
+- Add option to hide centerblock from small screens.
 
 ## v1.4.5
 Release 2018-04-14

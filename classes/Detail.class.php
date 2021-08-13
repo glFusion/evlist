@@ -11,6 +11,8 @@
  * @filesource
  */
 namespace Evlist;
+use Evlist\Models\Status;
+
 
 /**
  * Class for event detail.
@@ -483,18 +485,20 @@ class Detail
         if (!$this->isNew) {
             // For updates, delete the event from the cache table.
            $sql = "UPDATE {$_TABLES['evlist_detail']}
-                    SET $fld_sql,
-                    lat = '{$lat}',
-                    lng = '{$lng}'
-                    WHERE det_id='" . (int)$this->det_id . "'";
+                SET $fld_sql,
+                lat = '{$lat}',
+                lng = '{$lng}',
+                det_revision = det_revision + 1
+                WHERE det_id='" . (int)$this->det_id . "'";
             //echo $sql;die;
             DB_query($sql);
         } else {
             $sql = "INSERT INTO {$_TABLES['evlist_detail']} SET
-                    det_id = 0,
-                    lat = '{$lat}',
-                    lng = '{$lng}',
-                    $fld_sql";
+                det_id = 0,
+                lat = '{$lat}',
+                lng = '{$lng}',
+                det_revision = det_revision + 1,
+                $fld_sql";
             //echo $sql;die;
             DB_query($sql);
             $this->det_id = DB_insertID();
@@ -514,10 +518,26 @@ class Detail
             return false;
         }
 
-        DB_delete($_TABLES['evlist_detail'], 'det_id', $this->det_id);
-        $this->det_id = 0;
-        $this->isNew = true;
+        $sql = "UPDATE {$_TABLES['evlist_detail']}
+            SET det_status = " . Status::CANCELLED .
+            " WHERE det_id = {$this->det_id}";
+        DB_query($sql);
         return true;
+    }
+
+
+    /**
+     * Delete cancelled events that have not been updated in some time.
+     */
+    public static function purgeCancelled()
+    {
+        global $_TABLES, $_EV_CONF;
+
+        $days = (int)$_EV_CONF['purge_cancelled_days'];
+        $sql = "DELETE FROM {$_TABLES['evlist_detail']}
+                WHERE det_status = " . Status::CANCELLED .
+                " AND det_last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
+        DB_query($sql);
     }
 
 

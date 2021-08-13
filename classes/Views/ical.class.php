@@ -14,6 +14,7 @@
 namespace Evlist\Views;
 use Evlist\Calendar;
 use Evlist\Models\EventSet;
+use Evlist\Models\Status;
 
 
 /**
@@ -65,7 +66,8 @@ class ical extends \Evlist\View
         $end = sprintf('%d-%02d-%02d', $this->year+1, $this->month, $this->day);
         $EventSet = EventSet::create()
             ->withStart($start)
-            ->withEnd($end);
+            ->withEnd($end)
+            ->withActiveOnly(false);
 
         $opts = array('ical' => 1);
         if (isset($_GET['cal']) && !empty($_GET['cal'])) {
@@ -77,8 +79,7 @@ class ical extends \Evlist\View
             $EventSet->withRepeat($_GET['rp_id']);
         }
 
-        $domain = preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
-        $this->rev .= '@' . $domain;
+        $domain = '@' . preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
 
         $events = $EventSet->getEvents();
         $ical = '';
@@ -98,7 +99,18 @@ class ical extends \Evlist\View
                     ->format('Ymd\THis\Z', false);
                 $summary = $event['title'];
                 $permalink = COM_buildURL(EVLIST_URL . '/event.php?rp_id='. $event['rp_id']);
-                $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'] . '-' . $this->rev;
+                $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'] . $domain;
+                $sequence = max($event['rp_revision'], $event['ev_revision'], $event['det_revision']);
+                switch ($event['rp_status']) {
+                case Status::DISABLED:
+                case Status::CANCELLED:
+                    $status = 'CANCELLED';
+                    break;
+                case Status::ENABLED:
+                default:
+                    $status = 'CONFIRMED';
+                    break;
+                }
 
                 // Get the description. Prefer the text Summary, then HTML fulltext
                 // Since a description is required, re-use the title if nothing else.
@@ -121,6 +133,8 @@ class ical extends \Evlist\View
 
                 $ical .= "BEGIN:VEVENT\r\n" .
                     "UID:{$uuid}\r\n" .
+                    "SEQUENCE:{$sequence}\r\n" .
+                    "STATUS:{$status}\r\n" .
                     "DTSTAMP:$dtstart\r\n" .
                     "DTSTART:$dtstart\r\n" .
                     "DTEND:$dtend\r\n" .
@@ -154,6 +168,7 @@ class ical extends \Evlist\View
             "METHOD:PUBLISH\r\n" .
             $ical .
             "END:VCALENDAR\r\n";
+        echo $content;die;
         return $content;
     }
 }

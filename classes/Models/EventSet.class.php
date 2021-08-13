@@ -78,6 +78,10 @@ class EventSet
      * @var string */
     private $upcoming = false;
 
+    /** Show only active (not cancelled) events?
+     * @var boolean */
+    private $only_active = true;
+
 
     /**
      * Create a new EventSet.
@@ -223,6 +227,19 @@ class EventSet
 
 
     /**
+     * Set the flag to show only active events.
+     *
+     * @param   boolean $val    False to show all events, True to show only active
+     * @return  object  $this
+     */
+    public function withActiveOnly($val)
+    {
+        $this->only_active = $val ? true : false;
+        return $this;
+    }
+
+
+    /**
      * Set the fields to be selected in the query.
      *
      * @param   string  $selection  SQL fields to retrieve
@@ -332,6 +349,9 @@ class EventSet
             // Always limit to events starting before the specified end date
             $dt_sql .= " AND rep.rp_start <= '{$this->end}'";
         }
+        if ($this->only_active) {
+            $dt_sql .= " AND rep.rp_status = 1 ";
+        }
 
         // By default, get all fields that the caller could possibly want.  If
         // a selection option is specified, then that is used instead.  It's up
@@ -383,7 +403,6 @@ class EventSet
         global $_EV_CONF, $_USER;
 
         $sql = $this->getSql();
-        //echo $sql;die;
         $key = md5($sql);
         $events = Cache::get($key);
 

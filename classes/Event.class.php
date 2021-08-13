@@ -3,14 +3,16 @@
  * Class to manage events for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use Evlist\Models\Status;
+//use Evlist\Models\Intervals;
 
 
 /**
@@ -194,6 +196,10 @@ class Event
      * Used to check if the schedule must be updated after saving.
      * @var array */
     private $old_schedule = array();
+
+    /** Revision counter, used for iCal output.
+     * @var integer */
+    private $ev_revision = 0;
 
     /** Detail object.
      * @var object */
@@ -654,6 +660,7 @@ class Event
                 $this->options = array();
             }
             $this->tzid = $row['tzid'];
+            $this->ev_revision = (int)$row['ev_revision'];
         } else {        // Coming from the form
             $this->id = isset($row['eid']) ? $row['eid'] : '';
             // Ignore time entries & set to all day if flagged as such
@@ -878,8 +885,9 @@ class Event
             DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
 
             // Save the main event record
-            $sql1 = "UPDATE {$_TABLES[$this->table]} SET ";
-            $sql2 = "WHERE id='$ev_id_DB'";
+            $sql1 = "UPDATE {$_TABLES[$this->table]} SET
+                ev_revision = ev_revision + 1, ";
+            $sql2 = " WHERE id='$ev_id_DB'";
 
             // Save the new detail record & get the ID
             $this->det_id = $this->Detail->Save();
@@ -895,9 +903,13 @@ class Event
                     // If this was, or is now, a recurring event then clear
                     // out the repeats and update with new ones.
                     // First, delete all detail records except the master
-                    DB_query("DELETE FROM {$_TABLES['evlist_detail']}
-                            WHERE ev_id = '{$this->id}'
-                            AND det_id <> '{$this->det_id}'");
+                    DB_query(
+                        "UPDATE {$_TABLES['evlist_detail']} SET
+                        det_status = " . Status::CANCELLED . ",
+                        det_revision = det_revision + 1
+                        WHERE ev_id = '{$this->id}'
+                        AND det_id <> '{$this->det_id}'"
+                    );
                     // This function sets the rec_data value.
                     if (!$this->UpdateRepeats()) {
                         return $this->PrintErrors();
@@ -913,7 +925,8 @@ class Event
                             rp_time_start2 = '{$this->time_start2}',
                             rp_time_end2 = '{$this->time_end2}',
                             rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
-                            rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end')
+                            rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end'),
+                            rp_revision = rp_revision + 1
                         WHERE rp_ev_id = '{$this->id}'";
                     DB_query($sql, 1);
                 }
@@ -1054,11 +1067,14 @@ class Event
 
     /**
      * Delete the specified event record and all repeats.
+     * Specify "false" for clearcache param if the cache will be clared
+     * by the caller, e.g. when deleting events in bulk.
      *
      * @param   integer $eid    Event ID
+     * @param   boolean $clearcache True to clear cache, false to not
      * @return      True on success, False on failure
      */
-    public static function Delete($eid)
+    public static function Delete($eid, $clearcache=true)
     {
         global $_TABLES, $_PP_CONF;
 
@@ -1066,12 +1082,14 @@ class Event
             return false;
         }
 
-        // Make sure the current user has access to delete this event
-        $sql = "SELECT id FROM {$_TABLES['evlist_events']}
-                WHERE id='$eid' " . COM_getPermSQL('AND', 0, 3);
-        $res = DB_query($sql);
-        if (!$res || DB_numRows($res) != 1) {
-            return false;
+        // Make sure the current user has access to delete this eventa
+        if ($clearcache) {  // leverage flag to consider $eid as valid
+            $sql = "SELECT id FROM {$_TABLES['evlist_events']}
+                    WHERE id='$eid' " . COM_getPermSQL('AND', 0, 3);
+            $res = DB_query($sql);
+            if (!$res || DB_numRows($res) != 1) {
+                return false;
+            }
         }
 
         DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
@@ -1081,8 +1099,35 @@ class Event
         DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
         DB_delete($_TABLES['evlist_events'], 'id', $eid);
         PLG_itemDeleted($eid, 'evlist');
-        Cache::clear();
+        if ($clearcache) {
+            Cache::clear();
+        }
         return true;
+    }
+
+
+    /**
+     * Delete cancelled events that have not been updated in some time.
+     */
+    public static function purgeCancelled()
+    {
+        global $_TABLES, $_EV_CONF;
+
+        $days = (int)$_EV_CONF['purge_cancelled_days'];
+        $sql = "SELECT id FROM {$_TABLES['evlist_events']}
+                WHERE status = " . Status::CANCELLED .
+                " AND last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
+        $res = DB_query($sql);
+        if ($res) {
+            while ($A = DB_fetchArray($res, false)) {
+                self::Delete($A['id']);
+            }
+        }
+
+        // Now delete any remaining cancelled occurrences, maybe from
+        // modifying the schedule.
+        Repeat::purgeCancelled();
+        Detail::purgeCancelled();
     }
 
 
@@ -1312,6 +1357,7 @@ class Event
                 $tabs[] = 'ev_perms';   // Add permissions tab, event edit only
                 $T->set_var('permissions_editor', 'true');
             }
+            $Intervals = new Models\Intervals;
             $T->set_var(array(
                 'recurring' => $this->recurring,
                 'recur_section' => 'true',
@@ -1323,21 +1369,23 @@ class Event
                         EVCHECKED : '',
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
-                'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
+                'recurring_format_options' => 
+                        EVLIST_GetOptions($Intervals['descriptions'], $this->recurring),
+                        //EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
                 'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
-                'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
+                /*'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
                 'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
                 'yearlystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['year'], $LANG_EVLIST['if_any']),
-                'listdays_label' => sprintf($LANG_EVLIST['custom_label'],
-                        $LANG_EVLIST['days_of_week'], ''),
                 'listdaystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['date_l'], $LANG_EVLIST['if_any']),
                 'intervalstop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
+                $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),*/
+                'dailystop_label' =>  MO::_('Specify the date beyond which this event will not recur, if any.'),
+                'listdays_label' => sprintf($LANG_EVLIST['custom_label'],
+                        $LANG_EVLIST['days_of_week'], ''),
                 'custom_label' => sprintf($LANG_EVLIST['custom_label'],
                         $LANG_EVLIST['dates'], ''),
                 'datestart_note' => $LANG_EVLIST['datestart_note'],
@@ -1497,6 +1545,7 @@ class Event
             'description'   => $full_description,
             'location'      => $location,
             'status_checked' => $this->status == 1 ? EVCHECKED : '',
+            'status'        => $this->status,
             'url'           => $this->Detail->getUrl(),
             'street'        => $this->Detail->getStreet(),
             'city'          => $this->Detail->getCity(),
@@ -1560,6 +1609,13 @@ class Event
             'isNew'         => (int)$this->isNew,
             'fomat_opt'     => $this->recurring,
             'owner_name' => COM_getDisplayName($this->owner_id),
+            'lang_sunday' => MO::_('Sunday'),
+            'lang_monday' => MO::_('Monday'),
+            'lang_tueaday' => MO::_('Tuesday'),
+            'lang_wednesday' => MO::_('Wednesday'),
+            'lang_thursday' => MO::_('Thursday'),
+            'lang_friday' => MO::_('Friday'),
+            'lang_saturday' => MO::_('Saturday'),
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
@@ -1768,9 +1824,10 @@ class Event
         if ($ev_id == '') return $oldvalue;
         $oldvalue = $oldvalue == 0 ? 0 : 1;
         $newvalue = $oldvalue == 1 ? 0 : 1;
-        $sql = "UPDATE {$_TABLES['evlist_events']}
-                SET $varname=$newvalue
-                WHERE id='" . DB_escapeString($ev_id) . "'";
+        $sql = "UPDATE {$_TABLES['evlist_events']} SET
+            $varname=$newvalue,
+            ev_revision = ev_revision + 1
+            WHERE id='" . DB_escapeString($ev_id) . "'";
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
@@ -1838,7 +1895,7 @@ class Event
         }
 
         // Delete all existing instances
-        DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $this->id);
+        Repeat::cancelEvent();
         Cache::clear('repeats', 'event_' . $this->id);
 
         $i = 0;
@@ -2194,7 +2251,7 @@ class Event
      * @param   integer $interval   Interval, one to six
      * @return  string      Friendly text describing the interval
      */
-    public function RecurDescrip($freq = '', $interval = '')
+    public function RecurDscp($freq = '', $interval = '')
     {
         global $LANG_EVLIST;
 
@@ -2215,6 +2272,8 @@ class Event
 
         // Create the recurring description.  Nothing for custom dates
         if ($interval < EV_RECUR_DATES) {
+            //$Intervals = new Models\Intervals;
+            //$freq_str = $Intervals->strOccursEvery($freq, $interval);
             if ($freq == 1) {
                 $freq_str = $LANG_EVLIST['rec_period_dscp']['single'][$interval];
             } else {
@@ -2670,6 +2729,15 @@ class Event
         return $this->tzid;
     }
 
-}   // class Event
 
-?>
+    /**
+     * Get the revision number.
+     *
+     * @return  integer     Revision ID
+     */
+    public function getRevision()
+    {
+        return (int)$this->ev_revision;
+    }
+
+}

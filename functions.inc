@@ -668,6 +668,7 @@ function plugin_runScheduledTask_evlist()
 {
     if (!EVLIST_isCurrentVersion()) return;
 
+    Evlist\Event::purgeCancelled();
     $Rems = Evlist\Reminder::getCurrent();
     foreach ($Rems as $R) {
         $R->Send();
@@ -1629,9 +1630,10 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
                 ON c.cal_id = e.cal_id";
     if ($id == '*') {
         $where = ' WHERE 1 = 1 ';
-    } elseif ($buildingIndex) {
+    /*} elseif ($buildingIndex) {
         // If building the index, the repeat ID is passed in.
         $where = " WHERE (r.rp_id = '" . DB_escapeString($id) . "') ";
+        echo $where;die;*/
     } else {
         $where = " WHERE (e.id = '" . DB_escapeString($id) . "') ";
     }

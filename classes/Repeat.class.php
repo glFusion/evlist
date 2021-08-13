@@ -11,6 +11,8 @@
  * @filesource
  */
 namespace Evlist;
+use Evlist\Models\Status;
+
 
 /**
  * Class for events.
@@ -445,9 +447,46 @@ class Repeat
             Detail::getInstance($this->det_id)->Delete();
         }
 
-        DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
+        $sql = "UPDATE {$_TABLES['evlist_repeat']}
+            SET rp_status = " . Status::CANCELLED .
+            ", rp_revision = rp_revision + 1
+            WHERE rp_id = {$this->rp_id}";
+        DB_query($sql);
+        //DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
         Cache::clear();
         return true;
+    }
+
+
+    /**
+     * Cancel all repeats for an event.
+     *
+     * @param   string  $ev_id      Event ID
+     */
+    public static function cancelEvent($ev_id)
+    {
+        DB_query(
+            "UPDATE {$_TABLES['evlist_repeat']}
+            SET rp_status = " . Status::CANCELLED .
+            " rp_revision = rp_revision + 1
+            WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'"
+        );
+        DB_query($sql);
+    }
+
+
+    /**
+     * Delete cancelled events that have not been updated in some time.
+     */
+    public static function purgeCancelled()
+    {
+        global $_TABLES, $_EV_CONF;
+
+        $days = (int)$_EV_CONF['purge_cancelled_days'];
+        $sql = "DELETE FROM {$_TABLES['evlist_repeat']}
+                WHERE rp_status = " . Status::CANCELLED .
+                " AND rp_last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
+        DB_query($sql);
     }
 
 
@@ -571,14 +610,17 @@ class Repeat
             $this->Event->getRecData()['type'] < EV_RECUR_DATES
         ) {
             $rec_data = $this->Event->getRecData();
-            $rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
-                $this->Event->RecurDescrip();
+            //$rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
+            //    $this->Event->RecurDescrip();
+            $rec_string = $this->Event->RecurDscp();
+            $Days = new Models\Days;
             switch ($rec_data['type']) {
             case EV_RECUR_WEEKLY:        // sequential days
                 $weekdays = array();
                 if (is_array($rec_data['listdays'])) {
                     foreach ($rec_data['listdays'] as $daynum) {
-                        $weekdays[] = $LANG_WEEK[$daynum];
+                        //$weekdays[] = $LANG_WEEK[$daynum];
+                        $weekdays[] = $Days[$daynum];
                     }
                     $days_text = implode(', ', $weekdays);
                 } else {
@@ -592,7 +634,8 @@ class Repeat
                     $days[] = $LANG_EVLIST['rec_intervals'][$day];
                 }
                 $days_text = implode(', ', $days) . ' ' .
-                        $LANG_WEEK[$rec_data['weekday']];
+                    $Days[$rec_data['weekday']];
+                        //$LANG_WEEK[$rec_data['weekday']];
                 $rec_string .= ' ' . sprintf($LANG_EVLIST['on_the_days'],
                     $days_text);
                 break;
@@ -602,7 +645,7 @@ class Repeat
                 $this->Event->getRecData()['stop'] < EV_MAX_DATE
             ) {
                 $stop_date = new \Date($this->Event->getRecData()['stop'], $this->tzid);
-                $rec_string .= ' ' . sprintf(
+                $rec_string .= '<br />' . sprintf(
                     $LANG_EVLIST['recur_stop_desc'],
                     $stop_date->format($_CONF['dateonly'], true)
                 );
@@ -1048,16 +1091,11 @@ class Repeat
 
         $T->set_var('adblock', PLG_displayAdBlock('evlist_event', 0));
         $T->parse ('output','event');
-        PLG_callFunctionForOnePlugin(
-            'plugin_registerSmartResizer_lglib',
-            array(
-                1 => 'evlist_event',
-                2 => 'output',
-            )
-        );
-        PLG_templateSetVars('evlist_event', $T);
-
         $retval .= $T->finish($T->get_var('output'));
+
+        // Apply output filters
+        $retval = PLG_outputFilter($retval);
+
         return $retval;
     }
 
@@ -1356,15 +1394,20 @@ class Repeat
             }
             if (!empty($details)) {
                 $detail_str = implode(',', $details);
-                $sql = "DELETE FROM {$_TABLES['evlist_detail']}
-                        WHERE det_id IN ($detail_str)";
+                //$sql = "DELETE FROM {$_TABLES['evlist_detail']}
+                $sql = "UPDATE {$_TABLES['evlist_detail']}
+                    SET status = " . Status::CANCELLED .
+                    " WHERE det_id IN ($detail_str)";
                 DB_query($sql);
             }
 
             // Now delete the repeats
-            $sql = "DELETE FROM {$_TABLES['evlist_repeat']}
-                    WHERE rp_ev_id='{$this->ev_id}'
-                    AND rp_date_start >= '{$this->date_start}'";
+            //$sql = "DELETE FROM {$_TABLES['evlist_repeat']}
+            $sql = "UPDATE {$_TABLES['evlist_repeat']}
+                SET status = " . Status::CANCELLED .
+                ", rp_revision = rp_revision + 1
+                WHERE rp_ev_id='{$this->ev_id}'
+                AND rp_date_start >= '{$this->date_start}'";
             DB_query($sql);
 
             // Now adjust the recurring stop date for the event.

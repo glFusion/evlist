@@ -297,8 +297,6 @@ class EventSet
         // Set up other search options.
         //$selection = '';
         $opt_select = '';
-        $opt_join = '';
-        $opt_where = '';
         //$opt_order = 'ASC';
         $orderby = 'rep.rp_start';
         $grp_by = 'rep.rp_id';
@@ -309,23 +307,24 @@ class EventSet
         //$cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
         // default date range for fixed calendars, "upcoming" may be different
         $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start'";
+        $ands = array();
 
         // Create the SQL elements from the properties
         if ($this->cal > 0) {
-            $opt_where .= ' AND cal.cal_id = ' . $this->cal;
+            $ands[] = ' cal.cal_id = ' . $this->cal;
         }
         if ($this->eid != '') {
-            $opt_where .= " AND ev.id = '" . DB_escapeString($this->eid) . "'";
+            $ands[] = " ev.id = '" . DB_escapeString($this->eid) . "'";
         }
         if ($this->rp_id > 0) {
-            $opt_where .= ' AND rep.rp_id = ' . $this->rp_id;
+            $ands[] = ' rep.rp_id = ' . $this->rp_id;
         }
         if ($this->ical > -1) {
-            $opt_where .= ' AND cal.cal_ena_ical = ' . $this->ical;
+            $ands[] = ' cal.cal_ena_ical = ' . $this->ical;
         }
         if ($this->cat > 0) {
             //$opt_select .= ', cat.name AS cat_name';
-            $cat_status = " AND l.cid = '$value' AND cat.status = 1";
+            $ands[] = " (l.cid = '$value' AND cat.status = 1) ";
             $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
                 "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
         }
@@ -348,9 +347,10 @@ class EventSet
             }
             // Always limit to events starting before the specified end date
             $dt_sql .= " AND rep.rp_start <= '{$this->end}'";
+            $dt_sql = ' (' . $dt_sql . ') ';
         }
         if ($this->only_active) {
-            $dt_sql .= " AND rep.rp_status = 1 ";
+            $ands[] = " (rep.rp_status = 1 ";
         }
 
         // By default, get all fields that the caller could possibly want.  If
@@ -358,6 +358,11 @@ class EventSet
         // to the caller to request the value properly, including table prefix.
         if ($this->selection == '') {
             $this->selection = "rep.*, det.*, cal.*, ev.* $opt_select";
+        }
+        if (!empty($ands)) {
+            $ands = ' AND ' . implode(' AND ', $ands);
+        } else {
+            $ands = '';
         }
 
         // All the "*" queries may be ineffecient, but we need to read all
@@ -371,14 +376,13 @@ class EventSet
             LEFT JOIN {$_TABLES['evlist_calendars']} cal
                 ON cal.cal_id = ev.cal_id
             $cat_join
-            WHERE ev.status = 1
+            WHERE (cal.cal_status = 1 OR cal.cal_status IS NULL)
             AND ($dt_sql)
-            AND (cal.cal_status = 1 OR cal.cal_status IS NULL)
+            $ands
             $cat_status " .
             COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
             COM_getPermSQL('AND', 0, 2, 'cal') .
-            " $opt_where
-            ORDER BY $orderby {$this->order}";
+            " ORDER BY $orderby {$this->order}";
         if ($this->limit > 0) {
             if ($this->page > 1) {
                 $sql .= ' LIMIT ' . (($this->page - 1) * $this->limit) . ',' . $this->limit;

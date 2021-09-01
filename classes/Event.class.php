@@ -627,7 +627,9 @@ class Event
             $this->split = 0;
         }
 
-        $this->status = isset($row['status']) && $row['status'] == 1 ? 1 : 0;
+        if (isset($row['status'])) {
+            $this->status = (int)$row['status'];
+        }
         $this->postmode = isset($row['postmode']) &&
                 $row['postmode'] == 'html' ? 'html' : 'plaintext';
         $this->enable_reminders = isset($row['enable_reminders']) &&
@@ -847,6 +849,7 @@ class Event
             $this->old_schedule = array();
         }
 
+        $old_status = $this->status;
         // Now we can update our main record with the new info
         if (is_array($A)) {
             $this->SetVars($A);
@@ -926,12 +929,18 @@ class Event
                             rp_time_end2 = '{$this->time_end2}',
                             rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
                             rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end'),
+                            rp_status = {$this->status},
                             rp_revision = rp_revision + 1
                         WHERE rp_ev_id = '{$this->id}'";
                     DB_query($sql, 1);
                 }
+            } else {
+                // Update the repeat status only if the event status has changed.
+                // If new repeats were created, the status is updated at that time.
+                if ($old_status != $this->status) {
+                    Repeat::updateEventStatus($this->id, $this->status);
+                }
             }
-
         } else {
             // New event
             if (!$this->isAdmin) {
@@ -1357,7 +1366,7 @@ class Event
                 $tabs[] = 'ev_perms';   // Add permissions tab, event edit only
                 $T->set_var('permissions_editor', 'true');
             }
-            $Intervals = new Models\Intervals;
+            //$Intervals = new Models\Intervals;
             $T->set_var(array(
                 'recurring' => $this->recurring,
                 'recur_section' => 'true',
@@ -1370,10 +1379,9 @@ class Event
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
                 'recurring_format_options' => 
-                        EVLIST_GetOptions($Intervals['descriptions'], $this->recurring),
-                        //EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
                 'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
-                /*'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
+                'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),
                 'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
@@ -1382,8 +1390,7 @@ class Event
                 'listdaystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['date_l'], $LANG_EVLIST['if_any']),
                 'intervalstop_label' => sprintf($LANG_EVLIST['stop_label'],
-                $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),*/
-                'dailystop_label' =>  MO::_('Specify the date beyond which this event will not recur, if any.'),
+                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
                 'listdays_label' => sprintf($LANG_EVLIST['custom_label'],
                         $LANG_EVLIST['days_of_week'], ''),
                 'custom_label' => sprintf($LANG_EVLIST['custom_label'],
@@ -1544,7 +1551,7 @@ class Event
             'summary'       => $summary,
             'description'   => $full_description,
             'location'      => $location,
-            'status_checked' => $this->status == 1 ? EVCHECKED : '',
+            //'status_checked' => $this->status == 1 ? EVCHECKED : '',
             'status'        => $this->status,
             'url'           => $this->Detail->getUrl(),
             'street'        => $this->Detail->getStreet(),
@@ -1609,13 +1616,6 @@ class Event
             'isNew'         => (int)$this->isNew,
             'fomat_opt'     => $this->recurring,
             'owner_name' => COM_getDisplayName($this->owner_id),
-            'lang_sunday' => MO::_('Sunday'),
-            'lang_monday' => MO::_('Monday'),
-            'lang_tueaday' => MO::_('Tuesday'),
-            'lang_wednesday' => MO::_('Wednesday'),
-            'lang_thursday' => MO::_('Thursday'),
-            'lang_friday' => MO::_('Friday'),
-            'lang_saturday' => MO::_('Saturday'),
         ) );
 
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
@@ -1895,8 +1895,7 @@ class Event
         }
 
         // Delete all existing instances
-        Repeat::cancelEvent();
-        Cache::clear('repeats', 'event_' . $this->id);
+        Repeat::updateEventStatus($this->id, Status::CANCELLED);
 
         $i = 0;
         $vals = array();
@@ -1908,7 +1907,8 @@ class Event
                 '{$this->time_start1}', '{$this->time_end1}',
                 '{$this->time_start2}', '{$this->time_end2}',
                 '{$event['dt_start']} {$this->time_start1}',
-                '{$event['dt_end']} {$t_end}'
+                '{$event['dt_end']} {$t_end}',
+                {$this->status}
             )";
         }
         if (!empty($vals)) {
@@ -1917,7 +1917,8 @@ class Event
                         rp_ev_id, rp_det_id, rp_date_start, rp_date_end,
                         rp_time_start1, rp_time_end1,
                         rp_time_start2, rp_time_end2,
-                        rp_start, rp_end
+                        rp_start, rp_end,
+                        rp_status
                     ) VALUES $vals";
             //echo $sql;die;
             DB_query($sql, 1);

@@ -463,15 +463,17 @@ class Repeat
      *
      * @param   string  $ev_id      Event ID
      */
-    public static function cancelEvent($ev_id)
+    public static function updateEventStatus($ev_id, $status)
     {
-        DB_query(
-            "UPDATE {$_TABLES['evlist_repeat']}
-            SET rp_status = " . Status::CANCELLED .
-            " rp_revision = rp_revision + 1
-            WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'"
-        );
+        global $_TABLES;
+
+        $status = (int)$status;
+        $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+            rp_status = $status,
+            rp_revision = rp_revision + 1
+            WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'";
         DB_query($sql);
+        Cache::clear('repeats', 'event_' . $ev_id);
     }
 
 

@@ -636,11 +636,13 @@ function toggleRSVPdetail(val)
 				</div>
 
 				<div class="uk-form-row uk-margin">
-					<label class="uk-form-label">{$LANG_EVLIST['enabled']}
+					<label class="uk-form-label">{$LANG_EVLIST['status']}
 						<span id="hlp_enabled" class="tooltip_cfg tooltipstered"></span>
 					</label>
 					<div class="uk-form-controls uk-form-controls-text">
-						<input class="uk-checkbox" type="checkbox" name="status" value="1" id="status" {status_checked} />
+						<input class="uk-radio" type="radio" name="status" value="1" id="status" {!!if {status} == 1 !!}checked="checked"{!endif} />&nbsp;{$LANG_EVLIST['enabled']}&nbsp;&nbsp;
+						<input class="uk-radio" type="radio" name="status" value="0" id="status" {!!if {status} == 0 !!}checked="checked"{!endif} />&nbsp;{$LANG_EVLIST['disabled']}&nbsp;&nbsp;
+						<input class="uk-radio" type="radio" name="status" value="2" id="status" {!!if {status} == 2 !!}checked="checked"{!endif} />&nbsp;{$LANG_EVLIST['cancelled']}
 					</div>
 				</div>
 
@@ -799,14 +801,14 @@ function toggleRSVPdetail(val)
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['ev_location']}:</label>
 					<div class="uk-form-controls">
-						<input type="text" class="uk-input" name="location" id="location" value="{location}" />
+						<input type="text" class="uk-input uk-form-width-large" name="location" id="location" value="{location}" />
 					</div>
 				</div>
 
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['street_address']}:</label>
 					<div class="uk-form-controls">
-						<input class="uk-input" type="text" name="street" id="street"
+						<input class="uk-input uk-form-width-large" type="text" name="street" id="street"
 							maxlength="64" value="{street}" />
 					</div>
 				</div>
@@ -814,21 +816,21 @@ function toggleRSVPdetail(val)
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['city']}:</label>
 					<div class="uk-form-controls">
-						<input class="uk-input" type="text" name="city" id="city" maxlength="64" value="{city}" />
+						<input class="uk-input uk-form-width-large" type="text" name="city" id="city" maxlength="64" value="{city}" />
 					</div>
 				</div>
 
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['state']}:</label>
 					<div class="uk-form-controls">
-						<input class="uk-input" type="text" name="province" id="province" maxlength="64" value="{province}" />
+						<input class="uk-input uk-form-width-medium" type="text" name="province" id="province" maxlength="64" value="{province}" />
 					</div>
 				</div>
 
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['country']}:</label>
 					<div class="uk-form-controls">
-						<input class="uk-input" type="text" name="country" id="country" maxlength="64" value="{country}" />
+						<input class="uk-input uk-form-width-large" type="text" name="country" id="country" maxlength="64" value="{country}" />
 					</div>
 				</div>
 

@@ -168,7 +168,6 @@ class ical extends \Evlist\View
             "METHOD:PUBLISH\r\n" .
             $ical .
             "END:VCALENDAR\r\n";
-        echo $content;die;
         return $content;
     }
 }

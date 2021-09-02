@@ -80,6 +80,10 @@ class Repeat
      * @var object */
     private $dtEnd2 = NULL;
 
+    /** Status (enabled, disabled, cancelled).
+     * @var integer */
+    private $rp_status = 1;
+
     /** Associated event.
      * @var object */
     private $Event = NULL;
@@ -615,14 +619,14 @@ class Repeat
             //$rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
             //    $this->Event->RecurDescrip();
             $rec_string = $this->Event->RecurDscp();
-            $Days = new Models\Days;
+            //$Days = new Models\Days;
             switch ($rec_data['type']) {
             case EV_RECUR_WEEKLY:        // sequential days
                 $weekdays = array();
                 if (is_array($rec_data['listdays'])) {
                     foreach ($rec_data['listdays'] as $daynum) {
-                        //$weekdays[] = $LANG_WEEK[$daynum];
-                        $weekdays[] = $Days[$daynum];
+                        $weekdays[] = $LANG_WEEK[$daynum];
+                        //$weekdays[] = $Days[$daynum];
                     }
                     $days_text = implode(', ', $weekdays);
                 } else {
@@ -636,8 +640,8 @@ class Repeat
                     $days[] = $LANG_EVLIST['rec_intervals'][$day];
                 }
                 $days_text = implode(', ', $days) . ' ' .
-                    $Days[$rec_data['weekday']];
-                        //$LANG_WEEK[$rec_data['weekday']];
+                    //$Days[$rec_data['weekday']];
+                    $LANG_WEEK[$rec_data['weekday']];
                 $rec_string .= ' ' . sprintf($LANG_EVLIST['on_the_days'],
                     $days_text);
                 break;
@@ -1446,9 +1450,12 @@ class Repeat
             rp_time_start2 = '{$this->time_start2}',
             rp_time_end2 = '{$this->time_end2}',
             rp_start = CONCAT(rp_date_start, ' ', '{$this->time_start1}'),
-            rp_end = CONCAT(rp_date_end, ' ', '{$t_end}')
+            rp_end = CONCAT(rp_date_end, ' ', '{$t_end}'),
+            rp_status = {$this->rp_status}
+            rp_revision = rp_revision + 1
             WHERE rp_date_start >= '{$this->getDateStart1()->toMySQL(true)}'
             AND rp_ev_id = '{$this->getEventID()}'";
+            //rp_show_upcoming = {$this->rp_show_upcoming}
         DB_query($sql);
         return $this;
     }

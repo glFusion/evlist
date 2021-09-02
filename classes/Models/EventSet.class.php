@@ -350,7 +350,7 @@ class EventSet
             $dt_sql = ' (' . $dt_sql . ') ';
         }
         if ($this->only_active) {
-            $ands[] = " (rep.rp_status = 1 ";
+            $ands[] = " rep.rp_status = 1 ";
         }
 
         // By default, get all fields that the caller could possibly want.  If

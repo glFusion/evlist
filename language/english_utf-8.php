@@ -468,6 +468,7 @@ $LANG_confignames['evlist'] = array(
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
     'cb_dup_chk'            => 'Key to hide duplicate instances',
     'cb_hide_small'         => 'Hide on small screens',
+    'purge_cancelled_days'  => 'Days after which to purge cancelled events',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',

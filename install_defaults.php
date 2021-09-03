@@ -164,6 +164,17 @@ $evlistConfigData = array(
         'set' => true,
         'group' => 'evlist',
     ),
+    array(
+        'name' => 'purge_cancelled_days',
+        'default_value' => '30',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 120,
+        'set' => true,
+        'group' => 'evlist',
+    ),
 
     // GUI settings
     array(

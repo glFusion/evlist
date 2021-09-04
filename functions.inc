@@ -125,8 +125,8 @@ spl_autoload_register(function ($class)
         require $file;
     }
 });
-
 use \Evlist\DateFunc;
+use Evlist\Models\Status;
 
 /**
  * Return the current code (not necessarily installed) version.
@@ -331,7 +331,7 @@ function plugin_statssummary_evlist()
 
     $result = DB_query("SELECT COUNT(*) AS numrows
                 FROM {$_TABLES['evlist_events']}
-                WHERE status='1' $permSQL");
+                WHERE status='" . Status::ENABLED . "' $permSQL");
     list ($numrows) = DB_fetchArray($result);
 
     return array($LANG_EVLIST['events'], COM_numberFormat($numrows));
@@ -394,8 +394,10 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
                 ON c.cal_id = e.cal_id
             LEFT JOIN {$_TABLES['users']} gl
                 ON e.owner_id = gl.uid
-            WHERE (e.status='1')
-                $permSQL ";
+            WHERE (
+                e.status = " . Status::ENABLED . " AND d.det_status = " . Status::ENABLED . "
+            )
+            $permSQL ";
 
     if (!empty($author))
         $sql .= "AND (e.owner_id = '$author') ";
@@ -578,8 +580,8 @@ function plugin_user_delete_evlist($uid)
     global $_TABLES;
 
     DB_query("UPDATE {$_TABLES['evlist_events']} SET
-        owner_id = '2', status = '0'
-        WHERE owner_id = '$uid'");
+        owner_id = '2', status = " . Status::DISABLED .
+        " WHERE owner_id = '$uid'");
 }
 
 
@@ -713,8 +715,8 @@ function plugin_moderationapprove_evlist($eid)
 
     // Update the event with status=1
     $result = DB_query("UPDATE {$_TABLES['evlist_events']}
-            SET status = '1'
-            WHERE id = '$eid'");
+            SET status = " . Status::ENABLED .
+            " WHERE id = '$eid'");
 
     // The glFusion core already copies the event information to the event
     // table, and the Detail table was already in place.  This is wasteful,
@@ -1652,7 +1654,8 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
     } else {
         $where = " WHERE (e.id = '" . DB_escapeString($id) . "') ";
     }
-    $where .= ' AND e.status = 1 AND c.cal_status = 1 ';
+    $where .= ' AND r.rp_status = ' . Status::ENABLED .
+        ' AND c.cal_status = ' . Status::ENABLED;
     if ($uid > 0) {
         $permsql = COM_getPermSql('AND', $uid, 2, 'e')
                  . COM_getPermSql('AND', $uid, 2, 'c');
@@ -1823,7 +1826,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'summary' => $summary,
         'full_description' => $full_dscp,
         'url' => $info['url'] ? $info['url'] : '',
-        'status' => '1',
+        'status' => Status::ENABLED,
         'enable_comments' => $info['enable_comments'] ? (int)$info['enable_comments'] : -1,
         'newcat' => '',
         'date_start1' => $date,

@@ -2,7 +2,7 @@
 /**
  * View the detail of an event or repeat.
  *
- * @author      Mark R. Evans mark AT glfusion DOT org
+ * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
  * @version     v1.5.0
@@ -67,12 +67,12 @@ case 'event':
     }
 case 'instance':
     $Rep = Evlist\Repeat::getInstance($id);
-    if ($Rep->getID() == 0 || !$Rep->getEvent()->hasAccess(2)) {
+    if (!$Rep->canView()) {
         COM_setMsg($LANG_EVLIST['ev_not_found']);
         echo COM_refresh(EVLIST_URL . '/index.php');
         exit;
     }
-    $pagetitle = COM_stripslashes($Rep->getEvent()->getDetail()->getTitle());
+    $pagetitle = COM_stripslashes($Rep->getDetail()->getTitle());
     $content .= $Rep->withQuery($query)
                     ->withTemplate('')
                     ->withCommentMode($mode)
@@ -90,7 +90,6 @@ if (!empty($msg)) {
     $display .= $LANG_EVLIST['messages'][$msg];
     $display .= COM_endBlock('blockfooter-message.thtml');
 }
-
 $display .= $content;
 $display .= Evlist\Menu::siteFooter();
 echo $display;

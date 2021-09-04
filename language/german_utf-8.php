@@ -396,6 +396,9 @@ $LANG_EVLIST = array(
 'back_to_cal' => 'Back to Calendar',
 'my_events' => 'My Events',
 'print_cal' => 'Print Calendar',
+'status' => 'Status',
+'disabled' => 'Disabled',
+'cancelled' => 'Cancelled',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -421,6 +424,8 @@ $LANG_EVLIST_HELP = array(
 'perms' => 'Set the permissions for this item.',
 'event_pass' => 'Checked if this ticket type is a full event pass.',
 'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 
 // Localization of the Admin Configuration UI
@@ -466,6 +471,8 @@ $LANG_confignames['evlist'] = array(
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
     'cb_dup_chk'            => 'Key to hide duplicate instances',
     'cb_hide_small'         => 'Hide on small screens',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Haupteinstellungen',
@@ -480,40 +487,57 @@ $LANG_fs['evlist'] = array(
     'ev_rsvp'               => 'Tickets und Reservierung',
     'ev_integ_other'        => 'Other',
 );
-$LANG_configselects['evlist'] = array(
-    0 => array('Ja' => 1, 'Nein' => 0),
-    1 => array('Ja' => TRUE, 'Nein' => FALSE),
-    2 => array('Keine' => 0, 'Veranstaltung hinzufügen' => 1, 'Veranstaltungs-Liste' => 2),
-    3 => array('Sonntag' => 1, 'Montag' => 2),
-    4 => array(
-            'Don Nov 20, 2008'      => '%a %b %d, %Y',
-            'Don Nov 20'            => '%a %b %d',
-            'Donnerstag Nov 20, 2008' => '%A %b %d, %Y',
-            'Donnerstag Nov 20'       => '%A %b %d',
-            'Donnerstag November 20'  => '%A %B %d',
-            'November 20, 2008'     => '%B %d, %Y',
-            '11/20/08'              => '%m/%d/%y',
-            '11-20-08'              => '%m-%d-%y',
-            '2008 11 20'            => '%Y %m %d',
-            'Nov 20 2008'           => '%b %d %Y',
-            'Nov 20, 2008'          => '%b %d, %Y',
-            '20 Nov. 2008'            => '%d %b. %Y'
+$LANG_configSelect['evlist'] = array(
+    0 => array(
+        1 => 'Ja',
+        0 => 'Nein',
     ),
-    5 => array('02:38 PM' => '%I:%M %p', '14:48' => '%H:%M',),
+    2 => array('Keine' => 0, 'Veranstaltung hinzufügen' => 1, 'Veranstaltungs-Liste' => 2),
     6 => array(
-            'sobald Uhrzeit-Beginn um ist (wenn vorhanden)' => 1,
-            'sobald Datum-Beginn um ist (i.R. der nächste Tag)' => 2,
-            'sobald Uhrzeit-Ende um ist (wenn vorhanden)' => 3,
-            'sobald Datum-Ende um ist' => 4,
+        1 => 'sobald Uhrzeit-Beginn um ist (wenn vorhanden)',
+        2 => 'sobald Datum-Beginn um ist (i.R. der nächste Tag)',
+        3 => 'sobald Uhrzeit-Ende um ist (wenn vorhanden)',
+        4 => 'sobald Datum-Ende um ist',
         ),
-    7 => array('Oben auf Seite'=>1,'Nach Hauptartikel'=>2,'Unten auf Seite'=>3,'Gesamte Seite'=>0),
-    8 => array('Vergangen'=>1,'Bevorstehend'=>2,'Diese Woche'=>3,'Diesen Monat'=>4),
-    9 => array('Deaktiviert' => 0, 'Tabelle' => 1, 'Artikel' => 2, 'Kalender' => 3),
-    12 => array('Kein Zugriff' => 0, 'Nur-Lesen' => 2, 'Lesen-Schreiben' => 3),
-    13 => array('Linke Blöcke' => 0, 'Rechte Blöcke' => 1, 'Linke & Rechte Blöcke' => 2, 'Keine' => 3),
-    14 => array('Tages-Ansicht' => 'day', 'Wochen-Ansicht' => 'week', 'Monats-Ansicht' => 'month', 'Jahres-Ansicht' => 'year', 'Listen-Ansicht' => 'list'),
-    15 => array('Nur Admins' => 0, 'Angemeldete Benutzer' => 1, 'Angemeldete Benutzer & Gäste' => 2),
-    16 => array('HTML' => 'html', 'JSON' => 'json'),
-    17 => array('Nein' => 0, 'Standart Nein' => 1, 'Standart Bezahlt' => 2, 'Standart Bezahlt & Unbezahlt' => 3),
+    7 => array(
+        1 => 'Oben auf Seite',
+        2 => 'Nach Hauptartikel',
+        3 => 'Unten auf Seite',
+        0 => 'Gesamte Seite',
+    ),
+    8 => array(
+        1 => 'Vergangen',
+        2 => 'Bevorstehend',
+        3 => 'Diese Woche',
+        4 => 'Diesen Monat',
+    ),
+    9 => array(
+        0 => 'Disabled',
+        1 => 'Table',
+        2 => 'Story',
+        3 => 'Calendar',
+    ),
+    10 => array(
+        '' => 'Show all occurrences',
+        'rp_ev_id' => 'Master Event Record',
+        'rp_id' => 'Recurring Event Instance',
+    ),
+    12 => array(
+        0 => 'Kein Zugriff',
+        2 => 'Nur-Lesen',
+        3 => 'Lesen-Schreiben',
+    ),
+    13 => array(
+        0 => 'Linke Blöcke',
+        1 => 'Rechte Blöcke',
+        2 => 'Linke & Rechte Blöcke',
+        3 => 'Keine',
+    ),
+    14 => array(
+        'day' => 'Tages-Ansicht',
+        'week' => 'Wochen-Ansicht',
+        'month' => 'Monats-Ansicht',
+        'year' => 'Jahres-Ansicht',
+        'list' => 'Listen-Ansicht',
+    ),
 );
-?>

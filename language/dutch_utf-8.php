@@ -400,6 +400,9 @@ You may either move existing events to a new calendar, or delete those events.',
 'back_to_cal' => 'Back to Calendar',
 'my_events' => 'My Events',
 'print_cal' => 'Print Calendar',
+'status' => 'Status',
+'disabled' => 'Disabled',
+'cancelled' => 'Cancelled',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -425,6 +428,8 @@ $LANG_EVLIST_HELP = array(
 'perms' => 'Set the permissions for this item.',
 'event_pass' => 'Checked if this ticket type is a full event pass.',
 'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 
 // Localization of the Admin Configuration UI
@@ -470,6 +475,8 @@ $LANG_confignames['evlist'] = array(
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
     'cb_dup_chk'            => 'Key to hide duplicate instances',
     'cb_hide_small'         => 'Hide on small screens',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Hoofd Instellingen',
@@ -484,41 +491,61 @@ $LANG_fs['evlist'] = array(
     'ev_rsvp'               => 'Registration and Ticketing',
     'ev_integ_other'        => 'Other',
 );
-$LANG_configselects['evlist'] = array(
-    0 => array('Ja' => 1, 'Nee' => 0),
-    1 => array('Ja' => TRUE, 'Nee' => FALSE),
-    2 => array('Geen' => 0, 'Voeg Evenement Toe' => 1, 'Toon Evenementen' => 2),
-    3 => array('Zondag' => 1, 'Maandag' => 2),
-    4 => array(
-            'Don Nov 20, 2008'      => '%a %b %d, %Y',
-            'Don Nov 20'            => '%a %b %d',
-            'Donderdag Nov 20, 2008' => '%A %b %d, %Y',
-            'Donderdag Nov 20'       => '%A %b %d',
-            'Donderdag November 20'  => '%A %B %d',
-            'November 20, 2008'     => '%B %d, %Y',
-            '11/20/08'              => '%m/%d/%y',
-            '11-20-08'              => '%m-%d-%y',
-            '2008 11 20'            => '%Y %m %d',
-            'Nov 20 2008'           => '%b %d %Y',
-            'Nov 20, 2008'          => '%b %d, %Y',
+$LANG_configSelect['evlist'] = array(
+    0 => array(
+        1 => 'Ja',
+        0 => 'Nee',
     ),
-    5 => array('02:38 PM' => '%I:%M %p', '14:48' => '%H:%M',),
+    2 => array(
+        0 => 'Geen',
+        1 => 'Voeg Evenement Toe',
+        2 => 'Toon Evenementen' => 2,
+    ),
     6 => array(
-            'zodra de starttijd is overschreden (indien aanwezig)' => 1,
-            'zodra de startdatum is overschreden, bijv, de volgende dag.' => 2,
-            'as soon as the end time has passed (if exists).' => 3,
-            'as soon as the end date has passed.' => 4,
-        ),
-    7 => array('Bovenaan de pagina'=>1,'Na het featured artikel'=>2,'Onderaan de pagina'=>3,'Gehele Pagina'=>0),
-    8 => array('afgelopen'=>1,'aankomend'=>2,'deze week'=>3,'deze maand'=>4),
-    9 => array('Disabled' => 0, 'Table' => 1, 'Story' => 2, 'Calendar' => 3),
-    12 => array('Geen Toegang' => 0, 'Alleen-Lezen' => 2, 'Lezen-Schrijven' => 3),
-    13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
-    14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),
-    15 => array('Admins Only' => 0, 'Logged-In Users' => 1, 'Logged-In+Anon Users' => 2),
-    16 => array('HTML' => 'html', 'JSON' => 'json'),
-    17 => array('No' => 0, 'Default No' => 1, 'Default Paid Only' => 2,
-                'Default Paid or Unpaid' => 3),
+        1 => 'zodra de starttijd is overschreden (indien aanwezig)',
+        2 => 'zodra de startdatum is overschreden, bijv, de volgende dag.',
+        3 => 'as soon as the end time has passed (if exists).',
+        4 => 'as soon as the end date has passed.',
+    ),
+    7 => array(
+        1 => 'Bovenaan de pagina',
+        2 => 'Na het featured artikel',
+        3 => 'Onderaan de pagina',
+        0 => 'Gehele Pagina',
+    ),
+    8 => array(
+        1 => 'afgelopen',
+        2 => 'aankomend',
+        3 => 'deze week'=>3,
+        4 => 'deze maand',
+    ),
+    9 => array(
+        0 => 'Disabled',
+        1 => 'Table',
+        2 => 'Story',
+        3 => 'Calendar',
+    ),
+    10 => array(
+        '' => 'Show all occurrences',
+        'rp_ev_id' => 'Master Event Record',
+        'rp_id' => 'Recurring Event Instance',
+    ),
+    12 => array(
+        0 => 'Geen Toegang',
+        2 => 'Alleen-Lezen',
+        3 => 'Lezen-Schrijven',
+    ),
+    13 => array(
+        0 => 'Left Blocks',
+        1 => 'Right Blocks',
+        2 => 'Left & Right Blocks',
+        3 => 'None',
+    ),
+    14 => array(
+        'day' => 'Day',
+        'week' => 'Week',
+        'month' => 'Month',
+        'year' => 'Year',
+        'list' => 'List',
+    ),
 );
-
-?>

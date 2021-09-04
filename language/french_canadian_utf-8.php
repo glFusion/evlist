@@ -411,6 +411,9 @@ $LANG_EVLIST = array(
 'back_to_cal' => 'Back to Calendar',
 'my_events' => 'My Events',
 'print_cal' => 'Print Calendar',
+'status' => 'Status',
+'disabled' => 'Disabled',
+'cancelled' => 'Cancelled',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -436,6 +439,8 @@ $LANG_EVLIST_HELP = array(
 'perms' => 'Set the permissions for this item.',
 'event_pass' => 'Checked if this ticket type is a full event pass.',
 'del_hdr1' => 'Some items are reserved for system use and cannot be deleted.',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 
 $PLG_evlist_MESSAGE1         = "Cet événement n\ 't permettre les inscriptions, ou vous n'avez pas accès. ";
@@ -487,6 +492,8 @@ $LANG_confignames[ 'evlist'] = array(
 'pi_cal_map'            => 'Plugin-Calendar Mapping',
     'cb_dup_chk'            => 'Key to hide duplicate instances',
     'cb_hide_small'         => 'Hide on small screens',
+'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
+'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
 );
 
 $LANG_configsubgroups[ 'evlist'] = array(
@@ -504,99 +511,61 @@ $LANG_fs[ 'evlist'] = array(
 'ev_integ_other'        => 'Other',
 );
 
-$LANG_configselects[ 'evlist'] = array(
+$LANG_configSelect[ 'evlist'] = array(
     0 => array(
-        'true' => 1,
-        'false' => 0,
-    ),
-    1 => array(
-        'true' => TRUE,
-        'false' => FALSE,
+        1 => 'true',
+        2 => 'false',
     ),
     2 => array(
-        'None' => 0,
-        'Ajouter événement' => 1,
-        'liste les événements' => 2,
-    ),
-    3 => array(
-        'Dimanche' => 1,
-        'Lundi' => 2,
-    ),
-    4 => array(
-        'Jeu 20 Nov 2008'       => ' %a %b %d, %Y',
-        'Jeu Nov 20'            => ' %a %b %d',
-        'JEUDI 20 Nov 2008'         => ' %A %b %d, %Y',
-        'jeudi Nov 20'          => ' %A %b %d',
-        'jeudi 20 novembre '        => ' %A %B %d',
-        '20 Novembre 2008'      => ' %B %d, %Y',
-        '20/11/ 08'             => ' %m/ %d/ %y',
-        '11-20 -08'             => ' %m- %d- %y',
-        '2008 11 20'            => ' %Y %m %d',
-        '20 Nov 2008'           => ' %b %d %Y',
-        '20 Nov 2008'           => ' %b %d, %Y',
-    ),
-    5 => array(
-        '14:38' => ' %I: %M %p',
-        '14:48' => ' %H: %M',
+        0 => 'None',
+        1 => 'Ajouter événement',
+        2 => 'liste les événements',
     ),
     6 => array(
-        "dès que l'heure de début A adopté (si existe) " => 1,
-        "dès que la date de début n'est pas écoulé, ie, le jour suivant," => 2,
-        "dès que l'heure de fin a adopté (si il existe) ," => 3,
-        'dès que la date de fin a été dépassée,' => 4,
+        1 => "dès que l'heure de début A adopté (si existe) ",
+        2 => "dès que la date de début n'est pas écoulé, ie, le jour suivant,",
+        3 => "dès que l'heure de fin a adopté (si il existe) ,",
+        4 => 'dès que la date de fin a été dépassée,',
     ),
     7 => array(
-        'Haut de page' => 1,
-        'après une…' => 2,
-        'Bas de page' => 3,
-        'page entière' => 0,
+        1 => 'Haut de page',
+        2 => 'après une…',
+        3 => 'Bas de page',
+        4 => 'page entière',
     ),
     8 => array(
-        'passé' => 1,
-        'venir' => 2,
-        'cette semaine' => 3,
-        'ce mois' => 4,
+        1 => 'passé',
+        2 => 'venir',
+        3 => 'cette semaine',
+        4 => 'ce mois',
     ),
     9 => array(
-        'Disabled' => 0,
-        'Table' => 1,
-        'Story' => 2,
-        'Calendar' => 3,
+        0 => 'Disabled',
+        1 => 'Table',
+        2 => 'Story',
+        3 => 'Calendar',
+    ),
+    10 => array(
+        '' => 'Show all occurrences',
+        'rp_ev_id' => 'Master Event Record',
+        'rp_id' => 'Recurring Event Instance',
     ),
     12 => array(
-        'Aucun accès' => 0,
-        'Lecture seule' => 2,
-        'lecture-ecriture' => 3,
+        0 => 'Aucun accès',
+        2 => 'Lecture seule',
+        3 => 'lecture-ecriture',
     ),
     13 => array(
-        'Gauche Blocs' => 0,
-        'droit Blocs'=> 1,
-        'gauche & droit bloque' => 2,
-        'None' => 3,
+        0 => 'Gauche Blocs',
+        1 => 'droit Blocs',
+        2 => 'gauche & droit bloque',
+        3 => 'None',
     ),
     14 => array(
-        'Jour' => 'jour',
-        'Semaine' => 'semaine',
-        'Mois' => 'mois',
-        'année' => 'année',
-        'Liste' => 'liste',
-    ),
-    15 => array(
-        'Admins uniquement' => 0,
-        'connecté les utilisateurs' => 1,
-        'connecté +Anon Utilisateurs' => 2,
-    ),
-    16 => array(
-        'HTML' => 'html',
-        'JSON' => 'json',
-    ),
-    17 => array(
-        'No' => 0,
-        'Default No' => 1,
-        'Default Paid Only' => 2,
-        'Default Paid or Unpaid' => 3,
+        'day' => 'Jour',
+        'week' => 'Semaine',
+        'month' => 'Mois',
+        'year' => 'année',
+        'list' => 'Liste',
     ),
 );
-
-?>
-

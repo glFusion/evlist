@@ -57,9 +57,18 @@ class ical extends \Evlist\View
     {
         global $_EV_CONF, $LANG_EVLIST, $_CONF;
 
-        // Set up the period to export- now + 1 year
-        $start = sprintf('%d-%02d-%02d', $this->year-1, $this->month, $this->day);
-        $end = sprintf('%d-%02d-%02d', $this->year+1, $this->month, $this->day);
+        if (!empty($_EV_CONF['ical_range'])) {
+            $ical_ranges = explode(',', $_EV_CONF['ical_range']);
+            $from_days = !empty($ical_ranges[0]) ? (int)$ical_ranges[0] : 180;
+            $to_days = !empty($ical_ranges[1]) ? (int)$ical_ranges[1] : $from_days;
+        } else {
+            $to_days = 180;
+            $from_days = 180;
+        }
+        $from = clone($this->today);
+        $start = $from->sub(new \DateInterval('P'.$from_days.'D'))->format('Y-m-d');
+        $to = clone($this->today);
+        $end = $to->add(new \DateInterval('P'.$to_days.'D'))->format('Y-m-d');
         $EventSet = EventSet::create()
             ->withStart($start)
             ->withEnd($end)

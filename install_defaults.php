@@ -175,6 +175,17 @@ $evlistConfigData = array(
         'set' => true,
         'group' => 'evlist',
     ),
+    array(
+        'name' => 'ical_range',
+        'default_value' => '60,180',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 130,
+        'set' => true,
+        'group' => 'evlist',
+    ),
 
     // GUI settings
     array(

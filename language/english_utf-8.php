@@ -469,6 +469,7 @@ $LANG_confignames['evlist'] = array(
     'cb_dup_chk'            => 'Key to hide duplicate instances',
     'cb_hide_small'         => 'Hide on small screens',
     'purge_cancelled_days'  => 'Days after which to purge cancelled events',
+    'ical_range'            => 'ICal feed range of days (to,from)',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Main Settings',

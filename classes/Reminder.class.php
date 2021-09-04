@@ -11,6 +11,7 @@
  * @filesource
  */
 namespace Evlist;
+use Evlist\Models\Status;
 
 
 /**
@@ -212,21 +213,28 @@ class Reminder
 
 
     /**
-     * Delete the current reminder record from the database
+     * Delete the current reminder record from the database.
+     *
+     * @param   string  $ev_id  Master event ID
+     * @param   integer $rp_id  Repeat ID, zero to delete all for event
+     * @param   intger  $uid    User ID to delete for a single user
+     * @return  boolean     Tue on success, False on error
      */
-    public function Delete()
+    public static function Delete($ev_id, $rp_id=0, $uid=0)
     {
         global $_TABLES;
 
-        $flds = array('eid', 'uid');
-        $vals = array($this->eid, $this->uid);
-        if ($this->rp_id != '') {
+        $flds = array('eid');
+        $vals = array(DB_escapeString($ev_id));
+        if ($rp_id != '') {
             $flds[] = 'rp_id';
-            $vals[] = $this->rp_id;
+            $vals[] = (int)$rp_id;
+        }
+        if ($uid > 0) {
+            $flds[] = 'uid';
+            $vals[] = (int)$uid;
         }
         DB_delete($_TABLES['evlist_remlookup'], $flds, $vals);
-        $this->rp_id = '';
-        $this->isNew = true;
         return true;
     }
 
@@ -241,8 +249,12 @@ class Reminder
         global $_TABLES;
 
         $Rems = array();
-        $sql = "SELECT * FROM {$_TABLES['evlist_remlookup']}
-                WHERE date_start <= (UNIX_TIMESTAMP() + (days_notice * 86400))";
+        $sql = "SELECT rem.* FROM {$_TABLES['evlist_remlookup']} rem
+            LEFT JOIN {$_TABLES['evlist_events']} ev ON ev.id = rem.eid
+            LEFT JOIN {$_TABLES['evlist_repeat']} rp ON rp.rp_ev_idid = rem.eid
+            WHERE rem.date_start <= (UNIX_TIMESTAMP() + (rem.days_notice * 86400))
+            AND ev.status = " . Status::ENABLED . "
+            AND rp.status = " . Status::ENABLED;
         //echo $sql;die;
         $res = DB_query($sql);
         while ($A = DB_fetchArray($res, false)) {
@@ -256,12 +268,13 @@ class Reminder
      * Count reminders for a specific event, repeat and user.
      * This is used to determine whether the reminder form is shown or not.
      *
+     * @deprecated
      * @param   string  $ev_id  Event ID
      * @param   integer $rp_id  Repeat ID
      * @param   integer $uid    User ID, default to current user
      * @return  integer         Count of reminders, should be 0 or 1
      */
-    public static function countReminders($ev_id, $rp_id, $uid = 0)
+    public static function XXcountReminders($ev_id, $rp_id, $uid = 0)
     {
         global $_TABLES, $_USER;
 
@@ -375,6 +388,7 @@ class Reminder
             ),
         );
         COM_emailNotification($msgData);
+        self::Delete($this->ev_id, $this->rp_id, $this->uid);
     }
 
 }

@@ -341,6 +341,7 @@ class Event
     public static function getInstance($ev_id, $det_id = 0)
     {
         static $records = array();
+
         if (!array_key_exists($ev_id, $records)) {
             $key = 'event_' . $ev_id . '_' . $det_id;
             //$records[$ev_id] = Cache::get($key);
@@ -809,6 +810,29 @@ class Event
 
 
     /**
+     * Update the recurring data.
+     *
+     * @param   string  $key    Key name, e.g. "stop", empty to just save as-is
+     * @param   mixed   $val    New value for key
+     * @return  object  $this
+     */
+    public function updateRecData($key='', $val='')
+    {
+        global $_TABLES;
+
+        if ($key != '') {
+            $this->rec_data[$key] = $val;
+        }
+        $sql = "UPDATE {$_TABLES['evlist_events']} SET
+            rec_data = '" . DB_escapeString(serialize($this->rec_data)) . "',
+            ev_revision = ev_revision + 1
+            WHERE id = '{$this->id}'";
+        DB_query($sql);
+        return $this;
+    }
+
+
+    /**
      * Save the current values to the database.
      * Appends error messages to the $Errors property.
      *
@@ -879,8 +903,8 @@ class Event
         if (!$this->isNew) {
 
             // Existing event, we already have a Detail object instantiated
-            $this->Detail->setVars($A);
-            //$this->Detail->setEventID($this->id);
+            $this->getDetail()->setVars($A);
+            //$this->getDetail()->setEventID($this->id);
             if (!$this->isValidRecord()) {
                 return $this->PrintErrors();
             }
@@ -893,7 +917,7 @@ class Event
             $sql2 = " WHERE id='$ev_id_DB'";
 
             // Save the new detail record & get the ID
-            $this->det_id = $this->Detail->Save();
+            $this->det_id = $this->getDetail()->Save();
 
             // Quit now if the detail record failed
             if ($this->det_id == 0) return false;
@@ -960,14 +984,14 @@ class Event
 
             // Create a detail record
             $this->Detail = new Detail();
-            $this->Detail->setVars($A);
-            $this->Detail->setEventID($this->id);
+            $this->getDetail()->setVars($A);
+            $this->getDetail()->setEventID($this->id);
             if (!$this->isValidRecord()) {
                 return $this->PrintErrors();
             }
 
             // Save the new detail record & get the ID
-            $this->det_id = $this->Detail->Save();
+            $this->det_id = $this->getDetail()->Save();
 
             // Quit now if the detail record failed
             if ($this->det_id == 0) return false;
@@ -1044,8 +1068,8 @@ class Event
             $N = new \Template(EVLIST_PI_PATH . '/templates');
             $N->set_file('mail', 'notify_submission.thtml');
             $N->set_var(array(
-                'title'     => $this->Detail->getTitle(),
-                'summary'   => $this->Detail->getSummary(),
+                'title'     => $this->getDetail()->getTitle(),
+                'summary'   => $this->getDetail()->getSummary(),
                 'start_date' => $this->date_start1,
                 'end_date'  => $this->date_end1,
                 'start_time' => $this->time_start1,
@@ -1079,34 +1103,60 @@ class Event
      * Specify "false" for clearcache param if the cache will be clared
      * by the caller, e.g. when deleting events in bulk.
      *
-     * @param   integer $eid    Event ID
+     * @param   string  $eid    Event ID
      * @param   boolean $clearcache True to clear cache, false to not
      * @return      True on success, False on failure
      */
     public static function Delete($eid, $clearcache=true)
     {
-        global $_TABLES, $_PP_CONF;
+        global $_TABLES, $_EV_CONF;
 
         if ($eid == '') {
             return false;
         }
 
-        // Make sure the current user has access to delete this eventa
+        // Make sure the current user has access to delete this event.
+        // Try to retrieve the event. If the event is found and the user does
+        // not have write access, return false.
+        // If the event is not found then the repeats are probably out of sync
+        // so delete everything anyway.
         if ($clearcache) {  // leverage flag to consider $eid as valid
-            $sql = "SELECT id FROM {$_TABLES['evlist_events']}
-                    WHERE id='$eid' " . COM_getPermSQL('AND', 0, 3);
+            $sql = "SELECT * FROM {$_TABLES['evlist_events']}
+                    WHERE id='$eid'";
+            //COM_errorLog($sql);
+        static $counter = 0;
+            $counter++;
+            if ($counter > 1) {
+                var_dump(debug_backtrace(0));die;
+            }
             $res = DB_query($sql);
-            if (!$res || DB_numRows($res) != 1) {
-                return false;
+            if ($res && DB_numRows($res) == 1) {    // found normal record
+                $A = DB_fetchArray($res, false);
+                $access = SEC_hasAccess(
+                    $A['owner_id'], $A['group_id'],
+                    $A['perm_owner'], $A['perm_group'], $A['perm_members'], $A['perm_anon']
+                );
+                if ($access < 3) {
+                    return false;
+                }
             }
         }
 
+        if ($_EV_CONF['purge_cancelled_days'] < 1) {
+            DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
+            DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
+            DB_delete($_TABLES['evlist_tickets'], 'ev_id', $eid);
+            DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $eid);
+            DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
+            DB_delete($_TABLES['evlist_events'], 'id', $eid);
+        } else {
+            COM_errorLog("deleting event $eid");
+            Repeat::updateEventStatus($eid, Status::CANCELLED);
+            DB_change($_TABLES['evlist_events'], 'status', Status::CANCELLED, 'id', $eid);
+            DB_change($_TABLES['evlist_detail'], 'det_status', Status::CANCELLED, 'ev_id', $eid);
+        }
+        // Always delete reminders to avoid sending for cancelled events.
         DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
-        DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
-        DB_delete($_TABLES['evlist_tickets'], 'ev_id', $eid);
-        DB_delete($_TABLES['evlist_repeat'], 'rp_ev_id', $eid);
-        DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
-        DB_delete($_TABLES['evlist_events'], 'id', $eid);
         PLG_itemDeleted($eid, 'evlist');
         if ($clearcache) {
             Cache::clear();
@@ -1125,12 +1175,15 @@ class Event
         $days = (int)$_EV_CONF['purge_cancelled_days'];
         $sql = "SELECT id FROM {$_TABLES['evlist_events']}
                 WHERE status = " . Status::CANCELLED .
-                " AND last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
+                " AND ev_last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
         $res = DB_query($sql);
         if ($res) {
             while ($A = DB_fetchArray($res, false)) {
-                self::Delete($A['id']);
-            }
+                DB_delete($_TABLES['evlist_remlookup'], 'eid', $A['id']);
+                DB_delete($_TABLES['evlist_lookup'], 'eid', $A['id']);
+                DB_delete($_TABLES['evlist_tickets'], 'ev_id', $A['id']);
+                DB_delete($_TABLES['evlist_events'], 'id', $A['id']);
+             }
         }
 
         // Now delete any remaining cancelled occurrences, maybe from
@@ -1152,7 +1205,7 @@ class Event
         // Check that basic required fields are filled in.  We don't
         // check the event ID since that will be created automatically if
         // it is.
-        if ($this->Detail->getTitle() == '') {
+        if ($this->getDetail()->getTitle() == '') {
             $this->Errors[] = $LANG_EVLIST['err_missing_title'];
         }
 
@@ -1431,9 +1484,9 @@ class Event
         $retval = '';
 
         $retval .= COM_startBlock($LANG_EVLIST['event_editor']);
-        $summary = $this->Detail->getSummary();
-        $full_description = $this->Detail->getDscp();
-        $location = $this->Detail->getLocation();
+        $summary = $this->getDetail()->getSummary();
+        $full_description = $this->getDetail()->getDscp();
+        $location = $this->getDetail()->getLocation();
         if (
             ($this->isAdmin ||
             ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)
@@ -1446,21 +1499,21 @@ class Event
             $summary = htmlspecialchars(
                 COM_undoClickableLinks(
                     COM_undoSpecialChars(
-                        $this->Detail->getSummary()
+                        $this->getDetail()->getSummary()
                     )
                 )
             );
             $full_description = htmlspecialchars(
                 COM_undoClickableLinks(
                     COM_undoSpecialChars(
-                        $this->Detail->getDscp()
+                        $this->getDetail()->getDscp()
                     )
                 )
             );
             $location = htmlspecialchars(
                 COM_undoClickableLinks(
                     COM_undoSpecialChars(
-                        $this->Detail->getLocation()
+                        $this->getDetail()->getLocation()
                     )
                 )
             );
@@ -1547,21 +1600,21 @@ class Event
             'cancel_url'    => $cancel_url,
             'eid'           => $this->id,
             'rp_id'         => $rp_id,
-            'title'         => $this->Detail->getTitle(),
+            'title'         => $this->getDetail()->getTitle(),
             'summary'       => $summary,
             'description'   => $full_description,
             'location'      => $location,
             //'status_checked' => $this->status == 1 ? EVCHECKED : '',
             'status'        => $this->status,
-            'url'           => $this->Detail->getUrl(),
-            'street'        => $this->Detail->getStreet(),
-            'city'          => $this->Detail->getCity(),
-            'province'      => $this->Detail->getProvince(),
-            'country'       => $this->Detail->getCountry(),
-            'postal'        => $this->Detail->getPostal(),
-            'contact'       => $this->Detail->getContact(),
-            'email'         => $this->Detail->getEmail(),
-            'phone'         => $this->Detail->getPhone(),
+            'url'           => $this->getDetail()->getUrl(),
+            'street'        => $this->getDetail()->getStreet(),
+            'city'          => $this->getDetail()->getCity(),
+            'province'      => $this->getDetail()->getProvince(),
+            'country'       => $this->getDetail()->getCountry(),
+            'postal'        => $this->getDetail()->getPostal(),
+            'contact'       => $this->getDetail()->getContact(),
+            'email'         => $this->getDetail()->getEmail(),
+            'phone'         => $this->getDetail()->getPhone(),
             'startdate1'    => $this->date_start1,
             'enddate1'      => $this->date_end1,
             'd_startdate1'  => EVLIST_formattedDate($this->date_start1),
@@ -1601,8 +1654,8 @@ class Event
             'cal_select'    => $cal_select,
             'contactlink_chk' => $this->getOption('contactlink') == 1 ?
                                 EVCHECKED : '',
-            'lat'           => EVLIST_coord2str($this->Detail->getLatitude()),
-            'lng'           => EVLIST_coord2str($this->Detail->getLongitude()),
+            'lat'           => EVLIST_coord2str($this->getDetail()->getLatitude()),
+            'lng'           => EVLIST_coord2str($this->getDetail()->getLongitude()),
             'perm_msg'      => $LANG_ACCESS['permmsg'],
             'last'          => $LANG_EVLIST['rec_intervals'][5],
             'doc_url'       => EVLIST_getDocURL('event'),
@@ -2564,6 +2617,12 @@ class Event
      */
     public function getCalendar()
     {
+        if ($this->Calendar == NULL) {
+            if ($this->cal_id < 1) {
+                $this->cal_id = 1;
+            }
+            $this->Calendar = Calendar::getInstance($this->cal_id);
+        }
         return $this->Calendar;
     }
 
@@ -2705,6 +2764,9 @@ class Event
      */
     public function getDetail()
     {
+        if ($this->Detail == NULL) {
+            $this->Detail = Detail::getInstance($this->det_id);
+        }
         return $this->Detail;
     }
 
@@ -2716,7 +2778,7 @@ class Event
      */
     public function getStartDate1()
     {
-        return $this->start_date1;
+        return $this->date_start1;
     }
 
 

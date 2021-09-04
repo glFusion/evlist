@@ -3,7 +3,7 @@
  * Class to manage event repeats or single instances for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
  * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -339,6 +339,7 @@ class Repeat
             $this->time_end1    = $A['rp_time_end1'];
             $this->time_start2  = $A['rp_time_start2'];
             $this->time_end2    = $A['rp_time_end2'];
+            $this->rp_status    = (int)$A['rp_status'];
             // This is used by Reminders so make sure it's set:
             $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
             $this->setDateEnd1($this->date_end . ' ' . $this->time_end1);
@@ -433,7 +434,7 @@ class Repeat
      */
     public function Delete()
     {
-        global $_TABLES;
+        global $_TABLES, $_EV_CONF;
 
         if ($this->rp_id < 1 || !$this->Event->canEdit()) {
             // non-existent repeat ID or no edit access
@@ -451,19 +452,22 @@ class Repeat
             Detail::getInstance($this->det_id)->Delete();
         }
 
-        $sql = "UPDATE {$_TABLES['evlist_repeat']}
-            SET rp_status = " . Status::CANCELLED .
-            ", rp_revision = rp_revision + 1
-            WHERE rp_id = {$this->rp_id}";
-        DB_query($sql);
-        //DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
+        if ($_EV_CONF['purge_cancelled_days'] < 1) {
+            DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
+        } else {
+            $sql = "UPDATE {$_TABLES['evlist_repeat']}
+                SET rp_status = " . Status::CANCELLED .
+                ", rp_revision = rp_revision + 1
+                WHERE rp_id = {$this->rp_id}";
+            DB_query($sql);
+        }
         Cache::clear();
         return true;
     }
 
 
     /**
-     * Cancel all repeats for an event.
+     * Update the status for all occurrances of an event.
      *
      * @param   string  $ev_id      Event ID
      */
@@ -477,7 +481,7 @@ class Repeat
             rp_revision = rp_revision + 1
             WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'";
         DB_query($sql);
-        Cache::clear('repeats', 'event_' . $ev_id);
+        //Cache::clear('repeats', 'event_' . $ev_id);
     }
 
 
@@ -507,7 +511,6 @@ class Repeat
                 $LANG_LOCALE, $_SYSTEM, $LANG_EVLIST_HELP;
 
         $retval = '';
-
         $url = '';
         $location = '';
         $street = '';
@@ -536,7 +539,7 @@ class Repeat
         $permalink = COM_buildUrl(EVLIST_URL . '/view.php?&rid=0&eid=' . $this->Event->getID());
         $ss = $this->getShareIcons($permalink);
 
-        $Detail = $this->Event->getDetail();
+        $Detail = $this->getDetail();
         // If plain text then replace newlines with <br> tags
         $summary = $Detail->getSummary();
         $full_description = $Detail->getDscp();
@@ -1373,9 +1376,9 @@ class Repeat
      * Then, delete all the future repeat records. Finally, update the stop
      * date for the main event.
      */
-    public function DeleteFuture()
+    public function deleteFuture()
     {
-        global $_TABLES;
+        global $_TABLES, $_EV_CONF;
 
         if ($this->rp_id < 1 || !$this->Event->canEdit()) {
             // non-existent repeat ID or no edit access
@@ -1388,11 +1391,12 @@ class Repeat
             $this->Event->Delete();
         } else {
             // Find all custom detail records and delete them.
-            $sql = "SELECT rp_id, rp_det_id
+            $sql = "SELECT DISTINCT rp_det_id
                     FROM {$_TABLES['evlist_repeat']}
                     WHERE rp_ev_id='{$this->ev_id}'
                     AND rp_date_start >= '{$this->date_start}'
                     AND rp_det_id <> '{$this->Event->getDetailID()}'";
+            //echo $sql;die;
             $res = DB_query($sql);
             $details = array();
             while ($A = DB_fetchArray($res, false)) {
@@ -1400,37 +1404,50 @@ class Repeat
             }
             if (!empty($details)) {
                 $detail_str = implode(',', $details);
-                //$sql = "DELETE FROM {$_TABLES['evlist_detail']}
-                $sql = "UPDATE {$_TABLES['evlist_detail']}
-                    SET status = " . Status::CANCELLED .
-                    " WHERE det_id IN ($detail_str)";
+                if ($_EV_CONF['purge_cancelled_days'] < 1) {
+                    $sql = "DELETE FROM {$_TABLES['evlist_detail']}
+                        WHERE det_id IN ($detail_str)";
+                } else {
+                    $sql = "UPDATE {$_TABLES['evlist_detail']}
+                        SET det_status = " . Status::CANCELLED .
+                        " WHERE det_id IN ($detail_str)";
+                }
+                //echo $sql;die;
                 DB_query($sql);
             }
 
-            // Now delete the repeats
-            //$sql = "DELETE FROM {$_TABLES['evlist_repeat']}
-            $sql = "UPDATE {$_TABLES['evlist_repeat']}
-                SET status = " . Status::CANCELLED .
-                ", rp_revision = rp_revision + 1
-                WHERE rp_ev_id='{$this->ev_id}'
-                AND rp_date_start >= '{$this->date_start}'";
+            // Now cancel or delete the repeats
+            if ($_EV_CONF['purge_cancelled_days'] < 1) {
+                $sql = "DELETE FROM {$_TABLES['evlist_repeat']}
+                    WHERE rp_ev_id='{$this->ev_id}'
+                    AND rp_date_start >= '{$this->date_start}'";
+            } else {
+                $sql = "UPDATE {$_TABLES['evlist_repeat']}
+                    SET rp_status = " . Status::CANCELLED .
+                    ", rp_revision = rp_revision + 1
+                    WHERE rp_ev_id='{$this->ev_id}'
+                    AND rp_date_start >= '{$this->date_start}'";
+            }
+            //echo $sql;die;
             DB_query($sql);
 
             // Now adjust the recurring stop date for the event.
-            $new_stop = DB_getItem($_TABLES['evlist_repeat'],
+            $new_stop = DB_getItem(
+                $_TABLES['evlist_repeat'],
                 'rp_date_start',
-                "rp_ev_id='{$R->ev_id}'
-                    ORDER BY rp_date_start DESC LIMIT 1");
+                "rp_ev_id='{$this->ev_id}'ORDER BY rp_date_start DESC LIMIT 1"
+            );
+            //echo $new_stop;die;
             if (!empty($new_stop)) {
-                $this->Event->getRecData()['stop'] = $new_stop;
-                $this->Event->Save();
+                $this->Event->updateRecData('stop', $new_stop);
             }
+            Cache::clear();
         }
     }   // function DeleteFuture()
 
 
     /**
-     * Updates all future repeates from this one.
+     * Updates all future repeats from this one.
      * Sets the times to new values, but leaves the dates alone.
      *
      * @return  object  $this
@@ -1516,10 +1533,10 @@ class Repeat
             'item_number' => 'evlist:eventfee:' . $this->Event->getID() . '/' .
                     $tick_type . '/' . $rp_id,
             'item_name' => $TickType->getDscp() . ': ' . $LANG_EVLIST['fee'] . ' - ' .
-                    $this->Event->getDetail()->getTitle() . ' ' . $this->date_start.
+                    $this->getDetail()->getTitle() . ' ' . $this->date_start.
                     ' ' . $this->time_start1,
             'short_description' => $TickType->getDscp() . ': ' .
-                    $this->Event->getDetail()->getTitle() . ' ' . $this->date_start .
+                    $this->getDetail()->getTitle() . ' ' . $this->date_start .
                     ' ' . $this->time_start1,
 
             'amount' => number_format((float)$fee, 2, '.', ''),
@@ -1624,14 +1641,14 @@ class Repeat
     {
         if (version_compare(GVERSION, '2.0.0', '<')) {
             $ss = SOC_getShareIcons(
-                $this->Event->getDetail()->getTitle(),
-                $this->Event->getDetail()->getSummary(),
+                $this->getDetail()->getTitle(),
+                $this->getDetail()->getSummary(),
                 $permalink
             );
         } else {
             $ss = \glFusion\Social\Social::getShareIcons(
-                $this->Event->getDetail()->getTitle(),
-                $this->Event->getDetail()->getSummary(),
+                $this->getDetail()->getTitle(),
+                $this->getDetail()->getSummary(),
                 $permalink
             );
         }
@@ -1675,6 +1692,16 @@ class Repeat
     public function getEvent()
     {
         return $this->Event;
+    }
+
+
+    public function getDetail()
+    {
+        if ($this->det_id == $this->getEvent()->getDetailID()) {
+            return $this->getEvent()->getDetail();
+        } else {
+            return Detail::getInstance($this->det_id);
+        }
     }
 
 
@@ -1816,6 +1843,26 @@ class Repeat
     {
         $this->_cmtorder = $cmtorder;
         return $this;
+    }
+
+
+
+    /**
+     * Make sure the current user has access to view this event.
+     *
+     * @return  boolean     True if allowed, False if not
+     */
+    public function canView()
+    {
+        if (
+            $this->getID() == 0 ||      // indicates an invalid record
+            $this->rp_status != 1 ||    // indicates disabled or cancelled
+            !$this->getEvent()->hasAccess(2)    // no access to the event
+        ) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

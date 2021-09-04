@@ -81,8 +81,7 @@ case 'addreminder':
     break;
 
 case 'delreminder':
-    $R = new Evlist\Reminder($_POST['rp_id']);
-    $R->Delete();
+    Evlist\Reminder::Delete($_POST['eid'], $_POST['rp_id'], $_USER['uid']);
     echo json_encode(array('reminder_set' => false));
     exit;
     break;

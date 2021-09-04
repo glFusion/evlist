@@ -512,16 +512,20 @@ class Detail
      */
     public function Delete()
     {
-        global $_TABLES;
+        global $_TABLES, $_EV_CONF;
 
         if ($this->det_id == '') {
             return false;
         }
 
-        $sql = "UPDATE {$_TABLES['evlist_detail']}
-            SET det_status = " . Status::CANCELLED .
-            " WHERE det_id = {$this->det_id}";
-        DB_query($sql);
+        if ($_EV_CONF['purge_cancelled_days'] < 1) {
+            DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
+        } else {
+            $sql = "UPDATE {$_TABLES['evlist_detail']}
+                SET det_status = " . Status::CANCELLED .
+                " WHERE det_id = {$this->det_id}";
+            DB_query($sql);
+        }
         return true;
     }
 

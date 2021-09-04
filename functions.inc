@@ -663,16 +663,26 @@ function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
 /**
  * Run scheduled tasks for the plugin.
  * - Send event reminders
+ * - Purge cancelled events if a purge interval is set
  */
 function plugin_runScheduledTask_evlist()
 {
-    if (!EVLIST_isCurrentVersion()) return;
+    global $_EV_CONF;
 
-    Evlist\Event::purgeCancelled();
+    if (!EVLIST_isCurrentVersion())  {
+        return;
+    }
+
+    // Purge cancelled events, if the purge interval is > 0.
+    // Otherwise events have been deleted immediately.
+    if ($_EV_CONF['purge_cancelled_days'] > 0) {
+        Evlist\Event::purgeCancelled();
+    }
+
+    // Send out reminders
     $Rems = Evlist\Reminder::getCurrent();
     foreach ($Rems as $R) {
         $R->Send();
-        $R->Delete();
     }
     return true;
 }
@@ -885,12 +895,17 @@ function plugin_itemdeleted_evlist($id, $type)
 {
     global $_TABLES;
 
-    // If the lgLib plugin is disabled or removed, disable thie plugin
-    if ($type == 'lglib' && $id == '*') {
-        plugin_enablestatechange_evlist(false);
-        DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
+    if ($type == 'evlist') {
+        // We already know an item was deleted....
+        return;
     }
+
     if ($id == '*') {
+        if ($type == 'lglib') {
+            // If the lgLib plugin is disabled or removed, disable this plugin
+            plugin_enablestatechange_evlist(false);
+            DB_change($_TABLES['plugins'], 'pi_enabled', 0, 'pi_name', 'evlist');
+        }
         // TODO: Delete all calendar items for a plugin?
     } else {
         // Delete a single event related to a plugin item that was deleted

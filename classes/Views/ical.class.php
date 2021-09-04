@@ -135,9 +135,9 @@ class ical extends \Evlist\View
                     "UID:{$uuid}\r\n" .
                     "SEQUENCE:{$sequence}\r\n" .
                     "STATUS:{$status}\r\n" .
-                    "DTSTAMP:$dtstart\r\n" .
-                    "DTSTART:$dtstart\r\n" .
-                    "DTEND:$dtend\r\n" .
+                    "DTSTAMP;VALUE=DATE-TIME:$dtstart\r\n" .
+                    "DTSTART;VALUE=DATE-TIME:$dtstart\r\n" .
+                    "DTEND;VALUE=DATE-TIME:$dtend\r\n" .
                     "URL:$permalink\r\n" .
                     "SUMMARY:$summary\r\n" .
                     "$description\r\n"; // already includes the DESCRIPTION tag

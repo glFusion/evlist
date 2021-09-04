@@ -45,7 +45,7 @@ $event_table =
   `options` text DEFAULT NULL,
   `tzid` varchar(125) NOT NULL DEFAULT 'local',
   `ev_revision` int(5) unsigned NOT NULL DEFAULT 1,
-  `ev_last_mod` timestamp NOT NULL DEFAULT current_timestamp(),
+  `ev_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM";
 
@@ -69,7 +69,7 @@ $_SQL['evlist_repeat'] = "CREATE TABLE {$_TABLES['evlist_repeat']} (
   `rp_end` datetime DEFAULT NULL,
   `rp_status` tinyint(1) unsigned NOT NULL DEFAULT 1,
   `rp_revision` int(5) unsigned NOT NULL DEFAULT 1,
-  `rp_last_mod` timestamp NOT NULL DEFAULT current_timestamp(),
+  `rp_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`rp_id`),
   KEY `event` (`rp_ev_id`),
   KEY `start` (`rp_date_start`)
@@ -123,7 +123,7 @@ $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
   `lat` float(10,6) DEFAULT NULL,
   `lng` float(10,6) DEFAULT NULL,
   `det_status` tinyint(1) unsigned NOT NULL DEFAULT 1,
-  `det_last_mod` timestamp NOT NULL DEFAULT current_timestamp(),
+  `det_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`det_id`)
 ) ENGINE=MyISAM";
 
@@ -341,12 +341,12 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE options options text",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE rec_data rec_data text DEFAULT NULL",
     "ALTER TABLE {$_TABLES['evlist_events']} ADD ev_revision int(5) unsigned not null default 1",
-    "ALTER TABLE {$_TABLES['evlist_events']} ADD ev_last_mod timestamp default CURRENT_TIMESTAMP()",
+    "ALTER TABLE {$_TABLES['evlist_events']} ADD ev_last_mod timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE options options text",
     "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE rec_data rec_data text DEFAULT NULL",
     "ALTER TABLE {$_TABLES['evlist_submissions']} CHANGE cal_id cal_id int(10) not null DEFAULT 1",
     "ALTER TABLE {$_TABLES['evlist_submissions']} ADD ev_revision int(5) unsigned not null default 1",
-    "ALTER TABLE {$_TABLES['evlist_submissions']} ADD ev_last_mod timestamp default current_timestamp()",
+    "ALTER TABLE {$_TABLES['evlist_submissions']} ADD ev_last_mod timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `id` `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `description` `dscp` varchar(255) NOT NULL DEFAULT ''",
     "ALTER TABLE {$_TABLES['evlist_tickets']} CHANGE tic_id tic_num varchar(128) NOT NULL",
@@ -357,9 +357,9 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_repeat']} DROP KEY IF EXISTS `end`",
     "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_status` tinyint(1) unsigned NOT NULL DEFAULT 1",
     "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_revision` int(5) unsigned NOT NULL DEFAULT 1",
-    "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_last_mod` timestamp NOT NULL DEFAULT current_timestamp()",
+    "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_detail']} ADD `det_status` tinyint(1) unsigned NOT NULL DEFAULT 1",
-    "ALTER TABLE {$_TABLES['evlist_detail']} ADD `det_last_mod` timestamp NOT NULL DEFAULT current_timestamp()",
+    "ALTER TABLE {$_TABLES['evlist_detail']} ADD `det_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_remlookup']}
         ADD `rem_id` int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST",
     "DROP TABLE IF EXISTS {$_TABLES['evlist_rsvp']}",

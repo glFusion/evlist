@@ -35,10 +35,6 @@ class ical extends \Evlist\View
         '', 'DQUOTE', '\\,', '":"', '\\;', ' ', ' ',
     );
 
-    /** Revision, to alter the UID and force re-reading by the consumer.
-     * @var string */
-    private $rev = '1';
-
 
     /**
      * Escape a text string.
@@ -69,10 +65,15 @@ class ical extends \Evlist\View
             ->withEnd($end)
             ->withActiveOnly(false);
 
-        $opts = array('ical' => 1);
         if (isset($_GET['cal']) && !empty($_GET['cal'])) {
-            // Get only a specific calendar
+            // Get only a specific calendar, and set the description to tne
+            // calendar name
             $EventSet->withCalendar($_GET['cal']);
+            $Cal = Calendar::getInstance($_GET['cal']);
+            $dscp = $Cal->getName();
+        } else {
+            // Getting all events, just set the description to "Events"
+            $dscp = $LANG_EVLIST['events'];
         }
         if (isset($_GET['rp_id']) && !empty($_GET['rp_id'])) {
             // Get a single event
@@ -151,12 +152,7 @@ class ical extends \Evlist\View
                 $ical .= "END:VEVENT\r\n";
             }
         }
-        if (isset($opts['cal'])) {
-            $Cal = Calendar::getInstance($opts['cal']);
-            $dscp = $Cal->getName();
-        } else {
-            $dscp = $LANG_EVLIST['events'];
-        }
+
         $content = "BEGIN:VCALENDAR\r\n" .
             "VERSION:2.0\r\n" .
             "PRODID:-//{$_CONF['site_name']}\r\n" .    //NONSGML v1.0//EN

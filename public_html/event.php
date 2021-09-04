@@ -189,6 +189,7 @@ case 'delfuture':
     // Delete the selected and all future occurances.
     $R = Evlist\Repeat::getInstance($_REQUEST['rp_id']);
     $R->DeleteFuture();
+    $view = 'home';
     break;
 
 case 'register':

@@ -251,10 +251,10 @@ class Reminder
         $Rems = array();
         $sql = "SELECT rem.* FROM {$_TABLES['evlist_remlookup']} rem
             LEFT JOIN {$_TABLES['evlist_events']} ev ON ev.id = rem.eid
-            LEFT JOIN {$_TABLES['evlist_repeat']} rp ON rp.rp_ev_idid = rem.eid
+            LEFT JOIN {$_TABLES['evlist_repeat']} rp ON rp.rp_ev_id = rem.eid
             WHERE rem.date_start <= (UNIX_TIMESTAMP() + (rem.days_notice * 86400))
             AND ev.status = " . Status::ENABLED . "
-            AND rp.status = " . Status::ENABLED;
+            AND rp.rp_status = " . Status::ENABLED;
         //echo $sql;die;
         $res = DB_query($sql);
         while ($A = DB_fetchArray($res, false)) {

@@ -15,6 +15,7 @@ namespace Evlist\Views;
 use Evlist\View;
 use Evlist\Cache;
 use Evlist\Models\EventSet;
+use Evlist\Models\TimeRange;
 
 
 /**
@@ -23,6 +24,11 @@ use Evlist\Models\EventSet;
  */
 class Centerblock
 {
+    const DISABLED = 0;     // No centerblock shown
+    const TABLE = 1;        // Show as a table listing events
+    const STORY = 2;        // Show as stories
+    const CALENDAR = 3;     // Embed a calendar
+
 
     /**
      * Create the centerblock.
@@ -62,15 +68,15 @@ class Centerblock
             // overloading the previously-boolean enable_centerblock option to
             // indicate the centerblock format.
             switch ($_EV_CONF['enable_centerblock']) {
-            case 1:     // table format
-            case 2:     // story format
+            case self::TABLE:       // table format
+            case self::STORY:       // story format
                 $display = self::getContent($_EV_CONF['enable_centerblock']);
                 break;
-            case 3:     // calendar format
+            case self::CALENDAR:    // calendar format
                 $view = View::getView('month');
                 $display = $view->Render();
                 break;
-            case 0:     // disabled
+            case self::DISABLED:    // disabled
                 default:
                 $display = '';
             }
@@ -97,15 +103,15 @@ class Centerblock
         $retval = '';
 
         switch ($format) {
-        case 1:     // table format
+        case self::TABLE:   // table format
             $tpl_file = 'centerblock.thtml';
             $hidesmall = $_EV_CONF['cb_hide_small'];
             break;
-        case 2:     // story format
+        case self::STORY:   // story format
             $tpl_file = 'cblock_stories.thtml';
             $hidesmall = false;
             break;
-        default:
+        default:            // invalid format
             return '';
         }
 
@@ -140,23 +146,23 @@ class Centerblock
         $D = $_CONF['_now']->format('d');
         $M = $_CONF['_now']->format('m');
         switch ($_EV_CONF['range_centerblock']) {
-        case 1:         // past events
+        case TimeRange::PAST:         // past events
             $start = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 month"));
             $end = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 day"));
             $limit = 0;     // special, we need to get all events since we can't count back
             $EventSet->withOrder('DESC');
             break;
-        case 2:         // upcoming events
+        case TimeRange::UPCOMING:         // upcoming events
         default:
             $EventSet->withUpcoming(true);
             $start = $_EV_CONF['_today'];
             $end = $cb_max_date;
             break;
-        case 3:         // this week
+        case TimeRange::WEEK:         // this week
             $start = DateFunc::beginOfWeek($D, $M, $Y);
             $end = DateFunc::endOfWeek($D, $M, $Y);
             break;
-        case 4:         // upcoming month
+        case TimeRange::MONTH:         // upcoming month
             $start = DateFunc::beginOfMonth($M, $Y);
             $end = DateFunc::dateFormat(DateFunc::daysInMonth($M, $Y), $M, $Y);
             break;
@@ -179,7 +185,7 @@ class Centerblock
 
         // Special handling needed to get the latest X past events.  We have a bunch
         // from the query (to make sure we got enough).  Now pick out the last X.
-        if ($_EV_CONF['range_centerblock'] == 1) {
+        if ($_EV_CONF['range_centerblock'] == TimeRange::PAST) {
             $limit = (int)$_EV_CONF['limit_block'];     // Need this value again
             $events = array_splice($events, ($limit * -1), $limit);
         }

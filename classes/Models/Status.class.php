@@ -22,4 +22,5 @@ class Status
     const DISABLED = 0;
     const ENABLED = 1;
     const CANCELLED = 2;
+    const ALL = 15;     // should be enough for growth...
 }

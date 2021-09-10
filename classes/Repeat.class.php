@@ -418,11 +418,13 @@ class Repeat
                 rp_time_end2 = '$time_end2',
                 rp_start = '$date_start $time_start1',
                 rp_end = '$date_end $t_end',
-                rp_det_id='" . (int)$this->det_id . "'
+                rp_det_id='" . (int)$this->det_id . "',
+                rp_revision = rp_revision + 1
             WHERE rp_id='{$this->rp_id}'";
             DB_query($sql);
             Cache::clear();
             PLG_itemSaved($this->rp_id, 'evlist');
+            COM_rdfUpToDateCheck('evlist', 'events', $this->rp_id);
         }
     }
 

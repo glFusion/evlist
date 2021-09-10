@@ -496,8 +496,7 @@ class Detail
             $sql = "INSERT INTO {$_TABLES['evlist_detail']} SET
                 det_id = 0,
                 lat = '{$lat}',
-                lng = '{$lng}',
-                det_revision = det_revision + 1,
+                lng = '{$lng}'
                 $fld_sql";
             //echo $sql;die;
             DB_query($sql);

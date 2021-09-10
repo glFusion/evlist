@@ -78,9 +78,9 @@ class EventSet
      * @var string */
     private $upcoming = false;
 
-    /** Show only active (not cancelled) events?
-     * @var boolean */
-    private $only_active = true;
+    /** Set required status.
+     * @var integer */
+    private $status = Status::ENABLED;
 
 
     /**
@@ -227,15 +227,27 @@ class EventSet
 
 
     /**
+     * Set the status of events to include, NULL for all.
+     *
+     * @param   integer|null    $val    Value for status flag
+     * @return  object  $this
+     */
+    public function withStatus($val)
+    {
+        $this->status = $val;
+        return $this;
+    }
+
+
+    /**
      * Set the flag to show only active events.
      *
      * @param   boolean $val    False to show all events, True to show only active
      * @return  object  $this
      */
-    public function withActiveOnly($val)
+    public function withActiveOnly($val=true)
     {
-        $this->only_active = $val ? true : false;
-        return $this;
+        return $this->withStatus(Status::ENABLED);
     }
 
 
@@ -306,7 +318,7 @@ class EventSet
         $cat_join = '';
         //$cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
         // default date range for fixed calendars, "upcoming" may be different
-        $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start'";
+        $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start' AND rep.rp_end <= '$db_end'";
         $ands = array();
 
         // Create the SQL elements from the properties
@@ -324,7 +336,7 @@ class EventSet
         }
         if ($this->cat > 0) {
             //$opt_select .= ', cat.name AS cat_name';
-            $ands[] = " (l.cid = '$value' AND cat.status = 1) ";
+            $ands[] = " (l.cid = '{$this->cat}' AND cat.status = 1) ";
             $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
                 "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
         }
@@ -349,8 +361,9 @@ class EventSet
             $dt_sql .= " AND rep.rp_start <= '{$this->end}'";
             $dt_sql = ' (' . $dt_sql . ') ';
         }
-        if ($this->only_active) {
-            $ands[] = " rep.rp_status = 1 ";
+        if ($this->status < Status::ALL) {
+            // Limit by event status if requested
+            $ands[] = " rep.rp_status = {$this->status} ";
         }
 
         // By default, get all fields that the caller could possibly want.  If

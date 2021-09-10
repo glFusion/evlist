@@ -1055,7 +1055,6 @@ class Event
             options = '" . DB_escapeString(serialize($this->options)) . "' ";
 
         $sql = $sql1 . $fld_sql . $sql2;
-        //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
@@ -1090,6 +1089,7 @@ class Event
             if (!$this->isSubmission()) {
                 Cache::clear('events');
                 PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');
+                COM_rdfUpToDateCheck('evlist', 'events', $this->id);
             }
             return '';
         } else {

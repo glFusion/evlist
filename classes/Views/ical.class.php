@@ -13,6 +13,7 @@
  */
 namespace Evlist\Views;
 use Evlist\Calendar;
+use Evlist\Cache;
 use Evlist\Models\EventSet;
 use Evlist\Models\Status;
 
@@ -65,33 +66,48 @@ class ical extends \Evlist\View
             $to_days = 180;
             $from_days = 180;
         }
+
         $from = clone($this->today);
         $start = $from->sub(new \DateInterval('P'.$from_days.'D'))->format('Y-m-d');
         $to = clone($this->today);
         $end = $to->add(new \DateInterval('P'.$to_days.'D'))->format('Y-m-d');
         $EventSet = EventSet::create()
+            ->withIcal(true)
             ->withStart($start)
             ->withEnd($end)
-            ->withActiveOnly(false);
+            ->withStatus(Status::ALL);
 
+        $dscp = $LANG_EVLIST['events'];
         if (isset($_GET['cal']) && !empty($_GET['cal'])) {
             // Get only a specific calendar, and set the description to tne
             // calendar name
-            $EventSet->withCalendar($_GET['cal']);
-            $Cal = Calendar::getInstance($_GET['cal']);
-            $dscp = $Cal->getName();
+            $cal = (int)$_GET['cal'];
+            $EventSet->withCalendar($cal);
+            $Cal = Calendar::getInstance($cal);
+            if ($Cal) {
+                $dscp = $Cal->getName();
+            }
         } else {
             // Getting all events, just set the description to "Events"
-            $dscp = $LANG_EVLIST['events'];
+            $cal = 0;
         }
         if (isset($_GET['rp_id']) && !empty($_GET['rp_id'])) {
             // Get a single event
-            $EventSet->withRepeat($_GET['rp_id']);
+            $rp_id = (int)$_GET['rp_id'];
+            $EventSet->withRepeat($rp_id);
+        } else {
+            $rp_id = 0;
         }
 
-        $domain = '@' . preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
+        $cache_key = "ical_{$cal}_{$rp_id}";
+        $content = Cache::get($cache_key);
+        $content = NULL;
+        if ($content !== NULL) {
+            return $content;
+        }
 
         $events = $EventSet->getEvents();
+        $domain = '@' . preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
         $ical = '';
         $rp_shown = array();
         foreach ($events as $day) {
@@ -171,8 +187,10 @@ class ical extends \Evlist\View
             "X-WR-CALDESC:Events from {$_CONF['site_name']} \r\n" .
             "CALSCALE:GREGORIAN\r\n" .
             "METHOD:PUBLISH\r\n" .
+            "X-PUBLISHED-TTL:PT6H\r\n" .
             $ical .
             "END:VCALENDAR\r\n";
+        Cache::set($cache_key, $content, 'feeds', 1800);
         return $content;
     }
 }

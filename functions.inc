@@ -641,9 +641,12 @@ function plugin_getfeednames_evlist()
  * @param   string  $feedType   Feed type (RSS, ICS, etc.) We only do ICS.
  * @return  array               Array of event data
  */
-function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
-{
-    return Evlist\Models\Syndication::getFeedcontent($feed, $link, $update_data, $feedType);
+function plugin_getfeedcontent_evlist(
+    $feed, &$link, &$update_data, $feedType, $feedVersion, $A
+) {
+    return Evlist\Models\Syndication::getFeedcontent(
+        $feed, $link, $update_data, $feedType, $feedVersion, $A
+    );
 }
 
 
@@ -656,9 +659,14 @@ function plugin_getfeedcontent_evlist($feed, &$link, &$update_data, $feedType)
  * @param   integer $limit  Configured limit on item count for this feed
  * @return  boolean         True if feed needs updating, False otherwise
  */
-function plugin_feedupdatecheck_evlist($feed, $topic, $update_data, $limit)
-{
-    return Evlist\Models\Syndication::feedUpdateCheck($feed, $topic, $update_data, $limit);
+function plugin_feedupdatecheck_evlist(
+    $feed, $topic, $update_data, $limit,
+    $updated_type = '', $updated_topic = '', $updated_id = ''
+) {
+    return Evlist\Models\Syndication::feedUpdateCheck(
+        $feed, $topic, $update_data, $limit,
+        $updated_type, $updated_topic, $updated_id
+    );
 }
 
 

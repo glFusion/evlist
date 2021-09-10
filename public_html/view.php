@@ -67,6 +67,7 @@ case 'event':
     }
 case 'instance':
     $Rep = Evlist\Repeat::getInstance($id);
+    //if ($Rep->getID() == 0 || $Rep->getStatus() != 1 || !$Rep->getEvent()->hasAccess(2)) {
     if (!$Rep->canView()) {
         COM_setMsg($LANG_EVLIST['ev_not_found']);
         echo COM_refresh(EVLIST_URL . '/index.php');

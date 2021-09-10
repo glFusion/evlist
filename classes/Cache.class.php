@@ -35,7 +35,7 @@ class Cache
      * @param   string  $key    Item key
      * @param   mixed   $data   Data, typically an array
      * @param   mixed   $tag    Single tag or array
-     * @param   integer $ttl    Optional TTL override
+     * @param   integer $ttl    Optional TTL override, in seconds
      * @return  boolean         True on success, False on error.
      */
     public static function set($key, $data, $tag='', $ttl = null)

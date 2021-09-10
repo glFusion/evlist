@@ -58,7 +58,8 @@ class EventSet
      * @var string */
     private $end = '';
 
-    /** Return iCal-enabled events only? Default is all, 1=ical, 2=non-ical.
+    /** Return iCal-enabled events/calendars only?
+     * Default is all, 1=ical, 0=non-ical.
      * @var integer */
      private $ical = -1;
 

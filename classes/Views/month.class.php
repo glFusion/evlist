@@ -180,7 +180,7 @@ class month extends \Evlist\View
                         'fgcolor'   => $event['fgcolor'],
                         'bgcolor'   => $event['bgcolor'],
                         'pi_url'    => EVLIST_URL,
-                        'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?id=' . $event['rp_id']),
+                        'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $event['rp_id']),
                         'show'      => $this->getCalShowPref($event['cal_id']) ? 'block' : 'none',
                         'icon'      => Icon::getIcon($event['cal_icon']),
                     ) );

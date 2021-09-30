@@ -239,6 +239,11 @@ function evlist_upgrade($dvlp = false)
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
         // Order the calendars, initially by name;
         Evlist\Calendar::reOrder('cal_name');
+        if($_EV_CONF['default_view'] == 'list') {
+            $_EV_CONF['default_view'] = 'agenda';
+            $c = config::get_instance();
+            $c->set('default_view', 'agenda', 'evlist');
+        }
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
@@ -556,6 +561,13 @@ function EVLIST_remove_old_files()
             'language/english.php',
             'language/german.php',
             'language/german_formal.php',
+            'classes/Views/listView.class.php',
+            'classes/Views/monthView.class.php',
+            'classes/Views/weekView.class.php',
+            'classes/Views/dayView.class.php',
+            'classes/Views/yearView.class.php',
+            'classes/Views/smallmonthView.class.php',
+            'classes/Views/detailView.class.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

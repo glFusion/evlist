@@ -88,7 +88,7 @@ class Calendar
      */
     public function __construct($calendar = 0)
     {
-        global $_EV_CONF, $_USER;
+        global $_EV_CONF, $_USER, $LANG_EVLIST;
 
         if (is_array($calendar)) {
             // Already have values from the DB
@@ -105,6 +105,7 @@ class Calendar
             $this->perm_members = $_EV_CONF['default_permissions'][2];
             $this->perm_anon    = $_EV_CONF['default_permissions'][3];
             $this->owner_id     = $_USER['uid'];
+            $this->cal_name     = $LANG_EVLIST['all_calendars'];
         }
     }
 
@@ -119,7 +120,7 @@ class Calendar
     public static function getInstance($cal_id)
     {
         $Cals = self::getAll();
-        return isset($Cals[$cal_id]) ? $Cals[$cal_id] : NULL;
+        return isset($Cals[$cal_id]) ? $Cals[$cal_id] : new self;
     }
 
 

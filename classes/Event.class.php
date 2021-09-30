@@ -986,7 +986,7 @@ class Event
                         $new_start->sub(new \DateInterval('P1D'));
                         $this->UpdateRepeats(
                             $new_start->format('Y-m-d'),
-                            $this->old_schedule['rec_data']['date_start1']
+                            $this->old_schedule['date_start1']
                         );
                     }
                 }
@@ -2249,15 +2249,17 @@ class Event
         $new_rec = is_array($this->rec_data) ?
             $this->rec_data : array();
 
-        // Just check each relevant value in $A against our value.
-        // If any matches, return true
         if (
             $this->old_schedule['date_start1'] != $this->date_start1 ||
             $this->old_schedule['date_end1'] != $this->date_end1
         ) {
             // Begining date changed, may need to add or remove instances.
             // Ending date_end is still part of the first event if multiday.
-            $retval |= self::RP_NEWSTART;
+            if ($this->old_schedule['recurring'] == $this->recurring && $this->recurring == 0) {
+                $retval |= self::RP_NEWSCHEDULE;
+            } else {
+                $retval |= self::RP_NEWSTART;
+            }
         }
         if ($old_rec['stop'] != $new_rec['stop']) {
             // Stop date for instances changed, may need to add or remove some.

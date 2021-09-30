@@ -1,7 +1,6 @@
 {# begin {templatelocation} #}
-<a href="{feed_url}">
-  <img src="{layout_url}/images/rss_small.png" 
-    alt="{$LANG_EVLIST['subscribe_to']} {feed_title}" 
-    title="{$LANG_EVLIST['subscribe_to']} {feed_title}" />
+<a href="{feed_url}" class="tooltip" title="{$LANG_EVLIST['subscribe_to']} {feed_title}">
+	<i class="uk-icon uk-icon-rss-square tooltip"
+		></i>
 </a>
 {# end {templatelocation} #}

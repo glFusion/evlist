@@ -1,6 +1,6 @@
 # evlist
 Event List and calendar plugin for glFusion
-Version: 1.4.3
+Version: 1.5.0
 
 For the latest documentation, please see
 
@@ -19,8 +19,8 @@ categories, and more.
 ## SYSTEM REQUIREMENTS
 evList has the following system requirements:
 
-    * PHP 7.0 and higher.
-    * glFusion v1.7.0 or newer
+    * PHP 7.3 and higher.
+    * glFusion v1.7.9 or newer
     * lgLib plugin v1.0.10 or newer
     * Shop Plugin 0.7.0 or higher, if used.
 
@@ -97,6 +97,7 @@ enter their email address for a reminder. Default = 1.
   * "disabled" - no centerblock is shown
   * "table" - a table of events is shown
   * "story" - upcoming events are shown as stories
+  * "calendar" - embeds a monthly calendar in the page
 
 * Centerblock Position
 

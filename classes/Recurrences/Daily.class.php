@@ -12,6 +12,7 @@
  * @filesource
  */
 namespace Evlist\Recurrences;
+use Evlist\DateFunc;
 
 
 /**

@@ -93,6 +93,8 @@ class View
 
     protected $disp_date = NULL;
 
+    protected $show_date_sel = true;
+
 
     /**
      * Get a calendar view object for the specifiec type.
@@ -130,11 +132,11 @@ class View
         }
 
         // catch missing or incorrect view types, set to default or 'month'
-        if (!in_array($type, array('day','week','month','year','list', 'smallmonth', 'detail'))) {
+        if (!in_array($type, array('day','week','month','year','agenda','smallmonth','detail'))) {
             $type = isset($_EV_CONF['default_view']) ?
                 $_EV_CONF['default_view'] : 'month';
         }
-        $class = __NAMESPACE__ . '\\Views\\' . $type . 'View';
+        $class = __NAMESPACE__ . '\\Views\\' . $type;
         if (class_exists($class)) {
             $view = new $class($year, $month, $day, $cat, $cal, $opts);
         } else {
@@ -269,6 +271,7 @@ class View
             'view'  => $this->type,
             $this->type . '_sel' => 'selected="selected"',
             'cal_checkboxes' => $this->getCalCheckboxes(),
+            'show_date_sel' => $this->show_date_sel,
         ) );
 
         $cal_selected = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -305,7 +308,7 @@ class View
             $T->set_var('year_select', $options);
         }
 
-        $images = array('day', 'week', 'month', 'year', 'list');
+        $images = array('day', 'week', 'month', 'year', 'agenda');
         $options = '';
         foreach ($images as $v) {
             if ($v == $this->type) {
@@ -315,8 +318,8 @@ class View
                 $sel = '';
                 $T->set_var($v .'_img', $v . '_off.png');
             }
-            // Add views other than "list" to the jump dropdown
-            //if ($v != 'list') {
+            // Add views other than "agenda" to the jump dropdown
+            //if ($v != 'agenda') {
                 $options .= '<option value="' . $v . '" ' . $sel . ' >' .
                         $LANG_EVLIST['periods'][$v] . '</option>' . LB;
             //}
@@ -342,21 +345,30 @@ class View
         $T->set_file('calendar_footer', 'calendar_footer.thtml');
 
         $rssA = Syndication::getFeedLinks();
+
         $rss_links = '';
         if (!empty($rssA)) {
+            $T->set_var('feed_links', true);
+            $T->set_block('calendar_footer', 'feedLinks', 'FL');
             foreach ($rssA as $rss) {
-                $rss_links .= '<a href="' . $rss['feed_url'] . '">' .
+                $T->set_var(array(
+                    'feed_url' => $rss['feed_url'],
+                    'feed_title' => $rss['feed_title'],
+                ) );
+                $T->parse('FL', 'feedLinks', true);
+                /*$rss_links .= '<a href="' . $rss['feed_url'] . '">' .
                     $rss['feed_title'] . '</a>&nbsp;&nbsp;';
+                 */
             }
         }
 
         // Get ical options for all calendars
-        $ical_links = implode('&nbsp;&nbsp;', Calendar::getIcalLinks());
+        //$ical_links = implode('&nbsp;&nbsp;', Calendar::getIcalLinks());
 
         $T->set_var(array(
             'pi_url'        => EVLIST_URL,
-            'feed_links'    => $rss_links,
-            'ical_links'    => $ical_links,
+            //'feed_links'    => $rss_links,
+            //'ical_links'    => $rssA, //$ical_links,
         ) );
 
         $T->parse('output', 'calendar_footer');
@@ -465,7 +477,7 @@ class View
         case 'year':
             $this->today_str = $this->year;
             break;
-        case 'list':
+        case 'agenda':
             $this->today_str = 'Upcoming Events';
             break;
         }

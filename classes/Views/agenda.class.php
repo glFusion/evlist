@@ -14,13 +14,14 @@ namespace Evlist\Views;
 use Evlist\DateFunc;
 use Evlist\Menu;
 use Evlist\Models\EventSet;
+use Evlist\Models\TimeRange;
 
 
 /**
  * Create a list of events.
  * @package evlist
  */
-class listView extends \Evlist\View
+class agenda extends \Evlist\View
 {
     /**
      * Construct the list view.
@@ -34,7 +35,8 @@ class listView extends \Evlist\View
      */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
-        $this->type = 'list';
+        $this->type = 'agenda';
+        $this->show_date_sel = false;
         $this->incl_dt_sel = false;  // disable date/range selections
         if (!isset($opts['range'])) {
             $this->range = (int)SESS_getVar('evlist.range');
@@ -75,7 +77,7 @@ class listView extends \Evlist\View
         $EventSet = EventSet::create()
             ->withCategory($this->cat)
             ->withCalendar($this->cal)
-            ->withPage($this->page);
+            ->withPage($page);
 
         /*$opts = array(
                 'cat'   => $this->cat,
@@ -83,23 +85,23 @@ class listView extends \Evlist\View
                 'cal'   => $this->cal,
         );*/
         switch ($this->range) {
-        case 1:         // past
+        case TimeRange::PAST:
             $start = EV_MIN_DATE;
             $end = $_EV_CONF['_now']->toMySQL(true);
             $EventSet->withOrder('DESC');
             break;
-        case 3:         //this week
+        case TimeRange::WEEK:
             $start = DateFunc::beginOfWeek();
             $end = DateFunc::endOfWeek();
             break;
-        case 4:         //this month
+        case TimeRange::MONTH:
             $start = DateFunc::beginOfMonth();
             $year = DateFunc::getYear();
             $month = DateFunc::getMonth();
             $day = DateFunc::daysInMonth($month, $year);
             $end = DateFunc::dateFormat($day, $month, $year);
             break;
-        case 2:         //upcoming
+        case TimeRange::UPCOMING:
         default:
             $EventSet->withUpcoming(true);
             $start = $_EV_CONF['_today'];

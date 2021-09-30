@@ -18,7 +18,7 @@ namespace Evlist\Views;
  * The actual view is created by Repeat::Render().
  * This class is used simply to create the standard header.
  */
-class detailView extends \Evlist\View
+class detail extends \Evlist\View
 {
     /**
      * Construct the event detail view.

@@ -19,7 +19,7 @@ use Evlist\Models\EventSet;
  * Display a single-day calendar view.
  * @package evlist
  */
-class dayView extends \Evlist\View
+class day extends \Evlist\View
 {
     /**
      * Construct the daily view class.

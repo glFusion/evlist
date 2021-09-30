@@ -20,7 +20,7 @@ use Evlist\Models\EventSet;
  * Create a weekly view calendar.
  * @package evlist
  */
-class weekView extends \Evlist\View
+class week extends \Evlist\View
 {
     /**
      * Construct the weekly view.

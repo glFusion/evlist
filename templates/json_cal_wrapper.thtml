@@ -5,52 +5,52 @@ var newmonth = 0;
 var newday = 0;
 function ChangeView(sel)
 {
-    ChangeDate(newyear, newmonth, newday, sel.value);
+	ChangeDate(newyear, newmonth, newday, sel.value);
 }
 
 // Placeholders for newly-selected date values
 function ChangeDate(year, month, day, view)
 {
-    var action;
-    switch (view) {
-    case 'year':
-    case 'month':
-    case 'week':
-    case 'day':
-    case 'list':
-        action = view;
-        break;
-    default:
-        return;
-    }
-    newyear = year;
-    newmonth = month;
-    newday = day;
-    var dataS = {
-        "action" : action,
-        "year": year,
-        "month": month,
-        "day": day,
-        "cat": "{urlfilt_cat}",
-        "cal": "{urlfilt_cal}",
-    };
+	var action;
+	switch (view) {
+	case 'year':
+	case 'month':
+	case 'week':
+	case 'day':
+	case 'agenda':
+		action = view;
+		break;
+	default:
+		return;
+	}
+	newyear = year;
+	newmonth = month;
+	newday = day;
+	var dataS = {
+		"action" : action,
+		"year": year,
+		"month": month,
+		"day": day,
+		"cat": "{urlfilt_cat}",
+		"cal": "{urlfilt_cal}",
+	};
 
-    data = $.param(dataS);
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        url: glfusionSiteUrl + "/evlist/ajax.php",
-        data: data,
-        success: function(result) {
-            try {
-                $("#evlist_content").html(result.content);
-                $("#evlist_header").html(result.header);
-            }
-            catch(err) {
-            }
-        }
-    });
-    return false;
+	data = $.param(dataS);
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: glfusionSiteUrl + "/evlist/ajax.php",
+		data: data,
+		success: function(result) {
+			try {
+				$("#evlist_content").html(result.content);
+				$("#evlist_header").html(result.header);
+			}
+			catch(err) {
+			}
+		}
+	});
+	return false;
 }
 </script>
 

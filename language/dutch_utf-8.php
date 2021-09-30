@@ -191,7 +191,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'week_view'         => 'Weekly View',
 'month_view'        => 'Monthly View',
 'year_view'         => 'Yearly View',
-'list_view'         => 'List View',
+'agenda_view'         => 'Agenda View',
 'select_range'      => 'Selecteer een evenementenbereik om te tonen',
 'or_choose_cat'     => 'en/of kies een categorie',
 'go'                => 'Ga',
@@ -298,7 +298,7 @@ You may either move existing events to a new calendar, or delete those events.',
         'week'  => 'Week',
         'month' => 'Month',
         'year'  => 'Year',
-    'list'  => 'List',
+        'agenda'  => 'List',
     ),
 'on_days'   => 'on %s',
 'on_the_days' => 'on the %s',
@@ -403,6 +403,8 @@ You may either move existing events to a new calendar, or delete those events.',
 'status' => 'Status',
 'disabled' => 'Disabled',
 'cancelled' => 'Cancelled',
+'if_any'        => ', if any',
+'dates'         => 'Dates',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -477,6 +479,8 @@ $LANG_confignames['evlist'] = array(
     'cb_hide_small'         => 'Hide on small screens',
 'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
 'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
+    'purge_cancelled_days'  => 'Days after which to purge cancelled events',
+    'ical_range'            => 'ICal feed range of days (to,from)',
 );
 $LANG_configsubgroups['evlist'] = array(
     'sg_main'               => 'Hoofd Instellingen',
@@ -546,6 +550,6 @@ $LANG_configSelect['evlist'] = array(
         'week' => 'Week',
         'month' => 'Month',
         'year' => 'Year',
-        'list' => 'List',
+        'agenda' => 'Agenda',
     ),
 );

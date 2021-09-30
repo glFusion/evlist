@@ -17,7 +17,7 @@ namespace Evlist\Views;
  * Display a yearly calendar.
  * @package evlist
  */
-class yearView extends \Evlist\View
+class year extends \Evlist\View
 {
     /**
      * Construct the yearly view.

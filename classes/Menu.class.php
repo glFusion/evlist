@@ -162,7 +162,7 @@ class Menu
         }
 
         $base_url = EVLIST_URL.
-            "/index.php?cat=$cat&amp;cal=$cal&amp;range=$range&amp;view=list";
+            "/index.php?cat=$cat&amp;cal=$cal&amp;range=$range&amp;view=agenda";
         if ($numrows > $limit) {
             $numpages = ceil($numrows / $limit);
             $retval = COM_printPageNavigation($base_url, $page, $numpages);
@@ -171,7 +171,3 @@ class Menu
     }
 
 }
-
-?>
-
-

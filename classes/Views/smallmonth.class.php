@@ -19,7 +19,7 @@ use Evlist\Models\EventSet;
  * Class to create a small single-month claender view.
  * @package evlist
  */
-class smallmonthView extends \Evlist\View
+class smallmonth extends \Evlist\View
 {
     /**
      * Display a small monthly calendar for the current month.

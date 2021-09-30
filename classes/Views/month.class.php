@@ -20,7 +20,7 @@ use Evlist\Models\EventSet;
  * Display a monthly calendar.
  * @package evlist
  */
-class monthView extends \Evlist\View
+class month extends \Evlist\View
 {
 
     /**

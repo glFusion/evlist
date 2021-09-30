@@ -169,7 +169,7 @@ $LANG_EVLIST = array(
 'week'           => 'Semaine',
 'month'              => 'Mois',
 'year'             => 'Année',
-    'list'  => 'List',
+'agenda'  => 'Agenda',
 ),
 
 
@@ -248,7 +248,7 @@ $LANG_EVLIST = array(
 'week_view'             => 'affichage hebdomadaire',
 'month_view'            => 'affichage mensuel',
 'year_view'             => 'annuelle View',
-'list_view'             => 'Affichage liste',
+'agenda_view'             => 'Affichage liste',
 'select_range'          => "Sélectionnez un événement gamme d'affichage",
 'or_choose_cat'         => 'Et/ou choisissez une catégorie',
 'aller'             => 'Go',
@@ -414,6 +414,8 @@ $LANG_EVLIST = array(
 'status' => 'Status',
 'disabled' => 'Disabled',
 'cancelled' => 'Cancelled',
+'if_any'        => ', if any',
+'dates'         => 'Dates',
 );
 
 $LANG_EVLIST_HELP = array(
@@ -494,6 +496,8 @@ $LANG_confignames[ 'evlist'] = array(
     'cb_hide_small'         => 'Hide on small screens',
 'rec_seq_days' => 'The event will occur on each day from the start date through the provided end date.',
 'prt_tickets_btn' => 'Print all non-waitlisted tickets.',
+    'purge_cancelled_days'  => 'Days after which to purge cancelled events',
+    'ical_range'            => 'ICal feed range of days (to,from)',
 );
 
 $LANG_configsubgroups[ 'evlist'] = array(
@@ -566,6 +570,6 @@ $LANG_configSelect[ 'evlist'] = array(
         'week' => 'Semaine',
         'month' => 'Mois',
         'year' => 'année',
-        'list' => 'Liste',
+        'agenda' => 'Liste',
     ),
 );

@@ -149,7 +149,7 @@ case 'savefuturerepeat':
 case 'saveevent':
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $Ev = Evlist\Event::getInstance($eid);
-    $errors = $Ev->Save($_POST, empty($eid));
+    $errors = $Ev->asSubmission(empty($eid))->Save($_POST);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
         $content .= $Ev->Edit();
@@ -302,7 +302,9 @@ case 'edit':
 
 case 'clone':
     if (isset($_GET['eid'])) {
-        EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
+        if (isset($_GET['rp_id'])) {
+            EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
+        }
         $Ev = Evlist\Event::getInstance($_GET['eid']);
         if ($Ev->getID() == '' || !$Ev->canEdit())      // Event not found
             break;

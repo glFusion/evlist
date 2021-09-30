@@ -230,9 +230,9 @@ case 'delcalconfirm':
     break;
 
 case 'saveevent':
-    $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
+    $eid = (isset($_POST['eid']) && !empty($_POST['eid'])) ? $_POST['eid'] : '';
     $Ev = new Evlist\Event($eid);
-    $errors = $Ev->Save($_POST, empty($eid));
+    $errors = $Ev->asSubmission(empty($eid))->Save($_POST);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
         $content .= $Ev->Edit();
@@ -250,7 +250,7 @@ case 'saveevent':
 
 case 'saverepeat':
 case 'savefuturerepeat':
-    $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? $_POST['rp_id'] : '';
+    $rp_id = (isset($_POST['rp_id']) && !empty($_POST['rp_id'])) ? $_POST['rp_id'] : '';
     $Rp = new Evlist\Repeat($rp_id);
     $errors = $Rp->Save($_POST);
     if (!empty($errors)) {
@@ -492,7 +492,7 @@ case 'import':
 case 'edit':
     $eid = isset($_REQUEST['eid']) ? $_REQUEST['eid'] : '';
     $Ev = Evlist\Event::getInstance($eid);
-    $rp_id = isset($_POST['rp_id']) && !empty($_POST['rp_id']) ? $_POST['rp_id'] : '';
+    $rp_id = (isset($_POST['rp_id']) && !empty($_POST['rp_id'])) ? $_POST['rp_id'] : '';
     $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
     break;
 
@@ -516,5 +516,3 @@ $display .= $content;
 $display .= COM_siteFooter();
 
 echo $display;
-
-?>

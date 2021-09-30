@@ -55,7 +55,7 @@ case 'tickreset_x':
 case 'saveevent':
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $Ev = new Evlist\Event($eid);
-    $errors = $Ev->Save($_POST, empty($eid));
+    $errors = $Ev->asSubmission(empty($eid))->Save($_POST);
     if (!empty($errors)) {
         $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
         $content .= $Ev->Edit();

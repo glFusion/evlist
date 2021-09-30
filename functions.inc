@@ -631,6 +631,21 @@ function plugin_getfeednames_evlist()
     return Evlist\Models\Syndication::getFeedNames();
 }
 
+function plugin_getfeedformats_evlist()
+{
+    return Evlist\Models\Syndication::getFormats();
+}
+
+function plugin_getfeedprovider_evlist($format, $A=array())
+{
+    $cls = '\\Evlist\\Models\\Syndication2';
+    if (class_exists($cls)) {
+        return new $cls($A);
+    } else {
+        return NULL;
+    }
+}
+
 
 /**
  * Get content for the syndication feeds.
@@ -1889,7 +1904,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         // No times specified = all-day event
         $A['allday'] = 1;
     }
-    $Ev->Save($A, false);
+    $Ev->Save($A);
 }
 
 

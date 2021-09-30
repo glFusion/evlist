@@ -554,7 +554,7 @@ class Event
      * @param   boolean $submission True to use the submission table
      * @return  object  $this
      */
-    public function setTable($submission=true)
+    public function asSubmission($submission=true)
     {
         $this->table = $submission ? 'evlist_submissions' : 'evlist_events';
         return $this;
@@ -595,6 +595,20 @@ class Event
 
 
     /**
+     * Set the `isNew` flag to force this to be a new record.
+     * Used when importing records from the Calendar plugin, amont other uses.
+     *
+     * @param   bool    $isNew  True to forced new (default)
+     * @return  self
+     */
+    public function forceNew(bool $isNew = true) : self
+    {
+        $this->isNew = $isNew;
+        return $this;
+    }
+
+
+    /**
      * Sets all variables to the matching values from $row.
      *
      * @param   array   $row        Array of values, from DB or $_POST
@@ -621,7 +635,7 @@ class Event
         }
         $this->cal_id = $row['cal_id'];
         $this->show_upcoming = isset($row['show_upcoming']) ? (int)$row['show_upcoming'] : 0;
-        $this->recurring = (int)$row['recurring'];
+        $this->recurring = isset($row['recurring']) ? (int)$row['recurring'] : 0;
         if (isset($row['allday']) && $row['allday'] == 1) {
             $this->allday = 1;
             $this->split = 0;
@@ -777,7 +791,7 @@ class Event
      * @param   string  $table  Table name, default = production
      * @return  boolean     True if a record was read, False on failure.
      */
-    public function Read($ev_id = '', $submissions=false)
+    public function Read($ev_id = '')
     {
         global $_TABLES;
 
@@ -785,7 +799,6 @@ class Event
             $this->id = COM_sanitizeID($ev_id);
         }
 
-        $this->setTable($submissions);
         $sql = "SELECT * FROM {$_TABLES[$this->table]} WHERE id='$this->id'";
         $result = DB_query($sql);
         if (!$result || DB_numRows($result) != 1) {
@@ -843,16 +856,10 @@ class Event
      * Save the current values to the database.
      * Appends error messages to the $Errors property.
      *
-     * The $forceNew parameter is a hack to force this record to be saved
-     * as a new record even if it already has an ID.  This is only to
-     * handle events imported from the Calendar plugin.
-     *
      * @param   array   $A      Optional array of values from $_POST
-     * @param   boolean $isSubmission   True if this uses the submission table
-     * @param   boolean $forceNew   Hack to force this record to be "new"
      * @return  string      Error text, or empty string on success
      */
-    public function Save($A = '', $isSubmission = true, $forceNew=false)
+    public function Save($A = '')
     {
         global $_TABLES, $LANG_EVLIST, $_EV_CONF, $_CONF;
 
@@ -888,15 +895,9 @@ class Event
             DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
         }
 
-        /*if (isset($A['eid']) && !empty($A['eid']) && !$forceNew) {
-            $this->isNew = false;
-        }*/
-
         // Authorized to bypass the queue
         if ($this->isAdmin || plugin_ismoderator_evlist()) {
-            $this->setTable(false);
-        } else {
-            $this->setTable($isSubmission);
+            $this->asSubmission(false);
         }
 
         if ($this->id == '') {

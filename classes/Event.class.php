@@ -28,6 +28,13 @@ class Event
     const MIN_TIME      = '00:00';
     const MAX_TIME      = '23:59';
 
+    const RP_NEWSTART       = 1;    // Add or remove repeats due to new start date
+    const RP_NEWEND         = 2;    // Add or remove repeats due to new end date
+    const RP_NEWTIME        = 4;    // Update the time and allday flag in repeats
+    const RP_RECUR2SINGLE   = 8;    // Was recurring, convert to single
+    const RP_NEWSCHEDULE    = 64;   // Completely new schedule
+
+
     /** Event record ID.
      * @var string */
     private $id = '';
@@ -925,7 +932,10 @@ class Event
             // Determine if the schedule has changed so that we need to
             // update the repeat tables.  If we do, any customizations will
             // be lost.
-            if ($this->needRepeatUpdate($A)) {
+            $rp_update = $this->needRepeatUpdate($A);
+            if ($rp_update & self::RP_NEWSCHEDULE) {
+                // Entirely new schedule needed. Rebuild and ignore other values
+                // for $rp_update
                 if ($this->old_schedule['recurring'] || $this->recurring) {
                     // If this was, or is now, a recurring event then clear
                     // out the repeats and update with new ones.
@@ -959,11 +969,85 @@ class Event
                     DB_query($sql, 1);
                 }
             } else {
-                // Update the repeat status only if the event status has changed.
-                // If new repeats were created, the status is updated at that time.
-                if ($old_status != $this->status) {
-                    Repeat::updateEventStatus($this->id, $this->status);
+                if ($rp_update & self::RP_NEWSTART) {
+                    // Add or remove repeats at the end of the schedule
+                    if ($this->old_schedule['date_start1'] > $this->date_start1) {
+                        // Adding events from new_start to old_start
+                        $old_start = new \Date($this->old_schedule['date_start1']);
+                        $old_start->sub(new \DateInterval('P1D'));
+                        $this->UpdateRepeats(
+                            $this->date_start1,
+                            $old_start->format('Y-m-d')
+                        );
+                    } else {
+                        // Removing events from old_start to new_start
+                        $new_start = new \Date($this->date_start1);
+                        $new_start->sub(new \DateInterval('P1D'));
+                        $this->UpdateRepeats(
+                            $new_start->format('Y-m-d'),
+                            $this->old_schedule['rec_data']['date_start1']
+                        );
+                    }
                 }
+                if ($rp_update & self::RP_NEWEND) {
+                    // Add or remove repeats at the end of the schedule.
+                    // Start one day after the current end date to avoid
+                    // creating a duplicate event on that day.
+                    if ($this->old_schedule['rec_data']['stop'] < $this->rec_data['stop']) {
+                        // New end is greater, extending the series. Start with
+                        // one day after the current end.
+                        $old_end = new \Date($this->old_schedule['rec_data']['stop']);
+                        $old_end->add(new \DateInterval('P1D'));
+                        $this->UpdateRepeats(
+                            $old_end->format('Y-m-d'),
+                            $this->rec_data['stop']
+                        );
+                    } else {
+                        // Truncating the series, we'll be deleting events from
+                        // one day after the new end through the old ending.
+                        $new_end = new \Date($this->rec_data['stop']);
+                        $new_end->add(new \DateInterval('P1D'));
+                        $this->UpdateRepeats(
+                            $this->old_schedule['rec_data']['stop'],
+                            $new_end->format('Y-m-d')
+                        );
+                    }
+                }
+                if ($rp_update & self::RP_RECUR2SINGLE) {
+                    // Switching from recurring to single instance.
+                    // Cancel all repeats after the first one.
+                    Repeat::updateEventStatus(
+                        $this->id,
+                        Status::CANCELLED,
+                        "AND rp_date_start1 > '{$this->date_start1}' AND rp_status <> " .
+                        Status::CANCELLED
+                    );
+                    // Then cancel all custom detail records.
+                    Detail::updateEventStatus(
+                        $this->id,
+                        Status::CANCELLED,
+                        "AND det_id <> '{$this->det_id}' AND det_status <> " . Status::CANCELLED
+                    );
+
+                }
+                if ($rp_update & self::RP_NEWTIME) {
+                    // Update the start and end times for all event instances.
+                    Repeat::updateEvent(
+                        $this->id,
+                        array(
+                            'rp_time_start1' => $this->time_start1,
+                            'rp_time_end1' => $this->time_end1,
+                            'rp_time_start2' => $this->time_start2,
+                            'rp_time_end2' => $this->time_end2,
+                        )
+                    );
+                }
+            }
+
+            // Update the repeat status only if the event status has changed.
+            // If new repeats were created, the status is updated at that time.
+            if ($old_status != $this->status) {
+                Repeat::updateEventStatus($this->id, $this->status);
             }
         } else {
             // New event
@@ -1123,12 +1207,6 @@ class Event
         if ($clearcache) {  // leverage flag to consider $eid as valid
             $sql = "SELECT * FROM {$_TABLES['evlist_events']}
                     WHERE id='$eid'";
-            //COM_errorLog($sql);
-        static $counter = 0;
-            $counter++;
-            if ($counter > 1) {
-                var_dump(debug_backtrace(0));die;
-            }
             $res = DB_query($sql);
             if ($res && DB_numRows($res) == 1) {    // found normal record
                 $A = DB_fetchArray($res, false);
@@ -1431,7 +1509,7 @@ class Event
                         EVCHECKED : '',
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->enable_comments => 'selected="selected"',
-                'recurring_format_options' => 
+                'recurring_format_options' =>
                         EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
                 'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
@@ -1912,9 +1990,11 @@ class Event
      *
      * @return  array       Array of matching events, keyed by date, or false
      */
-    public function MakeRecurrences()
+    public function MakeRecurrences($start=NULL, $end=NULL)
     {
         return Recurrence::getInstance($this)
+            ->withStartingDate($start)
+            ->withEndingDate($end)
             ->MakeRecurrences()
             ->getEvents();
     }
@@ -1928,54 +2008,100 @@ class Event
      *
      * @return  boolean     True on success, False on failure
      */
-    public function UpdateRepeats()
+    public function UpdateRepeats($start=NULL, $end=NULL)
     {
         global $_TABLES;
 
+        // Sanitize some of the values in rec_data
         if (
             $this->rec_data['stop'] == '' ||
             $this->rec_data['stop'] > EV_MAX_DATE
         ) {
             $this->rec_data['stop'] = EV_MAX_DATE;
         }
-        if ((int)$this->rec_data['freq'] < 1) $this->rec_data['freq'] = 1;
+        if ((int)$this->rec_data['freq'] < 1) {
+            $this->rec_data['freq'] = 1;
+        }
+
+        // start and end will override rec_data, if supplied
+        if ($end === NULL) {
+            if ($this->rec_data['type'] == 0) {
+                // Not recurring, set end to the entered end date
+                $end = $this->date_end1;
+            } else {
+                $end = $this->rec_data['stop'];
+            }
+        }
+        if ($start === NULL) {
+            $start = $this->date_start1;
+        }
 
         // Get the actual repeat occurrences.
-        $days = $this->MakeRecurrences();
-        if ($days === false) {
-            $this->Errors[] = $LANG_EVLIST['err_upd_repeats'];
-            return false;
-        }
+        if ($start <= $end) {
+            $days = $this->MakeRecurrences($start, $end);
+            if ($days === false) {
+                $this->Errors[] = $LANG_EVLIST['err_upd_repeats'];
+                return false;
+            }
 
-        // Delete all existing instances
-        Repeat::updateEventStatus($this->id, Status::CANCELLED);
+            // Delete all existing instances
+            //Repeat::updateEventStatus($this->id, Status::CANCELLED);
+            $Existing = Repeat::getByEvent($this->id, $start, $end);
+            $i = 0;
+            $insert_vals = array();
+            $update_ids = array();
+            foreach($days as $event) {
+                if (isset($Existing[$event['dt_start']])) {
+                    // Already have a repeat for this day.
+                    $update_ids[] = $Existing[$event['dt_start']]->getID();
+                } else {
+                    $t_end = $this->split ? $this->time_end2 : $this->time_end1;
+                    $insert_vals[] = "(
+                        '{$this->id}', '{$this->det_id}',
+                        '{$event['dt_start']}', '{$event['dt_end']}',
+                        '{$this->time_start1}', '{$this->time_end1}',
+                        '{$this->time_start2}', '{$this->time_end2}',
+                        '{$event['dt_start']} {$this->time_start1}',
+                        '{$event['dt_end']} {$t_end}',
+                        {$this->status}
+                    )";
+                }
+            }
 
-        $i = 0;
-        $vals = array();
-        foreach($days as $event) {
-            $t_end = $this->split ? $this->time_end2 : $this->time_end1;
-            $vals[] = "(
-                '{$this->id}', '{$this->det_id}',
-                '{$event['dt_start']}', '{$event['dt_end']}',
-                '{$this->time_start1}', '{$this->time_end1}',
-                '{$this->time_start2}', '{$this->time_end2}',
-                '{$event['dt_start']} {$this->time_start1}',
-                '{$event['dt_end']} {$t_end}',
-                {$this->status}
-            )";
-        }
-        if (!empty($vals)) {
-            $vals = implode(',', $vals);
-            $sql = "INSERT INTO {$_TABLES['evlist_repeat']} (
+            if (!empty($insert_vals)) {
+                $vals = implode(',', $insert_vals);
+                $sql = "INSERT INTO {$_TABLES['evlist_repeat']} (
                         rp_ev_id, rp_det_id, rp_date_start, rp_date_end,
                         rp_time_start1, rp_time_end1,
                         rp_time_start2, rp_time_end2,
                         rp_start, rp_end,
                         rp_status
                     ) VALUES $vals";
-            //echo $sql;die;
+                //echo $sql;die;
+                DB_query($sql, 1);
+            }
+            if (!empty($update_ids)) {
+                // Update the status of any existing repeats within the range,
+                // if the status is not already the same as the event.
+                $ids = implode(',', $update_ids);
+                $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+                    rp_status = {$this->status},
+                    rp_revision = rp_revision + 1
+                    WHERE rp_id IN ({$ids})
+                    AND rp_status <> {$this->status}";
+                DB_query($sql);
+            }
+        } else {
+            // Deleting events at either end of the schedule
+            $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+                rp_status = " . Status::CANCELLED . ",
+                rp_revision = rp_revision + 1
+                WHERE rp_ev_id = '{$this->id}'
+                AND rp_date_start BETWEEN '$end' AND '$start'
+                AND rp_status <> " . Status::CANCELLED;
             DB_query($sql, 1);
         }
+
         return true;
     }
 
@@ -2112,34 +2238,50 @@ class Event
      *
      * @uses    self::_arrayDiffAssocRecursive()
      * @param   array   $A  Array of values (e.g. $_POST)
-     * @return  boolean     True if an update is needed, false if not
+     * @return  string      String indicating type of update needed
      */
     public function needRepeatUpdate($A)
     {
+        $retval = 0;
+        $old_rec = is_array($this->old_schedule['rec_data']) ?
+            $this->old_schedule['rec_data'] : array();
+        $new_rec = is_array($this->rec_data) ?
+            $this->rec_data : array();
+
         // Just check each relevant value in $A against our value.
         // If any matches, return true
         if (
             $this->old_schedule['date_start1'] != $this->date_start1 ||
-            $this->old_schedule['date_end1'] != $this->date_end1 ||
-            $this->old_schedule['time_start1'] != $this->time_start1 . ':00' ||
-            $this->old_schedule['time_end1'] != $this->time_end1 . ':00'
+            $this->old_schedule['date_end1'] != $this->date_end1
         ) {
-            return true;
+            // Begining date changed, may need to add or remove instances.
+            // Ending date_end is still part of the first event if multiday.
+            $retval |= self::RP_NEWSTART;
+        }
+        if ($old_rec['stop'] != $new_rec['stop']) {
+            // Stop date for instances changed, may need to add or remove some.
+            $retval |= self::RP_NEWEND;
         }
 
-        if ($this->time_start2 == '') $this->time_start2 = self::MIN_TIME;
-        if ($this->time_end2 == '') $this->time_end2 = self::MAX_TIME;
-
-        // Checking split times, this should cover the split checkbox also
+        if ($this->time_start2 == '') {
+            $this->time_start2 = self::MIN_TIME;
+        }
+        if ($this->time_end2 == '') {
+            $this->time_end2 = self::MAX_TIME;
+        }
         if (
+            $this->old_schedule['time_start1'] != $this->time_start1 ||
+            $this->old_schedule['time_end1'] != $this->time_end1 ||
             $this->old_schedule['time_start2'] != $this->time_start2 ||
             $this->old_schedule['time_end2'] != $this->time_end2 ||
             $this->old_schedule['allday'] != $this->allday
         ) {
-            return true;
+            // Only the time of day has changed, existing repeats
+            // will be updated
+            $retval |= self::RP_NEWTIME;
         }
 
-        // Possibilities:
+        // Recurrence Possibilities:
         //  - was not recurring, is now.  Return true at this point.
         //  - was recurring, isn't now.  Return true at this point.
         //  - wasn't recurring, still isn't, old_schedule['rec_data'] will
@@ -2147,18 +2289,20 @@ class Event
         //  - was recurring, still is.  Have to check old and new rec_data
         //      arrays.
         if ($this->old_schedule['recurring'] != $this->recurring) {
-            return true;
-        } elseif (!empty($this->old_schedule['rec_data'])) {
-            $old_rec = is_array($this->old_schedule['rec_data']) ?
-                $this->old_schedule['rec_data'] : array();
-            $new_rec = is_array($this->rec_data) ?
-                $this->rec_data : array();
-
-            // Check the recurring event options
-            $diff = self::_arrayDiffAssocRecursive($old_rec, $new_rec);
-            if (!empty($diff)) {
-                return true;
+            if ($this->recurring == 0) {
+                // Was recurring, now is not.
+                // Just need to delete the recurrences.
+                $retval |= self::RP_RECUR2SINGLE;
+            } else {
+                // Recurrence type changed, need to rebuild the schedule.
+                $retval |= self::RP_NEWSCHEDULE;
             }
+        } elseif (!empty($this->old_schedule['rec_data'])) {
+            // Check the recurring event options
+            /*$diff = self::_arrayDiffAssocRecursive($old_rec, $new_rec);
+            if (!empty($diff)) {
+                $retval |= self::RP_NEWSCHEDULE;
+            }*/
 
             // Have to descend into sub-arrays manually.  Old and/or new
             // values may not be arrays if the recurrence type was changed.
@@ -2169,17 +2313,16 @@ class Event
                     $new_rec[$key] : array();
                 $diff = self::_arrayDiffAssocRecursive($oldA, $newA);
                 if (!empty($diff)) {
-                    return true;
+                    $retval |= self::RP_NEWSCHEDULE;
                 }
             }
         } else {
             // Even non-recurring events should have some empty array for
             // old schedule data, so go ahead & rebuild the repeats.
-            return true;
+            $retval |= self::RP_NEWSCHEDULE;
         }
 
-        // If all tests fail, return false (no need to update repeats
-        return false;
+        return $retval;
     }
 
 
@@ -2549,6 +2692,9 @@ class Event
                 );
             } else {
                 $retval = $fieldvalue;
+            }
+            if ($A['status'] == '2') {
+                $retval = '<span class="event_disabled">' . $retval . '</span>';
             }
             break;
         case 'status':

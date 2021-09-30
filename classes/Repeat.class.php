@@ -250,6 +250,10 @@ class Repeat
                 $this->$field = $row['rp_' . $field];
             }
         }
+        if (isset($row['rp_id'])) {
+            $this->rp_id = $row['rp_id'];
+        }
+
         // Join or split the date values as needed
         if ($fromDB) {      // Read from the database
 
@@ -469,21 +473,49 @@ class Repeat
 
 
     /**
-     * Update the status for all occurrances of an event.
+     * Update field values for all occurrances of an event.
      *
-     * @param   string  $ev_id      Event ID
+     * @param   string  $ev_id  Event ID
+     * @param   array   $args   Fieldname=>value pairs to update
+     * @param   string  $ands   Additional WHERE conditions as "AND ... AND ..."
      */
-    public static function updateEventStatus($ev_id, $status)
+    public static function updateEvent($ev_id, $args=array(), $ands='')
     {
         global $_TABLES;
 
-        $status = (int)$status;
+        $sql_args = array();
+        foreach ($args as $key=>$val) {
+            if (is_string($val)) {
+                $val = DB_escapeString($val);
+            } elseif (is_integer($val)) {
+                $val = (int)$val;
+            }
+            $sql_args[] = "$key = '$val'";
+        }
+        if (!empty($sql_args)) {
+            $sql_args = implode(', ', $sql_args) . ',';
+        } else {
+            $sql_args = '';
+        }
         $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
-            rp_status = $status,
+            $sql_args
             rp_revision = rp_revision + 1
-            WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'";
+            WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "' $ands";
         DB_query($sql);
         //Cache::clear('repeats', 'event_' . $ev_id);
+    }
+
+
+    /**
+     * Update the status for all occurrances of an event.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   integer $status New status value
+     * @param   string  $ands   Additional WHERE conditions as "AND ... AND ..."
+     */
+    public static function updateEventStatus($ev_id, $status, $ands='')
+    {
+        self::updateEvent($ev_id, array('rp_status'=>$status), $ands);
     }
 
 
@@ -621,9 +653,8 @@ class Repeat
             $this->Event->getRecData()['type'] < EV_RECUR_DATES
         ) {
             $rec_data = $this->Event->getRecData();
-            //$rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
-            //    $this->Event->RecurDescrip();
-            $rec_string = $this->Event->RecurDscp();
+            $rec_string = $LANG_EVLIST['recur_freq_txt'] . ' ' .
+                $this->Event->RecurDscp();
             //$Days = new Models\Days;
             switch ($rec_data['type']) {
             case EV_RECUR_WEEKLY:        // sequential days
@@ -1437,9 +1468,9 @@ class Repeat
             $new_stop = DB_getItem(
                 $_TABLES['evlist_repeat'],
                 'rp_date_start',
-                "rp_ev_id='{$this->ev_id}'ORDER BY rp_date_start DESC LIMIT 1"
+                "rp_ev_id='{$this->ev_id}' AND rp_status < " .
+                    Status::CANCELLED . " ORDER BY rp_date_start DESC LIMIT 1"
             );
-            //echo $new_stop;die;
             if (!empty($new_stop)) {
                 $this->Event->updateRecData('stop', $new_stop);
             }
@@ -1697,6 +1728,11 @@ class Repeat
     }
 
 
+    /**
+     * Get the Detail object related to this repeat.
+     *
+     * @return  object      Detail object
+     */
     public function getDetail()
     {
         if ($this->det_id == $this->getEvent()->getDetailID()) {
@@ -1805,6 +1841,7 @@ class Repeat
         return $this;
     }
 
+
     /**
      * Set the override to use a different template for the event.
      * The parameter should be the part of the template name following `event_`.
@@ -1865,6 +1902,36 @@ class Repeat
         } else {
             return true;
         }
+    }
+
+
+    /**
+     * Get all the repeats for an event ID, optionally limiting by dates.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   string  $min_dt Starting date as YYYY-MM-DD
+     * @param   string  @max_dt End date as YYYY-MM-DD
+     * @return  array       Array of Repeat objects
+     */
+    public static function getByEvent($ev_id, $min_dt = '', $max_dt = '')
+    {
+        global $_TABLES;
+
+        $retval = array();
+        $sql = "SELECT * FROM {$_TABLES['evlist_repeat']}
+            WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "'";
+        if ($min_dt != '') {
+            $sql .= " AND rp_date_start >= '$min_dt'";
+        }
+        if ($max_dt != '') {
+            $sql .= " AND rp_date_start <= '$max_dt'";
+        }
+        $res = DB_query($sql);
+        while ($A = DB_fetchArray($res, false)) {
+            $retval[$A['rp_date_start']] = new self;
+            $retval[$A['rp_date_start']]->setVars($A, true);
+        }
+        return $retval;
     }
 
 }

@@ -31,19 +31,24 @@ class Syndication
      * @param   string  $feedType   Feed type (RSS, ICS, etc.) We only do ICS.
      * @return  array               Array of event data
      */
-    public static function getFeedContent($feed, &$link, &$update_data, $feedType, $feedVersion, $A=array())
+    public static function getFeedContent($feed, &$link, &$update_data, $feedType, $feedVersion)
     {
         switch ($feedType) {
         case 'ICS':
-            return self::getIcal($feed, $link, $update_data, $feedType, $A);
+            return self::getIcal($feed, $link, $update_data, $feedType);
             break;
         default:
-            return self::getXML($feed, $link, $update_data, $feedtype, $A);
+            return self::getXML($feed, $link, $update_data, $feedtype);
             break;
         }
     }
 
 
+    /**
+     * Get an XML feed.
+     *
+     * @deprecated
+     */
     private static function getXML($feed, &$link, &$update_data, $feedtype)
     {
         global $_CONF, $_EV_CONF, $_TABLES, $LANG_EVLIST;
@@ -59,12 +64,7 @@ class Syndication
             return $content;
         }
 
-        $result = DB_query(
-            "SELECT topic,limits,content_length
-            FROM {$_TABLES['syndication']}
-            WHERE fid = $feed"
-        );
-        $F = DB_fetchArray($result, false);
+        $F = self::_getFeedInfo($feed);
 
         // Set a sane limit on the events retrieved to avoid OOM errors
         $limit = (int)$F['limits'];
@@ -156,16 +156,14 @@ class Syndication
                 'name' => $LANG_EVLIST['all_calendars']
             ),
         );
-        $result = DB_query(
-            "SELECT cal_id, cal_name
-            FROM {$_TABLES['evlist_calendars']}
-            WHERE cal_status = 1 AND cal_ena_ical = 1"
-        );
-        while ($A = DB_fetchArray($result, false)) {
-            $feeds[] = array(
-                'id' => $A['cal_id'],
-                'name' => $A['cal_name']
-            );
+        $Cals = Calendar::getAll(true);
+        foreach ($Cals as $Cal) {
+            if ($Cal->isIcalEnabled()) {
+                $feeds[] = array(
+                    'id' => $Cal->getID(),
+                    'name' => $Cal->getName(),
+                );
+            }
         }
         return $feeds;
     }
@@ -187,9 +185,14 @@ class Syndication
         global $_EV_CONF, $_CONF, $_TABLES;
 
         $feed = (int)$feed;
-        $last_updated = DB_getItem($_TABLES['syndication'], 'updated', "fid = $feed");
+        $F = self::_getFeedInfo($feed);
+        if (!$F) {
+            // If not a valid feed, just return true to indicate no further action.
+            return true;
+        }
+
         $dt = clone $_CONF['_now'];
-        if ($last_updated > $dt->sub(new \DateInterval('PT30M'))) {
+        if ($F['updated'] > $dt->sub(new \DateInterval('PT30M'))) {
             return true;
         }
 
@@ -198,6 +201,7 @@ class Syndication
         $start = clone $_CONF['_now'];
         $start->sub(new \DateInterval('P30D'));
         $end = NULL;
+        $limit = $F['limits'];
         if (!empty($limit)) {
             if (substr($limit, -1) == 'h') { // last xx hours
                 $end = clone $_CONF['_now'];
@@ -216,8 +220,8 @@ class Syndication
         }
         $ES = EventSet::create()
             ->withStart($start->format('Y-m-d', true))
-            ->withCalendar($topic)
-            ->withSelection('rep.rp_id, rep.rp_revision')
+            ->withCalendar($F['topic'])
+            ->withSelection('rep.rp_id, rep.rp_revision, ev.ev_revision, det.det_revision')
             ->withStatus(Status::ALL)
             ->withLimit($limit);
         if ($end) {
@@ -230,7 +234,7 @@ class Syndication
             $eids[] = $A['rp_id'] . '.' . $rev;
         }
         $current = implode (',', $eids);
-        return ($current != $update_data) ? false : true;
+        return ($current != $F['update_info']) ? false : true;
     }
 
 
@@ -321,7 +325,7 @@ class Syndication
      * @return  string      iCal output
      */
     private static function getIcal(
-        $feed, &$link, &$update_data, $feedType, $A=array()
+        $feed, &$link, &$update_data, $feedType
     ) {
         global $_EV_CONF, $LANG_EVLIST, $_CONF;
 
@@ -330,17 +334,20 @@ class Syndication
         $start = clone $_CONF['_now'];
         $start->sub(new \DateInterval('P30D'));
         $end = NULL;
-        if (isset($A['limits']) && !empty($A['limits'])) {
-            if (substr($A['limits'], -1) == 'h') { // last xx hours
-                $end = clone $_CONF['_now'];
-                $hours = (int) substr($A['limits'], 0, -1 );
-                $end->add(new \DateInterval('PT' . $hours . 'H'));
-                $limit = 0;
-            } else {
-                $limit = (int)$A['limits'];
-            }
+
+        $A = self::_getFeedInfo($feed);
+        if ($!$A) {
+            // Invalid feed data received.
+            return '';
+        }
+
+        if (substr($A['limits'], -1) == 'h') { // last xx hours
+            $end = clone $_CONF['_now'];
+            $hours = (int) substr($A['limits'], 0, -1 );
+            $end->add(new \DateInterval('PT' . $hours . 'H'));
+            $limit = 0;
         } else {
-            $limit = 100;
+            $limit = (int)$A['limits'];
         }
 
         // Set a sane limit on the events retrieved to avoid OOM errors
@@ -378,25 +385,33 @@ class Syndication
         $eids = array();
         foreach ($events as $day) {
             foreach ($day as $event) {
+
+                /*if ($event['rp_status'] != Status::ENABLED) {
+                    continue;
+            }*/
+
                 // Check if this repeat is already shown.  We only want multi-day
                 // events included once instead of each day
                 if (array_key_exists($event['rp_id'], $rp_shown)) {
                     continue;
                 }
                 $sequence = $event['rp_revision'] + $event['ev_revision'] + $event['det_revision'];
+                // Collect the unique identifiers for the syndication table to track
                 $eids[] = $event['rp_id'] . '.' . $sequence;
+                // Track that this repeat has already been shown
                 $rp_shown[$event['rp_id']] = 1;
+
+                // Format the dates for iCalendar
                 $dtstart = (new \Date($event['rp_start'], $_CONF['timezone']))
                     ->format('Ymd\THis\Z', false);
-                COM_errorLog("Event " . $event['rp_id'] . " start date: " . $dtstart);
-
                 $dtend = (new \Date($event['rp_end'], $_CONF['timezone']))
                     ->format('Ymd\THis\Z', false);
+
                 $summary = $event['title'];
                 $permalink = COM_buildURL(EVLIST_URL . '/event.php?rp_id='. $event['rp_id']);
                 $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'] . $domain;
                 $created = max($event['rp_last_mod'], $event['ev_last_mod'], $event['det_last_mod']);
-                // Get the description. Prefer the text Summary, then HTML fulltext
+                // Get the description. Prefer the text Summary, then HTML fulltext.
                 // Since a description is required, re-use the title if nothing else.
                 if (!empty($event['summary'])) {
                     $description = $event['summary'];
@@ -406,34 +421,28 @@ class Syndication
                 } else {
                     $description = $summary;    // Event title is required
                 }
+
+                $tmp = array(
+                    'date' => $dtstart,
+                    'title' => $summary,
+                    'summary' => $description,
+                    'guid' => $uuid,
+                    'link' => $permalink,
+                    'dtstart' => $dtstart,
+                    'dtend' => $dtend,
+                    'allday' => $event['allday'],
+                    'sequence' => $sequence,
+                );
+
                 switch ($event['rp_status']) {
                 case Status::DISABLED:
                 case Status::CANCELLED:
-                    $tmp = array(
-                        'date' => $dtstart,
-                        'created' => new \Date($created),
-                        'modified' => new \Date($created),
-                        'guid' => $uuid,
-                        'dtstart' => $dtstart,
-                        'dtend' => $dtend,
-                        'sequence' => $sequence,
-                        'status' => 'CANCELLED',
-                    );
+                    continue 2;
+                    $tmp['status'] = 'CANCELLED';
                     break;
                 case Status::ENABLED:
                 default:
                     //$status = 'CONFIRMED';
-                    $tmp = array(
-                        'date' => $dtstart,
-                        'title' => $summary,
-                        'summary' => $description,
-                        'guid' => $uuid,
-                        'link' => $permalink,
-                        'dtstart' => $dtstart,
-                        'dtend' => $dtend,
-                        'allday' => $event['allday'],
-                        'sequence' => $sequence,
-                    );
                     if ($event['lat'] != 0 && $event['lng'] != 0) {
                         $tmp['location'] = "{$event['lat']},{$event['lng']}";
                     }
@@ -442,7 +451,38 @@ class Syndication
                 $retval[] = $tmp;
             }
         }
+        // Contains a list of repeats shown, returned to lib-syndication
+        // to check for changes
         $update_data = implode(',', $eids);
         return $retval;
     }
+
+
+    /**
+     * Get the feed information from the database.
+     *
+     * @param   integer $fid    Feed ID
+     * @return  array|bool  Array of key->values from the DB, False on error
+     */
+    private static function _getFeedInfo($fid)
+    {
+        global $_TABLES;
+        static $feeds = array();
+
+        $fid = (int)$fid;
+        if (!isset($feeds[$fid])) {
+            $res = DB_query(
+                "SELECT * FROM {$_TABLES['syndication']}
+                WHERE fid = $fid"
+            );
+            if ($res) {
+                $feeds[$fid] = DB_fetchArray($res, false);
+                if (!$feeds[$fid]) {
+                    return false;
+                }
+            }
+        }
+        return $feeds[$fid];
+    }
+
 }

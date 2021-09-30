@@ -27,6 +27,14 @@ namespace Evlist;
  */
 class Recurrence
 {
+    const ONETIME   = 0;    // Non-recurring
+    const DAILY     = 1;    // Every day
+    const MONTHLY   = 2;    // Monthly on the date
+    const YEARLY    = 3;    // Yearly on the date
+    const WEEKLY    = 4;    // Weekly on the day(s)
+    const DOM       = 5;    // Day of Month (2nd Tuesday, etc.)
+    const DATES     = 6;    // Specific dates
+
     /** Event object.
      * @var object */
     protected $Event = NULL;
@@ -75,6 +83,14 @@ class Recurrence
     /** Skip-weekends setting.
      * @var integer */
     protected $skip = 0;
+
+    /** Starting date.
+     * @var object */
+    private $_dt_start = NULL;
+
+    /** Ending date.
+     * @var object */
+    private $_dt_end = NULL;
 
 
     /**
@@ -126,37 +142,67 @@ class Recurrence
     public static function getInstance($Event)
     {
         switch ((int)$Event->getRecData()['type']) {
-        case EV_RECUR_ONETIME:
-            $Rec = new RecurOnetime($Event);
+        case self::ONETIME:
+            $Rec = new Recurrences\Onetime($Event);
             break;
-        case EV_RECUR_DATES:
+        case self::DATES:
             // Specific dates.  Simple handling.
-            $Rec = new RecurDates($Event);
+            $Rec = new Recurrences\Dates($Event);
             break;
-        case EV_RECUR_DOM:
+        case self::DOM:
             // Recurs on one or more days each month-
             // e.g. first and third Tuesday
-            $Rec = new RecurDOM($Event);
+            $Rec = new Recurrences\DOM($Event);
             break;
-        case EV_RECUR_DAILY:
+        case self::DAILY:
             // Recurs daily for a number of days
-            $Rec = new RecurDaily($Event);
+            $Rec = new Recurrences\Daily($Event);
             break;
-        case EV_RECUR_WEEKLY:
+        case self::WEEKLY:
             // Recurs on one or more days each week-
             // e.g. Tuesday and Thursday
-            $Rec = new RecurWeekly($Event);
+            $Rec = new Recurrences\Weekly($Event);
             break;
-        case EV_RECUR_MONTHLY:
+        case self::MONTHLY:
             // Recurs on the same date(s) each month
-            $Rec = new RecurMonthly($Event);
+            $Rec = new Recurrences\Monthly($Event);
             break;
-        case EV_RECUR_YEARLY:
+        case self::YEARLY:
             // Recurs once each year
-            $Rec = new RecurYearly($Event);
+            $Rec = new Recurrences\Yearly($Event);
             break;
         }
         return $Rec;
+    }
+
+
+    /**
+     * Set the starting date for creating recurrances.
+     *
+     * @param   string  $dt     Date string (YYYY-MM-DD)
+     * @return  object  $this
+     */
+    public function withStartingDate(string $dt) : object
+    {
+        if ($dt !== NULL) {
+            $this->date_start = $dt;
+        }
+        return $this;
+    }
+
+
+    /**
+     * Set the ending date for creating recurrances.
+     *
+     * @param   string  $dt     Date string (YYYY-MM-DD)
+     * @return  object  $this
+     */
+    public function withEndingDate(string $dt) : object
+    {
+        if ($dt !== NULL) {
+            $this->date_end = $dt;
+        }
+        return $this;
     }
 
 

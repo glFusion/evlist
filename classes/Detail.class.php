@@ -3,9 +3,10 @@
  * Class to manage event detail records for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.3
+ * @version     1.5.0
+ * @since       v1.4.3
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -496,7 +497,7 @@ class Detail
             $sql = "INSERT INTO {$_TABLES['evlist_detail']} SET
                 det_id = 0,
                 lat = '{$lat}',
-                lng = '{$lng}'
+                lng = '{$lng}',
                 $fld_sql";
             //echo $sql;die;
             DB_query($sql);
@@ -541,6 +542,53 @@ class Detail
                 WHERE det_status = " . Status::CANCELLED .
                 " AND det_last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
         DB_query($sql);
+    }
+
+
+    /**
+     * Update the fields for all detail records relating to an event.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   array   $args   Fieldname=>value pairs to update
+     * @param   string  $ands   Additional conditions as "AND ... AND ..."
+     */
+    public static function updateEvent(string $ev_id, array $args=array(), string $ands='') : void
+    {
+        global $_TABLES;
+
+        $sql_args = array();
+        foreach ($args as $key=>$val) {
+            if (is_string($val)) {
+                $val = DB_escapeString($val);
+            } elseif (is_integer($val)) {
+                $val = (int)$val;
+            }
+            $sql_args[] = "$key = '$val'";
+        }
+        if (!empty($sql_args)) {
+            $sql_args = implode(', ', $sql_args) . ',';
+        } else {
+            $sql_args = '';
+        }
+        $sql = "UPDATE {$_TABLES['evlist_detail']} SET
+            $sql_args
+            det_revision = det_revision + 1
+            WHERE ev_id = '" . DB_escapeString($ev_id) . "' $ands";
+        DB_query($sql);
+        //Cache::clear('repeats', 'event_' . $ev_id);
+    }
+
+
+    /**
+     * Update the status for all occurrances of an event.
+     *
+     * @param   string  $ev_id  Event ID
+     * @param   integer $status New status value
+     * @param   string  $ands   Additional WHERE conditions as "AND ... AND ..."
+     */
+    public static function updateEventStatus(string $ev_id, integer $status, string $ands='') : void
+    {
+        self::updateEvent($ev_id, array('det_status'=>$status), $ands);
     }
 
 

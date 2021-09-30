@@ -642,11 +642,16 @@ function plugin_getfeednames_evlist()
  * @return  array               Array of event data
  */
 function plugin_getfeedcontent_evlist(
-    $feed, &$link, &$update_data, $feedType, $feedVersion, $A
+    $feed, &$link, &$update_data, $feedType, $feedVersion
 ) {
     return Evlist\Models\Syndication::getFeedcontent(
-        $feed, $link, $update_data, $feedType, $feedVersion, $A
+        $feed, $link, $update_data, $feedType, $feedVersion
     );
+}
+
+function plugin_getfeedtopic_evlist($tid)
+{
+    return Evlist\Calendar::getInstance($tid)->getName();
 }
 
 

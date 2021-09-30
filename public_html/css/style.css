@@ -102,7 +102,9 @@ div.evEventItem {
 	/* Override uk-margin setting */
 	margin-top: 0px !important;
 }
-
+div.evEventItem div {
+	margin-left:100px;
+}
 #evlistEventDetail div label,
 #evlistEvent div label {
     float: left;
@@ -795,4 +797,7 @@ div#evlist_signups {
 i#next_href, i#prev_href {
 	margin-right: 10px;
 	cursor: pointer;
+}
+.event_disabled {
+    background-color: #dedede;
 }

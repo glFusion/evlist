@@ -19,7 +19,7 @@ use Evlist\Calendar;
  * Class for syndiation feeds.
  * @package evlist
  */
-class Syndication
+class Syndication //extends \glFusion\Syndication\Feed
 {
 
     /**
@@ -336,7 +336,7 @@ class Syndication
         $end = NULL;
 
         $A = self::_getFeedInfo($feed);
-        if ($!$A) {
+        if (!$A) {
             // Invalid feed data received.
             return '';
         }
@@ -483,6 +483,23 @@ class Syndication
             }
         }
         return $feeds[$fid];
+    }
+
+
+    /**
+     * Get the available feed formats.
+     * Only ICS is supporteb by Evlist.
+     *
+     * @return  array   Array of name & version arrays
+     */
+    public static function getFormats() : array
+    {
+        return array(
+            array(
+                'name' => 'ICS',
+                'version' => '1.0',
+            ),
+        );
     }
 
 }

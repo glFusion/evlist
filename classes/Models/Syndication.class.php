@@ -13,6 +13,7 @@
  */
 namespace Evlist\Models;
 use Evlist\Calendar;
+use Evlist\Event;
 
 
 /**
@@ -363,6 +364,8 @@ class Syndication //extends \glFusion\Syndication\Feed
             ->withLimit($limit);
         if ($end) {
             $ES->withEnd($end->format('Y-m-d', true));
+        } else {
+            $ES->withEnd(Event::MAX_DATE);
         }
 
         // Default description if retrieving all events

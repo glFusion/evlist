@@ -79,7 +79,7 @@ class EventSet
      * @var string */
     private $upcoming = false;
 
-    /** Set required status.
+    /** Set required status, default is "enabled".
      * @var integer */
     private $status = Status::ENABLED;
 
@@ -408,7 +408,7 @@ class EventSet
         return $sql;
     }
 
-    
+
     /**
      * Get all events that fall within a range.
      * This is in functions.inc so it can be used by the feed update
@@ -447,8 +447,8 @@ class EventSet
                     } else {
                         // Multi-day events get a record for each day up to the event end
                         // or limit, whichever comes first
-                        $end_date = min($A['rp_date_end'], $end);
-                        $newdate = max($A['rp_date_start'], $start);
+                        $end_date = min($A['rp_date_end'], $this->end);
+                        $newdate = max($A['rp_date_start'], $this->start);
                         while ($newdate <= $end_date) {
                             if (!isset($events[$newdate]))
                                 $events[$newdate] = array();

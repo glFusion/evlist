@@ -1,42 +1,16 @@
 <?php
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | calendar_import.php                                                      |
-// |                                                                          |
-// | Import existing calendar entries into evList                             |
-// +--------------------------------------------------------------------------+
-// | Based on the evList Plugin for Geeklog CMS                               |
-// | Copyright (C) 2007 by the following authors:                             |
-// |                                                                          |
-// | Authors: Alford Deeley     - ajdeeley AT summitpages.ca                  |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
 /**
-*   Import data from the Calendar plugin into evList
-*   @author     Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @package    evlist
-*   @version    1.3.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Import data from the Calendar plugin into evList.
+ *
+ * @author      Mark R. Evans mark AT glfusion DOT org
+ * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
+ * @package     evlist
+ * @version     v1.5.0
+ * @since       v1.3.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
@@ -71,35 +45,38 @@ function evlist_import_calendar_events()
         $e_ampm = $e_hour == 0 || $e_hour > 12 ? 'pm' : 'am';
 
         $E = array(
-                'eid'           => $A['eid'],
-                'title'         => $A['title'],
-                'summary'       => $A['description'],
-                'full_description' => '',
-                'date_start1'   => $A['datestart'],
-                'date_end1'     => $A['dateend'],
-                'starthour1'    => $s_hour,
-                'startminute1'  => $s_min,
-                'start1_ampm'    => $s_ampm,
-                'endhour1'      => $e_hour,
-                'endminute1'    => $e_min,
-                'end1_ampm'      => $e_ampm,
-                'url'           => $A['url'],
-                'street'        => $A['address1'],
-                'city'          => $A['city'],
-                'province'      => $A['state'],
-                'postal'        => $A['zipcode'],
-                'allday'        => $A['allday'] == 1 ? 1 : 0,
-                'location'      => $A['location'],
-                'owner_id'      => (int)$A['owner_id'],
-                'group_id'      => (int)$A['group_id'],
-                'perm_owner'    => (int)$A['perm_owner'],
-                'perm_group'    => (int)$A['perm_group'],
-                'perm_members'  => (int)$A['perm_members'],
-                'perm_anon'     => (int)$A['perm_anon'],
-                'show_upcoming' => 1,
-                'status'        => $A['status'] == 1 ? 1 : 0,
-                'hits'          => (int)$A['hits'],
-                'cal_id'        => 1,
+            'eid'           => $A['eid'],
+            'title'         => $A['title'],
+            'summary'       => $A['description'],
+            'full_description' => '',
+            'date_start1'   => $A['datestart'],
+            'date_end1'     => $A['dateend'],
+            'time_start1'   => $s_hour . ':' . $s_min,
+            'time_end1'     => $e_hour . ':' . $e_min,
+            //'starthour1'    => $s_hour,
+            //'startminute1'  => $s_min,
+            'start1_ampm'   => $s_ampm,
+            //'endhour1'      => $e_hour,
+            //'endminute1'    => $e_min,
+            'end1_ampm'     => $e_ampm,
+            'url'           => $A['url'],
+            'street'        => $A['address1'],
+            'city'          => $A['city'],
+            'province'      => $A['state'],
+            'postal'        => $A['zipcode'],
+            'allday'        => $A['allday'] == 1 ? 1 : 0,
+            'location'      => $A['location'],
+            'owner_id'      => (int)$A['owner_id'],
+            'group_id'      => (int)$A['group_id'],
+            'perm_owner'    => (int)$A['perm_owner'],
+            'perm_group'    => (int)$A['perm_group'],
+            'perm_members'  => (int)$A['perm_members'],
+            'perm_anon'     => (int)$A['perm_anon'],
+            'show_upcoming' => 1,
+            'status'        => $A['status'] == 1 ? 1 : 0,
+            'hits'          => (int)$A['hits'],
+            'cal_id'        => 1,
+            'recurring'     => 0,
         );
 
         // We'll let the event object handle most things, saving the 
@@ -107,14 +84,13 @@ function evlist_import_calendar_events()
 
         // Create the event object, while checking if the eid exists
         $Ev = new Evlist\Event($A['eid']);
-        if ($Ev->id != '') {    // Oops, dup ID, must already be done.
+        if ($Ev->getID() != '') {    // Oops, dup ID, must already be done.
             COM_errorLog("{$A['eid']} - already exists");
             continue;           // Skip possible duplicates
         }
 
         // Force it to be a new event even though we have an event ID
-        $Ev->isNew = true;
-        if ($Ev->Save($E, false, true) !== '') {
+        if ($Ev->forceNew()->Save($E) !== '') {
             COM_errorLog(sprintf($LANG_EVLIST['err_import_event'], $A['eid']));
             $errors++;
             continue;       // This one failed, keep trying the others
@@ -128,7 +104,7 @@ function evlist_import_calendar_events()
                     perm_group   = '{$E['perm_members']}',
                     perm_members = '{$E['perm_anon']}',
                     perm_anon    = '{$E['perm_anon']}'
-                WHERE id='{$Ev->id}'";
+                WHERE id='{$Ev->getID()}'";
         //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
@@ -139,5 +115,3 @@ function evlist_import_calendar_events()
     }
     return $errors;
 }
-
-?>

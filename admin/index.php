@@ -435,7 +435,7 @@ case 'calendars':
 
 case 'moderate':
     $Ev = new Evlist\Event();
-    $Ev->Read($_REQUEST['id'], 'evlist_submissions');
+    $Ev->asSubmission()->Read($_REQUEST['id']);
     $content .= $Ev->Edit('', 0, 'moderate');
     break;
 

@@ -788,11 +788,10 @@ class Event
     /**
      * Read a specific record and populate the local values.
      *
-     * @param   integer $ev_id  Optional ID.  Current ID is used if zero.
-     * @param   string  $table  Table name, default = production
+     * @param   string  $ev_id  Optional ID.  Current ID is used if zero.
      * @return  boolean     True if a record was read, False on failure.
      */
-    public function Read($ev_id = '')
+    public function Read(string $ev_id = '') : bool
     {
         global $_TABLES;
 

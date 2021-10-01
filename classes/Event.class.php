@@ -488,7 +488,7 @@ class Event
         global $_EV_CONF;
 
         if ($perm == -1) $perm = $_EV_CONF['default_permissions'][2];
-        $this->perm_member = (int)$perm;
+        $this->perm_members = (int)$perm;
         return $this;
     }
 

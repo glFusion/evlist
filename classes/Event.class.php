@@ -32,6 +32,7 @@ class Event
     const RP_NEWEND         = 2;    // Add or remove repeats due to new end date
     const RP_NEWTIME        = 4;    // Update the time and allday flag in repeats
     const RP_RECUR2SINGLE   = 8;    // Was recurring, convert to single
+    const RP_SINGLEEDIT     = 16;   // Single event changed date or time
     const RP_NEWSCHEDULE    = 64;   // Completely new schedule
 
 
@@ -934,6 +935,23 @@ class Event
             // update the repeat tables.  If we do, any customizations will
             // be lost.
             $rp_update = $this->needRepeatUpdate($A);
+            if ($rp_update & self::RP_SINGLEEDIT) {
+                // this is a one-time event, update the existing instance
+                $t_end = $this->split ? $this->time_end2 : $this->time_end1;
+                $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+                        rp_date_start = '{$this->date_start1}',
+                        rp_date_end = '{$this->date_end1}',
+                        rp_time_start1 = '{$this->time_start1}',
+                        rp_time_end1 = '{$this->time_end1}',
+                        rp_time_start2 = '{$this->time_start2}',
+                        rp_time_end2 = '{$this->time_end2}',
+                        rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
+                        rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end'),
+                        rp_status = {$this->status},
+                        rp_revision = rp_revision + 1
+                    WHERE rp_ev_id = '{$this->id}'";
+                DB_query($sql, 1);
+            }
             if ($rp_update & self::RP_NEWSCHEDULE) {
                 // Entirely new schedule needed. Rebuild and ignore other values
                 // for $rp_update
@@ -952,22 +970,6 @@ class Event
                     if (!$this->UpdateRepeats()) {
                         return $this->PrintErrors();
                     }
-                } else {
-                    // this is a one-time event, update the existing instance
-                    $t_end = $this->split ? $this->time_end2 : $this->time_end1;
-                    $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
-                            rp_date_start = '{$this->date_start1}',
-                            rp_date_end = '{$this->date_end1}',
-                            rp_time_start1 = '{$this->time_start1}',
-                            rp_time_end1 = '{$this->time_end1}',
-                            rp_time_start2 = '{$this->time_start2}',
-                            rp_time_end2 = '{$this->time_end2}',
-                            rp_start = CONCAT('{$this->date_start1}', ' ', '{$this->time_start1}'),
-                            rp_end = CONCAT('{$this->date_end1}' , ' ' , '$t_end'),
-                            rp_status = {$this->status},
-                            rp_revision = rp_revision + 1
-                        WHERE rp_ev_id = '{$this->id}'";
-                    DB_query($sql, 1);
                 }
             } else {
                 if ($rp_update & self::RP_NEWSTART) {
@@ -2255,11 +2257,7 @@ class Event
         ) {
             // Begining date changed, may need to add or remove instances.
             // Ending date_end is still part of the first event if multiday.
-            if ($this->old_schedule['recurring'] == $this->recurring && $this->recurring == 0) {
-                $retval |= self::RP_NEWSCHEDULE;
-            } else {
-                $retval |= self::RP_NEWSTART;
-            }
+            $retval |= self::RP_NEWSTART;
         }
         if ($old_rec['stop'] != $new_rec['stop']) {
             // Stop date for instances changed, may need to add or remove some.
@@ -2300,19 +2298,17 @@ class Event
                 // Recurrence type changed, need to rebuild the schedule.
                 $retval |= self::RP_NEWSCHEDULE;
             }
+        } elseif ($this->recurring == 0) {
+            // Was not and still isn't recurring, update the single instance.
+            $retval |= self::RP_SINGLEEDIT;
         } elseif (!empty($this->old_schedule['rec_data'])) {
             // Check the recurring event options
-            /*$diff = self::_arrayDiffAssocRecursive($old_rec, $new_rec);
-            if (!empty($diff)) {
-                $retval |= self::RP_NEWSCHEDULE;
-            }*/
-
             // Have to descend into sub-arrays manually.  Old and/or new
             // values may not be arrays if the recurrence type was changed.
             foreach (array('listdays', 'interval', 'custom') as $key) {
-                $oldA = isset($old_rec[$key]) && is_array($old_rec[$key]) ?
+                $oldA = (isset($old_rec[$key]) && is_array($old_rec[$key])) ?
                     $old_rec[$key] : array();
-                $newA = isset($new_rec[$key]) && is_array($new_rec[$key]) ?
+                $newA = (isset($new_rec[$key]) && is_array($new_rec[$key])) ?
                     $new_rec[$key] : array();
                 $diff = self::_arrayDiffAssocRecursive($oldA, $newA);
                 if (!empty($diff)) {

@@ -752,7 +752,7 @@ function plugin_moderationapprove_evlist($eid)
     // create the recurrences.
     $Ev = new Evlist\Event($eid);
     $Ev->UpdateRepeats();
-
+    Evlist\Cache::clear();
     return true;
 }
 

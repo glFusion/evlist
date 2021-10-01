@@ -296,10 +296,12 @@ function toggleRSVPdetail(val)
 {!endif}
 
 <ul uk-switcher="connect: #ev_forms" data-uk-switcher="{connect:'#ev_forms'}" class="uk-tab">
-    <li><a href="#">Event Information</a></li>
-    <li><a href="#">Location</a></li>
-    <li><a href="#">Contact</a></li>
-    <li><a href="">Permissions</a></li>
+    <li><a href="#">{$LANG_EVLIST['ev_info']}</a></li>
+    <li><a href="#">{$LANG_EVLIST['ev_location']}</a></li>
+    <li><a href="#">{$LANG_EVLIST['ev_contact']}</a></li>
+{!if permissions_editor}
+    <li><a href="">{$LANG_EVLIST['ev_perms']}</a></li>
+{!endif}
 </ul>
 {alert_msg}
 <form action="{action_url}" method="post" class="uk-form uk-form-horizontal evForm"
@@ -895,6 +897,7 @@ function toggleRSVPdetail(val)
 {!endif}
 		</li>
 
+{!if permissions_editor}
 		<li>
 			<fieldset>
 				<legend>{$LANG_ACCESS['accessrights']}</legend>
@@ -923,7 +926,7 @@ function toggleRSVPdetail(val)
 				</div>
 			</fieldset>
 		</li>
-
+{!endif}
 		</ul>
 	<input type="hidden" name="isNew" value="{isNew}" />
 	<input type="hidden" name="eid" value="{eid}" />

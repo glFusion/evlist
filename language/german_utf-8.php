@@ -545,3 +545,41 @@ $LANG_configSelect['evlist'] = array(
         'agenda' => 'Listen-Ansicht',
     ),
 );
+
+// Legacy config selections, requires glFusion 2.0
+$LANG_configselects['evlist'] = array(
+    0 => array('Ja' => 1, 'Nein' => 0),
+    1 => array('Ja' => TRUE, 'Nein' => FALSE),
+    2 => array('Keine' => 0, 'Veranstaltung hinzufügen' => 1, 'Veranstaltungs-Liste' => 2),
+    3 => array('Sonntag' => 1, 'Montag' => 2),
+    4 => array(
+            'Don Nov 20, 2008'      => '%a %b %d, %Y',
+            'Don Nov 20'            => '%a %b %d',
+            'Donnerstag Nov 20, 2008' => '%A %b %d, %Y',
+            'Donnerstag Nov 20'       => '%A %b %d',
+            'Donnerstag November 20'  => '%A %B %d',
+            'November 20, 2008'     => '%B %d, %Y',
+            '11/20/08'              => '%m/%d/%y',
+            '11-20-08'              => '%m-%d-%y',
+            '2008 11 20'            => '%Y %m %d',
+            'Nov 20 2008'           => '%b %d %Y',
+            'Nov 20, 2008'          => '%b %d, %Y',
+            '20 Nov. 2008'            => '%d %b. %Y'
+    ),
+    5 => array('02:38 PM' => '%I:%M %p', '14:48' => '%H:%M',),
+    6 => array(
+            'sobald Uhrzeit-Beginn um ist (wenn vorhanden)' => 1,
+            'sobald Datum-Beginn um ist (i.R. der nächste Tag)' => 2,
+            'sobald Uhrzeit-Ende um ist (wenn vorhanden)' => 3,
+            'sobald Datum-Ende um ist' => 4,
+        ),
+    7 => array('Oben auf Seite'=>1,'Nach Hauptartikel'=>2,'Unten auf Seite'=>3,'Gesamte Seite'=>0),
+    8 => array('Vergangen'=>1,'Bevorstehend'=>2,'Diese Woche'=>3,'Diesen Monat'=>4),
+    9 => array('Deaktiviert' => 0, 'Tabelle' => 1, 'Artikel' => 2, 'Kalender' => 3),
+    12 => array('Kein Zugriff' => 0, 'Nur-Lesen' => 2, 'Lesen-Schreiben' => 3),
+    13 => array('Linke Blöcke' => 0, 'Rechte Blöcke' => 1, 'Linke & Rechte Blöcke' => 2, 'Keine' => 3),
+    14 => array('Tages-Ansicht' => 'day', 'Wochen-Ansicht' => 'week', 'Monats-Ansicht' => 'month', 'Jahres-Ansicht' => 'year', 'Listen-Ansicht' => 'list'),
+    15 => array('Nur Admins' => 0, 'Angemeldete Benutzer' => 1, 'Angemeldete Benutzer & Gäste' => 2),
+    16 => array('HTML' => 'html', 'JSON' => 'json'),
+    17 => array('Nein' => 0, 'Standart Nein' => 1, 'Standart Bezahlt' => 2, 'Standart Bezahlt & Unbezahlt' => 3),
+);

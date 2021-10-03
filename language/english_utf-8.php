@@ -542,3 +542,48 @@ $LANG_configSelect['evlist'] = array(
         'agenda' => 'Agenda',
     ),
 );
+
+// Legacy config selections, requires glFusion 2.0
+$LANG_configselects['evlist'] = array(
+    0 => array('True' => 1, 'False' => 0),
+    1 => array('True' => TRUE, 'False' => FALSE),
+    2 => array('None' => 0, 'Add Event' => 1, 'List Events' => 2),
+    3 => array('Sunday' => 1, 'Monday' => 2),
+    4 => array(
+            'Thu Nov 20, 2008'      => '%a %b %d, %Y',
+            'Thu Nov 20'            => '%a %b %d',
+            'Thursday Nov 20, 2008' => '%A %b %d, %Y',
+            'Thursday Nov 20'       => '%A %b %d',
+            'Thursday November 20'  => '%A %B %d',
+            'November 20, 2008'     => '%B %d, %Y',
+            '11/20/08'              => '%m/%d/%y',
+            '11-20-08'              => '%m-%d-%y',
+            '2008 11 20'            => '%Y %m %d',
+            'Nov 20 2008'           => '%b %d %Y',
+            'Nov 20, 2008'          => '%b %d, %Y',
+    ),
+    5 => array('02:38 PM' => '%I:%M %p', '14:48' => '%H:%M',),
+    //4 => array('Thu Nov 20, 2008' => 1,'Thu Nov 20' => 2, 'Thursday Nov 20, 2008' => 3,'Thursday Nov 20' => 4, 'Thursday November 20' => 5, 'November 20, 2008' => 6,'11/20/08' => 7, '11-20-08' => 8,'2008 11 20'=>9,'Nov 20 2008' => 10,'Nov 20, 2008' => 11),
+    //5 => array('02:38 PM' => 1,'14:48' => 2),
+    6 => array(
+            'as soon as the start time has passed (if exists)' => 1,
+            'as soon as the start date has passed, ie, the next day.' => 2,
+            'as soon as the end time has passed (if exists).' => 3,
+            'as soon as the end date has passed.' => 4,
+        ),
+    7 => array('Top of page'=>1,'After featured story'=>2,'Bottom of page'=>3,'Entire page'=>0),
+    8 => array('past'=>1,'upcoming'=>2,'this week'=>3,'this month'=>4),
+    9 => array('Disabled' => 0, 'Table' => 1, 'Story' => 2, 'Calendar' => 3),
+    10 => array(
+        'Show all occurrences' => '',
+        'Master Event Record' => 'rp_ev_id',
+        'Recurring Event Instance' => 'rp_id',
+    ),
+    12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
+    13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
+    14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),
+    15 => array('Admins Only' => 0, 'Logged-In Users' => 1, 'Logged-In+Anon Users' => 2),
+    16 => array('HTML' => 'html', 'JSON' => 'json'),
+    17 => array('No' => 0, 'Default No' => 1, 'Default Paid Only' => 2,
+                'Default Paid or Unpaid' => 3),
+);

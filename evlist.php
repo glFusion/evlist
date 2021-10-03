@@ -25,7 +25,7 @@ global $_DB_table_prefix, $_TABLES;
 */
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.4.7.1';
+$_EV_CONF['pi_version']      = '1.4.7.2';
 $_EV_CONF['gl_version']      = '1.7.8';
 $_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 

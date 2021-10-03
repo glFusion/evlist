@@ -123,7 +123,8 @@ $_SQL['evlist_detail'] = "CREATE TABLE {$_TABLES['evlist_detail']} (
   `lat` float(10,6) DEFAULT NULL,
   `lng` float(10,6) DEFAULT NULL,
   `det_status` tinyint(1) unsigned NOT NULL DEFAULT 1,
-  `det_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `det_revision` int(5) unsigned NOT NULL DEFAULT 0,
+  `det_last_mod` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`det_id`)
 ) ENGINE=MyISAM";
 
@@ -359,6 +360,7 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_revision` int(5) unsigned NOT NULL DEFAULT 1",
     "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_detail']} ADD `det_status` tinyint(1) unsigned NOT NULL DEFAULT 1",
+    "ALTER TABLE {$_TABLES['evlist_detail']} ADD `det_revision` int(5) unsigned NOT NULL DEFAULT 0",
     "ALTER TABLE {$_TABLES['evlist_detail']} ADD `det_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_remlookup']}
         ADD `rem_id` int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST",

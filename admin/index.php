@@ -172,7 +172,7 @@ $expected = array(
     'import_csv', 'import_cal', 'movecal',
     'delbutton_x',
     // Views to display
-    'view', 'delevent', 'importcalendar', 'clone', 'rsvp', 'calendars',
+    'view', 'delevent', 'delcancelled', 'importcalendar', 'clone', 'rsvp', 'calendars',
     'import', 'edit', 'editcat', 'editticket', 'tickettypes',
     'tickets',
 );
@@ -311,6 +311,11 @@ case 'delbutton_x':
     $view = 'events';
     break;
 
+case 'delcancelled':
+    // Permanently delete a cancelled event.
+    // We'll cheat here and set purge_days to zero to force immediate deletion,
+    // then fall through to call Event::Delete()
+    $_EV_CONF['purge_cancelled_days'] = 0;
 case 'delevent':
     $eid = isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ?
             $_REQUEST['eid'] : '';

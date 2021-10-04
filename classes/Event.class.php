@@ -892,7 +892,7 @@ class Event
         if (is_array($A)) {
             $this->SetVars($A);
             $this->MakeRecData($A);
-            DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
+            //DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
         }
 
         // Authorized to bypass the queue
@@ -1898,11 +1898,12 @@ class Event
         if ($this->isAdmin) {
             $T->set_var(array(
                 //'owner_username' => COM_stripslashes($ownerusername),
-                'owner_dropdown' => COM_optionList($_TABLES['users'],
-                        'uid,username', $this->owner_id, 1),
-                 'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
-                     (int)$this->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
-                 ),
+                'owner_dropdown' => COM_optionList(
+                    $_TABLES['users'], 'uid,username', $this->owner_id, 1
+                ),
+                'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
+                    (int)$this->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
+                ),
             ) );
             if ($rp_id == 0) {  // can only change permissions on main event
                 $T->set_var('permissions_editor', SEC_getPermissionsHTML(
@@ -2709,7 +2710,12 @@ class Event
                 '"event","'.EVLIST_ADMIN_URL."\");' />" . LB;
             break;
         case 'delete':
-            $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
+            // Enabled events get cancelled, others get immediately deleted.
+            if ($A['status'] == Status::ENABLED) {
+                $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
+            } else {
+                $url = EVLIST_ADMIN_URL. '/index.php?delcancelled=x&eid=' . $A['id'];
+            }
             if (isset($_REQUEST['cal_id'])) {
                 $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
             }

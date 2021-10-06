@@ -167,6 +167,21 @@ class Repeat
 
 
     /**
+     * Create a repeat from an array of values, normally from a DB record.
+     *
+     * @param   array   $A      Array of key=>value pairs
+     * @param   bool    $fromDB True if from a DB record
+     * @return  object  Repeat object
+     */
+    public static function fromArray($A, $fromDB=true)
+    {
+        $retval = new self;
+        $retval->setVars($A, $fromDB);
+        return $retval;
+    }
+
+
+    /**
      * Check if the current user is an administrator.
      *
      * @return  boolean     True for administrators, False for regular users
@@ -183,10 +198,11 @@ class Repeat
      * @param   string  $dt_tm  MySQL-formatted datetime string
      * @return  object  $this
      */
-    private function setDateStart1($dt_tm)
+    public function setDateStart1($dt_tm)
     {
         global $_CONF;
         $this->dtStart1 = new \Date($dt_tm, $_CONF['timezone']);
+        return $this;
     }
 
 
@@ -196,10 +212,89 @@ class Repeat
      * @param   string  $dt_tm  MySQL-formatted datetime string
      * @return  object  $this
      */
-    private function setDateEnd1($dt_tm)
+    public function setDateEnd1($dt_tm)
     {
         global $_CONF;
         $this->dtEnd1 = new \Date($dt_tm, $_CONF['timezone']);
+        return $this;
+    }
+
+
+    /**
+     * Set the starting date string.
+     *
+     * @param   string  $dt     Date as YYYY-MM-DD
+     * @return  self
+     */
+    public function setDateStart($dt)
+    {
+        $this->date_start = $dt;
+        return $this;
+    }
+
+
+    /**
+     * Set the ending date string.
+     *
+     * @param   string  $dt     Date as YYYY-MM-DD
+     * @return  self
+     */
+    public function setDateEnd($dt)
+    {
+        $this->date_end = $dt;
+        return $this;
+    }
+
+
+    /**
+     * Set the first starting time string.
+     *
+     * @param   string  $tm     Time as HH:mm
+     * @return  self
+     */
+    public function setTimeStart1($tm)
+    {
+        $this->time_start1 = $tm;
+        return $this;
+    }
+
+
+    /**
+     * Set the first ending time string.
+     *
+     * @param   string  $tm     Time as HH:mm
+     * @return  self
+     */
+    public function setTimeEnd1($tm)
+    {
+        $this->time_end1 = $tm;
+        return $this;
+    }
+
+
+    /**
+     * Set the second starting time string.
+     *
+     * @param   string  $tm     Time as HH:mm
+     * @return  self
+     */
+    public function setTimeStart2($tm)
+    {
+        $this->time_start2 = $tm;
+        return $this;
+    }
+
+
+    /**
+     * Set the second ending time string.
+     *
+     * @param   string  $tm     Time as HH:mm
+     * @return  self
+     */
+    public function setTimeEnd2($tm)
+    {
+        $this->time_end2 = $tm;
+        return $this;
     }
 
 
@@ -255,14 +350,7 @@ class Repeat
         }
 
         // Join or split the date values as needed
-        if ($fromDB) {      // Read from the database
-
-            // dates are YYYY-MM-DD
-            /*list($startyear, $startmonth, $startday) = explode('-', $row['rp_date_start']);
-            list($endyear, $endmonth, $endday) = explode('-', $row['rp_date_end']);
-             */
-        } else {            // Coming from the form
-
+        if (!$fromDB) {     // Coming from the form
             $this->date_start = $row['date_start1'];
             $this->date_end = $row['date_end1'];
 
@@ -275,33 +363,9 @@ class Repeat
             } else {
                 $this->time_start1 = $row['time_start1'];
                 $this->time_end1 = $row['time_end1'];
-                /*$tmp = DateFunc::conv12to24($row['starthour1'], $row['start1_ampm']);
-                $this->time_start1 = sprintf(
-                    '%02d:%02d:00',
-                    $tmp,
-                    $row['startminute1']
-                );
-                $tmp = DateFunc::conv12to24($row['endhour1'], $row['end1_ampm']);
-                $this->time_end1 = sprintf(
-                    '%02d:%02d:00',
-                    $tmp,
-                    $row['endminute1']
-                );*/
                 if (isset($row['split']) && $row['split'] == '1') {
                     $this->time_start2 = $row['time_start2'];
                     $this->time_end2 = $row['time_end2'];
-                    /*$tmp = DateFunc::conv12to24($row['starthour2'], $row['start2_ampm']);
-                    $this->time_start2 = sprintf(
-                        '%02d:%02d:00',
-                        $tmp,
-                        $row['startminute1']
-                    );
-                    $tmp = DateFunc::conv12to24($row['endhour2'], $row['end2_ampm']);
-                    $this->time_end2 = sprintf(
-                        '%02d:%02d:00',
-                        $tmp,
-                        $row['endminute2']
-                    );*/
                 } else {
                     $this->time_start2 = '00:00:00';
                     $this->time_end2   = '00:00:00';
@@ -387,7 +451,7 @@ class Repeat
      * @param   array   $A      Optional array of values from $_POST
      * @return  boolean         True if no errors, False otherwise
      */
-    public function Save($A = '')
+    public function Save(?array $A = NULL)
     {
         global $_TABLES;
 
@@ -396,23 +460,17 @@ class Repeat
         }
 
         if ($this->rp_id > 0) {
-            // Update this repeat's detail record if there is one.  Otherwise
-            // create a new one.
-            if ($this->det_id != $this->Event->getDetailID()) {
-                $D = new Detail($this->det_id);
-            } else {
-                $D = new Detail();
-            }
-            $D->setVars($A);
-            $D->setEventID($this->ev_id);
-            $this->det_id = $D->Save();
             $date_start = DB_escapeString($this->date_start);
             $date_end = DB_escapeString($this->date_end);
             $time_start1 = DB_escapeString($this->time_start1);
             $time_start2 = DB_escapeString($this->time_start2);
             $time_end1 = DB_escapeString($this->time_end1);
             $time_end2 = DB_escapeString($this->time_end2);
-            $t_end = $this->Event->isSplit() ? $time_end2 : $time_end1;
+            if ($time_end2 != '00:00') {
+                $t_end = $time_end2;
+            } else {
+                $t_end = $time_end1;
+            }
             $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
                 rp_date_start = '$date_start',
                 rp_date_end= '$date_end',
@@ -420,10 +478,11 @@ class Repeat
                 rp_time_end1 = '$time_end1',
                 rp_time_start2 = '$time_start2',
                 rp_time_end2 = '$time_end2',
-                rp_start = '$date_start $time_start1',
+                p_start = '$date_start $time_start1',
                 rp_end = '$date_end $t_end',
                 rp_det_id='" . (int)$this->det_id . "',
-                rp_revision = rp_revision + 1
+                rp_revision = rp_revision + 1,
+                rp_status = " . (int)$this->rp_status . "
             WHERE rp_id='{$this->rp_id}'";
             DB_query($sql);
             Cache::clear();
@@ -515,7 +574,23 @@ class Repeat
      */
     public static function updateEventStatus($ev_id, $status, $ands='')
     {
-        self::updateEvent($ev_id, array('rp_status'=>$status), $ands);
+        global $_TABLES;
+
+        $status = (int)$status;
+        $Ev = Event::getInstance($ev_id);
+        $master_det_id = (int)$Ev->getDetailID();
+        if ($master_det_id > 0) {       // protect against invalid records
+            Detail::updateEventStatus(
+                $ev_id,
+                $status,
+                " AND det_status <> $status AND ev_id <> " . $Ev->getDetailID()
+            );
+        }
+        self::updateEvent(
+            $ev_id,
+            array('rp_status'=>$status),
+            " AND rp_status <> $status $ands"
+        );
     }
 
 
@@ -1885,6 +1960,18 @@ class Repeat
     }
 
 
+    /**
+     * Set the status value explicitely.
+     *
+     * @param   int     $status     New status value
+     * @return  self
+     */
+    public function setStatus($status)
+    {
+        $this->rp_status = (int)$status;
+        return $this;
+    }
+
 
     /**
      * Make sure the current user has access to view this event.
@@ -1895,7 +1982,7 @@ class Repeat
     {
         if (
             $this->getID() == 0 ||      // indicates an invalid record
-            $this->rp_status != 1 ||    // indicates disabled or cancelled
+            $this->rp_status != Status::ENABLED ||    // indicates disabled or cancelled
             !$this->getEvent()->hasAccess(2)    // no access to the event
         ) {
             return false;
@@ -1926,6 +2013,7 @@ class Repeat
         if ($max_dt != '') {
             $sql .= " AND rp_date_start <= '$max_dt'";
         }
+        $sql .= " ORDER BY rp_date_start ASC";
         $res = DB_query($sql);
         while ($A = DB_fetchArray($res, false)) {
             $retval[$A['rp_date_start']] = new self;

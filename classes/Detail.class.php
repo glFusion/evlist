@@ -586,9 +586,14 @@ class Detail
      * @param   integer $status New status value
      * @param   string  $ands   Additional WHERE conditions as "AND ... AND ..."
      */
-    public static function updateEventStatus(string $ev_id, integer $status, string $ands='') : void
+    public static function updateEventStatus(string $ev_id, int $status, string $ands='') : void
     {
-        self::updateEvent($ev_id, array('det_status'=>$status), $ands);
+        $status = (int)$status;
+        self::updateEvent(
+            $ev_id,
+            array('det_status'=>$status),
+            " AND det_status <> $status $ands"
+        );
     }
 
 

@@ -203,7 +203,12 @@ case 'register':
         exit;
     }
     $Ev = Evlist\Repeat::getInstance($rp_id);
-    $msg = $Ev->Register($_POST['tick_count'], $_POST['tick_type'], 0, $_POST['rsvp_comment']);
+    $msg = $Ev->Register(
+        EV_getVar($_POST, 'tick_count', 'integer', 1),
+        EV_getVar($_POST, 'tick_type', 'string', ''),
+        0,
+        EV_getVar($_POST, 'rsvp_comment', 'string', '')
+    );
     echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;
 

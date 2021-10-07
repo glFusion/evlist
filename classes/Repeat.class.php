@@ -478,7 +478,7 @@ class Repeat
                 rp_time_end1 = '$time_end1',
                 rp_time_start2 = '$time_start2',
                 rp_time_end2 = '$time_end2',
-                p_start = '$date_start $time_start1',
+                rp_start = '$date_start $time_start1',
                 rp_end = '$date_end $t_end',
                 rp_det_id='" . (int)$this->det_id . "',
                 rp_revision = rp_revision + 1,
@@ -2021,5 +2021,202 @@ class Repeat
         }
         return $retval;
     }
+
+
+    /**
+     * Check if the supplied schedule array matches this repeat.
+     * Checks start & end dates and both start & end time pairs.
+     *
+     * @param   array   $schedule   Schedule to verify
+     * @param   int     $status     Optional status to match as well
+     * @return  bool    True if matching, False if any element doesn't
+     */
+    public function matchesSchedule(array $schedule, ?int $status) : bool
+    {
+        if (
+            $schedule['dt_start'] != $this->date_start ||
+            $schedule['dt_end'] != $this->date_end ||
+            $schedule['tm_start1'] . ':00' != $this->time_start1 ||
+            $schedule['tm_end1'] . ':00' != $this->time_end1 ||
+            $schedule['tm_start2'] . ':00' != $this->time_start2 ||
+            $schedule['tm_end2'] . ':00' != $this->time_end2
+        ) {
+            return false;
+        }
+        if ($status !== NULL && $this->rp_status != $status) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Get the admin list of occurrences for a specific event.
+     *
+     * @return  string      HTML for admin list
+     */
+    public static function adminList(?string $ev_id='') : string
+    {
+        global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN;
+
+        USES_lib_admin();
+
+        $header_arr = array(
+            array(
+                'text' => $LANG_EVLIST['edit'],
+                'field' => 'edit',
+                'sort' => false,
+                'align' => 'center',
+            ),
+            /*array(
+                'text' => $LANG_EVLIST['copy'],
+                'field' => 'copy',
+                'sort' => false,
+                'align' => 'center',
+            ),*/
+            array(
+                'text' => $LANG_EVLIST['id'],
+                'field' => 'rp_id',
+                'sort' => true,
+            ),
+            array(
+                'text' => $LANG_EVLIST['title'],
+                'field' => 'title',
+                'sort' => true,
+            ),
+            array(
+                'text' => $LANG_EVLIST['start_date'],
+                'field' => 'rp_date_start',
+                'sort' => true,
+            ),
+            array(
+                'text' => $LANG_EVLIST['status'],
+                'field' => 'rp_status',
+                'sort' => false,
+                'align' => 'center',
+            ),
+            array(
+                'text' => $LANG_ADMIN['delete'],
+                'field' => 'delete',
+                'sort' => false,
+                'align' => 'center',
+            ),
+        );
+
+        $defsort_arr = array(
+            'field' => 'rp_date_start',
+            'direction' => 'DESC',
+        );
+        $options = array(
+            'chkdelete' => 'true',
+            'chkfield' => 'rp_id',
+            'chkname' => 'delrepeat',
+        );
+        $text_arr = array(
+            'has_menu'     => true,
+            'has_extras'   => true,
+            'form_url'     => EVLIST_ADMIN_URL . "/index.php?edit=event&eid=$ev_id&from=admin&tab=repeats",
+            'help_url'     => '',
+        );
+
+        // Select distinct to get only one entry per event.  We can only edit/modify
+        // events here, not repeats
+        $sql = "SELECT rp.*, det.title
+                FROM {$_TABLES['evlist_repeat']} rp
+                LEFT JOIN {$_TABLES['evlist_detail']} det
+                    ON det.det_id = rp.rp_det_id";
+        if ($ev_id != '') {
+            $sql .= " WHERE ev_id = '" . DB_escapeString($ev_id) . "'";
+        }
+
+        $query_arr = array(
+            'table' => 'evlist_repeat',
+            'sql' => $sql,
+            'query_fields' => array(),
+        );
+        $filter = COM_createLink(
+            'Back to Event',
+            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $ev_id . '&from=admin',
+        );
+
+        $retval = ADMIN_list(
+            'evlist_event_admin',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr,
+            $query_arr, $defsort_arr, $filter, '', $options
+        );
+        return $retval;
+    }
+
+
+    /**
+     * Return the display value for a field in the admin list.
+     *
+     * @param   string  $fieldname  Name of the field
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Name-value pairs for all fields
+     * @param   array   $icon_arr   Array of system icons
+     * @return  string      HTML to display for the field
+     */
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
+        static $del_icon = NULL;
+        $retval = '';
+
+        switch($fieldname) {
+        case 'edit':
+            $retval = COM_createLink(
+                $_EV_CONF['icons']['edit'],
+                EVLIST_ADMIN_URL . '/index.php?edit=repeat&amp;eid=' . $A['rp_id'] . '&from=admin',
+                array(
+                    'title' => $LANG_EVLIST['edit_event'],
+                )
+            );
+            break;
+
+        case 'rp_status':
+            $retval = "<select name=\"status[{$A['rp_id']}]\"
+                onchange='EVLIST_updateStatus(this, \"repeat\", \"{$A['rp_id']}\", \"{$A['rp_status']}\", \"" . EVLIST_ADMIN_URL . "\");'>" . LB;
+            foreach (
+                array(
+                    1 => $LANG_EVLIST['enabled'],
+                    2 => $LANG_EVLIST['cancelled'],
+                    0 => $LANG_EVLIST['disabled'],
+                ) as $val=>$dscp) {
+                $sel = ($val == $A['rp_status']) ? EVSELECTED : '';
+                $retval .= "<option value=\"$val\" $sel>$dscp</option>" . LB;
+            }
+            $retval .= '</select>';
+            break;
+
+        case 'delete':
+            // Enabled events get cancelled, others get immediately deleted.
+            $url = EVLIST_ADMIN_URL. "/index.php?rp_id={$A['rp_id']}&ev_id={$A['rp_ev_id']}";
+            if ($A['rp_status'] == Status::ENABLED) {
+                $url .= '&cxrepeat';
+            } else {
+                $url .= '&delcxrepeat';
+            }
+            if (isset($_REQUEST['cal_id'])) {
+                $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
+            }
+            $retval = COM_createLink(
+                $_EV_CONF['icons']['delete'],
+                $url,
+                array(
+                    'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
+                    'title' => $LANG_ADMIN['delete'],
+                    'class' => 'tooltip',
+                )
+            );
+            break;
+        default:
+            $retval = $fieldvalue;
+            break;
+        }
+        return $retval;
+    }
+
 
 }

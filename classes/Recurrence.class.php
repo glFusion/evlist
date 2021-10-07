@@ -182,7 +182,7 @@ class Recurrence
      * @param   string  $dt     Date string (YYYY-MM-DD)
      * @return  object  $this
      */
-    public function withStartingDate(string $dt) : object
+    public function withStartingDate(?string $dt=NULL) : object
     {
         if ($dt !== NULL) {
             $this->date_start = $dt;
@@ -197,7 +197,7 @@ class Recurrence
      * @param   string  $dt     Date string (YYYY-MM-DD)
      * @return  object  $this
      */
-    public function withEndingDate(string $dt) : object
+    public function withEndingDate(?string $dt=NULL) : object
     {
         if ($dt !== NULL) {
             $this->date_end = $dt;

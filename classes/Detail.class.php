@@ -130,7 +130,20 @@ class Detail
                 $this->det_id = '';
             }
         }
+    }
 
+
+    /**
+     * Create a Detail object from an array of values.
+     *
+     * @param   array   $A  Array of name=>value pairs
+     * @return  object      Detail object
+     */
+    public static function fromArray(array $A) : self
+    {
+        $retval = new self;
+        $retval->setVars($A);
+        return $retval;
     }
 
 
@@ -658,15 +671,31 @@ class Detail
     }
 
 
-    public static function getIndexRecords($fields)
+    /**
+     * Check if this object matches the provided object for key values.
+     *
+     * @param   object  $B      Object "B" to test
+     * @return  bool    True if the objects match, False if not
+     */
+    public function Matches(Detail $B) : bool
     {
-        global $_TABLES;
-
-        if (isset($fields['id']) && !empty($fields['id'])) {
-            $ev_id = $fields['id'];
+        if (
+            $this->title != $B->getTitle() ||
+            $this->summary != $B->getSummary() ||
+            $this->full_description != $B->getDscp() ||
+            $this->url != $B->getUrl() ||
+            $this->location != $B->getLocation() ||
+            $this->street != $B->getStreet() ||
+            $this->city != $B->getCity() ||
+            $this->province != $B->getProvince() ||
+            $this->postal != $B->getPostal() ||
+            $this->country != $B->getCountry() ||
+            $this->email != $B->getEmail() ||
+            $this->phone != $B->getPhone()
+        ) {
+            return false;
         }
+        return true;
     }
 
-}   // class Detail
-
-?>
+}

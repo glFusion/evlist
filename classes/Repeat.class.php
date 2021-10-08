@@ -459,36 +459,48 @@ class Repeat
             $this->setVars($A);
         }
 
-        if ($this->rp_id > 0) {
-            $date_start = DB_escapeString($this->date_start);
-            $date_end = DB_escapeString($this->date_end);
-            $time_start1 = DB_escapeString($this->time_start1);
-            $time_start2 = DB_escapeString($this->time_start2);
-            $time_end1 = DB_escapeString($this->time_end1);
-            $time_end2 = DB_escapeString($this->time_end2);
-            if ($time_end2 != '00:00') {
-                $t_end = $time_end2;
-            } else {
-                $t_end = $time_end1;
-            }
-            $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
-                rp_date_start = '$date_start',
-                rp_date_end= '$date_end',
-                rp_time_start1 = '$time_start1',
-                rp_time_end1 = '$time_end1',
-                rp_time_start2 = '$time_start2',
-                rp_time_end2 = '$time_end2',
-                rp_start = '$date_start $time_start1',
-                rp_end = '$date_end $t_end',
-                rp_det_id='" . (int)$this->det_id . "',
-                rp_revision = rp_revision + 1,
-                rp_status = " . (int)$this->rp_status . "
-            WHERE rp_id='{$this->rp_id}'";
-            DB_query($sql);
-            Cache::clear();
-            PLG_itemSaved($this->rp_id, 'evlist');
-            COM_rdfUpToDateCheck('evlist', 'events', $this->rp_id);
+        if ($this->rp_id == 0) {
+            return false;
         }
+
+        if (is_array($A)) {
+            // A form was submitted, check if the values are different.
+            $Detail = $this->getDetail();
+            $newDetail = Detail::fromArray($A);
+            if (!$Detail->Matches($newDetail)) {
+                $this->det_id = $newDetail->Save();
+                $this->Detail = $newDetail;
+            }
+        }
+
+        $date_start = DB_escapeString($this->date_start);
+        $date_end = DB_escapeString($this->date_end);
+        $time_start1 = DB_escapeString($this->time_start1);
+        $time_start2 = DB_escapeString($this->time_start2);
+        $time_end1 = DB_escapeString($this->time_end1);
+        $time_end2 = DB_escapeString($this->time_end2);
+        if ($time_end2 != '00:00') {
+            $t_end = $time_end2;
+        } else {
+            $t_end = $time_end1;
+        }
+        $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
+            rp_date_start = '$date_start',
+            rp_date_end= '$date_end',
+            rp_time_start1 = '$time_start1',
+            rp_time_end1 = '$time_end1',
+            rp_time_start2 = '$time_start2',
+            rp_time_end2 = '$time_end2',
+            rp_start = '$date_start $time_start1',
+            rp_end = '$date_end $t_end',
+            rp_det_id='" . (int)$this->det_id . "',
+            rp_revision = rp_revision + 1,
+            rp_status = " . (int)$this->rp_status . "
+            WHERE rp_id = {$this->rp_id}";
+        DB_query($sql);
+        Cache::clear();
+        PLG_itemSaved($this->rp_id, 'evlist');
+        COM_rdfUpToDateCheck('evlist', 'events', $this->rp_id);
     }
 
 
@@ -583,7 +595,7 @@ class Repeat
             Detail::updateEventStatus(
                 $ev_id,
                 $status,
-                " AND det_status <> $status AND ev_id <> " . $Ev->getDetailID()
+                " AND det_status <> $status AND det_id <> " . $Ev->getDetailID()
             );
         }
         self::updateEvent(
@@ -1799,6 +1811,9 @@ class Repeat
      */
     public function getEvent()
     {
+        if ($this->Event === NULL) {
+            $this->Event = Event::getInstance($this->ev_id);
+        }
         return $this->Event;
     }
 
@@ -1808,13 +1823,14 @@ class Repeat
      *
      * @return  object      Detail object
      */
-    public function getDetail()
+    public function getDetail() : object
     {
-        if ($this->det_id == $this->getEvent()->getDetailID()) {
-            return $this->getEvent()->getDetail();
-        } else {
-            return Detail::getInstance($this->det_id);
-        }
+        /*if ($this->det_id == $this->getEvent()->getDetailID()) {
+            $this->Detail = $this->getEvent()->getDetail();
+    } else {*/
+            $this->Detail = Detail::getInstance($this->det_id);
+        //}
+        return $this->Detail;
     }
 
 
@@ -2115,7 +2131,7 @@ class Repeat
         $text_arr = array(
             'has_menu'     => true,
             'has_extras'   => true,
-            'form_url'     => EVLIST_ADMIN_URL . "/index.php?edit=event&eid=$ev_id&from=admin&tab=repeats",
+            'form_url'     => EVLIST_ADMIN_URL . "/index.php?repeats&eid=$ev_id",
             'help_url'     => '',
         );
 
@@ -2135,8 +2151,8 @@ class Repeat
             'query_fields' => array(),
         );
         $filter = COM_createLink(
-            'Back to Event',
-            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $ev_id . '&from=admin',
+            $LANG_EVLIST['back_to_event'],
+            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $ev_id . '&from=ev_repeats',
         );
 
         $retval = ADMIN_list(
@@ -2168,7 +2184,8 @@ class Repeat
         case 'edit':
             $retval = COM_createLink(
                 $_EV_CONF['icons']['edit'],
-                EVLIST_ADMIN_URL . '/index.php?edit=repeat&amp;eid=' . $A['rp_id'] . '&from=admin',
+                EVLIST_URL . '/event.php?edit=repeat&eid=' .
+                    $A['rp_ev_id'] . '&rp_id=' . $A['rp_id'] . '&from=ev_repeats',
                 array(
                     'title' => $LANG_EVLIST['edit_event'],
                 )

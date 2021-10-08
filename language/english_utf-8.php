@@ -391,6 +391,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'back_to_cal' => 'Back to Calendar',
 'my_events' => 'My Events',
 'print_cal' => 'Print Calendar',
+'back_to_event' => 'Back to Event',
 );
 
 $LANG_EVLIST_HELP = array(

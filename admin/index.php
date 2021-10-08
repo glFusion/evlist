@@ -227,6 +227,7 @@ case 'delcalconfirm':
     $newcal = isset($_POST['newcal']) ? (int)$_POST['newcal'] : 0;
     $Cal = new Evlist\Calendar($cal_id);
     $Cal->Delete($newcal);
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?calendars');
     break;
 
 case 'saveevent':
@@ -299,7 +300,7 @@ case 'delcat':
     if ($cat_id > 0) {
         Evlist\Category::Delete($cat_id);
     }
-    $view = 'categories';
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?categories');
     break;
 
 case 'delbutton_x':
@@ -308,7 +309,7 @@ case 'delbutton_x':
             Evlist\Event::Delete($eid);
         }
     }
-    $view = 'events';
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?events');
     break;
 
 case 'delcxrepeat':
@@ -332,7 +333,7 @@ case 'delevent':
     if ($eid != '') {
         Evlist\Event::Delete($eid);
     }
-    $view = 'events';
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     break;
 
 case 'disapprove';
@@ -422,7 +423,7 @@ case 'exporttickets':
 
 case 'movecal':
     Evlist\Calendar::moveRow($_GET['id'], $actionval);
-    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php?view=calendars');
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?view=calendars');
     break;
 
 default:

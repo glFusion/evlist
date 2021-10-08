@@ -336,7 +336,7 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_events']}
         CHANGE cal_id cal_id int(10) not null DEFAULT 1",
     ),
-'1.5.0' => array(
+'1.4.7' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE options options text",

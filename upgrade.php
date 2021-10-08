@@ -234,8 +234,8 @@ function evlist_upgrade($dvlp = false)
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
-    if (!COM_checkVersion($currentVersion, '1.5.0')) {
-        $currentVersion = '1.5.0';
+    if (!COM_checkVersion($currentVersion, '1.4.7')) {
+        $currentVersion = '1.4.7';
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
         // Order the calendars, initially by name;
         Evlist\Calendar::reOrder('cal_name');

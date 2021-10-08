@@ -663,8 +663,10 @@ class DateFunc
      */
     public static function dateDiff($day1, $month1, $year1, $day2, $month2, $year2)
     {
-        if (!checkdate($month1, $day1, $year1) ||
-            !checkdate($month2, $day2, $year2)) {
+        if (
+            !self::isValidDate($day1, $month1, $year1) ||
+            !self::isValidDate($day2, $month2, $year2)
+        ) {
             return -1;
         }
         $date1 = new \Date(sprintf('%d-%02d-%02d', $year1, $month1, $day1));

@@ -140,9 +140,10 @@ case 'savefuturerepeat':
             DB_query($sql);
         }
     }
-    if (isset($_GET['admin'])) {
-        echo COM_refresh(EVLIST_ADMIN_URL);
-        exit;
+    if (isset($_POST['aftersave_url'])) {
+        COM_refresh($_POST['aftersave_url']);
+    } elseif (isset($_GET['admin'])) {
+        COM_refresh(EVLIST_ADMIN_URL);
     }
     break;
 
@@ -161,6 +162,9 @@ case 'saveevent':
         } else {
             COM_setMsg($LANG_EVLIST['messages'][2]);
         }
+    }
+    if (isset($_POST['aftersave_url'])) {
+        COM_refresh($_POST['aftersave_url']);
     }
     break;
 
@@ -275,11 +279,13 @@ case 'edit':
         if (isset($_REQUEST['rp_id'])) {
             $rp_id = (int)$_GET['rp_id'];
             $Ev = Evlist\Repeat::getInstance($rp_id);
-            if ($Ev->getEvent()->canEdit()) {
+            $Editor = new Evlist\Views\Editor;
+            $content .= $Editor->withSaveAction($actionval)->withRepeat($Ev)->Render();
+            /*if ($Ev->getEvent()->canEdit()) {
                 $content .= $Ev->Edit(0, $actionval);
             } else {
                 COM_404();
-            }
+            }*/
         }
         break;
     case 'event':

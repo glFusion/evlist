@@ -22,6 +22,25 @@ if (!plugin_isadmin_evlist()) {
 }
 
 switch ($_POST['action']) {
+case 'setStatus':
+    $newval = (int)$_POST['newval'];
+    $oldval = (int)$_POST['oldval'];
+    COM_errorLog("changing $oldval to $newval");
+    if ($_POST['type'] == 'event') {
+        $newval = Evlist\Event::setEventStatus($_POST['id'], $newval, $oldval);
+    } elseif ($_POST['type'] == 'repeat') {
+        Evlist\Repeat::getInstance($_POST['id'])->setStatus($newval)->Save();
+    }
+    $response = array(
+        'newval' => $newval,
+        'id'    => $_POST['id'],
+        'type'  => $_POST['type'],
+        'baseurl'   => EVLIST_ADMIN_URL,
+        'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
+    );
+    echo json_encode($response);
+    break;
+
 case 'toggle':
     $oldval = $_POST['oldval'] == 1 ? 1 : 0;
     switch ($_POST['component']) {

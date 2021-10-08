@@ -174,7 +174,7 @@ $expected = array(
     // Views to display
     'view', 'delevent', 'delcancelled', 'importcalendar', 'clone', 'rsvp', 'calendars',
     'import', 'edit', 'editcat', 'editticket', 'tickettypes',
-    'tickets',
+    'tickets', 'repeats', 'cxrepeat', 'delcxrepeat',
 );
 $action = 'view';
 $actionval = '';
@@ -311,6 +311,16 @@ case 'delbutton_x':
     $view = 'events';
     break;
 
+case 'delcxrepeat':
+    // Permanently delete a cancelled repeat.
+    // We'll cheat here and set purge_days to zero to force immediate deletion,
+    // then fall through to call Repeat::Delete()
+    $_EV_CONF['purge_cancelled_days'] = 0;
+case 'cxrepeat':
+    Evlist\Repeat::getInstance($_GET['rp_id'])->Delete();
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?repeats=x&eid=' . $_GET['ev_id']);
+    break;
+
 case 'delcancelled':
     // Permanently delete a cancelled event.
     // We'll cheat here and set purge_days to zero to force immediate deletion,
@@ -441,7 +451,9 @@ case 'calendars':
 case 'moderate':
     $Ev = new Evlist\Event();
     $Ev->asSubmission()->Read($_REQUEST['id']);
-    $content .= $Ev->Edit('', 0, 'moderate');
+    $Editor = new Evlist\Views\Editor;
+    $Editor->withEvent($Ev)->Render();
+    //$content .= $Ev->Edit('', 0, 'moderate');
     break;
 
 case 'categories':
@@ -497,8 +509,20 @@ case 'import':
 case 'edit':
     $eid = isset($_REQUEST['eid']) ? $_REQUEST['eid'] : '';
     $Ev = Evlist\Event::getInstance($eid);
+    $Editor = new Evlist\Views\Editor;
     $rp_id = (isset($_POST['rp_id']) && !empty($_POST['rp_id'])) ? $_POST['rp_id'] : '';
-    $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+    if (!empty($rp_id)) {
+        $Editor->withRepeat(Evlist\Repeat::getIntance($rp_id));
+    } else {
+        $Editor->withEvent($Ev);
+    }
+    //$content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
+    $content .= $Editor->Render();
+    break;
+
+case 'repeats':
+    $eid = isset($_REQUEST['eid']) ? $_REQUEST['eid'] : '';
+    $content .= Evlist\Repeat::adminList($eid);
     break;
 
 default:

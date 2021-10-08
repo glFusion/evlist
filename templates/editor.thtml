@@ -309,6 +309,11 @@ function toggleRSVPdetail(val)
 	<input type="hidden" name="src" value="{src}" />
 	<input type="hidden" name="owner_id" value="{owner_id}" />
 	<input type="hidden" name="postmode" value="{postmode}" />
+	<input type="hidden" name="aftersave_url" value="{cancel_url}" />
+	<input type="hidden" name="isNew" value="{isNew}" />
+	<input type="hidden" name="eid" value="{eid}" />
+	<input type="hidden" name="ev_id" value="{eid}" />
+	<input type="hidden" name="rp_id" value="{rp_id}" />
 
 	<ul id="ev_forms" class="uk-switcher">
 		<li>
@@ -928,9 +933,6 @@ function toggleRSVPdetail(val)
 		</li>
 {!endif}
 		</ul>
-	<input type="hidden" name="isNew" value="{isNew}" />
-	<input type="hidden" name="eid" value="{eid}" />
-	<input type="hidden" name="rp_id" value="{rp_id}" />
 	{submission}
 
 	<p style="text-align:left;">

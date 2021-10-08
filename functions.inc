@@ -1820,8 +1820,8 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         if (!$info['month'] || !$info['day']) return;   // Need something for date
         $date = sprintf('%d-%02d-%02d', $info['year'], $info['month'], $info['day']);
     }
-    $summary = $info['summary'] ? $info['summary'] : $info['title'];
-    $full_dscp = $info['description'] ? $info['description'] : $summary;
+    $summary = $info['summary']; // ? $info['summary'] : $info['title'];
+    $full_dscp = $info['description']; //? $info['description'] : $summary;
     if ($info['group_id'] === NULL) $info['group_id'] = 13;
     if ($info['owner_id'] === NULL) $info['owner_id'] = 2;
     if ($info['perms'] === NULL || !is_array($info['perms'])) {
@@ -1846,7 +1846,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     $Ev = Evlist\Event::getInstance($ev_id);
     // Set variables to simulate a form submission
     $A = array(
-        'eid' => $ev_id,
+        'ev_id' => $ev_id,
         'owner_id' => $info['owner_id'] ? $info['owner_id'] : 2,
         'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
         'cal_id' => $Cal->getID(),
@@ -1868,10 +1868,10 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'rec_freq' => $info['recur_interval'],
         'show_upcoming' => isset($info['show_upcoming']) && $info['show_upcoming'] ? '1' : '0',
         'use_rsvp' => '0',
-        'perm_owner' => array ( 0 => $info['perms']['perm_owner'] ),
-        'perm_group' => array ( 0 => $info['perms']['perm_group'] ),
-        'perm_members' => array ( 0 => $info['perms']['perm_members'] ),
-        'perm_anon' => array ( 0 => $info['perms']['perm_anon'] ),
+        'perm_owner' => array ( 0 => $info['perms']['perm_owner'] || 3),
+        'perm_group' => array ( 0 => $info['perms']['perm_group'] || 2),
+        'perm_members' => array ( 0 => $info['perms']['perm_members'] || 2),
+        'perm_anon' => array ( 0 => $info['perms']['perm_anon'] || 2),
     );
 
     if ($info['time_start'] && $info['time_end']) {

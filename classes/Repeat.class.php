@@ -98,19 +98,19 @@ class Repeat
 
     /** Query string used in search.
      * @var string */
-    private $_qs = '';
+    //private $_qs = '';
 
     /** Template name for rendering the event view.
      * @var string */
-    private $_tpl = '';
+    //private $_tpl = '';
 
     /** Comment mode used for event display.
      * @var string */
-    private $_cmtmode = 'nested';
+    //private $_cmtmode = 'nested';
 
     /** Comment ordering for event display.
      * @var string */
-    private $_cmtorder = 'ASC';
+    //private $_cmtorder = 'ASC';
 
 
     /**
@@ -630,6 +630,7 @@ class Repeat
     {
         global $_CONF, $_USER, $_EV_CONF, $LANG_EVLIST, $LANG_WEEK,
                 $LANG_LOCALE, $_SYSTEM, $LANG_EVLIST_HELP;
+        echo "Repeat::Render DEPRECATED";die;
 
         $retval = '';
         $url = '';
@@ -1757,8 +1758,13 @@ class Repeat
      * @param   string  $permalink  URL to the specific event occurrence
      * @return  string  HTML for social sharing icons
      */
-    private function getShareIcons($permalink)
+    public function getShareIcons(?string $permalink=NULL)
     {
+        if ($permalink === NULL) {
+            $permalink = COM_buildUrl(
+                EVLIST_URL . '/view.php?&rid=0&eid=' . $this->getEventID()
+            );
+        }
         if (version_compare(GVERSION, '2.0.0', '<')) {
             $ss = SOC_getShareIcons(
                 $this->getDetail()->getTitle(),
@@ -1839,7 +1845,7 @@ class Repeat
      *
      * @return  object      Starting date object
      */
-    public function getDateStart1()
+    public function getDateStart1() : object
     {
         return $this->dtStart1;
     }
@@ -1850,7 +1856,7 @@ class Repeat
      *
      * @return  object      Starting date object
      */
-    public function getDateEnd1()
+    public function getDateEnd1() : object
     {
         return $this->dtEnd1;
     }

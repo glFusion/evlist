@@ -29,10 +29,10 @@ if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
     exit;
 }
 
-COM_setArgNames(array('rid', 'eid'));
+COM_setArgNames(array('rid', 'eid', 'page'));
 $id = COM_getArgument('rid');
 $eid = COM_getArgument('eid');
-
+$page = COM_getArgument('page');
 $pagetitle = '';        // Default to empty page title
 $content = '';
 
@@ -66,19 +66,13 @@ case 'event':
         COM_refresh($EVLIST_URL . '/index.php');
     }
 case 'instance':
-    $Rep = Evlist\Repeat::getInstance($id);
-    //if ($Rep->getID() == 0 || $Rep->getStatus() != 1 || !$Rep->getEvent()->hasAccess(2)) {
-    if (!$Rep->canView()) {
-        COM_setMsg($LANG_EVLIST['ev_not_found']);
-        echo COM_refresh(EVLIST_URL . '/index.php');
-        exit;
-    }
-    $pagetitle = COM_stripslashes($Rep->getDetail()->getTitle());
-    $content .= $Rep->withQuery($query)
-                    ->withTemplate('')
-                    ->withCommentMode($mode)
-                    ->withCommentOrder($order)
-                    ->Render();
+    $View = new Evlist\Views\Occurrence($id);
+    $content .= $View->withQuery($query)
+                     ->withTemplate('')
+                     ->withCommentMode($mode)
+                     ->withCommentOrder($order)
+                     ->withReferer($_SERVER['HTTP_REFERER'])
+                     ->Render();
     break;
 }
 

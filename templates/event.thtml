@@ -6,7 +6,7 @@
 		<li><a href="#">RSVP ({rsvp_count})</a></li>
 	</ul>
 {!endif}
-	<a style="float:right;" class="uk-button uk-button-primary" href="{site_url}/evlist/index.php">{$LANG_EVLIST['back_to_cal']}</a>
+	<a style="float:right;" class="uk-button uk-button-primary" href="{_referer}">{$LANG_EVLIST['back_to_cal']}</a>
 </div>
 
 <div id="evlistEventHeader">

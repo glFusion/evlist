@@ -390,23 +390,17 @@ default:
         break;
     }
     if (!empty($rp_id)) {
-        $Rep = Evlist\Repeat::getInstance($rp_id);
-        if ($Rep->getID() == 0 || !$Rep->getEvent()->hasAccess(2)) {
-            COM_setMsg($LANG_EVLIST['ev_not_found']);
-            echo COM_refresh(EVLIST_URL . '/index.php');
-            exit;
-        }
-        $pagetitle = COM_stripslashes($Rep->getEvent()->getDetail()->getTitle());
+        $View = new Evlist\Views\Occurrence($rp_id);
         if ($view == 'print') {
             $template = 'print';
-            $query = '';
         }
         $query = isset($_GET['query']) ? $_GET['query'] : '';
-        $content .= $Rep->withQuery($query)
-                        ->withTemplate($template)
-                        ->withCommentMode($mode)
-                        ->withCommentOrder($order)
-                        ->Render();
+        $content .= $View->withQuery($query)
+                         ->withTemplate($template)
+                         ->withCommentMode($mode)
+                         ->withCommentOrder($order)
+                         ->Render();
+        break;
     } else {
         // Shouldn't be in this file without an event ID to display or edit
         echo COM_refresh(EVLIST_URL . '/index.php');
@@ -429,4 +423,3 @@ $display .= $content;
 $display .= EVLIST_siteFooter();
 echo $display;
 
-?>

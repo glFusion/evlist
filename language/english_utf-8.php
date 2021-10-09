@@ -283,6 +283,7 @@ You may either move existing events to a new calendar, or delete those events.',
     28  => 'You have %d tickets remaining.',
     50  => 'Not Paid',
     51  => 'Already Used',
+    52  => 'Unauthorized Checkin',
 ),
 'admin_instr' => array(
     'categories' => 'Deleting categories <strong>will not</strong> delete events belonging to those categories.<br />Disabling a category <strong>will not</strong> disable its events.  Those events will continue to appear in the event list.',

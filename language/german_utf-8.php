@@ -241,6 +241,7 @@ $LANG_EVLIST = array(
                 28  => 'Du hast noch %d Tickets übrig.',
                 50  => 'Nicht bezahlt',
                 51  => 'Bereits benutzt',
+                52  => 'Unauthorized Checkin',
     ),
 'admin_instr'            => array(
         'categories'    => '<ul><li>Beim Löschen von Kategorien werden Veranstaltungen, die zu diesen Kategorien gehören, nicht gelöscht.</li><li>Durch deaktivieren einer Kategorie werden ihre Veranstaltungen nicht deaktiviert.</li><li>Veranstaltung ohne Kategorie erscheinen weiterhin in der Veranstaltungs-Liste.</li></ul>',

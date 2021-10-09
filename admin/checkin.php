@@ -6,9 +6,9 @@
  * a browser.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.0
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php 
  *              GNU Public License v2 or later
  * @filesource
@@ -27,7 +27,7 @@ $tic_id = isset($_GET['tic']) ? $_GET['tic'] : '';
 $rp_id = isset($_GET['rp']) ? $_GET['rp'] : '';
 if (!empty($tic_id) && !empty($rp_id)) {
     $Ticket = new Evlist\Ticket($tic_id);
-    if ($Ticket->tic_id != $tic_id) {
+    if ($Ticket->getID() != $tic_id) {
         $color = "red";
         $text = "Invalid Ticket";
     } else {

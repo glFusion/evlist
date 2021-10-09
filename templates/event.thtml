@@ -1,7 +1,7 @@
 {# begin {templatelocation} #}
 <div id="evEventButtons" style="margin-bottom:15px;">
 {!if admin_rsvp}
-	<ul class="uk-subnav uk-subnav-pill" uk-switcher data-uk-switcher="{connect:'#evlistEvent'}">
+	<ul class="uk-subnav uk-subnav-pill" uk-switcher data-uk-switcher="{connect:'#evlistEvent',swiping:false}}">
 		<li><a href="#">{$LANG_EVLIST['event']}</a></li>
 		<li><a href="#">RSVP ({rsvp_count})</a></li>
 	</ul>

@@ -341,7 +341,8 @@ class EventSet
             $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
                 "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
         }
-        if ($this->upcoming) {
+        if ($this->show_upcoming) {
+            $ands[] = ' ev.show_upcoming = 1 ';
             // Alters the date range based on the setting for upcoming
             // events.
             switch ($_EV_CONF['event_passing']) {

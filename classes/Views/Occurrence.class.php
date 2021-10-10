@@ -228,7 +228,7 @@ class Occurrence
                 $Event->getRecData()['stop'] != '' &&
                 $Event->getRecData()['stop'] < EV_MAX_DATE
             ) {
-                $stop_date = new \Date($Event->getRecData()['stop'], $this->tzid);
+                $stop_date = new \Date($Event->getRecData()['stop'], $Event->getTZID());
                 $rec_string .= '<br />' . sprintf(
                     $LANG_EVLIST['recur_stop_desc'],
                     $stop_date->format($_CONF['dateonly'], true)

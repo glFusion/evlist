@@ -8,27 +8,29 @@ Release TBD
 - Leverage list item template to correctly show event date and time in lists.
 - Use calendar selector for plugin to calendar mapping config.
 - Update service functions for compatibility with Paypal 0.6.0/Shop 1.0.0
+- Switch from Paypal plugin to Shop.
 - Add orderby field to calendars to control order in selection lists.
 - Fix search results not excluding by calendar status or permissions.
 - Consider calendar perms in Event::hasAccess().
 - Request perms in `plugin_itemsaved`, calculate based on owner/group if not supplied.
 - Remove support for Meetup.com API.
 - Remove hit counter, was never used.
-- Switch from Paypal plugin to Shop.
 - Limit centerblock display to a number of days as well as events.
 - Use layout-based mail templates for consistency.
 - Enable signups with custom fields, may be used instead of the forms plugin.
 - Add nofollow and noindex tags to subscription and print links/pages.
-- Configurable key to hide repeating events from centerblock.
 - Condense header, better for small screens.
 - Fix iCal format for long descriptions.
 - Use glFusion built-in datetime picker instead of UIkit version.
-- Add option to hide centerblock from small screens.
 - Ical improvements:
   - event sequences and statuses
   - Cancel instead of deleting events and occurrences.
   - Publish feeds as .ics files via Content Syndication model.
 - Smarter recreation of event occurrences when event is updated.
+- Configuration options:
+  - Add option to hide centerblock from small screens.
+  - Add option to show or hide QRCodes on printed tickets.
+  - Configurable key used to hide repeating events from centerblock.
 
 ## v1.4.5
 Release 2018-04-14

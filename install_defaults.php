@@ -423,6 +423,17 @@ $evlistConfigData = array(
         'set' => true,
         'group' => 'evlist',
     ),
+    array(
+        'name' => 'qrcode_tickets',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 10,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 40,
+        'set' => true,
+        'group' => 'evlist',
+    ),
 
     // Subgroup: External integrations
     array(

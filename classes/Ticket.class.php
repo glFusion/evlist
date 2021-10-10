@@ -567,9 +567,6 @@ class Ticket
         // reading.
         $ev_id = NULL;
 
-        // create params array for qrcode, if used
-        $params = array('module_size'=>5);
-
         $pdf = new \TCPDF();
         $pdf->SetLeftMargin(20);
         $pdf->AddPage();
@@ -686,12 +683,17 @@ class Ticket
                 $pdf->Cell(0,10, $ticket->getID());
 
                 // print qrcode if possible
-                $params['data'] = $checkin_url . $tic_id . '&rp=' . $rp_id;
-                $qrc_status = LGLIB_invokeService('qrcode', 'getcode', $params, $qrcode, $svc_msg);
-                if ($qrc_status == PLG_RET_OK) {
-                    $fileinfo = pathinfo($qrcode['img']);
-                    $pdf->SetX(-40);
-                    $pdf->Image($qrcode['path'], null, $y, 25, 0, $fileinfo['extension']);
+                if (Config::get('qrcode_tickets')) {
+                    $params = array(
+                        'module_size' => 5,
+                        'data' => $checkin_url . $tic_id . '&rp=' . $rp_id,
+                    );
+                    $qrc_status = LGLIB_invokeService('qrcode', 'getcode', $params, $qrcode, $svc_msg);
+                    if ($qrc_status == PLG_RET_OK) {
+                        $fileinfo = pathinfo($qrcode['img']);
+                        $pdf->SetX(-40);
+                        $pdf->Image($qrcode['path'], null, $y, 25, 0, $fileinfo['extension']);
+                    }
                 }
                 $pdf->Ln();
 
@@ -1189,9 +1191,9 @@ class Ticket
                 ON u.uid = tk.uid
             WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
 
-        if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
+        /*if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
             $sql .= " AND rp_id = '{$Ev->getID()}' ";
-        }
+            }*/
 
         $defsort_arr = array('field' => 'waitlist,dt', 'direction' => 'ASC');
 

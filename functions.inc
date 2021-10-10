@@ -17,27 +17,54 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
+spl_autoload_register(function ($class)
+{
+    // project-specific namespace prefix
+    $prefix = 'Evlist\\';
+
+    // does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+
+    // base directory for the namespace prefix
+    $base_dir = __DIR__ . '/classes/';
+
+    // get the relative class name
+    $relative_class = substr($class, $len);
+
+    // replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
+
+    // if the file exists, require it
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+use Evlist\DateFunc;
+use Evlist\Models\Status;
+use Evlist\Config;
+
 /** Initialize the configuration */
-require_once $_CONF['path_system'] . 'classes/config.class.php';
-$ev_config = config::get_instance();
-$_EV_CONF = $ev_config->get_config('evlist');
+Config::getInstance();
 
 require_once __DIR__ . '/evlist.php';
 
-// Some variables are used all over, so get them once to avoid a lot of
-// function calls
-$_EV_CONF['_now'] = new Date('now', $_CONF['timezone']);
-$_EV_CONF['_today'] = $_EV_CONF['_now']->format('Y-m-d', true);
-$_EV_CONF['_today_ts'] = $_EV_CONF['_now']->toUnix();
-
 // Check the version of the locator plugin and reset the use_locator
 // config value if it's inadequate.
-if (isset($_EV_CONF) && $_EV_CONF['use_locator'] == 1) {
+if (Config::get('use_locator') && !isset($_PLUGIN_INFO['locator'])) {
+    Config::set('use_locator', 0);
+}
+/*if (isset($_EV_CONF) && $_EV_CONF['use_locator'] == 1) {
     if (!isset($_PLUGIN_INFO['locator']) ||
         !COM_checkVersion($_PLUGIN_INFO['locator']['pi_version'], $_EV_CONF['min_locator_ver'])) {
         $_EV_CONF['use_locator'] = 0;
     }
-}
+}*/
 
 // Local configuration overrides can be set by having a config.php file.
 if (file_exists(__DIR__ . '/config.php')) {
@@ -47,7 +74,8 @@ if (file_exists(__DIR__ . '/config.php')) {
 
 // Override plugin config if login is required globally
 if ($_CONF['loginrequired'] == 1) {
-    $_EV_CONF['allow_anon_view'] = '0';
+    Config::set('allow_anon_view', 0);
+    //$_EV_CONF['allow_anon_view'] = '0';
 }
 
 // Include the user's language file, if found.  Default to englsh.
@@ -96,37 +124,6 @@ if (!defined('DATE_CALC_FORMAT')) {
 if (isset($_EV_CONF['enable_rsvp']) && $_EV_CONF['enable_rsvp']) {
     include_once __DIR__ . '/services.inc.php';
 }
-
-spl_autoload_register(function ($class)
-{
-    // project-specific namespace prefix
-    $prefix = 'Evlist\\';
-
-    // does the class use the namespace prefix?
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // no, move to the next registered autoloader
-        return;
-    }
-
-    // base directory for the namespace prefix
-    $base_dir = __DIR__ . '/classes/';
-
-    // get the relative class name
-    $relative_class = substr($class, $len);
-
-    // replace the namespace prefix with the base directory, replace namespace
-    // separators with directory separators in the relative class name, append
-    // with .php
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
-
-    // if the file exists, require it
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-use \Evlist\DateFunc;
-use Evlist\Models\Status;
 
 /**
  * Return the current code (not necessarily installed) version.

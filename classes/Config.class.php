@@ -53,30 +53,22 @@ final class Config
      */
     private function __construct()
     {
-        global $_CONF, $_SHOP_CONF;
+        global $_CONF, $_EV_CONF;
 
         $cfg = \config::get_instance();
         $this->properties = $cfg->get_config(self::PI_NAME);
 
         $this->properties['pi_name'] = self::PI_NAME;
-        $this->properties['pi_display_name'] = 'Shop';
+        $this->properties['pi_display_name'] = 'Evlist';
         $this->properties['pi_url'] = 'http://www.glfusion.org';
         $this->properties['url'] = $_CONF['site_url'] . '/' . self::PI_NAME;
         $this->properties['admin_url'] = $_CONF['site_admin_url'] . '/plugins/' . self::PI_NAME;
-        $this->properties['logfile'] = "{$_CONF['path']}/logs/" . self::PI_NAME . '_downloads.log';
-        $this->properties['tmpdir'] = "{$_CONF['path']}/data/" . self::PI_NAME . '/';
-        $this->properties['download_path'] = $this->properties['tmpdir'] . 'files/';
-        $this->properties['image_dir'] = $this->properties['tmpdir'] . 'images/products';
-        $this->properties['catimgpath'] = $this->properties['tmpdir'] . 'images/categories';
-        $this->properties['order_tn_size'] = 65;
-        $this->properties['buttons'] = array(
-            'buy_now'   => 1,   // enabled by default
-            'donation'  => 0,   // disabled by default
-        );
-        $this->properties['datetime_fmt'] = 'Y-m-d H:i:s T';
         $this->properties['path'] = $_CONF['path'] . 'plugins/' . self::PI_NAME . '/';
+        $this->properties['_now'] = new \Date('now', $_CONF['timezone']);
+        $this->properties['_today'] = $this->properties['_now']->format('Y-m-d', true);
+        $this->properties['_today_ts'] = $this->properties['_now']->toUnix();
 
-        $_SHOP_CONF = $this->properties;
+        $_EV_CONF = $this->properties;
     }
 
 
@@ -108,12 +100,9 @@ final class Config
      * @param   string  $key    Configuration item name
      * @param   mixed   $val    Value to set
      */
-    private function _set($key, $val)
+    private function _set(string $key, $val) : self
     {
-        global $_SHOP_CONF;
-
         $this->properties[$key] = $val;
-        $_SHOP_CONF[$key] = $val;
         return $this;
     }
 
@@ -126,7 +115,7 @@ final class Config
      * @param   string  $key    Configuration item name
      * @param   mixed   $val    Value to set, NULL to unset
      */
-    public static function set($key, $val=NULL)
+    public static function set(string $key, $val=NULL)
     {
         return self::getInstance()->_set($key, $val);
     }
@@ -140,15 +129,9 @@ final class Config
      * @param   mixed       $default    Default value if item is not set
      * @return  mixed       Value of config item
      */
-    public static function get($key=NULL, $default=NULL)
+    public static function get(?string $key=NULL, $default=NULL)
     {
-        global $_EV_CONF;
-        if (isset($_EV_CONF['key'])) {
-            return $_EV_CONF['key'];
-        } else {
-            return $default;
-        }
-        //return self::getInstance()->_get($key, $default);
+        return self::getInstance()->_get($key, $default);
     }
 
 

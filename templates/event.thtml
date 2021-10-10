@@ -1,7 +1,7 @@
 {# begin {templatelocation} #}
 <div id="evEventButtons" style="margin-bottom:15px;">
 {!if admin_rsvp}
-	<ul class="uk-subnav uk-subnav-pill" uk-switcher data-uk-switcher="{connect:'#evlistEvent',swiping:false}}">
+	<ul class="uk-subnav uk-subnav-pill" uk-switcher data-uk-switcher="{connect:'#evlistEvent',swiping:false}">
 		<li><a href="#">{$LANG_EVLIST['event']}</a></li>
 		<li><a href="#">RSVP ({rsvp_count})</a></li>
 	</ul>
@@ -9,12 +9,13 @@
 	<a style="float:right;" class="uk-button uk-button-primary" href="{_referer}">{$LANG_EVLIST['back_to_cal']}</a>
 </div>
 
-<div id="evlistEventHeader">
+<div id="evlistEventHeader" class="uk-grid">
+    <div class="uk-width-5-6">
 	<h2 class="evlist_header">
 		{title}
 	</h2>
-
-	<div id="evlistEventEditSelect">
+    </div>
+	<div >
 {!if can_edit}
 	{!if is_recurring}
 		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}" uk-dropdown="mode:click">
@@ -197,11 +198,7 @@
 					<form action="https://www.google.com/maps/dir/" method="GET" target="_blank">
 						<input type="hidden" name="api" value="1" />
 						<input type="text" name="origin" id="saddr" placeholder="{$LANG_GEO['start_addr']}" />
-{!if 0}
 						<input value="{$LANG_GEO['get_directions']}" type="submit" class="uk-button uk-button-primary uk-button-small" />
-{!else}
-						<input value="{$LANG_GEO['get_directions']}" type="submit" class="lgButton blue"/>
-{!endif}
 						<input type="hidden" name="destination" value="{lat},{lng}" />
 					</form>
 				</div>

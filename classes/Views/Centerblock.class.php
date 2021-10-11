@@ -13,7 +13,6 @@
  */
 namespace Evlist\Views;
 use Evlist\View;
-use Evlist\Cache;
 use Evlist\Models\EventSet;
 use Evlist\Models\TimeRange;
 
@@ -168,17 +167,10 @@ class Centerblock
             break;
         }
 
-        // Try first to get from cache
-        $cache_key = 'evlistcb_' . $_EV_CONF['enable_centerblock'] . '_' .
-            $_EV_CONF['cb_dup_chk'];
-        $events = Cache::get($cache_key);
-        if ($events === NULL) {
-            $events = $EventSet
-                ->withStart($start)
-                ->withEnd($end)
-                ->getEvents();
-            Cache::set($cache_key, $events, array('evlistcb', 'calendars'));
-        }
+        $events = $EventSet
+            ->withStart($start)
+            ->withEnd($end)
+            ->getEvents();
         if (empty($events) || !is_array($events)) {
             return '';
         }

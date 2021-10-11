@@ -405,6 +405,8 @@ You may either move existing events to a new calendar, or delete those events.',
 'cancelled' => 'Cancelled',
 'if_any'        => ', if any',
 'dates'         => 'Dates',
+'back_to_event' => 'Back to Event',
+'cal_has_no_events' => 'This calendar has no events.',
 );
 
 $LANG_EVLIST_HELP = array(

@@ -124,7 +124,7 @@ class Calendar
     public static function getInstance($cal_id)
     {
         $Cals = self::getAll();
-        return isset($Cals[$cal_id]) ? $Cals[$cal_id] : new self;
+        return isset($Cals[$cal_id]) ? $Cals[$cal_id] : new self($cal_id);
     }
 
 
@@ -403,8 +403,9 @@ class Calendar
         global $_TABLES;
 
         // Can't delete calendar #1.  Shouldn't get to this point, but
-        // return an error if we do.
-        if ($this->cal_id == 1) {
+        // return an error if we do. Also don't try to delete an invalid
+        // calendar.
+        if ($this->cal_id == 0 || $this->cal_id == 1) {
             return false;
         }
 
@@ -920,13 +921,10 @@ class Calendar
                 '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
             break;
         case 'delete':
-            if ($A['cal_id'] > 1) {
+            if ($A['cal_id'] != 1) {
                 $retval = COM_createLink(
                     $_EV_CONF['icons']['delete'],
                     EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . $A['cal_id'],
-                    array(
-                        'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
-                    )
                 );
             }
             break;

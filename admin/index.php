@@ -223,10 +223,11 @@ case 'delcalconfirm':
         break;
     }
     $cal_id = isset($_POST['cal_id']) ? (int)$_POST['cal_id'] : 0;
-    if ($cal_id < 1) break;
-    $newcal = isset($_POST['newcal']) ? (int)$_POST['newcal'] : 0;
-    $Cal = new Evlist\Calendar($cal_id);
-    $Cal->Delete($newcal);
+    if ($cal_id != 1) {
+        $newcal = isset($_POST['newcal']) ? (int)$_POST['newcal'] : 0;
+        $Cal = new Evlist\Calendar($cal_id);
+        $Cal->Delete($newcal);
+    }
     COM_refresh(EVLIST_ADMIN_URL . '/index.php?calendars');
     break;
 
@@ -435,9 +436,10 @@ $page = $view;      // Default for menu creation
 switch ($view) {
 case 'deletecal':
     $cal_id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
-    if ($cal_id < 1) break;
-    $Cal = new Evlist\Calendar($cal_id);
-    $content .= $Cal->DeleteForm();
+    if ($cal_id != 1) {
+        $Cal = new Evlist\Calendar($cal_id);
+        $content .= $Cal->DeleteForm();
+    }
     break;
 
 case 'editcal':

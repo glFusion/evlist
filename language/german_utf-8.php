@@ -402,6 +402,8 @@ $LANG_EVLIST = array(
 'cancelled' => 'Cancelled',
 'if_any'        => ', if any',
 'dates'         => 'Dates',
+'back_to_event' => 'Back to Event',
+'cal_has_no_events' => 'This calendar has no events.',
 );
 
 $LANG_EVLIST_HELP = array(

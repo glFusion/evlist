@@ -393,6 +393,7 @@ You may either move existing events to a new calendar, or delete those events.',
 'my_events' => 'My Events',
 'print_cal' => 'Print Calendar',
 'back_to_event' => 'Back to Event',
+'cal_has_no_events' => 'This calendar has no events.',
 );
 
 $LANG_EVLIST_HELP = array(

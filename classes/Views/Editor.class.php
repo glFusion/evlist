@@ -199,7 +199,7 @@ class Editor
 
         // Set up the recurring options needed for the current event
         $recweekday  = '';
-        switch ($this->Event->isRecurring()) {
+        switch ($this->Event->getRecurring()) {
         case 0:
             // Not a recurring event
             break;
@@ -306,7 +306,7 @@ class Editor
                 'commentsupport' => $_EV_CONF['commentsupport'],
                 'ena_cmt_' . $this->Event->commentsEnabled() => 'selected="selected"',
                 'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->Event->isRecurring()),
+                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->Event->getRecurring()),
                 'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
                 'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
                         $LANG_EVLIST['day_by_date'], ''),

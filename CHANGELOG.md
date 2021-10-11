@@ -31,6 +31,7 @@ Release TBD
   - Add option to hide centerblock from small screens.
   - Add option to show or hide QRCodes on printed tickets.
   - Configurable key used to hide repeating events from centerblock.
+- Allow deleting calendars that were previously reserved (Birthdays and Meetup Events).
 
 ## v1.4.5
 Release 2018-04-14

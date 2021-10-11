@@ -460,7 +460,7 @@ class EventSet
                     }
                 }   // while
             }
-            Cache::set($key, $events, 'events');
+            Cache::set($key, $events, array('events', 'calendars'));
         }
         return $events;
     }

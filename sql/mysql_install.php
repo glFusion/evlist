@@ -165,6 +165,24 @@ $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
   KEY `user` (`uid`,`ev_id`),
   KEY `ev_dt` (`ev_id`,`dt`)
 ) ENGINE=MyISAM";
+$_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
+  `cal_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cal_name` varchar(255) NOT NULL DEFAULT '',
+  `cal_status` tinyint(1) unsigned DEFAULT 1,
+  `cal_ena_ical` tinyint(1) unsigned DEFAULT 1,
+  `bgcolor` varchar(7) NOT NULL DEFAULT '#FFFFFF',
+  `fgcolor` varchar(7) NOT NULL DEFAULT '#000000',
+  `cal_show_upcoming` tinyint(1) unsigned NOT NULL DEFAULT 1,
+  `owner_id` int(10) unsigned NOT NULL,
+  `group_id` int(10) unsigned NOT NULL,
+  `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT 3,
+  `perm_group` tinyint(1) unsigned NOT NULL DEFAULT 2,
+  `perm_members` tinyint(1) unsigned NOT NULL DEFAULT 2,
+  `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT 2,
+  `cal_icon` varchar(40) DEFAULT NULL,
+  `orderby` int(5) NOT NULL DEFAULT 9999,
+  PRIMARY KEY (`cal_id`)
+) ENGINE=MyISAM",
 
 $_EV_UPGRADE = array(
 '1.3.0' => array(
@@ -338,6 +356,7 @@ $_EV_UPGRADE = array(
     ),
 '1.4.7' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
+    "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `calshow_upcoming` tinyint(1) NOT NULL DEFAULT 1 AFTER `fgcolor`",
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE options options text",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE rec_data rec_data text DEFAULT NULL",

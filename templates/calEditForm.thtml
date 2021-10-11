@@ -71,6 +71,16 @@
 
 		<div class="uk-form-row uk-margin">
 			<label class="uk-form-label">
+				{$LANG_EVLIST['show_upcoming']}:
+				<span id="show_upcoming" class="tooltip_cfg tooltipstered"></span>
+			</label>
+			<div class="uk-form-controls uk-form-controls-text">
+				<input type="checkbox" class="uk-checkbox" id="fld_show_upcoming" name="cal_show_upcoming" value="1" {upcoming_chk} />
+			</div>
+		</div>
+
+		<div class="uk-form-row uk-margin">
+			<label class="uk-form-label">
 				{$LANG_ACCESS['owner']}:
 				<span id="owner" class="tooltip_cfg tooltipstered"></span>
 			</label>

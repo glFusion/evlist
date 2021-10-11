@@ -177,7 +177,7 @@ class Centerblock
                 ->withStart($start)
                 ->withEnd($end)
                 ->getEvents();
-            Cache::set($cache_key, $events, 'evlistcb');
+            Cache::set($cache_key, $events, array('evlistcb', 'calendars'));
         }
         if (empty($events) || !is_array($events)) {
             return '';

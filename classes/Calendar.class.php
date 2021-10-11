@@ -63,6 +63,10 @@ class Calendar
      * @var boolean */
     private $cal_ena_ical = 1;
 
+    /** Show events in the upcoming events block?
+     * @var bool */
+    private $cal_show_upcoming = 1;
+
     /** Calendar descriptive name.
      * @var string */
     private $cal_name = '';
@@ -225,12 +229,17 @@ class Calendar
         } else {
             $this->cal_status = 0;
         }
-
         if (isset($A['cal_ena_ical']) && $A['cal_ena_ical'] == 1) {
             $this->cal_ena_ical = 1;
         } else {
             $this->cal_ena_ical = 0;
         }
+        if (isset($A['cal_show_upcoming']) && $A['cal_show_upcoming'] == 1) {
+            $this->cal_show_upcoming = 1;
+        } else {
+            $this->cal_show_upcoming = 0;
+        }
+
         $this->orderby = isset($A['orderby']) ? $A['orderby'] : 0;
         if ($fromDB) {
             $this->perm_owner   = $A['perm_owner'];
@@ -289,6 +298,7 @@ class Calendar
                         $this->perm_members, $this->perm_anon),
             'stat_chk'      => $this->cal_status == 1 ? EVCHECKED : '',
             'ical_chk'      => $this->cal_ena_ical == 1 ? EVCHECKED : '',
+            'upcoming_chk'  => $this->cal_show_upcoming == 1 ? EVCHECKED : '',
             'can_delete'    => $this->cal_id > 1 ? 'true' : '',
             'doc_url'       => EVLIST_getDocUrl('calendar', 'evlist'),
             'colorpicker_js' => LGLIB_colorpicker(array(
@@ -340,6 +350,7 @@ class Calendar
             bgcolor = '" . DB_escapeString($this->bgcolor) . "',
             cal_status = '{$this->cal_status}',
             cal_ena_ical = '{$this->cal_ena_ical}',
+            cal_show_upcoming = '{$this->cal_show_upcoming}',
             perm_owner = '{$this->perm_owner}',
             perm_group = '{$this->perm_group}',
             perm_members = '{$this->perm_members}',

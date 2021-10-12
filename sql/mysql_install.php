@@ -182,7 +182,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `cal_icon` varchar(40) DEFAULT NULL,
   `orderby` int(5) NOT NULL DEFAULT 9999,
   PRIMARY KEY (`cal_id`)
-) ENGINE=MyISAM",
+) ENGINE=MyISAM";
 
 $_EV_UPGRADE = array(
 '1.3.0' => array(

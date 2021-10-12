@@ -123,36 +123,40 @@ case 'search':
 
 case 'saverepeat':
 case 'savefuturerepeat':
+    $status = true;
     if ($rp_id > 0) {
         $R = Evlist\Repeat::getInstance($rp_id);
-        $errors = $R->Save($_POST); // save detail info
-        if (!empty($errors)) {
-            $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
+        $_POST['save_type'] = $action;
+        $status = $R->Save($_POST); // save detail info
+        if (!$status) {
             $content .= $R->Edit();
             $view = 'none';
-        } elseif ($action == 'savefuturerepeat') {
+        /*} elseif ($action == 'savefuturerepeat') {
             // Update all future repeat records.
             $det_id = $R->det_id;
             $sql = "UPDATE {$_TABLES['evlist_repeat']}
-                SET rp_det_id = '{$R->det_id}'
-                WHERE rp_date_start >= '{$R->date_start}'
+                    SET rp_det_id = '{$R->det_id}'
+                    WHERE rp_date_start >= '{$R->date_start}'
                     AND rp_ev_id = '{$R->ev_id}'";
-            DB_query($sql);
+            DB_query($sql);*/
         }
     }
-    if (isset($_POST['aftersave_url'])) {
-        COM_refresh($_POST['aftersave_url']);
-    } elseif (isset($_GET['admin'])) {
-        COM_refresh(EVLIST_ADMIN_URL);
+    if ($status) {
+        // Default if save is successful, or no repeat ID supplied.
+        if (isset($_POST['aftersave_url'])) {
+            COM_refresh($_POST['aftersave_url']);
+        } elseif (isset($_GET['admin'])) {
+            COM_refresh(EVLIST_ADMIN_URL);
+        }
     }
     break;
 
 case 'saveevent':
     $eid = isset($_POST['eid']) && !empty($_POST['eid']) ? $_POST['eid'] : '';
     $Ev = Evlist\Event::getInstance($eid);
-    $errors = $Ev->asSubmission(empty($eid))->Save($_POST);
-    if (!empty($errors)) {
-        $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
+    $status = $Ev->asSubmission(empty($eid))->Save($_POST);
+    if (!$status) {
+        //$content .= '<div class="uk-alert uk-alert-danger"><ul>' . $Ev->PrintErrors() . '</ul></div>';
         $content .= $Ev->Edit();
         $view = 'none';
     } else {
@@ -162,9 +166,9 @@ case 'saveevent':
         } else {
             COM_setMsg($LANG_EVLIST['messages'][2]);
         }
-    }
-    if (isset($_POST['aftersave_url'])) {
-        COM_refresh($_POST['aftersave_url']);
+        if (isset($_POST['aftersave_url'])) {
+            COM_refresh($_POST['aftersave_url']);
+        }
     }
     break;
 

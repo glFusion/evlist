@@ -234,13 +234,11 @@ case 'delcalconfirm':
 case 'saveevent':
     $eid = (isset($_POST['eid']) && !empty($_POST['eid'])) ? $_POST['eid'] : '';
     $Ev = new Evlist\Event($eid);
-    $errors = $Ev->asSubmission(empty($eid))->Save($_POST);
-    if (!empty($errors)) {
-        $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
+    $status = $Ev->asSubmission(empty($eid))->Save($_POST);
+    if (!$status) {
         $content .= $Ev->Edit();
         $view = 'none';
     } else {
-        $view = 'home';
         if ($Ev->isSubmission()) {
             COM_setMsg($LANG_EVLIST['messages'][9]);
         } else {
@@ -254,9 +252,8 @@ case 'saverepeat':
 case 'savefuturerepeat':
     $rp_id = (isset($_POST['rp_id']) && !empty($_POST['rp_id'])) ? $_POST['rp_id'] : '';
     $Rp = new Evlist\Repeat($rp_id);
-    $errors = $Rp->Save($_POST);
-    if (!empty($errors)) {
-        $content .= '<span class="alert"><ul>' . $errors . '</ul></span>';
+    $status = $Rp->Save($_POST);
+    if (!$status) {
         $content .= $Rp->Edit();
         $view = 'none';
     } else {

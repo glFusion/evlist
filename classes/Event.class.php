@@ -974,7 +974,7 @@ class Event
             //$this->getDetail()->setEventID($this->id);
 
             if (!$this->isValidRecord()) {
-                return $this->PrintErrors();
+                return false;
             }
             // Delete the category lookups
             DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
@@ -1016,7 +1016,7 @@ class Event
                 if ($this->old_schedule['recurring'] || $this->recurring) {
                     // This function sets the rec_data value.
                     if (!$this->UpdateRepeats()) {
-                        return $this->PrintErrors();
+                        return false;
                     }
                     // Cancel any instances that occur before the start date,
                     // just in case we're here due to a start date change.
@@ -1116,7 +1116,7 @@ class Event
             $this->getDetail()->setVars($A);
             $this->getDetail()->setEventID($this->id);
             if (!$this->isValidRecord()) {
-                return $this->PrintErrors();
+                return false;
             }
 
             // Save the new detail record & get the ID
@@ -1128,7 +1128,7 @@ class Event
             if (!$this->isSubmission()) {
                 // This function gets the rec_data value.
                 if (!$this->UpdateRepeats()) {
-                    return $this->PrintErrors();
+                    return false;
                 }
             }
 
@@ -1220,9 +1220,9 @@ class Event
                 PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');
                 COM_rdfUpToDateCheck('evlist', 'events', $this->id);
             }
-            return '';
+            return true;
         } else {
-            return $this->PrintErrors();
+            return false;
         }
     }
 
@@ -1389,8 +1389,9 @@ class Event
             if (!$this->Read($eid)) {
                 return 'Invalid object ID';
             }
-        } elseif (isset($_POST['eid']) && !empty($_POST['eid'])) {
-            // Returning to an existing form, probably due to errors
+        } elseif ($rp_id == 0 && isset($_POST['eid']) && !empty($_POST['eid'])) {
+            // Returning to an existing event form, probably due to errors.
+            // If $rp_id > 0 then this object has already been created.
             $this->SetVars($_POST);
 
             // Make sure the current user has access to this event.
@@ -1434,6 +1435,10 @@ class Event
             // don't support others right now
             $T->set_var('show_htmleditor', false);
             break;
+        }
+
+        if (!empty($this->Errors)) {
+            $T->set_var('errors', $this->PrintErrors());
         }
 
         if (
@@ -2053,6 +2058,13 @@ class Event
         } else {
             return $oldval;
         }
+    }
+
+
+    public function setErrors(array $Errors) : self
+    {
+        $this->Errors = $Errors;
+        return $this;
     }
 
 

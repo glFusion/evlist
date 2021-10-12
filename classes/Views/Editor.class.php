@@ -274,16 +274,23 @@ class Editor
             /*$Rep = DB_fetchArray(DB_query("SELECT *
                     FROM {$_TABLES['evlist_repeat']}
                     WHERE rp_id='$rp_id'"), false);
-            if ($Rep) {
-                $this->date_start1 = $Rep['rp_date_start'];
-                $this->date_end1 = $Rep['rp_date_end'];
-                $this->time_start1 = $Rep['rp_time_start1'];
-                $this->time_end1 = $Rep['rp_time_end1'];
-                $this->time_start2 = $Rep['rp_time_start2'];
-                $this->time_end2 = $Rep['rp_time_end2'];
-            }*/
+            if ($Rep) {*/
+                $date_start1 = $this->Repeat->getDateStart1()->format('Y-m-d',true);
+                $date_end1 = $this->Repeat->getDateEnd1()->format('Y-m-d',true);
+                $time_start1 = $this->Repeat->getTimeStart1();
+                $time_end1 = $this->Repeat->getTimeEnd1();
+                $time_start2 = $this->Repeat->getTimeStart2();
+                $time_end2 = $this->Repeat->getTimeEnd2();
+            /*}*/
 
         } else {            // Editing the main event record
+
+            $date_start1 = $this->Event->getDateStart1()->format('Y-m-d',true);
+            $date_end1 = $this->Event->getDateEnd1()->format('Y-m-d',true);
+            $time_start1 = $this->Event->getTimeStart1();
+            $time_end1 = $this->Event->getTimeEnd1();
+            $time_start2 = $this->Event->getTimeStart2();
+            $time_end2 = $this->Event->getTimeEnd2();
 
             if ($this->Event->getID() != '' && $this->Event->isRecurring() == 1) {
                 $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_series'],
@@ -449,10 +456,10 @@ class Editor
             }
         }
 
-        $start1 = DateFunc::TimeSelect('start1', $this->Event->getTimeStart1());
-        $start2 = DateFunc::TimeSelect('start2', $this->Event->getTimeStart2());
-        $end1 = DateFunc::TimeSelect('end1', $this->Event->getTimeEnd1());
-        $end2 = DateFunc::TimeSelect('end2', $this->Event->getTimeEnd2());
+        $start1 = DateFunc::TimeSelect('start1', $time_start1);
+        $start2 = DateFunc::TimeSelect('start2', $time_start2);
+        $end1 = DateFunc::TimeSelect('end1', $time_end1);
+        $end2 = DateFunc::TimeSelect('end2', $time_end2);
         $cal_select = Calendar::optionList($this->Event->getCalendarID(), true, 3);
         $navbar = new \navbar;
         $cnt = 0;
@@ -474,7 +481,6 @@ class Editor
             'summary'       => $summary,
             'description'   => $full_description,
             'location'      => $location,
-            //'status_checked' => $this->status == 1 ? EVCHECKED : '',
             'status'        => $this->Event->getStatus(),
             'url'           => $this->Detail->getUrl(),
             'street'        => $this->Detail->getStreet(),
@@ -485,20 +491,16 @@ class Editor
             'contact'       => $this->Detail->getContact(),
             'email'         => $this->Detail->getEmail(),
             'phone'         => $this->Detail->getPhone(),
-            'startdate1'    => $this->Event->getDateStart1(),
-            'enddate1'      => $this->Event->getDateEnd1(),
-            'd_startdate1'  => EVLIST_formattedDate($this->Event->getDateStart1()),
-            'd_enddate1'    => EVLIST_formattedDate($this->Event->getDateEnd1()),
+            'startdate1'    => $date_start1,
+            'enddate1'      => $date_end1,
+            //'d_startdate1'  => EVLIST_formattedDate($this->Event->getDateStart1()),
+            //'d_enddate1'    => EVLIST_formattedDate($this->Event->getDateEnd1()),
             // Don't need seconds in the time boxes
             'hour_mode'     => $_CONF['hour_mode'],
-            /*'time_start1'   => DateFunc::conv24to12($this->time_start1),
-            'time_end1'     => DateFunc::conv24to12($this->time_end1),
-            'time_start2'   => DateFunc::conv24to12($this->time_start2),
-            'time_end2'     => DateFunc::conv24to12($this->time_end2),*/
-            'time_start1'   => substr($this->Event->getTimeStart1(), 0, 5),
-            'time_end1'     => substr($this->Event->getTimeEnd1(), 0, 5),
-            'time_start2'   => substr($this->Event->getTimeStart2(), 0, 5),
-            'time_end2'     => substr($this->Event->getTimeEnd2(), 0, 5),
+            'time_start1'   => substr($time_start1, 0, 5),
+            'time_end1'     => substr($time_end1, 0, 5),
+            'time_start2'   => substr($time_start2, 0, 5),
+            'time_end2'     => substr($time_end2, 0, 5),
             'start_hour_options1'   => $start1['hour'],
             'start_minute_options1' => $start1['minute'],
             'startdate1_ampm'       => $start1['ampm'],

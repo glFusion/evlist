@@ -95,9 +95,7 @@ $DEFVALUES['evlist_calendars'] = "INSERT INTO {$_TABLES['evlist_calendars']}
         (cal_id, cal_name, cal_status, fgcolor, bgcolor, owner_id, group_id,
         perm_owner, perm_group, perm_members, perm_anon, cal_icon)
     VALUES
-        (1, 'Events', 1, '#990000', '#ffccff', 2, 13, 3, 3, 2, 2, ''),
-        (-1, 'Meetup Events', 1, '#000000', '#ffffff', 2, 13, 3, 3, 2, 2, ''),
-        (-2, 'Birthdays', 1, '#000000', '#ffffff', 2, 13, 3, 3, 2, 2, 'birthday-cake')
+        (1, 'Events', 1, '#990000', '#ffccff', 2, 13, 3, 3, 2, 2, '')
     ";
 
 $DEFVALUES['evlist_repeat'] = "INSERT INTO `{$_TABLES['evlist_repeat']}`

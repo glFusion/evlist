@@ -2368,7 +2368,7 @@ class Repeat
         } else {
             // Get a count of instances prior to the "before" date
             $before = DB_escapeString($before);
-            $count DB_getItem(
+            $count = DB_getItem(
                 $_TABLES['evlist_repeat'],
                 'count(*)',
                 "rp_det_id = $det_id AND rp_date_end < '$before'"

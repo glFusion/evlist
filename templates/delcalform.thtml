@@ -22,7 +22,7 @@
 	<input type=radio name="confirmdel" value="0" checked="checked" />{$LANG_EVLIST['no']}
 	<p />
 	<button class="uk-button uk-button-danger" type="submit" name="delcalconfirm">{$LANG_ADMIN['submit']}</button>
-	<a href="{site_admin_url}/evlist/index.php?calendars" class="uk-button">{$LANG_ADMIN['cancel']}</a>
+	<a href="{site_admin_url}/plugins/evlist/index.php?calendars" class="uk-button">{$LANG_ADMIN['cancel']}</a>
 </form>
 </div>
 {# end {templatelocation} #}

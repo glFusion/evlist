@@ -96,6 +96,10 @@ class Repeat
      * @var boolean */
     private $isAdmin = false;
 
+    /** Array of error messages when saving.
+     * @var array */
+    private $Errors = array();
+
     /** Query string used in search.
      * @var string */
     //private $_qs = '';
@@ -427,16 +431,21 @@ class Repeat
      * @param   string  $edit_type  Type of repeat (repeat or futurerepeat)
      * @return  string      Editing form
      */
-    public function Edit($rp_id = 0, $edit_type='repeat')
+    public function Edit(int $rp_id = 0, ?string $edit_type='repeat') : string
     {
         if ($rp_id > 0) {
             $this->Read($rp_id);
         }
-        return $this->Event->Edit(
-            $this->ev_id,
-            $this->rp_id,
-            'save' . $edit_type
-        );
+
+        // Set any errors into the Event object to be displayed
+        // with the editing form.
+        return $this->Event
+                    ->setErrors($this->Errors)
+                    ->Edit(
+                        $this->ev_id,
+                        $this->rp_id,
+                        'save' . $edit_type
+                    );
     }
 
 
@@ -451,7 +460,7 @@ class Repeat
      * @param   array   $A      Optional array of values from $_POST
      * @return  boolean         True if no errors, False otherwise
      */
-    public function Save(?array $A = NULL)
+    public function Save(?array $A = NULL) : bool
     {
         global $_TABLES;
 
@@ -463,14 +472,59 @@ class Repeat
             return false;
         }
 
+        /* If a form was submitted, check what to do with the submitted detail,
+         * if it is different from the existing one. If no detail update, then
+         * no action is needed.
+         *
+         * - Saving a single instance:
+         *   - If the detail record is used only once, update it in-place.
+	     *   - If the detail record is used by 2 or more repeats, create a new one.
+         * - Saving all future repeats:
+         *   - If the detail record is not used by any repeats prior to the one
+         *     being saved, update it in-place.
+         *   - If the detail record is used by more events than just all future ones,
+         *     create a new detail.
+         */
         if (is_array($A)) {
             // A form was submitted, check if the values are different.
             $Detail = $this->getDetail();
             $newDetail = Detail::fromArray($A);
             if (!$Detail->Matches($newDetail)) {
-                $this->det_id = $newDetail->Save();
                 $this->Detail = $newDetail;
+                if ($A['save_type'] == 'saveepeat') {
+                    // Saving a single occurrence.
+                    if (self::countWithDetail($this->det_id) < 2) {
+                        // If this repeat is the only one using this detail
+                        // record, just update it in place.
+                        $this->Detail->setID($this->det_id)->Save();
+                    } else {
+                        // If used by more than one repeat, create a new detail
+                        // record and set its ID in this object.
+                        $this->det_id = $this->Detail->Save();
+                    }
+                } elseif ($A['save_type'] == 'savefuturerepeat') {
+                    // Saving all future repeats, see if the current detail
+                    // is used by any repeats prior to this one.
+                    if (self::countWithDetail($this->det_id, $this->date_end) < 2) {
+                        // If this detail is not used by any prior repeats, then
+                        // update the detail in place
+                        $this->Detail->setID($this->det_id)->Save();
+                    } else {
+                        // New detail is used by prior repeats, creat a new one
+                        // and propagate it to all future repeats.
+                        $this->det_id = (int)$this->newDetail->Save();
+                        $sql = "UPDATE {$_TABLES['evlist_repeat']}
+                            SET rp_det_id = '{$this->det_id}'
+                            WHERE rp_date_start >= '{$this->date_start}'
+                            AND rp_ev_id = '{$this->ev_id}'";
+                        DB_query($sql);
+                    }
+                }
             }
+        }
+
+        if (!$this->isValidRecord()) {
+            return false;
         }
 
         $date_start = DB_escapeString($this->date_start);
@@ -501,6 +555,7 @@ class Repeat
         Cache::clear();
         PLG_itemSaved($this->rp_id, 'evlist');
         COM_rdfUpToDateCheck('evlist', 'events', $this->rp_id);
+        return true;
     }
 
 
@@ -524,7 +579,7 @@ class Repeat
         // occurrences.
         if (
             $this->det_id != $this->Event->getDetailID() &&
-            DB_count($_TABLES['evlist_repeat'], 'rp_det_id', (int)$this->det_id) == 1
+            self::countWithDetail($this->det_id) == 1
         ) {
             Detail::getInstance($this->det_id)->Delete();
         }
@@ -2073,6 +2128,46 @@ class Repeat
 
 
     /**
+     * Determines if the current record is valid.
+     *
+     * @return  boolean     True if ok, False when first test fails.
+     */
+    private function isValidRecord()
+    {
+        global $LANG_EVLIST;
+
+        // Check that basic required fields are filled in.  We don't
+        // check the event ID since that will be created automatically if
+        // it is.
+        if ($this->getDetail()->getTitle() == '') {
+            $this->Errors[] = $LANG_EVLIST['err_missing_title'];
+        }
+
+        if (
+            $this->date_start . ' ' . $this->time_start1 >
+            $this->date_end . ' ' . $this->time_end1
+        ) {
+            $this->Errors[] = $LANG_EVLIST['err_times'];
+        }
+
+        /*if ($this->split == 1 && $this->date_start1 == $this->date_end1) {
+            if (
+                $this->date_start . ' ' . $this->time_start2 >
+                $this->date_start . ' ' . $this->time_end2
+            ) {
+                $this->Errors[] = $LANG_EVLIST['err_times'];
+            }
+        }*/
+
+        if (!empty($this->Errors)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    /**
      * Get the admin list of occurrences for a specific event.
      *
      * @return  string      HTML for admin list
@@ -2239,6 +2334,47 @@ class Repeat
             break;
         }
         return $retval;
+    }
+
+
+    /**
+     * Delete orphaned occurrence records that have no matching Event.
+     */
+    public static function cleanOrphans()
+    {
+        global $_TABLES;
+
+        $sql = "DELETE FROM {$_TABLES['evlist_repeat']} r
+            LEFT JOIN {$_TABLES['evlist_events']} e ON r.rp_ev_id = e.id
+            WHERE e.id IS NULL";
+        DB_query($sql);
+    }
+
+
+    /**
+     * Get a count of the repeats using a detail record.
+     *
+     * @param   int     $det_id     Detail record ID
+     * @param   string  $before     Optional cutoff to count only earlier repeats
+     * @return  int     Count of instances using the detail record
+     */
+    public static function countWithDetail(int $det_id, ?string $before = '') : int
+    {
+        global $_TABLES;
+
+        if ($before == '') {
+            // Get a count from all instances
+            $count = DB_count($_TABLES['evlist_repeat'], 'rp_det_id', (int)$det_id);
+        } else {
+            // Get a count of instances prior to the "before" date
+            $before = DB_escapeString($before);
+            $count DB_getItem(
+                $_TABLES['evlist_repeat'],
+                'count(*)',
+                "rp_det_id = $det_id AND rp_date_end < '$before'"
+            );
+        }
+        return $count;
     }
 
 

@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     1.5.0
+ * @version     v1.5.0
  * @since       v1.4.3
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -21,10 +21,6 @@ use Evlist\Models\Status;
  */
 class Detail
 {
-    /** Property fields.  Accessed via __set() and __get()
-     * @var array */
-    //var $properties = array();
-
     /** Detail record ID.
      * @var integer */
     private $det_id = 0;
@@ -153,7 +149,7 @@ class Detail
      * @param   integer $det_id     Detail record ID
      * @return  object              Detail object
      */
-    public static function getInstance($det_id)
+    public static function getInstance(int $det_id) : self
     {
         static $records = array();
         if (!array_key_exists($det_id, $records)) {
@@ -174,12 +170,26 @@ class Detail
 
 
     /**
+     * Set the detail record ID.
+     * Used to force updating an existing record.
+     *
+     * @param   int     $det_id Detail ID
+     * @return  object  $this
+     */
+    public function setID(int $det_id) : self
+    {
+        $this->det_id = (int)$det_id;
+        return $this;
+    }
+
+
+    /**
      * Set the event ID value.
      *
      * @param   string  $ev_id  Event ID
      * @return  object  $this
      */
-    public function setEventID($ev_id)
+    public function setEventID(string $ev_id) : self
     {
         $this->ev_id = $ev_id;
     }
@@ -190,7 +200,7 @@ class Detail
      *
      * @return  string      Event title
      */
-    public function getTitle()
+    public function getTitle() : string
     {
         return $this->title;
     }
@@ -201,7 +211,7 @@ class Detail
      *
      * @return  string      Event summary
      */
-    public function getSummary()
+    public function getSummary() : string
     {
         return $this->summary;
     }
@@ -212,7 +222,7 @@ class Detail
      *
      * @return  string      Description text
      */
-    public function getDscp()
+    public function getDscp() : string
     {
         return $this->full_description;
     }
@@ -223,7 +233,7 @@ class Detail
      *
      * @return  string      Name of location
      */
-    public function getLocation()
+    public function getLocation() : string
     {
         return $this->location;
     }
@@ -234,7 +244,7 @@ class Detail
      *
      * @return  string      Street address
      */
-    public function getStreet()
+    public function getStreet() : string
     {
         return $this->street;
     }
@@ -696,6 +706,25 @@ class Detail
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * Delete orphaned detail records.
+     * This can happen when a recurring event instance is edited to create
+     * a new detail record, and then edited again since any change to the
+     * detail causes a new record to be created to protect any other instances
+     * that share the record.
+     */
+    public static function cleanOrphans()
+    {
+        global $_TABLES;
+
+        $sql = "DELETE FROM {$_TABLES['evlist_detail']} d
+            LEFT JOIN {$_TABLES['evlist_events']} e ON d.ev_id = e.id
+            LEFT JOIN {$_TABLES['evlist_repeat']} r ON d.det_id = r.rp_det_id
+            WHERE e.det_id IS NULL AND r.rp_det_id IS NULL";
+        DB_query($sql);
     }
 
 }

@@ -284,9 +284,8 @@ class Editor
             /*}*/
 
         } else {            // Editing the main event record
-
-            $date_start1 = $this->Event->getDateStart1()->format('Y-m-d',true);
-            $date_end1 = $this->Event->getDateEnd1()->format('Y-m-d',true);
+            $date_start1 = $this->Event->getDateStart1();
+            $date_end1 = $this->Event->getDateEnd1();
             $time_start1 = $this->Event->getTimeStart1();
             $time_end1 = $this->Event->getTimeEnd1();
             $time_start2 = $this->Event->getTimeStart2();

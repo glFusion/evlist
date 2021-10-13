@@ -452,8 +452,7 @@ case 'moderate':
     $Ev = new Evlist\Event();
     $Ev->asSubmission()->Read($_REQUEST['id']);
     $Editor = new Evlist\Views\Editor;
-    $Editor->withEvent($Ev)->Render();
-    //$content .= $Ev->Edit('', 0, 'moderate');
+    $content .= $Editor->withEvent($Ev)->Render();
     break;
 
 case 'categories':

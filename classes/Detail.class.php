@@ -192,6 +192,7 @@ class Detail
     public function setEventID(string $ev_id) : self
     {
         $this->ev_id = $ev_id;
+        return $this;
     }
 
 
@@ -255,7 +256,7 @@ class Detail
      *
      * @return  string      City name
      */
-    public function getCity()
+    public function getCity() : string
     {
         return $this->city;
     }
@@ -266,7 +267,7 @@ class Detail
      *
      * @return  string      State/province name
      */
-    public function getProvince()
+    public function getProvince() : string
     {
         return $this->province;
     }
@@ -277,7 +278,7 @@ class Detail
      *
      * @return  string      Postal code
      */
-    public function getPostal()
+    public function getPostal() : string
     {
         return $this->postal;
     }
@@ -288,7 +289,7 @@ class Detail
      *
      * @return  string      Contact name
      */
-    public function getContact()
+    public function getContact() : string
     {
         return $this->contact;
     }
@@ -299,7 +300,7 @@ class Detail
      *
      * @return  string      Email address
      */
-    public function getEmail()
+    public function getEmail() : string
     {
         return $this->email;
     }
@@ -310,7 +311,7 @@ class Detail
      *
      * @return  string      Phone number
      */
-    public function getPhone()
+    public function getPhone() : string
     {
         return $this->phone;
     }

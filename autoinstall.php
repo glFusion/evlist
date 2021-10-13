@@ -4,40 +4,13 @@
  *
  * @author      Mark R. Evans mark AT glfusion DOT org
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright   Copyright (c) 2010 - 2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.1
+ * @version     v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
-// +--------------------------------------------------------------------------+
-// | evList A calendar solution for glFusion                                  |
-// +--------------------------------------------------------------------------+
-// | autoinstall.php                                                          |
-// |                                                                          |
-// | glFusion Auto Installer module                                           |
-// +--------------------------------------------------------------------------+
-// | Copyright (C) 2009 by the following authors:                             |
-// |                                                                          |
-// | Mark R. Evans          mark AT glfusion DOT org                          |
-// +--------------------------------------------------------------------------+
-// |                                                                          |
-// | This program is free software; you can redistribute it and/or            |
-// | modify it under the terms of the GNU General Public License              |
-// | as published by the Free Software Foundation; either version 2           |
-// | of the License, or (at your option) any later version.                   |
-// |                                                                          |
-// | This program is distributed in the hope that it will be useful,          |
-// | but WITHOUT ANY WARRANTY; without even the implied warranty of           |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            |
-// | GNU General Public License for more details.                             |
-// |                                                                          |
-// | You should have received a copy of the GNU General Public License        |
-// | along with this program; if not, write to the Free Software Foundation,  |
-// | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          |
-// |                                                                          |
-// +--------------------------------------------------------------------------+
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
@@ -52,124 +25,146 @@ require_once __DIR__ . '/sql/def_events.php';
  * @var array
  */
 $INSTALL_plugin['evlist'] = array(
-    'installer' => array('type' => 'installer',
-                    'version' => '1', 
-                    'mode' => 'install'),
+    'installer' => array(
+        'type' => 'installer',
+        'version' => '1',
+        'mode' => 'install',
+    ),
 
-    'plugin' => array(  'type'      => 'plugin',
-                        'name'      => $_EV_CONF['pi_name'],
-                        'ver'       => $_EV_CONF['pi_version'],
-                        'gl_ver'    => $_EV_CONF['gl_version'],
-                        'url'       => $_EV_CONF['pi_url'],
-                        'display'   => $_EV_CONF['pi_display_name']),
-
-    array(  'type' => 'table', 
-            'table' => $_TABLES['evlist_events'], 
-            'sql' => $_SQL['evlist_events'],
-        ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['evlist_submissions'], 
-            'sql' => $_SQL['evlist_submissions'],
-        ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['evlist_repeat'], 
-            'sql' => $_SQL['evlist_repeat'],
-        ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['evlist_categories'], 
-            'sql' => $_SQL['evlist_categories'],
-        ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['evlist_lookup'], 
-            'sql' => $_SQL['evlist_lookup'],
-        ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['evlist_remlookup'], 
-            'sql' => $_SQL['evlist_remlookup'],
-        ),
-
-    array(  'type' => 'table',
-            'table' => $_TABLES['evlist_detail'],
-            'sql' => $_SQL['evlist_detail'],
-        ),
-
-    array(  'type' => 'table',
-            'table' => $_TABLES['evlist_calendars'],
-            'sql' => $_SQL['evlist_calendars'],
-        ),
-
-    array(  'type' => 'table',
-            'table' => $_TABLES['evlist_tickets'],
-            'sql' => $_SQL['evlist_tickets'],
-        ),
-
-    array(  'type' => 'table',
-            'table' => $_TABLES['evlist_tickettypes'],
-            'sql' => $_SQL['evlist_tickettypes'],
-        ),
-
-    array(  'type' => 'table',
-            'table' => $_TABLES['evlist_cache'],
-            'sql' => $_SQL['evlist_cache'],
-        ),
-
-    array(  'type' => 'group', 
-            'group' => 'evList Admin', 
-            'desc' => 'Administrator of the evList Plugin',
-            'variable' => 'admin_group_id', 
-            'addroot' => true, 
-            'admin' => true,
-        ),
-
-    array(  'type' => 'feature', 
-            'feature' => 'evlist.submit', 
-            'desc' => 'May bypass the evList submission queue',
-            'variable' => 'submit_feature_id',
-        ),
-
-    array(  'type' => 'mapping', 
-            'group' => 'admin_group_id', 
-            'feature' => 'submit_feature_id', 
-            'log' => 'Adding evList Submit feature to the evList admin group',
-        ),
-
-    array(  'type' => 'feature', 
-            'feature' => 'evlist.admin', 
-            'desc' => 'Administrative access to the evList plugin',
-            'variable' => 'admin_feature_id',
-        ),
-
-    array(  'type' => 'mapping', 
-            'group' => 'admin_group_id', 
-            'feature' => 'admin_feature_id', 
-            'log' => 'Adding evList Admin feature to the evList admin group',
-        ),
-
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_events']),
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_detail']),
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_categories']),
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_calendars']),
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_submissions']),
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_repeat']),
-    array('type' => 'sql', 'sql' => $DEFVALUES['evlist_tickettypes']),
-
-    array(  'type' => 'block', 
-            'name' => 'evlist_upcoming', 
-            'title' => 'Upcoming Events',
-            'phpblockfn' => 'phpblock_evlist_upcoming', 
-            'block_type' => 'phpblock',
-            'group_id' => 'admin_group_id',
-        ),
-
-    array(  'type'          => 'block', 
-            'name'          => 'evlist_smallmonth', 
-            'title'         => 'Event Calendar',
-            'phpblockfn'    => 'phpblock_evlist_smallmonth', 
-            'block_type'    => 'phpblock',
-            'group_id'      => 'admin_group_id',
-            'is_enabled'    => 0,
-        ),
+    'plugin' => array(
+        'type'      => 'plugin',
+        'name'      => $_EV_CONF['pi_name'],
+        'ver'       => $_EV_CONF['pi_version'],
+        'gl_ver'    => $_EV_CONF['gl_version'],
+        'url'       => $_EV_CONF['pi_url'],
+        'display'   => $_EV_CONF['pi_display_name'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_events'],
+        'sql' => $_SQL['evlist_events'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_submissions'],
+        'sql' => $_SQL['evlist_submissions'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_repeat'],
+        'sql' => $_SQL['evlist_repeat'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_categories'],
+        'sql' => $_SQL['evlist_categories'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_lookup'],
+        'sql' => $_SQL['evlist_lookup'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_remlookup'],
+        'sql' => $_SQL['evlist_remlookup'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_detail'],
+        'sql' => $_SQL['evlist_detail'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_calendars'],
+        'sql' => $_SQL['evlist_calendars'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_tickets'],
+        'sql' => $_SQL['evlist_tickets'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_tickettypes'],
+        'sql' => $_SQL['evlist_tickettypes'],
+    ),
+    array(
+        'type' => 'table',
+        'table' => $_TABLES['evlist_cache'],
+        'sql' => $_SQL['evlist_cache'],
+    ),
+    array(
+        'type' => 'feature',
+        'feature' => 'evlist.admin',
+        'desc' => 'Administrative access to the evList plugin',
+        'variable' => 'admin_feature_id',
+    ),
+    array(
+        'type' => 'feature',
+        'feature' => 'evlist.submit',
+        'desc' => 'May bypass the evList submission queue',
+        'variable' => 'submit_feature_id',
+    ),
+    array(
+        'type' => 'mapping',
+        'findgroup' => 'Root',
+        'feature' => 'admin_feature_id',
+        'log' => 'Adding Admin feature to the Root group',
+    ),
+    array(
+        'type' => 'mapping',
+        'findgroup' => 'Root',
+        'feature' => 'submit_feature_id',
+        'log' => 'Adding evList Submit feature to the Root group',
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_events'],
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_detail'],
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_categories'],
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_calendars'],
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_submissions'],
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_repeat'],
+    ),
+    array(
+        'type' => 'sql',
+        'sql' => $DEFVALUES['evlist_tickettypes'],
+    ),
+    array(
+        'type' => 'block',
+        'name' => 'evlist_upcoming',
+        'title' => 'Upcoming Events',
+        'phpblockfn' => 'phpblock_evlist_upcoming',
+        'block_type' => 'phpblock',
+        'group_id' => 'admin_group_id',
+    ),
+    array(
+        'type'          => 'block',
+        'name'          => 'evlist_smallmonth',
+        'title'         => 'Event Calendar',
+        'phpblockfn'    => 'phpblock_evlist_smallmonth',
+        'block_type'    => 'phpblock',
+        'group_id'      => 'admin_group_id',
+        'is_enabled'    => 0,
+    ),
 );
+
 
 /**
  * Puts the datastructures for this plugin into the glFusion database.
@@ -206,5 +201,3 @@ function plugin_load_configuration_evlist()
     require_once __DIR__ . '/install_defaults.php';
     return plugin_initconfig_evlist();
 }
-
-?>

@@ -165,6 +165,15 @@ $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
   KEY `user` (`uid`,`ev_id`),
   KEY `ev_dt` (`ev_id`,`dt`)
 ) ENGINE=MyISAM";
+
+$_SQL['evlist_tickettypes'] = "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
+  `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `dscp` varchar(255) NOT NULL DEFAULT '',
+  `event_pass` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`tt_id`)
+) ENGINE=MyISAM";
+
 $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `cal_id` int(11) NOT NULL AUTO_INCREMENT,
   `cal_name` varchar(255) NOT NULL DEFAULT '',
@@ -387,6 +396,5 @@ $_EV_UPGRADE = array(
     ),
 
 );
-$_SQL['evlist_tickettypes'] = $_EV_UPGRADE['1.3.7'][1];
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];
 

@@ -215,7 +215,7 @@ case 'register':
         EV_getVar($_POST, 'tick_count', 'integer', 1),
         EV_getVar($_POST, 'tick_type', 'string', ''),
         0,
-        EV_getVar($_POST, 'rsvp_comment', 'string', '')
+        EV_getVar($_POST, 'rsvp_comment', 'array', array())
     );
     echo COM_refresh(EVLIST_URL . '/event.php?eid=' . $rp_id);
     break;

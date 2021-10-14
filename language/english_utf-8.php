@@ -100,9 +100,8 @@ $LANG_EVLIST = array(
 'cal_name'          => 'Calendar Name',
 'cat_name'          => 'Category Name',
 'reset'             => 'Reset Form',
-'del_cal_msg1'      => 'You are about to delete a calendar.  This is a permanent deletion and cannot be reversed.  Be sure that this is what you want to do before you click "Submit" below!
-You may either move existing events to a new calendar, or delete those events.',
-'del_cal_events'    => 'This calendar has %d events associated with it.  You may move these events to another calendar by selecting one below.  If you do not select a new calendar for the events, they will ALL be permanently deleted from the database.',
+'del_cal_msg1'      => 'You are about to delete a calendar. This is a permanent deletion and cannot be reversed.  Be sure that this is what you want to do before you click &quot;Delete&quot; below!',
+'del_cal_events'    => 'This calendar has %d event(s) associated with it. You may move these events to another calendar by selecting one below.  If you do not select a new calendar for the events, they will ALL be permanently deleted from the database.',
 'confirm_del'       => 'Confirm that you want to delete the item',
 'none_delete'       => 'None- delete the events',
 'deleting_cal'      => 'Deleting Calendar',

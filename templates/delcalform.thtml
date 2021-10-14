@@ -5,7 +5,7 @@
 	class="uk-form uk-form-horizontal" method="post" style="color:#FF0000;">
 	<input type=hidden name="cal_id" value="{cal_id}" />
 	<p><b>{$LANG_EVLIST['deleting_cal']}: {cal_name}</b></p>
-	{$LANG_EVLIST['del_cal_msg1']}
+	{$LANG_EVLIST['del_cal_msg1']}<br />
 	<hr />
 {!if has_events}
 	{has_events}<br />
@@ -17,11 +17,13 @@
 	{$LANG_EVLIST['cal_has_no_events']}
 {!endif}
 	<hr />
-	{$LANG_EVLIST['confirm_del']}
-	<input type=radio name="confirmdel" value="1" />{$LANG_EVLIST['yes']}
-	<input type=radio name="confirmdel" value="0" checked="checked" />{$LANG_EVLIST['no']}
+	{$LANG_EVLIST['confirm_del']}:&nbsp;
+	<select class="uk-select uk-form-width-xsmall">
+		<option value="0" selected="selected">{$LANG_EVLIST['no']}</option>
+		<option value="1">{$LANG_EVLIST['yes']}</option>
+	</select>
+	<button style="margin-left:25px;" class="uk-button uk-button-danger" type="submit" name="delcalconfirm">{$LANG_ADMIN['delete']}</button>
 	<p />
-	<button class="uk-button uk-button-danger" type="submit" name="delcalconfirm">{$LANG_ADMIN['submit']}</button>
 	<a href="{site_admin_url}/plugins/evlist/index.php?calendars" class="uk-button">{$LANG_ADMIN['cancel']}</a>
 </form>
 </div>

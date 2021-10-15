@@ -239,6 +239,7 @@ function evlist_upgrade($dvlp = false)
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
         // Order the calendars, initially by name;
         Evlist\Calendar::reOrder('cal_name');
+        Evlist\TicketType::reOrder();
         if($_EV_CONF['default_view'] == 'list') {
             $_EV_CONF['default_view'] = 'agenda';
             $c = config::get_instance();
@@ -568,6 +569,7 @@ function EVLIST_remove_old_files()
             'classes/Views/yearView.class.php',
             'classes/Views/smallmonthView.class.php',
             'classes/Views/detailView.class.php',
+            'calendar_import.php',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

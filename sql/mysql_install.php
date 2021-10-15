@@ -168,6 +168,8 @@ $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
 
 $_SQL['evlist_tickettypes'] = "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
   `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `orderby` int(3) NOT NULL DEFAULT 999,
+  `shortcode` varchar(8) NOT NULL DEFAULT '',
   `dscp` varchar(255) NOT NULL DEFAULT '',
   `event_pass` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
@@ -383,6 +385,8 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD UNIQUE KEY `idx_tic_num` (tic_num)",
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD tic_id int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY",
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD comment varchar(255) NOT NULL DEFAULT ''",
+    "ALTER TABLE {$_TABLES['evlist_tickettypes']} ADD orderby int(3) NOT NULL DEFAULT 999 AFTER tt_id",
+    "ALTER TABLE {$_TABLES['evlist_tickettypes']} ADD shortcode varchar(12) NOT NULL DEFAULT '' AFTER orderby",
     "ALTER TABLE {$_TABLES['evlist_repeat']} DROP KEY IF EXISTS `end`",
     "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_status` tinyint(1) unsigned NOT NULL DEFAULT 1",
     "ALTER TABLE {$_TABLES['evlist_repeat']} ADD `rp_revision` int(5) unsigned NOT NULL DEFAULT 1",

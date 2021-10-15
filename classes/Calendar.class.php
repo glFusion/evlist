@@ -18,6 +18,16 @@ namespace Evlist;
  */
 class Calendar
 {
+    use \Evlist\Traits\DBO;        // Import database operations
+
+    /** Table name, for DBO operations.
+     * @var string */
+    protected static $TABLE = 'evlist_calendars';
+
+    /** Key field name, for DBO operations.
+     * @var string */
+    protected static $F_ID = 'cal_id';
+
     /** Flag to indicate a new record.
      * @var boolean */
     private $isNew = true;
@@ -472,61 +482,6 @@ class Calendar
 
 
     /**
-     * Sets the "enabled" field baed on the existing value.
-     *
-     * @param   integer $oldvalue   Original value to be changed
-     * @param   integer $cal_id     ID number of element to modify
-     * @return         New value, or old value upon failure
-     */
-    public static function toggleEnabled($oldvalue, $cal_id)
-    {
-        return self::_toggle('cal_status', $oldvalue, $cal_id);
-    }
-
-
-    /**
-     * Toggle the "cal_ena_ical" field based on the existing value.
-     *
-     * @param   integer $oldvalue   Original value to be changed
-     * @param   integer $cal_id     ID number of element to modify
-     * @return         New value, or old value upon failure
-     */
-    public static function toggleIcal($oldvalue, $cal_id)
-    {
-        return self::_toggle('cal_ena_ical', $oldvalue, $cal_id);
-    }
-
-
-    /**
-     * Toggle a boolean field based on the existing value.
-     *
-     * @param   string  $fld        Field name
-     * @param   integer $oldvalue   Original value to be changed
-     * @param   integer $cal_id     ID number of element to modify
-     * @return         New value, or old value upon failure
-     */
-    private static function _toggle($fld, $oldvalue, $cal_id)
-    {
-        global $_TABLES;
-
-        $cal_id = (int)$cal_id;
-        $newvalue = $oldvalue == 0 ? 1 : 0;
-        $sql = "UPDATE {$_TABLES['evlist_calendars']}
-                SET $fld = $newvalue
-                WHERE cal_id='$cal_id'";
-        DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog("SQL Error: $sql");
-            return $oldvalue;
-        } else {
-            Cache::clear('calendars');
-            Cache::clear('events');
-            return $newvalue;
-        }
-    }
-
-
-    /**
      * Determine if the current calendar is in use by any events.
      *
      * @return  mixed   Number of events using the calendar, false if unused.
@@ -696,77 +651,6 @@ class Calendar
             $Cal = self::getInstance(1);
         }
         return $Cal;
-    }
-
-
-    /**
-     * Reorder all calendars.
-     * The "orderby" field can be overridden during upgrades to set a good
-     * default order.
-     * Clears the cache if any positions were changed.
-     *
-     * @param   string  $orderby_fld    Field name for ordering
-     */
-    public static function reOrder($orderby_fld = 'orderby')
-    {
-        global $_TABLES;
-
-        $orderby_fld = DB_escapeString($orderby_fld);
-        $sql = "SELECT cal_id, orderby
-                FROM {$_TABLES['evlist_calendars']}
-                ORDER BY `$orderby_fld` ASC;";
-        $result = DB_query($sql);
-
-        $order = 10;
-        $stepNumber = 10;
-        $clear_cache = false;
-        while ($A = DB_fetchArray($result, false)) {
-            if ($A['orderby'] != $order) {  // only update incorrect ones
-                $clear_cache = true;
-                $sql = "UPDATE {$_TABLES['evlist_calendars']}
-                    SET orderby = '$order'
-                    WHERE cal_id = '" . (int)$A['cal_id'] . "'";
-                DB_query($sql);
-            }
-            $order += $stepNumber;
-        }
-        if ($clear_cache) {
-            Cache::clear('calendars');
-        }
-    }
-
-
-    /**
-     * Move a calendar up or down the admin list.
-     *
-     * @param  string  $id     Calendar ID
-     * @param  string  $where  Direction to move (up or down)
-     */
-    public static function moveRow($id, $where)
-    {
-        global $_TABLES;
-
-        switch ($where) {
-        case 'up':
-            $oper = '-';
-            break;
-        case 'down':
-            $oper = '+';
-            break;
-        default:
-            $oper = '';
-            break;
-        }
-
-        if (!empty($oper)) {
-            $id = (int)$id;
-            $sql = "UPDATE {$_TABLES['evlist_calendars']}
-                    SET orderby = orderby $oper 11
-                    WHERE cal_id = '$id'";
-            //echo $sql;die;
-            DB_query($sql);
-            self::reOrder();
-        }
     }
 
 

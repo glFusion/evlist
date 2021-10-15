@@ -32,7 +32,7 @@ if (!in_array('evlist', $_PLUGINS) || !plugin_ismoderator_evlist()) {
  *
  * @return  string      Completion message
  */
-function EVLIST_importCSV()
+function XXEVLIST_importCSV()
 {
     global $_CONF, $_TABLES, $LANG_EVLIST, $_USER;
 
@@ -170,7 +170,7 @@ $expected = array(
     'saveticket', 'deltickettype', 'delticket', 'printtickets',
     'tickreset_x', 'tickdelete_x', 'exporttickets',
     'import_csv', 'import_cal', 'movecal',
-    'delbutton_x',
+    'delbutton_x', 'tt_move',
     // Views to display
     'view', 'delevent', 'delcancelled', 'importcalendar', 'clone', 'rsvp', 'calendars',
     'import', 'edit', 'editcat', 'editticket', 'tickettypes',
@@ -375,20 +375,28 @@ case 'delrsvp':
     break;
 
 case 'import_cal':
-    require_once EVLIST_PI_PATH . '/calendar_import.php';
-    $errors = evlist_import_calendar_events();
+    $errors = Evlist\Util\Import::do_cal();
+    /*require_once EVLIST_PI_PATH . '/calendar_import.php';
+    $errors = evlist_import_calendar_events();*/
     if ($errors == -1) {
-        $content .= COM_showMessageText($LANG_EVLIST['err_cal_notavail'],
-                '', true);
+        $content .= COM_showMessageText(
+            $LANG_EVLIST['err_cal_notavail'],
+            '',
+            true
+        );
     } elseif ($errors > 0) {
         $content .= COM_showMessageText(
-                sprintf($LANG_EVLIST['err_cal_import'], $errors), '', true);
+            sprintf($LANG_EVLIST['err_cal_import'], $errors),
+            '',
+            true
+        );
     }
     break;
 
 case 'import_csv':
     // Import events from CSV file
-    $status = EVLIST_importCSV();
+    //$status = EVLIST_importCSV();
+    $status = Evlist\Util\Import::do_csv();
     $content .= COM_showMessageText($status, '', true, 'error');
     $view = '';
     break;
@@ -422,6 +430,14 @@ case 'exporttickets':
 case 'movecal':
     Evlist\Calendar::moveRow($_GET['id'], $actionval);
     COM_refresh(EVLIST_ADMIN_URL . '/index.php?view=calendars');
+    break;
+
+case 'tt_move':
+    $tt_id = EV_getVar($_GET, 'tt_id', 'integer');
+    if ($tt_id > 0) {
+        Evlist\TicketType::moveRow($tt_id, $actionval);
+    }
+    COM_refresh(EVLIST_ADMIN_URL . '/index.php?view=tickettypes');
     break;
 
 default:
@@ -495,14 +511,7 @@ case 'rsvp':
     break;
 
 case 'import':
-    $T = new Template(EVLIST_PI_PATH . '/templates/');
-    $T->set_file(array(
-        'form'  => 'import.thtml',
-        'instr' => 'import_csv_instr.thtml',
-    ) );
-    $T->parse('import_csv_instr', 'instr');
-    $T->parse('output', 'form');
-    $content .= $T->finish($T->get_var('output'));
+    $content .= Evlist\Util\Import::showForm();
     break;
 
 case 'edit':

@@ -19,6 +19,12 @@ namespace Evlist;
  */
 class Category
 {
+    use \Evlist\Traits\DBO;        // Import database operations
+
+    /** Table name, for DBO operations.
+     * @var string */
+    protected static $TABLE = 'evlist_categories';
+
     /** Indicator that this is a new record.
      * @var boolean */
     private $isNew = true;
@@ -233,32 +239,6 @@ class Category
         DB_delete($_TABLES['evlist_categories'], 'id', $cat_id);
         DB_delete($_TABLES['evlist_lookup'], 'cid', $cat_id);
         Cache::clear('categories');
-    }
-
-
-    /**
-     * Sets the "enabled" field to the specified value.
-     *
-     * @param   integer $oldvalue   Original value to be toggled
-     * @param   integer $cat_id     ID number of element to modify
-     * @return      New value, or old value upon failure
-     */
-    public static function toggleEnabled($oldvalue, $cat_id)
-    {
-        global $_TABLES;
-
-        $cat_id = (int)$cat_id;
-        $newvalue = $oldvalue == 0 ? 1 : 0;
-        $sql = "UPDATE {$_TABLES['evlist_categories']}
-                SET status=$newvalue
-                WHERE id='$cat_id'";
-        DB_query($sql, 1);
-        if (DB_error()) {
-            return $oldvalue;
-        } else {
-            Cache::clear('categories');
-            return $newvalue;
-        }
     }
 
 

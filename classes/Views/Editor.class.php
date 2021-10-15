@@ -545,13 +545,13 @@ class Editor
         if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
             $TickTypes = TicketType::GetTicketTypes();
             $T->set_block('editor', 'Tickets', 'tTypes');
-            $tick_opts = '';
+            $tick_opts = $this->Event->getOption('tickets');
             foreach ($TickTypes as $tick_id=>$TicketType) {
                 // Check enabled tickets. Ticket type 1 enabled by default
-                if (isset($this->Event->getOption('tickets')[$tick_id]) || $tick_id == 1) {
+                if (isset($tick_opts[$tick_id]) || $tick_id == 1) {
                     $checked = true;
-                    if (isset($this->Event->getOptions('tickets')[$tick_id])) {
-                        $fee = (float)$this->Event->getOptions('tickets')[$tick_id]['fee'];
+                    if (isset($tick_opts[$tick_id]) && isset($tick_opts[$tick_id]['fee'])) {
+                        $fee = (float)$tick_opts[$tick_id]['fee'];
                     } else {
                         $fee = 0;
                     }

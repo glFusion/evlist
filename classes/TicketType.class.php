@@ -23,6 +23,16 @@ namespace Evlist;
  */
 class TicketType
 {
+    use \Evlist\Traits\DBO;        // Import database operations
+
+    /** Table name, for DBO operations.
+     * @var string */
+    protected static $TABLE = 'evlist_tickettypes';
+
+    /** Key field name, for DBO operations.
+     * @var string */
+    protected static $F_ID = 'tt_id';
+
     /** Flag to indicate a new record.
      * @var boolean */
     private $isNew = true;
@@ -38,6 +48,11 @@ class TicketType
     /** Flag indicating this ticket type is enabled.
      * @var boolean */
     private $enabled = 1;
+
+    /** Short code or description of the ticket.
+     * Example: "GA" for General Adminssion.
+     * @var string */
+    private $shortcode = '';
 
     /** Description of the ticket type.
      * @var string */
@@ -95,6 +110,7 @@ class TicketType
     public function SetVars($A)
     {
         $this->tt_id = isset($A['tt_id']) ? (int)$A['tt_id'] : 0;
+        $this->shortcode = $A['shortcode'];
         $this->dscp = $A['dscp'];
         $this->event_pass = isset($A['event_pass']) && $A['event_pass'] ? 1 : 0;
         $this->enabled = isset($A['enabled']) && $A['enabled'] ? 1 : 0;
@@ -137,6 +153,7 @@ class TicketType
         ) );
         $T->set_var(array(
             'tt_id'             => $this->tt_id,
+            'shortcode'         => $this->shortcode,
             'dscp'              => $this->dscp,
             'event_pass_chk'    => $this->event_pass == 1 ? EVCHECKED : '',
             'enabled_chk'       => $this->enabled == 1 ? EVCHECKED : '',
@@ -166,7 +183,8 @@ class TicketType
             $this->isNew = true;
         }
 
-        $fld_sql = "dscp = '" . DB_escapeString($this->dscp) ."',
+        $fld_sql = "shortcode = '" . DB_escapeString($this->shortcode) . "',
+            dscp = '" . DB_escapeString($this->dscp) ."',
             enabled = '{$this->enabled}',
             event_pass = '{$this->event_pass}'";
 
@@ -232,51 +250,12 @@ class TicketType
 
 
     /**
-     * Sets the field to the opposite of the specified value.
-     *
-     * @param   string  $fld        DB Field to toggle
-     * @param   integer $oldvalue   Old (current) value of field
-     * @param   integer $id         ID number of element to modify
-     * @return          New value, or old value upon failure
-     */
-    public static function Toggle($fld, $oldvalue, $id)
-    {
-        global $_TABLES;
-
-        // Validate $item - only toggle-able fields
-        switch ($fld) {
-        case 'event_pass':
-        case 'enabled':
-            break;
-        default:
-            return $oldval;
-            break;
-        }
-
-        $id = (int)$id;
-        if ($id == 0) return $oldvalue;
-        $newvalue = $oldvalue == 0 ? 1 : 0;
-        $sql = "UPDATE {$_TABLES['evlist_tickettypes']}
-                SET $fld = $newvalue
-                WHERE tt_id = '$id'";
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog("Evlist\\TicketType::Toggle SQL Error: $sql");
-            return $oldvalue;
-        } else {
-            return $newvalue;
-        }
-    }
-
-
-    /**
      * Get all the ticket types into objects.
      *
      * @param   boolean $enabled    True to get only enabled, false for all
      * @return  array       Array of TicketType objects, indexed by ID
      */
-    public static function GetTicketTypes($enabled = true)
+    public static function getTicketTypes($enabled = true)
     {
         global $_TABLES;
 
@@ -287,6 +266,7 @@ class TicketType
             $types[$key] = array();
             $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']}";
             if ($enabled) $sql .= " WHERE enabled = 1";
+            $sql .= " ORDER BY orderby ASC";
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 // create empty objects and use SetVars to save DB lookups
@@ -321,7 +301,17 @@ class TicketType
             ),
             array(
                 'text' => $LANG_EVLIST['id'],
-                'field' => 'id',
+                'field' => 'tt_id',
+                'sort' => true,
+            ),
+            array(
+                'text' => $LANG_EVLIST['orderby'],
+                'field' => 'orderby',
+                'sort' => true,
+            ),
+            array(
+                'text' => $LANG_EVLIST['shortcode'],
+                'field' => 'shortcode',
                 'sort' => true,
             ),
             array(
@@ -360,7 +350,7 @@ class TicketType
         );
 
         $defsort_arr = array(
-            'field' => 'tt_id',
+            'field' => 'orderby',
             'direction' => 'ASC',
         );
         $text_arr = array(
@@ -375,6 +365,9 @@ class TicketType
             'sql' => $sql,
             'query_fields' => array('dscp'),
         );
+        $extra = array(
+            'tt_count' => DB_count($_TABLES[static::$TABLE]),
+        );
 
         $retval .= COM_createLink(
             $LANG_EVLIST['new_ticket_type'],
@@ -388,7 +381,8 @@ class TicketType
         $retval .= ADMIN_list(
             'evlist_tickettype_admin',
             array(__CLASS__, 'getAdminField'),
-            $header_arr, $text_arr, $query_arr, $defsort_arr
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            '', $extra
         );
         return $retval;
     }
@@ -403,7 +397,7 @@ class TicketType
      * @param   array   $icon_arr   Array of system icons
      * @return  string      HTML to display for the field
      */
-    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr, $extra)
     {
         global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_EV_CONF;
 
@@ -446,6 +440,34 @@ class TicketType
                         'title' => $LANG_ADMIN['delete'],
                     )
                 );
+            }
+            break;
+
+        case 'orderby':
+            $fieldvalue = (int)$fieldvalue;
+            if ($fieldvalue == 999) {
+                return '';
+            } elseif ($fieldvalue > 10) {
+                $retval = COM_createLink(
+                    Icon::getHTML(
+                        'arrow-up',
+                        'uk-icon-justify'
+                    ),
+                    EVLIST_ADMIN_URL . '/index.php?tt_move=up&tt_id=' . $A['tt_id']
+                );
+            } else {
+                $retval = '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+            }
+            if ($fieldvalue < $extra['tt_count'] * 10) {
+                $retval .= COM_createLink(
+                    Icon::getHTML(
+                        'arrow-down',
+                        'uk-icon-justify'
+                    ),
+                    EVLIST_ADMIN_URL . '/index.php?tt_move=down&tt_id=' . $A['tt_id']
+                );
+            } else {
+                $retval .= '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
             }
             break;
 

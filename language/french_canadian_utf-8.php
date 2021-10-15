@@ -394,8 +394,6 @@ $LANG_EVLIST = array(
 'first'         => 'First',
 'ev_not_found'  => 'The requested event was not found.',
 'jump'          => 'Jump',
-'if_any' => ', if any',
-'dates' => 'Dates',
 'no_tickets_print' => 'There are no tickets qualified for printing.',
 'comment' => 'Comment',
 'enter_comments' => 'Enter Comments',
@@ -414,6 +412,8 @@ $LANG_EVLIST = array(
 'cancelled' => 'Cancelled',
 'if_any'        => ', if any',
 'dates'         => 'Dates',
+'shortcode'     => 'Short Code',
+'free_caps'     => 'FREE',
 );
 
 $LANG_EVLIST_HELP = array(

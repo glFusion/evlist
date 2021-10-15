@@ -3,6 +3,16 @@
 	action="{site_admin_url}/plugins/evlist/index.php">
 	<input type="hidden" name="tt_id" value="{tt_id}" />
 	<div class="uk-form-row uk-margin">
+		<label class="uk-form-label">{$LANG_EVLIST['shortcode']}:
+			<span id="hlp_shortcode" class="tooltip_cfg tooltipstered"></span>
+		</label>
+		<div class="uk-form-controls">
+			<input class="uk-input uk-form-small uk-form-width-medium" required type="text"
+				id="shortcode" size="12" maxlength="12"
+				name="shortcode" value="{shortcode}" />
+		</div>
+	</div>
+	<div class="uk-form-row uk-margin">
 		<label class="uk-form-label">{$LANG_EVLIST['description']}:
 			<span id="hlp_dscp" class="tooltip_cfg tooltipstered"></span>
 		</label>

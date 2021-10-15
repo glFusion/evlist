@@ -402,6 +402,8 @@ $LANG_EVLIST = array(
 'cancelled' => 'Cancelled',
 'if_any'        => ', if any',
 'dates'         => 'Dates',
+'shortcode'     => 'Short Code',
+'free_caps'     => 'FREE',
 );
 
 $LANG_EVLIST_HELP = array(

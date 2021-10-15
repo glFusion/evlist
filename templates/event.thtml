@@ -244,8 +244,8 @@
 {!endif}
 
 {!if show_reminderform}
-		<div class="uk-width-1-1 uk-width-medium-1-2">
-			<div id="reminder_no" class="evdata uk-alert" style="display:none;">
+		<div class="reminder_div">
+			<div id="reminder_no" class="uk-alert" style="display:none;">
 				<form uk-form class="uk-form uk-form-horizontal" id="evRemAdd" onsubmit="updateReminder(this);return false;">
 					{$LANG_EVLIST['email']}
 					<input class="uk-input uk-form-small uk-form-width-medium" type="text" maxlength="96" name="rem_email" id="rem_email"  value="{reminder_email}" />&nbsp;
@@ -286,9 +286,9 @@
 			<div id="regdiv" style="margin-top:15px;"></div>
 
 			<form class="uk-form uk-form-horizontal" id="rsvp" action="{site_url}/evlist/event.php" method="post">
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['signup']}</label>
-					<div class="uk-form-controls uk-margin">
+					<div class="uk-form-controls">
 						<input type="hidden" name="rp_id" value="{rp_id}" />
 						{$LANG_EVLIST['quantity']}:
 {!if register_unltd}
@@ -317,7 +317,7 @@
 				</div>
 
 {!if rsvp_comments}
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['enter_comments']}:</label>
 					<div class="uk-form-controls">
 						<table>
@@ -332,10 +332,10 @@
 				</div>
 {!endif}
 
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label"></label>
 					<div class="uk-form-controls">
-						<button type="submit" class="uk-button uk-button-mini uk-button-success" name="register"
+						<button type="submit" class="uk-button uk-button-small uk-button-success" name="register"
 							value="{$LANG_EVLIST['register']}">{$LANG_EVLIST['register']}</button>
 					</div>
 				</div>

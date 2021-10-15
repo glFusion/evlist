@@ -674,7 +674,7 @@ table.smallmonthtable a.day-noevents {
 
 .reminder_div {
     clear:both;
-    width:50%;
+    /*width:50%;*/
 }
 
 #rsvp_detail {

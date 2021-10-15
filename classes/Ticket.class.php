@@ -64,6 +64,10 @@ class Ticket
      * @var string */
     private $comment = '';
 
+    /** Comment array.
+     * @var array */
+    private $_comments = array();
+
 
     /**
      * Constructor.
@@ -113,6 +117,19 @@ class Ticket
 
 
     /**
+     * Set the ID of the registrant.
+     *
+     * @param   int     $uid    User ID
+     * @return  object  $this
+     */
+    public function withUid(int $uid) : self
+    {
+        $this->uid = $uid;
+        return $this;
+    }
+
+
+    /**
      * Get the ticket ID.
      *
      * @return  string      Ticket record ID
@@ -120,6 +137,19 @@ class Ticket
     public function getID()
     {
         return $this->tic_id;
+    }
+
+
+    /**
+     * Set the event ID.
+     *
+     * @param   string  $ev_id  Event ID
+     * @return  object  $this
+     */
+    public function withEventId(string $ev_id) : self
+    {
+        $this->ev_id = $ev_id;
+        return $this;
     }
 
 
@@ -135,6 +165,19 @@ class Ticket
 
 
     /**
+     * Set the repeat ID.
+     *
+     * @param   int     $rp_id  Repeat ID
+     * @return  object  $this
+     */
+    public function withRepeatId(int $rp_id) : self
+    {
+        $this->rp_id = $rp_id;
+        return $this;
+    }
+
+
+    /**
      * Get the related event instance ID.
      *
      * @return  integer     Repeat ID
@@ -142,6 +185,19 @@ class Ticket
     public function getRepeatID()
     {
         return (int)$this->rp_id;
+    }
+
+
+    /**
+     * Set the ticket type ID.
+     *
+     * @param   int     $tic_type   Ticket type record ID
+     * @return  object  $this
+     */
+    public function withTypeId(int $tic_type) : self
+    {
+        $this->tic_type = $tic_type;
+        return $this;
     }
 
 
@@ -168,6 +224,19 @@ class Ticket
 
 
     /**
+     * Set the amount charged for the ticket.
+     *
+     * @param   float   $fee    Ticket fee
+     * @return  object  $this
+     */
+    public function withFee(float $fee) : self
+    {
+        $this->fee = $fee;
+        return $this;
+    }
+
+
+    /**
      * Get the total amount charged for this ticket.
      *
      * @return  float       Total price
@@ -190,13 +259,39 @@ class Ticket
 
 
     /**
-     * Check if this ticket is on a waitlist.
+     * Set the waitlisted flag.
+     *
+     * @param   bool    $flag   True if waitlisted, False if not
+     * @return  object  $this
+     */
+    public function setWaitlisted(bool $flag) : self
+    {
+        $this->waitlist = $flag ? 1 : 0;
+        return $this;
+    }
+
+
+    /**
+     * Check whether this ticket is on a waitlist.
      *
      * return   boolean     1 if waitlisted, 0 if not
      */
-    public function isWaitlisted()
+    public function isWaitlisted() : bool
     {
         return $this->waitlist ? 1 : 0;
+    }
+
+
+    /**
+     * Set the comments as an array.
+     *
+     * @param   array   $comments   Comment array
+     * @return  object  $this
+     */
+    public function withComments(array $comments) : self
+    {
+        $this->_comments = $comments;
+        return $this;
     }
 
 
@@ -257,48 +352,35 @@ class Ticket
     /**
      * Create a ticket.
      *
-     * @param   string  $ev_id  Event ID (required)
-     * @param   integer $type   Type of ticket, from the ticket_types table
-     * @param   integer $rp_id  Optional Repeat ID, 0 for event pass
-     * @param   float   $fee    Optional Ticket Fee, default = 0 (free)
-     * @param   integer $uid    Optional User ID, default = current user
-     * @param   integer $wl     Waitlisted ? 1 = yes, 0 = no
-     * @param   string  $cmt    User-supplied comment
      * @return  string      Ticket identifier
      */
-    public static function Create($ev_id, $type, $rp_id = 0, $fee = 0, $uid = 0, $wl = 0, $cmt='')
+    public function Create()
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
-        $uid = (int)$uid;
-        if ($uid == 0) $uid = (int)$_USER['uid'];
-        $rp_id = (int)$rp_id;
-        $fee = (float)$fee;
-        $type = (int)$type;
-        $wl = $wl == 0 ? 0 : 1;
         $tic_num = self::makeTicketId(
             array(
-                'event_id' => $ev_id,
-                'repeat_id' => $rp_id,
-                'fee' => $fee,
-                'uid' => $uid,
+                'event_id' => $this->ev_id,
+                'repeat_id' => $this->rp_id,
+                'fee' => $this->fee,
+                'uid' => $this->uid,
             )
         );
-        if (!is_array($cmt) || empty($cmt)) {
-            $cmt = array();
+        if (!is_array($this->_comments) || empty($this->_comments)) {
+            $this->_comments = array();
         }
-        $cmt = DB_escapeString(json_encode($cmt));
+        $cmt = DB_escapeString(json_encode($this->_comments));
         $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
             tic_num = '" . DB_escapeString($tic_num) . "',
-            tic_type = $type,
-            ev_id = '" . DB_escapeString($ev_id) . "',
-            rp_id = $rp_id,
-            fee = $fee,
+            tic_type = {$this->tic_type},
+            ev_id = '" . DB_escapeString($this->ev_id) . "',
+            rp_id = {$this->rp_id},
+            fee = {$this->fee},
             paid = 0,
-            uid = $uid,
+            uid = {$this->uid},
             used = 0,
             dt = UNIX_TIMESTAMP(),
-            waitlist = $wl,
+            waitlist = {$this->waitlist},
             comment = '$cmt'";
         //echo $sql;die;
         DB_query($sql, 1);
@@ -448,7 +530,7 @@ class Ticket
             $where[] = "ev_id = '$ev_id'";
         }
         if ($rp_id > 0) {
-            $where[] = "rp_id = $rp_id";
+            $where[] = "(rp_id = 0 OR rp_id = $rp_id)";
         }
         if ($uid > 0) {
             // for a user printing their own tickets
@@ -526,7 +608,7 @@ class Ticket
         }
     }
 
-    
+
     /**
      * Print tickets as PDF documents.
      * Tickets can be printed for an event, a single occurrence,
@@ -549,14 +631,10 @@ class Ticket
         */
         $checkin_url = $_CONF['site_admin_url'] . '/plugins/evlist/checkin.php?tic=';
 
-        // get the tickets, paid and unpaid. Need event id and uid.
-        //$tickets = self::getTickets($ev_id, $rp_id, $uid);
-
         // The PDF functions in lgLib are a recent addition. Make sure that
         // the lgLib version supports PDF creation since we can't yet check
         // the lglib version during installation
         if (
-        //    $rsvp_print == 0 ||
             empty($tickets) ||
             !in_array('lglib', $_PLUGINS)
         ) {
@@ -602,7 +680,8 @@ class Ticket
 
             // Get the repeat(s) for the ticket(s) to print a ticket for each
             // occurrence.
-            $repeats = Repeat::getRepeats($ticket->getEventID(), $ticket->getRepeatID());
+            $limit = $ticket->getRepeatID() == 0 ? 1 : 0;
+            $repeats = Repeat::getRepeats($ticket->getEventID(), $ticket->getRepeatID(), $limit);
             if (empty($repeats)) {
                 continue;
             }
@@ -1181,9 +1260,9 @@ class Ticket
         if ($Ev->getID() == 0) return '';
 
         $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
-                    tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
-                    u.fullname,
-                    {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
+                tk.uid, tk.used, tt.shortcode, tt.dscp, tk.waitlist, tk.comment,
+                u.fullname,
+                {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
             FROM {$_TABLES['evlist_tickets']} tk
             LEFT JOIN {$_TABLES['evlist_tickettypes']} tt
                 ON tt.tt_id = tk.tic_type
@@ -1242,9 +1321,14 @@ class Ticket
                 'sort'  => false,
             ),
             array(
-                'text'  => $LANG_EVLIST['ticket_num'],
+                'text'  => $LANG_EVLIST['id'],
                 'field' => 'tic_id',
                 'sort'  => false,
+            ),
+            array(
+                'text'  => $LANG_EVLIST['type'],
+                'field' => 'shortcode',
+                'sort'  => true,
             ),
             array(
                 'text'  => $LANG_EVLIST['date_used'],

@@ -415,7 +415,12 @@ class Repeat
             // This is used by Reminders so make sure it's set:
             $this->setDateStart1($this->date_start . ' ' . $this->time_start1);
             $this->setDateEnd1($this->date_end . ' ' . $this->time_end1);
-
+            if ($this->time_start2 > '00:00:00') {
+                $this->setDateStart2($this->date_end . ' ' . $this->time_start2);
+            }
+            if ($this->time_end2 > '00:00:00') {
+                $this->setDateEnd2($this->date_end . ' ' . $this->time_end2);
+            }
             $this->Event = Event::getInstance($this->ev_id, $this->det_id);
             $this->tzid = $this->Event->getTZID();
             return true;
@@ -1023,7 +1028,7 @@ class Repeat
                             $T->set_var(array(
                                 'tick_type' => $tick_id,
                                 'tick_descr' => $Ticks[$tick_id]->getDscp(),
-                                'tick_fee' => $data['fee'] > 0 ? $fmt_amt : 'FREE',
+                                'tick_fee' => $data['fee'] > 0 ? $fmt_amt : $LANG_EVLIST['free_caps'],
                             ) );
                             $T->parse('tBlk', 'tickTypeBlk', true);
                         }
@@ -1406,7 +1411,16 @@ class Repeat
             if ($max_rsvp > 0) {
                 $wl = ($total_reg + $i) <= $max_rsvp ? 0 : 1;
             }
-            Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl, $comments);
+            $Tic = new Ticket;
+            $Tic->withEventId($this->Event->getID())
+                ->withUid($uid)
+                ->withTypeId($tick_type)
+                ->withRepeatId($t_rp_id)
+                ->withFee($fee)
+                ->setWaitlisted($wl)
+                ->withComments($comments)
+                ->Create();
+            //Ticket::Create($this->Event->getID(), $tick_type, $t_rp_id, $fee, $uid, $wl, $comments);
         }
         return 0;
     }
@@ -1493,18 +1507,27 @@ class Repeat
     {
         global $_TABLES, $_EV_CONF;
 
-        static $count = NULL;
+        static $count = array();
 
-        if ($count === NULL) {
+        if (!isset($count[$this->rp_id])) {
+            $count[$this->rp_id] = 0;
             if ($_EV_CONF['enable_rsvp'] != 1) {
-                $count = 0;
+                // noop
             } elseif ($this->Event->getOption('use_rsvp') == EV_RSVP_EVENT) {
-                $count = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $this->ev_id);
+                $count[$this->rp_id] = (int)DB_count($_TABLES['evlist_tickets'], 'ev_id', $this->ev_id);
             } else {
-                $count = (int)DB_count($_TABLES['evlist_tickets'], 'rp_id', $this->rp_id);
+                $sql = "SELECT count(*) AS cnt FROM {$_TABLES['evlist_tickets']} WHERE
+                    ev_id = '" . DB_escapeString($this->ev_id) . "' AND (
+                        rp_id = {$this->rp_id} OR rp_id = 0
+                    )";
+                $res = DB_query($sql);
+                if ($res && DB_numRows($res) == 1) {
+                    $A = DB_fetchArray($res, false);
+                    $count[$this->rp_id] = (int)$A['cnt'];
+                }
             }
         }
-        return $count;
+        return $count[$this->rp_id];
     }
 
 
@@ -1663,7 +1686,7 @@ class Repeat
      * @param   integer $rp_id  Repeat ID
      * @return  array       Array of occurrences
      */
-    public static function getRepeats($ev_id, $rp_id=0)
+    public static function getRepeats($ev_id, $rp_id=0, $limit = 0)
     {
         global $_TABLES;
 
@@ -1671,6 +1694,7 @@ class Repeat
         $where = array();
         $ev_id = DB_escapeString($ev_id);
         $rp_id = (int)$rp_id;
+        $limit = (int)$limit;
 
         $where = "rp_ev_id = '$ev_id'";
         if ($rp_id > 0) {
@@ -1678,6 +1702,9 @@ class Repeat
         }
         if (!empty($where)) {
             $sql = "SELECT * FROM {$_TABLES['evlist_repeat']} WHERE $where";
+            if ($limit > 0) {
+                $sql .= " LIMIT $limit";
+            }
             $res = DB_query($sql, 1);
             while ($A = DB_fetchArray($res, false)) {
                 $repeats[$A['rp_id']] = new Repeat();
@@ -1914,6 +1941,28 @@ class Repeat
     public function getDateEnd1() : object
     {
         return $this->dtEnd1;
+    }
+
+
+    /**
+     * Get the second starting date/time object, for split events.
+     *
+     * @return  object      Starting date object
+     */
+    public function getDateStart2() : object
+    {
+        return $this->dtStart2;
+    }
+
+
+    /**
+     * Get the first starting date/time object, for split events.
+     *
+     * @return  object      Starting date object
+     */
+    public function getDateEnd2() : object
+    {
+        return $this->dtEnd2;
     }
 
 

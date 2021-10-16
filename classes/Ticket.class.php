@@ -1182,7 +1182,7 @@ class Ticket
             WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
 
         if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
-            $sql .= " AND rp_id = '{$Ev->getID()}' ";
+            $sql .= " AND rp_id = '{$Ev->getID()}' OR rp_id = 0 ";
         }
 
         $text_arr = array(

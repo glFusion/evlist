@@ -229,7 +229,7 @@ class Occurrence
                 $Event->getRecData()['stop'] < EV_MAX_DATE
             ) {
                 $stop_date = new \Date($Event->getRecData()['stop'], $Event->getTZID());
-                $rec_string .= '<br />' . sprintf(
+                $rec_string .= sprintf(
                     $LANG_EVLIST['recur_stop_desc'],
                     $stop_date->format($_CONF['dateonly'], true)
                 );
@@ -529,13 +529,23 @@ class Occurrence
                 'lng'   => $lng,
                 'text'  => $Detail->formatAddress(),
             );
-            $status = LGLIB_invokeService('locator', 'getMap', $args, $map, $svc_msg);
-            if ($status == PLG_RET_OK) {
-                $T->set_var(array(
-                    'map'   => $map,
-                    'lat'   => EVLIST_coord2str($Detail->getLatitude()),
-                    'lng'   => EVLIST_coord2str($Detail->getLongitude()),
-                ) );
+            if ($this->_tpl == 'event_print') {
+                $status = LGLIB_invokeService('locator', 'getEmbeddedMap', $args, $map, $svc_msg);
+                if ($status == PLG_RET_OK) {
+                    $T->set_var(array(
+                        'map_url'   => $map['url'],
+                        'map_type' => $map['type'],
+                    ) );
+                }
+            } else {
+                $status = LGLIB_invokeService('locator', 'getMap', $args, $map, $svc_msg);
+                if ($status == PLG_RET_OK) {
+                    $T->set_var(array(
+                        'map'   => $map,
+                        'lat'   => EVLIST_coord2str($lat),
+                        'lng'   => EVLIST_coord2str($lng),
+                    ) );
+                }
             }
         }
 

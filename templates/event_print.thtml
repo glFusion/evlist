@@ -1,20 +1,11 @@
-<!DOCTYPE html>
-<html lang="{lang_locale}" dir="{direction}" class="uk-height-1-1">
-<head>
-    <meta charset="{charset}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex">
-    <title>{title}{page_site_splitter}{site_name}</title>
-    <link rel="stylesheet" type="text/css" href="{site_url}/evlist/css/style.css" />
-</head>
 <body>
   <div class="evlist" id="evlistEventHeader">
     <h2>{site_name}</h2>
-    <h2 class="evlist_header">{title}<br />{datetime_info}
-    </h2>
+	<h2 class="evlist_header">{title}</h2>
+	<h3>{datetime_info}</h3>
   </div>
 
-  <div id="evlistEventDetail">
+  <div id="evlistPrtEventDetail">
     {# event detail elements #}
     <div style="margin-top:2em;"></div>
 
@@ -32,9 +23,6 @@
       <label>{$LANG_EVLIST['when']}:</label>
       <div class="evdata">
         {datetime_info}
-        {!if recurring_event}
-        <br />{recurring_event}
-        {!endif}
       </div>
     </div>
     {!endif}
@@ -82,19 +70,19 @@
 
   </div>
 
-  {!if map}
+{!if map_url}
+  {!!if {map_type} == 'iframe' !!}}
   <div id="evlistMapOuter" class="evEventItem" style="width:50%;padding-left:25%;">
-    {map}
+	<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="{map_url}" style="border: 1px solid black"></iframe>
   </div>
   {!endif}
+{!endif}
 
   {!if weather}
-  <div class="evEventItem" id="weather" style="width:80%;">
+  <div class="evPrtDataItem" id="weather" style="width:80%;">
     {weather}
   </div>
     {!endif}
-
-
 
 <div style="clear:both;">
 <i>{site_slogan}</i>

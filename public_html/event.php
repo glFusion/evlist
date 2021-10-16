@@ -348,8 +348,10 @@ case 'print':
     $rp_id = isset($_GET['rp_id']) ? $_GET['rp_id'] : '';
     if (!empty($rp_id)) {
         $Rep = Evlist\Repeat::getInstance($rp_id);
+        $View = new Evlist\Views\Occurrence($rp_id);
         $pagetitle = COM_stripslashes($Rep->getEvent()->getDetail()->getTitle());
-        echo $Rep->withTemplate('print')->Render();
+        COM_siteHeader();   // To get base styles loaded
+        echo $View->withTemplate('print')->Render();
         exit;
     } else {
         // Shouldn't be in this file without an event ID to display or edit

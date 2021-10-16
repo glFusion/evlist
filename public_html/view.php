@@ -77,9 +77,6 @@ case 'instance':
 }
 
 $display = Evlist\Menu::siteHeader($pagetitle);
-$V = Evlist\View::getView('detail');
-$display .= $V->Header();
-
 if (!empty($msg)) {
     $display .= COM_startBlock($LANG_EVLIST['alert'],'','blockheader-message.thtml');
     $display .= $LANG_EVLIST['messages'][$msg];

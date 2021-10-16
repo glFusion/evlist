@@ -45,7 +45,7 @@ $event_table =
   `options` text DEFAULT NULL,
   `tzid` varchar(125) NOT NULL DEFAULT 'local',
   `ev_revision` int(5) unsigned NOT NULL DEFAULT 1,
-  `ev_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `ev_last_mod` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM";
 
@@ -69,7 +69,7 @@ $_SQL['evlist_repeat'] = "CREATE TABLE {$_TABLES['evlist_repeat']} (
   `rp_end` datetime DEFAULT NULL,
   `rp_status` tinyint(1) unsigned NOT NULL DEFAULT 1,
   `rp_revision` int(5) unsigned NOT NULL DEFAULT 1,
-  `rp_last_mod` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `rp_last_mod` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`rp_id`),
   KEY `event` (`rp_ev_id`),
   KEY `start` (`rp_date_start`)
@@ -135,6 +135,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `cal_ena_ical` tinyint(1) unsigned DEFAULT 1,
   `bgcolor` varchar(7) NOT NULL DEFAULT '#FFFFFF',
   `fgcolor` varchar(7) NOT NULL DEFAULT '#000000',
+  `cal_show_upcoming` tinyint(1) unsigned NOT NULL DEFAULT 1,
   `owner_id` int(10) unsigned NOT NULL,
   `group_id` int(10) unsigned NOT NULL,
   `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT 3,
@@ -143,7 +144,8 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT 2,
   `cal_icon` varchar(40) DEFAULT NULL,
   `orderby` int(5) NOT NULL DEFAULT 9999,
-  PRIMARY KEY (`cal_id`)
+  PRIMARY KEY (`cal_id`),
+  KEY `orderby` (`orderby`)
 ) ENGINE=MyISAM";
 
 $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
@@ -173,26 +175,8 @@ $_SQL['evlist_tickettypes'] = "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
   `dscp` varchar(255) NOT NULL DEFAULT '',
   `event_pass` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`tt_id`)
-) ENGINE=MyISAM";
-
-$_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
-  `cal_id` int(11) NOT NULL AUTO_INCREMENT,
-  `cal_name` varchar(255) NOT NULL DEFAULT '',
-  `cal_status` tinyint(1) unsigned DEFAULT 1,
-  `cal_ena_ical` tinyint(1) unsigned DEFAULT 1,
-  `bgcolor` varchar(7) NOT NULL DEFAULT '#FFFFFF',
-  `fgcolor` varchar(7) NOT NULL DEFAULT '#000000',
-  `cal_show_upcoming` tinyint(1) unsigned NOT NULL DEFAULT 1,
-  `owner_id` int(10) unsigned NOT NULL,
-  `group_id` int(10) unsigned NOT NULL,
-  `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT 3,
-  `perm_group` tinyint(1) unsigned NOT NULL DEFAULT 2,
-  `perm_members` tinyint(1) unsigned NOT NULL DEFAULT 2,
-  `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT 2,
-  `cal_icon` varchar(40) DEFAULT NULL,
-  `orderby` int(5) NOT NULL DEFAULT 9999,
-  PRIMARY KEY (`cal_id`)
+  PRIMARY KEY (`tt_id`),
+  KEY `orderby` (`orderby`
 ) ENGINE=MyISAM";
 
 $_EV_UPGRADE = array(
@@ -367,6 +351,7 @@ $_EV_UPGRADE = array(
     ),
 '1.4.7' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
+    "ALTER TABLE {$_TABLES['evlist_calendars']} ADD KEY (`orderby`)",
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `calshow_upcoming` tinyint(1) NOT NULL DEFAULT 1 AFTER `fgcolor`",
     "ALTER TABLE {$_TABLES['evlist_events']} DROP `hits`",
     "ALTER TABLE {$_TABLES['evlist_events']} CHANGE options options text",
@@ -380,6 +365,7 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_submissions']} ADD ev_last_mod timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `id` `tt_id` int(11) unsigned NOT NULL AUTO_INCREMENT",
     "ALTER TABLE {$_TABLES['evlist_tickettypes']} CHANGE `description` `dscp` varchar(255) NOT NULL DEFAULT ''",
+    "ALTER TABLE {$_TABLES['evlist_tickettypes']} ADD KEY (`orderby`)",
     "ALTER TABLE {$_TABLES['evlist_tickets']} CHANGE tic_id tic_num varchar(128) NOT NULL",
     "ALTER TABLE {$_TABLES['evlist_tickets']} DROP PRIMARY KEY",
     "ALTER TABLE {$_TABLES['evlist_tickets']} ADD UNIQUE KEY `idx_tic_num` (tic_num)",

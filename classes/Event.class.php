@@ -2054,6 +2054,7 @@ class Event
             WHERE id = '" . DB_escapeString($ev_id) . "'";
         DB_query($sql);
         if (!DB_error()) {
+            Cache::clear();
             return $newval;
         } else {
             return $oldval;
@@ -2061,6 +2062,12 @@ class Event
     }
 
 
+    /**
+     * Set the error messages from an external source, e.g. a Repeat
+     *
+     * @param   array   $Errors     Array of error messages
+     * @return  object  $this
+     */
     public function setErrors(array $Errors) : self
     {
         $this->Errors = $Errors;

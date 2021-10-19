@@ -12,6 +12,7 @@
  * @filesource
  */
 namespace Evlist\Traits;
+use Evlist\Cache;
 
 
 /**
@@ -144,6 +145,7 @@ trait DBO
             EVLIST_log("SQL error: $sql");
             return $oldvalue;
         } else {
+            Cache::clear();
             return $newvalue;
         }
     }

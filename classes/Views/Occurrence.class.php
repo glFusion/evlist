@@ -530,7 +530,7 @@ class Occurrence
                 'text'  => $Detail->formatAddress(),
             );
             if ($this->_tpl == 'event_print') {
-                $status = LGLIB_invokeService('locator', 'getEmbeddedMap', $args, $map, $svc_msg);
+                $status = LGLIB_invokeService('locator', 'getStaticMap', $args, $map, $svc_msg);
                 if ($status == PLG_RET_OK) {
                     $T->set_var(array(
                         'map_url'   => $map['url'],

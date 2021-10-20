@@ -71,11 +71,13 @@
   </div>
 
 {!if map_url}
-  {!!if {map_type} == 'iframe' !!}}
   <div id="evlistMapOuter" class="evEventItem" style="width:50%;padding-left:25%;">
+  {!!if {map_type} == 'iframe' !!}}
 	<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="{map_url}" style="border: 1px solid black"></iframe>
-  </div>
+  {!!elseif {map_type} == 'image' !!}
+	<img src="{map_url}" />
   {!endif}
+  </div>
 {!endif}
 
   {!if weather}

@@ -505,7 +505,7 @@ function toggleRSVPdetail(val)
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="22" {mdchk22} /> 21</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="23" {mdchk23} /> 23</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="24" {mdchk24} /> 24</li>
-								li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="25" {mdchk25} /> 25</li>
+								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="25" {mdchk25} /> 25</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="26" {mdchk26} /> 26</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="27" {mdchk27} /> 27</li>
 								<li><input class="uk-checkbox" type="checkbox" name="mdays[]" value="28" {mdchk28} /> 28</li>

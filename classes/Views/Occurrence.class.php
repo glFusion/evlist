@@ -747,7 +747,7 @@ class Occurrence
     /**
      * Set the referrer URL, to create the "back to calendar" button.
      *
-     * @param   string  $url    Return URL
+     * @param   string  $url    Return URL. Could be null if direct access.
      * @return  object  $this
      */
     public function withReferer(?string $url) : self

@@ -750,7 +750,7 @@ class Occurrence
      * @param   string  $url    Return URL
      * @return  object  $this
      */
-    public function withReferer(string $url) : self
+    public function withReferer(?string $url) : self
     {
         $this->_referer = $url;
         return $this;

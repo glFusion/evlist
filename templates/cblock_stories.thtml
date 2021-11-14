@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
 <!-- BEGIN eventRow -->
-<article class="uk-article tm-article uk-margin-large-bottom">
+<article class="uk-article tm-article uk-margin-bottom">
   <h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
       <a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}</a>
   </h1>

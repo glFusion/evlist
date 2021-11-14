@@ -159,7 +159,7 @@ function plugin_autouninstall_evlist()
             'evlist_cache',
         ),
         'groups'    => array(
-            'evlist Admin',
+            'evlist Admin',     // legacy
         ),
         'features'  => array(
             'evlist.admin',
@@ -564,7 +564,8 @@ function plugin_getheadercss_evlist()
  */
 function plugin_centerblock_evlist($where, $page, $topic = '')
 {
-    return Evlist\Views\Centerblock::Render($where, $page, $topic);
+    $CB = new Evlist\Views\Centerblock;
+    return $CB->Render($where, $page, $topic);
 }
 
 
@@ -629,11 +630,25 @@ function plugin_getfeednames_evlist()
     return Evlist\Models\Syndication::getFeedNames();
 }
 
+
+/**
+ * Get the supported syndication feed formats.
+ *
+ * @since   glFusion 2.0
+ * @return  array   Array of array('name' => name, 'version' => ver)
+ */
 function plugin_getfeedformats_evlist()
 {
     return Evlist\Models\Syndication::getFormats();
 }
 
+
+/**
+ * Get the syndication provider object.
+ *
+ * @since   glFusion 2.0
+ * @return  object      Syndication provider object
+ */
 function plugin_getfeedprovider_evlist($format, $A=array())
 {
     $cls = '\\Evlist\\Models\\Syndication2';
@@ -662,6 +677,11 @@ function plugin_getfeedcontent_evlist(
     );
 }
 
+/**
+ * Get the feed topic name corresponding to a topic ID.
+ *
+ * @return  string      Topic (calendar) name
+ */
 function plugin_getfeedtopic_evlist($tid)
 {
     return Evlist\Calendar::getInstance($tid)->getName();
@@ -2168,7 +2188,7 @@ function EVLIST_coord2str($val, $us = false)
  *
  * @param   string  $logentry   Text to log
  */
-function EVLIST_Log($logentry = '')
+function EVLIST_log($logentry = '')
 {
     global $_CONF, $_USER, $LANG01;
 

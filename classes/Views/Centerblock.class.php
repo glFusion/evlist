@@ -38,7 +38,7 @@ class Centerblock
      * @param   string  $topic  Topic currently being displayed
      * @return  string          HTML for centerblock
      */
-    public static function Render($where, $page, $topic = '')
+    public function Render($where, $page, $topic = '')
     {
         global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
@@ -69,7 +69,7 @@ class Centerblock
             switch ($_EV_CONF['enable_centerblock']) {
             case self::TABLE:       // table format
             case self::STORY:       // story format
-                $display = self::getContent($_EV_CONF['enable_centerblock']);
+                $display = $this->getContent();
                 break;
             case self::CALENDAR:    // calendar format
                 $view = View::getView('month');
@@ -92,23 +92,24 @@ class Centerblock
     /**
      * Get the content for a table- or story-formatted centerblock.
      *
-     * @param   integer $format     Centerblock type, 1=table,2=story
      * @return  string      HTML for centerblock section
      */
-    private static function getContent($format)
+    private function getContent()
     {
         global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
         $retval = '';
 
-        switch ($format) {
+        switch ($_EV_CONF['enable_centerblock']) {
         case self::TABLE:   // table format
             $tpl_file = 'centerblock.thtml';
             $hidesmall = $_EV_CONF['cb_hide_small'];
+            $length = $_EV_CONF['limit_summary'];
             break;
         case self::STORY:   // story format
             $tpl_file = 'cblock_stories.thtml';
             $hidesmall = false;
+            $length = -1;
             break;
         default:            // invalid format
             return '';
@@ -116,7 +117,6 @@ class Centerblock
 
         $range    = $_EV_CONF['range_centerblock'];
         $limit    = (int)$_EV_CONF['limit_block'];
-        $length   = $_EV_CONF['limit_summary'];
         // Retrieve Centerblock Settings
         $_dt = clone($_CONF['_now']);
         $interval = (int)$_EV_CONF['max_upcoming_days'];
@@ -215,7 +215,9 @@ class Centerblock
             if ($date == '_empty_') continue;
             foreach ($day as $A) {
                 // Don't display birthdays as story items
-                if ($format == 2 && $A['cal_id'] == -2) continue;
+                if ($_EV_CONF['enable_centerblock'] == self::STORY && $A['cal_id'] == -2) {
+                    continue;
+                }
 
                 // Make sure we only show each event once for multiday
                 if ($dup_chk != '') {
@@ -232,8 +234,10 @@ class Centerblock
 
                 // Prepare the summary for display. Remove links and autotags
                 $summary = empty($A['summary']) ? $A['title'] : $A['summary'];
-                $summary = strip_tags($summary, '<a>');
-                $summary = preg_replace($patterns, '', $summary);
+                $summary = strip_tags($summary, '<div><a><img>');
+                if (!empty($patterns)) {
+                    $summary = preg_replace($patterns, '', $summary);
+                }
 
                 if (!empty($length) && $length >= 1) {
                     if (strlen($summary) > $length) {

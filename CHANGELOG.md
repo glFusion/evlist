@@ -32,6 +32,9 @@ Release TBD
   - Add option to show or hide QRCodes on printed tickets.
   - Configurable key used to hide repeating events from centerblock.
 - Allow deleting calendars that were previously reserved (Birthdays and Meetup Events).
+- Allow custom display ordering of ticket types.
+- Include event pass tickets in per-instance signup lists.
+- Enable advanced editor for event summary.
 
 ## v1.4.5
 Release 2018-04-14

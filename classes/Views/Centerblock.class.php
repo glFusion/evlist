@@ -105,11 +105,13 @@ class Centerblock
             $tpl_file = 'centerblock.thtml';
             $hidesmall = $_EV_CONF['cb_hide_small'];
             $length = $_EV_CONF['limit_summary'];
+            $allowed_tags = '';
             break;
         case self::STORY:   // story format
             $tpl_file = 'cblock_stories.thtml';
             $hidesmall = false;
             $length = -1;
+            $allowed_tags = '<div><a><img>';
             break;
         default:            // invalid format
             return '';
@@ -234,7 +236,7 @@ class Centerblock
 
                 // Prepare the summary for display. Remove links and autotags
                 $summary = empty($A['summary']) ? $A['title'] : $A['summary'];
-                $summary = strip_tags($summary, '<div><a><img>');
+                $summary = strip_tags($summary, $allowed_tags);
                 if (!empty($patterns)) {
                     $summary = preg_replace($patterns, '', $summary);
                 }

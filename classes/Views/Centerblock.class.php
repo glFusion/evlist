@@ -295,7 +295,7 @@ class Centerblock
                     'endtime1'  => EVLIST_formattedTime($e_ts1),
                     'allday'    => $A['allday'],
                     'adblock'   => PLG_displayAdBlock('evlist_centerblock', $count),
-                    'multiday'  => $A['allday'] && ($A['rp_date_start'] != $A['rp_date_end']),
+                    'multiday'  => ($A['rp_date_start'] != $A['rp_date_end']),
                 ) );
                 if (isset($A['split']) && $A['split'] == 1) {
                     $s_ts2 = strtotime($A['rp_date_start'] . ' ' . $A['rp_time_start2']);

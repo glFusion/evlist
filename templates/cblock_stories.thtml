@@ -2,7 +2,7 @@
 <!-- BEGIN eventRow -->
 <article class="uk-article tm-article uk-margin-bottom">
   <h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
-      <a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}</a>
+      <a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
   </h1>
     <div class="story-body">
         {summary}

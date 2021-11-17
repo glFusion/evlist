@@ -89,5 +89,5 @@ $DEFVALUES['evlist_repeat'] = "INSERT INTO `gl_evlist_repeat` VALUES
     (40,'20070924175337252',1,'2037-02-14','2037-02-14','00:00:00','23:59:59','00:00:00','00:00:00','2037-02-14 23:59:59','2037-02-14 23:59:59',2,2,'2021-10-13 15:16:41')";
 
 $DEFVALUES['evlist_tickettypes'] = "INSERT INTO `{$_TABLES['evlist_tickettypes']}` VALUES
-    (0, 'General Admission', 0, 1)";
+    (0, 10, 'general', 'General Admission', 0, 1)";
 

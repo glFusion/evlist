@@ -176,7 +176,7 @@ $_SQL['evlist_tickettypes'] = "CREATE TABLE `{$_TABLES['evlist_tickettypes']}` (
   `event_pass` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`tt_id`),
-  KEY `orderby` (`orderby`
+  KEY `orderby` (`orderby`)
 ) ENGINE=MyISAM";
 
 $_EV_UPGRADE = array(

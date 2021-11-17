@@ -41,7 +41,6 @@ if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
 class DateFunc
 {
     const DEF_FORMAT = 'Y-m-d';
-    const CAL = CAL_GREGORIAN;
 
     /**
      * Returns the current local date. NOTE: This function
@@ -686,7 +685,7 @@ class DateFunc
     public static function daysInMonth($month=0, $year=0)
     {
         list($day, $month, $year) = self::validateParams(1, $month, $year);
-        return cal_days_in_month(self::CAL, $month, $year);
+        return cal_days_in_month(CAL_GREGORIAN, $month, $year);
     }
 
 
@@ -1493,4 +1492,3 @@ class DateFunc
 
 }
 
-?>

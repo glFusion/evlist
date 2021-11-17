@@ -301,7 +301,8 @@ class Editor
             }
             //$Intervals = new Models\Intervals;
             $T->set_var(array(
-                'recurring' => $this->Event->isRecurring(),
+                'is_recurring' => $this->Event->isRecurring(),
+                'recur_type' => $this->Event->getRecurring(),
                 'recur_section' => 'true',
                 'contact_section' => 'true',
                 'category_section' => 'true',

@@ -1038,7 +1038,7 @@ for (i = 0; i < el.length; i++) {
 $(document).ready(function() {
 	toggleRSVPdetail({use_rsvp});
 {!if recur_section}
-	showhideformatoptions({recurring});
+	showhideformatoptions({recur_type});
 {!endif}
 	showhide_tzselect(document.getElementById("tz_local"));
 	chk_allday();

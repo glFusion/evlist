@@ -1184,6 +1184,7 @@ class Event
             options = '" . DB_escapeString(serialize($this->options)) . "' ";
 
         $sql = $sql1 . $fld_sql . $sql2;
+        //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
             $this->Errors[] = $LANG_EVLIST['err_db_saving'];
@@ -1244,6 +1245,8 @@ class Event
             return false;
         }
 
+        $force_delete = false;
+
         // Make sure the current user has access to delete this event.
         // Try to retrieve the event. If the event is found and the user does
         // not have write access, return false.
@@ -1263,9 +1266,12 @@ class Event
                     return false;
                 }
             }
+            if ($A['status'] == Status::CANCELLED) {
+                $force_delete = true;
+            }
         }
 
-        if ($_EV_CONF['purge_cancelled_days'] < 1) {
+        if ($force_delete || $_EV_CONF['purge_cancelled_days'] < 1) {
             DB_delete($_TABLES['evlist_remlookup'], 'eid', $eid);
             DB_delete($_TABLES['evlist_lookup'], 'eid', $eid);
             DB_delete($_TABLES['evlist_tickets'], 'ev_id', $eid);
@@ -2076,6 +2082,17 @@ class Event
 
 
     /**
+     * Get the raw error messages for logging.
+     *
+     * @return  array   Array of error messages
+     */
+    public function getErrors() : array
+    {
+        return $this->Errors;
+    }
+
+
+    /**
      * Create the individual occurrances of a the current event.
      * If the event is not recurring, returns an array with only one element.
      *
@@ -2817,17 +2834,13 @@ class Event
             break;
         case 'repeats':
             $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-calendar"></i>',
+                '<i class="uk-icon uk-icon-repeat"></i>',
                 EVLIST_ADMIN_URL . '/index.php?repeats=x&eid=' . $A['id'],
             );
             break;
         case 'delete':
             // Enabled events get cancelled, others get immediately deleted.
-            if ($A['status'] == Status::ENABLED) {
-                $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
-            } else {
-                $url = EVLIST_ADMIN_URL. '/index.php?delcancelled=x&eid=' . $A['id'];
-            }
+            $url = EVLIST_ADMIN_URL. '/index.php?delevent=x&eid=' . $A['id'];
             if (isset($_REQUEST['cal_id'])) {
                 $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
             }

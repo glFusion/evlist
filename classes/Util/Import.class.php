@@ -40,7 +40,7 @@ class Import
         // First, upload the file
         USES_class_upload();
 
-        $upload = new upload ();
+        $upload = new \upload();
         $upload->setPath ($_CONF['path_data']);
         $upload->setAllowedMimeTypes(array(
             'text/plain' => '.txt, .csv',
@@ -66,7 +66,7 @@ class Import
             $retval = $LANG_EVLIST['err_invalid_import'];
             return $retval;
         }
-        $success = 0;
+        $successes = 0;
         $failures = 0;
 
         // Set owner_id to the current user and group_id to the default
@@ -77,8 +77,7 @@ class Import
         if ($group_id < 2) $group_id = 2;  // last resort, use Root
 
         while (($event = fgetcsv($fp)) !== false) {
-            $Ev = new Evlist\Event();
-            $Ev->isNew = true;
+            $Ev = new Event();
             $i = 0;
             $A = array(
                 'date_start1'   => $event[$i++],
@@ -104,13 +103,13 @@ class Import
                 'hits'          => 0,
                 'recurring'     => 0,
                 'split'         => 0,
-                'time_start2'   => '00:00:00',
-                'time_end2'     => '00:00:00',
+                'time_start2'   => '00:00',
+                'time_end2'     => '00:00',
                 'owner_id'      => $owner_id,
                 'group_id'      => $group_id,
             );
 
-            if ($_CONF['hour_mode'] == 12) {
+            /*if ($_CONF['hour_mode'] == 12) {
                 list($hour, $minute, $second) = explode(':', $A['time_start1']);
                 if ($hour > 12) {
                     $hour -= 12;
@@ -138,13 +137,16 @@ class Import
                 $A['end1_ampm'] = $am;
                 $A['endhour1'] = $hour;
                 $A['endminute1'] = $minute;
-            }
-            if ($A['time_start1'] == '00:00:00' && $A['time_end1'] == '00:00:00') {
+            }*/
+            if (
+                substr($A['time_start1'], 0, 5) == '00:00' &&
+                substr($A['time_end1'], 0, 5) == '00:00'
+            ) {
                 $A['allday'] = 1;
             } else {
                 $A['allday'] = 0;
             }
-            $msg = $Ev->Save($A);
+            $status = $Ev->Save($A);
             if (empty($msg)) {
                 $successes++;
             } else {
@@ -185,7 +187,7 @@ class Import
             $e_ampm = $e_hour == 0 || $e_hour > 12 ? 'pm' : 'am';
 
             $E = array(
-                'eid'           => $A['eid'],
+                'ev_id'         => $A['eid'],
                 'title'         => $A['title'],
                 'summary'       => $A['description'],
                 'full_description' => '',
@@ -230,8 +232,12 @@ class Import
             }
 
             // Force it to be a new event even though we have an event ID
-            if ($Ev->forceNew()->Save($E) !== '') {
-                COM_errorLog(sprintf($LANG_EVLIST['err_import_event'], $A['eid']));
+            $status = $Ev->forceNew()->Save($E);
+            if (!$status) {
+                COM_errorLog(
+                    sprintf($LANG_EVLIST['err_import_event'], $A['eid']) .
+                    var_dump($Ev->getErrors(),true)
+                );
                 $errors++;
                 continue;       // This one failed, keep trying the others
             }

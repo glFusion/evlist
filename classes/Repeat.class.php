@@ -258,7 +258,9 @@ class Repeat
      */
     public function setTimeStart1($tm)
     {
-        $this->time_start1 = $tm;
+        if (!empty($tm)) {
+            $this->time_start1 = $tm;
+        }
         return $this;
     }
 
@@ -271,7 +273,9 @@ class Repeat
      */
     public function setTimeEnd1($tm)
     {
-        $this->time_end1 = $tm;
+        if (!empty($tm)) {
+            $this->time_end1 = $tm;
+        }
         return $this;
     }
 
@@ -284,7 +288,9 @@ class Repeat
      */
     public function setTimeStart2($tm)
     {
-        $this->time_start2 = $tm;
+        if (!empty($tm)) {
+            $this->time_start2 = $tm;
+        }
         return $this;
     }
 
@@ -297,7 +303,9 @@ class Repeat
      */
     public function setTimeEnd2($tm)
     {
-        $this->time_end2 = $tm;
+        if (!empty($tm)) {
+            $this->time_end2 = $tm;
+        }
         return $this;
     }
 
@@ -539,7 +547,7 @@ class Repeat
         $time_start2 = DB_escapeString($this->time_start2);
         $time_end1 = DB_escapeString($this->time_end1);
         $time_end2 = DB_escapeString($this->time_end2);
-        if ($time_end2 != '00:00') {
+        if (substr($time_end2, 0, 5) != '00:00') {
             $t_end = $time_end2;
         } else {
             $t_end = $time_end1;
@@ -2325,7 +2333,7 @@ class Repeat
      * @param   array   $icon_arr   Array of system icons
      * @return  string      HTML to display for the field
      */
-    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    public static function getAdminField(string $fieldname, string $fieldvalue, array $A, array $icon_arr) : string
     {
         global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
         static $del_icon = NULL;
@@ -2390,7 +2398,7 @@ class Repeat
     /**
      * Delete orphaned occurrence records that have no matching Event.
      */
-    public static function cleanOrphans()
+    public static function cleanOrphans() : void
     {
         global $_TABLES;
 

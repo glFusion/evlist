@@ -106,12 +106,16 @@ class Centerblock
             $hidesmall = $_EV_CONF['cb_hide_small'];
             $length = $_EV_CONF['limit_summary'];
             $allowed_tags = '';
+            $use_outputfilter = false;
+            $strip_tags = true;
             break;
         case self::STORY:   // story format
             $tpl_file = 'cblock_stories.thtml';
             $hidesmall = false;
             $length = -1;
             $allowed_tags = '<div><a><img>';
+            $use_outputfilter = true;
+            $strip_tags = false;
             break;
         default:            // invalid format
             return '';
@@ -236,7 +240,9 @@ class Centerblock
 
                 // Prepare the summary for display. Remove links and autotags
                 $summary = empty($A['summary']) ? $A['title'] : $A['summary'];
-                $summary = strip_tags($summary, $allowed_tags);
+                if ($strip_tags) {
+                    $summary = strip_tags($summary, $allowed_tags);
+                }
                 if (!empty($patterns)) {
                     $summary = preg_replace($patterns, '', $summary);
                 }
@@ -317,6 +323,9 @@ class Centerblock
 
         $T->parse('output', 'centerblock');
         $retval .= $T->finish($T->get_var('output'));
+        if ($use_outputfilter) {
+            $retval = PLG_outputFilter($retval, 'evlist_cblock');
+        }
         return $retval;
     }
 

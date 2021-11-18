@@ -494,9 +494,10 @@ class Repeat
             // A form was submitted, check if the values are different.
             $Detail = $this->getDetail();
             $newDetail = Detail::fromArray($A);
+
             if (!$Detail->Matches($newDetail)) {
                 $this->Detail = $newDetail;
-                if ($A['save_type'] == 'saveepeat') {
+                if ($A['save_type'] == 'saverepeat') {
                     // Saving a single occurrence.
                     if (self::countWithDetail($this->det_id) < 2) {
                         // If this repeat is the only one using this detail

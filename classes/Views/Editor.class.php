@@ -64,8 +64,16 @@ class Editor
         } else {
             $this->cancel_url = EVLIST_URL . '/index.php';
         }
+        $this->isAdmin = plugin_isadmin_evlist();
     }
 
+
+    /**
+     * Set the event being edited.
+     *
+     * @param   object  $Event  Event object
+     * @return  object  $this
+     */
     public function withEvent(Event $Event) : self
     {
         $this->Event = $Event;
@@ -73,6 +81,13 @@ class Editor
         return $this;
     }
 
+
+    /**
+     * Set the specific occurrence being edited.
+     *
+     * @param   object  $Repeat Repeat object
+     * @return  object  $this
+     */
     public function withRepeat(Repeat $Repeat) : self
     {
         $this->Repeat = $Repeat;
@@ -238,7 +253,6 @@ class Editor
 
         // Basic tabs for editing both events and instances, show up on
         // all edit forms
-        $tabs = array('ev_info', 'ev_location', 'ev_contact',);
         $alert_msg = '';
         $rp_id = (int)$this->getRepeatID();
         if ($this->Repeat) {   // Editing a single occurrence
@@ -296,9 +310,12 @@ class Editor
                     'error');
             }
             if ($this->isAdmin) {
-                $tabs[] = 'ev_perms';   // Add permissions tab, event edit only
                 $T->set_var('permissions_editor', 'true');
             }
+            if ($_EV_CONF['enable_rsvp']) {
+                $T->set_var('rsvp_enabled', true);
+            }
+
             //$Intervals = new Models\Intervals;
             $T->set_var(array(
                 'is_recurring' => $this->Event->isRecurring(),
@@ -463,16 +480,10 @@ class Editor
         $cal_select = Calendar::optionList($this->Event->getCalendarID(), true, 3);
         $navbar = new \navbar;
         $cnt = 0;
-        foreach ($tabs as $id) {
-            $navbar->add_menuitem($LANG_EVLIST[$id],'showhideEventDiv("'.$id.'",'.$cnt.');return false;',true);
-            $cnt++;
-        }
-        $navbar->set_selected($LANG_EVLIST['ev_info']);
 
         $T->set_var(array(
             'is_admin'      => $this->isAdmin,
             'action_url'    => $action_url,
-            'navbar'        => $navbar->generate(),
             'alert_msg'     => $alert_msg,
             'cancel_url'    => $this->cancel_url,
             'eid'           => $this->Event->getID(),
@@ -691,7 +702,7 @@ class Editor
             $T->set_var(array(
                 //'owner_username' => COM_stripslashes($ownerusername),
                 'owner_dropdown' => COM_optionList(
-                    $_TABLES['users'], 'uid,username', $this->owner_id, 1
+                    $_TABLES['users'], 'uid,username', $this->Event->getOwnerID(), 1
                 ),
                 'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
                     (int)$this->Event->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
@@ -721,14 +732,28 @@ class Editor
 
         // Latitude & Longitude part of location, if Location plugin is used
         if ($_EV_CONF['use_locator']) {
-            $status = LGLIB_invokeService('locator', 'optionList', '',
-                $output, $svc_msg);
+            $status = LGLIB_invokeService(
+                'locator', 'optionList',
+                '',
+                $output,
+                $svc_msg
+            );
             if ($status == PLG_RET_OK) {
                 $T->set_var(array(
                     'use_locator'   => 'true',
                     'loc_selection' => $output,
                 ) );
             }
+            /*$opts = PLG_callFunctionForOnePlugin(
+                'plugin_optionlist_locator',
+                array(1 => '')
+            );
+            if (!empty($opts)) {
+                $T->set_var(array(
+                    'use_locator'   => 'true',
+                    'loc_selection' => $output,
+                ) );
+            }*/
         }
         $T->parse('tooltipster_js', 'tips');
         $T->parse('output', 'editor');

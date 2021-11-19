@@ -872,7 +872,7 @@ function toggleRSVPdetail(val)
                     <div class="uk-form-row uk-margin">
                         <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_prompts']}</label>
                         <div class="uk-form-controls">
-                            <input class="uk-input" type="text" name="rsvp_cmt_prompts" value="{rsvp_cmt_prompts}" />
+                            <input class="uk-input uk-form-width-large" type="text" name="rsvp_cmt_prompts" value="{rsvp_cmt_prompts}" />
                         </div>
                     </div>
 

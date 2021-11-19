@@ -1,24 +1,26 @@
 <?php
 /**
-*   Installation defaults for the evList plugin
-*
-*   @author     Mark R. Evans mark AT glfusion DOT org
-*   @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
-*   @package    evlist
-*   @version    v1.4.6
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Installation defaults for the evList plugin.
+ *
+ * @author     Mark R. Evans
+ * @author     Lee P. Garner
+ * @copyright  Copyright (c) 2008 - 2010 Mark R. Evans <mark AT glfusion DOT org>
+ * @copyright  Copyright (c) 2011 - 2021 Lee P. Garner <lee AT leegarner DOT com>
+ * @package    evlist
+ * @version    v1.5.0
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 if (!defined ('GVERSION')) {
     die('This file can not be used on its own!');
 }
 
 /**
-*   @global array   $evlistConfigData
-*   evList default settings
-*/
+ * evList default settings.
+ * @global  array   $evlistConfigData
+ */
 global $evlistConfigData;
 $evlistConfigData = array(
     array(
@@ -370,7 +372,7 @@ $evlistConfigData = array(
     ),
     array(
         'name' => 'enable_rsvp',
-        'default_value' => 0,
+        'default_value' => 1,
         'type' => 'select',
         'subgroup' => 10,
         'fieldset' => 0,
@@ -476,16 +478,16 @@ $evlistConfigData = array(
 
 
 /**
-* Initialize evList plugin configuration
-*
-* Creates the database entries for the configuation if they don't already
-* exist. Initial values will be taken from $CONF_EVLIST if available (e.g. from
-* an old config.php), uses $CONF_EVLIST_DEFAULT otherwise.
-*
-* @param    integer $group_id   Not used
-* @return   boolean     true: success; false: an error occurred
-*
-*/
+ * Initialize evList plugin configuration.
+ *
+ * Creates the database entries for the configuation if they don't already
+ * exist. Initial values will be taken from $CONF_EVLIST if available (e.g. from
+ * an old config.php), uses $CONF_EVLIST_DEFAULT otherwise.
+ *
+ * @param   integer $group_id   Not used
+ * @return  boolean     true: success; false: an error occurred
+ *
+ */
 function plugin_initconfig_evlist($group_id = 0)
 {
     global $evlistConfigData;
@@ -512,4 +514,3 @@ function plugin_updateconfig_evlist()
     _update_config('evlist', $evlistConfigData);
 }
 
-?>

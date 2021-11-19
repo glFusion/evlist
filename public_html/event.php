@@ -321,8 +321,9 @@ case 'clone':
             EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
         }
         $Ev = Evlist\Event::getInstance($_GET['eid']);
-        if ($Ev->getID() == '' || !$Ev->canEdit())      // Event not found
-            break;
+        if ($Ev->getID() == '' || !$Ev->canEdit()) {    // Event not found
+            COM_404();
+        }
         // Now prep it to be saved as a new record
         $Ev->setID('');
         $Ev->forceNew();

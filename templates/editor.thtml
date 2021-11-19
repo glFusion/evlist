@@ -297,6 +297,9 @@ function toggleRSVPdetail(val)
     <li><a href="#">{$LANG_EVLIST['ev_info']}</a></li>
     <li><a href="#">{$LANG_EVLIST['ev_location']}</a></li>
     <li><a href="#">{$LANG_EVLIST['ev_contact']}</a></li>
+{!if rsvp_enabled}
+    <li><a href="">{$LANG_EVLIST['registration']}</a></li>
+{!endif}
 {!if permissions_editor}
     <li><a href="">{$LANG_EVLIST['ev_perms']}</a></li>
 {!endif}
@@ -677,112 +680,6 @@ function toggleRSVPdetail(val)
 				</div>
 {!endif}
 {!endif}
-
-			</fieldset>
-{!endif}
-
-{!if enable_rsvp}
-			<fieldset class="evForm">
-				<legend>Registration</legend>
-				<div class="uk-form-row uk-margin">
-					<label class="uk-form-label">{$LANG_EVLIST['use_rsvp']}:</label>
-					<div class="uk-form-controls">
-						<input id="use_rsvp" class="uk-radio" type="radio" name="use_rsvp" value="0" {reg_chk0}
-							onclick="javascript:toggleRSVPdetail(0);" />&nbsp;{$LANG_EVLIST['rsvp_none']}&nbsp;&nbsp;
-						<input class="uk-radio" type="radio" name="use_rsvp" value="1" {reg_chk1}
-							onclick="javascript:toggleRSVPdetail(1);" />&nbsp;{$LANG_EVLIST['rsvp_event']}&nbsp;&nbsp;
-						<span id="rsvp_repeat">
-							<input class="uk-radio" type="radio" name="use_rsvp" value="2" {reg_chk2}
-								onclick="javascript:toggleRSVPdetail(2);" />&nbsp;{$LANG_EVLIST['rsvp_repeat']}
-						</span>
-					</div>
-				</div>
-
-				<div id="rsvp_detail">
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['max_rsvp']}:</label>
-						<div class="uk-form-controls uk-form-controls-text">
-							<input class="uk-input uk-form-width-small" type="text" id="max_rsvp" name="max_rsvp" maxlength="5" value="{max_rsvp}" />
-							&nbsp;&nbsp;{$LANG_EVLIST['rsvp_waitlist']}
-							<input class="uk-checkbox" type="checkbox" name="rsvp_waitlist" value="1" {rsvp_wait_chk} />
-						</div>
-					</div>
-
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['rsvp_cutoff']}:</label>
-						<div class="uk-form-controls">
-							<input class="uk-input uk-form-width-small" type="text" name="rsvp_cutoff" maxlength="5" id="rsvp_cutoff" value="{rsvp_cutoff}" />
-						</div>
-					</div>
-
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['max_user_rsvp']}:</label>
-						<div class="uk-form-controls">
-							<input class="uk-input uk-form-width-small" type="text" name="max_user_rsvp" maxlength="5" id="max_user_rsvp" value="{max_user_rsvp}" />
-						</div>
-					</div>
-
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['tickettypes']}:</label>
-						<div class="uk-form-controls">
-							<table>
-								<tr>
-									<th>{$LANG_EVLIST['enabled']}</th>
-									<th>{$LANG_EVLIST['type']}</th>
-									<th>{$LANG_EVLIST['fee']}</th>
-								</tr>
-<!-- BEGIN Tickets -->
-								<tr>
-									<td>
-										<input name="tickets[{tick_id}]" class="uk-checkbox" type="checkbox" {!if tick_checked}checked="checked"{!endif} value="1" />
-									</td>
-									<td>{tick_dscp}</td>
-									<td><input class="uk-input uk-form-small uk-form-width-small" type="text" name="tick_fees[{tick_id}]" value="{tick_fee}"/></td>
-								</tr>
-<!-- END Tickets -->
-							</table>
-						</div>
-					</div>
-
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['tic_cmt_allowed']}?</label>
-						<div class="uk-form-controls uk-form-controls-text">
-							<input class="uk-checkbox" type="checkbox" name="rsvp_comments" value="1" {rsvp_cmt_chk} />
-						</div>
-					</div>
-
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['tic_cmt_prompts']}</label>
-						<div class="uk-form-controls">
-							<input class="uk-input" type="text" name="rsvp_cmt_prompts" value="{rsvp_cmt_prompts}" />
-						</div>
-					</div>
-
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['tic_cmt_view_grp']}:</label>
-						<div class="uk-form-controls">
-							{rsvp_view_grp_dropdown}
-						</div>
-					</div>
-
-{!if 0}
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['txt_fields']}</label>
-						<div class="uk-form-controls">
-							<input id="txt_fields" name="txt_fields" class="uk-input uk-form-width-small" type="text" maxlength="255" />
-						</div>
-					</div>
-{!endif}
-{!if rsvp_print}
-					<div class="uk-form-row uk-margin">
-						<label class="uk-form-label">{$LANG_EVLIST['allow_ticket_printing']}?:</label>
-						<div class="uk-form-controls">
-							<input class="uk-radio" type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}>&nbsp;{$LANG_EVLIST['no']}&nbsp;&nbsp;
-							<input class="uk-radio" type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}>&nbsp;{$LANG_EVLIST['paid_only']}&nbsp;&nbsp;
-							<input class="uk-radio" type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}>&nbsp;{$LANG_EVLIST['paid_or_unpaid']}
-						</div>
-					</div>
-{!endif}
 			</fieldset>
 {!endif}
 		</li>
@@ -899,6 +796,106 @@ function toggleRSVPdetail(val)
 			</fieldset>
 {!endif}
 		</li>
+
+{!if rsvp_enabled}
+        <li>
+            <fieldset class="evForm">
+                <legend>{$LANG_EVLIST['registration']}</legend>
+                <div class="uk-form-row uk-margin">
+                    <label class="uk-form-label">{$LANG_EVLIST['use_rsvp']}:</label>
+                    <div class="uk-form-controls">
+                        <input id="use_rsvp" class="uk-radio" type="radio" name="use_rsvp" value="0" {reg_chk0}
+                            onclick="javascript:toggleRSVPdetail(0);" />&nbsp;{$LANG_EVLIST['rsvp_none']}&nbsp;&nbsp;
+                        <input class="uk-radio" type="radio" name="use_rsvp" value="1" {reg_chk1}
+                            onclick="javascript:toggleRSVPdetail(1);" />&nbsp;{$LANG_EVLIST['rsvp_event']}&nbsp;&nbsp;
+                        <span id="rsvp_repeat">
+                            <input class="uk-radio" type="radio" name="use_rsvp" value="2" {reg_chk2}
+                                onclick="javascript:toggleRSVPdetail(2);" />&nbsp;{$LANG_EVLIST['rsvp_repeat']}
+                        </span>
+                    </div>
+                </div>
+
+                <div id="rsvp_detail">
+                <div id="rsvp_detail">
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['max_rsvp']}:</label>
+                        <div class="uk-form-controls uk-form-controls-text">
+                            <input class="uk-input uk-form-width-small" type="text" id="max_rsvp" name="max_rsvp" maxlength="5" value="{max_rsvp}" />
+                            &nbsp;&nbsp;{$LANG_EVLIST['rsvp_waitlist']}
+                            <input class="uk-checkbox" type="checkbox" name="rsvp_waitlist" value="1" {rsvp_wait_chk} />
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['rsvp_cutoff']}:</label>
+                        <div class="uk-form-controls">
+                            <input class="uk-input uk-form-width-small" type="text" name="rsvp_cutoff" maxlength="5" id="rsvp_cutoff" value="{rsvp_cutoff}" />
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['max_user_rsvp']}:</label>
+                        <div class="uk-form-controls">
+                            <input class="uk-input uk-form-width-small" type="text" name="max_user_rsvp" maxlength="5" id="max_user_rsvp" value="{max_user_rsvp}" />
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['tickettypes']}:</label>
+                        <div class="uk-form-controls">
+                            <table>
+                                <tr>
+                                    <th>{$LANG_EVLIST['enabled']}</th>
+                                    <th>{$LANG_EVLIST['type']}</th>
+                                    <th>{$LANG_EVLIST['fee']}</th>
+                                </tr>
+<!-- BEGIN Tickets -->
+                                <tr>
+                                    <td>
+                                        <input name="tickets[{tick_id}]" class="uk-checkbox" type="checkbox" {!if tick_checked}checked="checked"{!endif} value="1" />
+                                    </td>
+                                    <td>{tick_dscp}</td>
+                                    <td><input class="uk-input uk-form-small uk-form-width-small" type="text" name="tick_fees[{tick_id}]" value="{tick_fee}"/></td>
+                                </tr>
+<!-- END Tickets -->
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_allowed']}?</label>
+                        <div class="uk-form-controls uk-form-controls-text">
+                            <input class="uk-checkbox" type="checkbox" name="rsvp_comments" value="1" {rsvp_cmt_chk} />
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_prompts']}</label>
+                        <div class="uk-form-controls">
+                            <input class="uk-input" type="text" name="rsvp_cmt_prompts" value="{rsvp_cmt_prompts}" />
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_view_grp']}:</label>
+                        <div class="uk-form-controls">
+                            {rsvp_view_grp_dropdown}
+                        </div>
+                    </div>
+{!if rsvp_print}
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['allow_ticket_printing']}?:</label>
+                        <div class="uk-form-controls">
+                            <input class="uk-radio" type="radio" name="rsvp_print" value="0" {rsvp_print_chk0}>&nbsp;{$LANG_EVLIST['no']}&nbsp;&nbsp;
+                            <input class="uk-radio" type="radio" name="rsvp_print" value="1" {rsvp_print_chk1}>&nbsp;{$LANG_EVLIST['paid_only']}&nbsp;&nbsp;
+                            <input class="uk-radio" type="radio" name="rsvp_print" value="2" {rsvp_print_chk2}>&nbsp;{$LANG_EVLIST['paid_or_unpaid']}
+                        </div>
+                    </div>
+{!endif}
+                </div>
+            </fieldset>
+        </li>
+{!endif}
 
 {!if permissions_editor}
 		<li>

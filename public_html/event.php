@@ -202,6 +202,7 @@ case 'delfuture':
 
 case 'register':
     if ($rp_id < 1) {
+        COM_setMsg($LANG_EVLIST['ev_not_found']);
         break;
     } elseif (COM_isAnonUser()) {
         $display = EVLIST_siteHeader();
@@ -223,6 +224,7 @@ case 'register':
 case 'cancelreg':
     if ($rp_id < 1 || COM_isAnonUser()) {
         // Anonymous users can't register
+        COM_setMsg($LANG_EVLIST['ev_not_found']);
         break;
     }
     $Ev = Evlist\Repeat::getInstance($rp_id);
@@ -284,33 +286,47 @@ case 'edit':
             $rp_id = (int)$_GET['rp_id'];
             $Ev = Evlist\Repeat::getInstance($rp_id);
             $Editor = new Evlist\Views\Editor;
-            $content .= $Editor->withSaveAction($actionval)->withRepeat($Ev)->Render();
-            /*if ($Ev->getEvent()->canEdit()) {
-                $content .= $Ev->Edit(0, $actionval);
+            if ($Ev->getEvent()->canEdit()) {
+                $content .= $Editor->withSaveAction($actionval)->withRepeat($Ev)->Render();
             } else {
                 COM_404();
-            }*/
+            }
+        } else {
+            COM_setMsg($LANG_EVLIST['ev_not_found']);
         }
         break;
     case 'event':
     default:
+        $actionval = 'event';
+        $Editor = new Evlist\Views\Editor;
         if (isset($_REQUEST['eid'])) {
             $Ev = Evlist\Event::getInstance($_REQUEST['eid']);
-            if ($Ev->canEdit()) {
+            $allowed = $Ev->canEdit();
+        } else {
+            $Ev = new Evlist\Event;
+            $allowed = EVLIST_canSubmit();
+        }
+        if ($allowed) {
+            $content .= $Editor->withSaveAction($actionval)->withEvent($Ev)->Render();
+            $add_link = false;
+        } else {
+            COM_404();
+        }
+            /*if ($Ev->canEdit()) {
                 // allowed to edit an existing event
                 $content .= $Ev->Edit('', $rp_id, 'save'.$actionval);
                 $add_link = false;
             } else {
                 COM_404();
-            }
-        } else {
+            }*/
+        /*} elseif (EVLIST_canSubmit()) {
             // Submitting a new event
-            if (EVLIST_canSubmit()) {
-                $Ev = new Evlist\Event();
-                $content .= $Ev->Edit();
-                $add_link = false;
-            }
-        }
+            $Ev = new Evlist\Event();
+            $content .= $Ev->Edit();
+            $add_link = false;
+        } else {
+            COM_404();
+        }*/
         break;
     }
     break;
@@ -329,6 +345,8 @@ case 'clone':
         $Ev->forceNew();
         $add_link = false;
         $content .= $Ev->Edit();
+    } else {
+        COM_404();
     }
     break;
 

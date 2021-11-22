@@ -877,7 +877,14 @@ function toggleRSVPdetail(val)
                     </div>
 
                     <div class="uk-form-row uk-margin">
-                        <label class="uk-form-label">{$LANG_EVLIST['tic_cmt_view_grp']}:</label>
+                        <label class="uk-form-label">{$LANG_EVLIST['rsvp_signup_grp']}:</label>
+                        <div class="uk-form-controls">
+                            {rsvp_signup_grp_dropdown}
+                        </div>
+                    </div>
+
+                    <div class="uk-form-row uk-margin">
+                        <label class="uk-form-label">{$LANG_EVLIST['rsvp_view_grp']}:</label>
                         <div class="uk-form-controls">
                             {rsvp_view_grp_dropdown}
                         </div>

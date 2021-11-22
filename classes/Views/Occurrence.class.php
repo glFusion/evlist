@@ -347,10 +347,7 @@ class Occurrence
             );
         }
 
-        if (
-            $_EV_CONF['enable_rsvp'] == 1 &&
-            $Event->getOption('use_rsvp') > 0
-        ) {
+        if ($Event->userCanRegister()) {
             if (time() > $this->Repeat->getDateStart1()->toUnix() - ((int)$Event->getOption('rsvp_cutoff') * 86400)) {
                 $past_cutoff = true;
             } else {

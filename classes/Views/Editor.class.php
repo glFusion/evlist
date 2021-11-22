@@ -707,6 +707,9 @@ class Editor
                 'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
                     (int)$this->Event->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
                 ),
+                'rsvp_signup_grp_dropdown' => SEC_getGroupDropdown(
+                    (int)$this->Event->getOption('rsvp_signup_grp', 1), 3, 'rsvp_signup_grp'
+                ),
             ) );
             if ($rp_id == 0) {  // can only change permissions on main event
                 $T->set_var('permissions_editor', SEC_getPermissionsHTML(

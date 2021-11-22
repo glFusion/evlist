@@ -240,7 +240,6 @@ class Event
 
         $this->isNew = true;
 
-        $this->options['rsvp_view_grp'] = 1;
         if ($ev_id == '') {
             $this->owner_id = $_USER['uid'];
             $this->enable_comments = $_EV_CONF['commentsupport'] ? 0 : 2;
@@ -308,6 +307,7 @@ class Event
                 'contactlink' => '',
                 'max_user_rsvp' => 1,
                 'rsvp_comments' => 0,
+                'rsvp_signup_grp' => 1,
                 'rsvp_view_grp' => 1,
                 'rsvp_cmt_prompts' => array(),
             );
@@ -803,7 +803,8 @@ class Event
                 } else {
                     $this->options['rsvp_cmt_prompts'] = array();
                 }
-                $this->options['rsvp_view_grp'] = isset($row['rsvp_view_grp']) ? (int)$row['rsvp_view_grp'] : 2;
+                $this->options['rsvp_signup_grp'] = isset($row['rsvp_signup_grp']) ? (int)$row['rsvp_signup_grp'] : 2;
+                $this->options['rsvp_view_grp'] = isset($row['rsvp_view_grp']) ? (int)$row['rsvp_view_grp'] : 1;
                 $this->options['use_rsvp'] = isset($row['use_rsvp']) ? (int)$row['use_rsvp'] : 0;
                 $this->options['max_rsvp'] = isset($row['max_rsvp']) ? (int)$row['max_rsvp'] : 0;
                 $this->options['rsvp_waitlist'] = isset($row['rsvp_waitlist']) ? 1 : 0;
@@ -3086,6 +3087,23 @@ class Event
     public function getRevision() : int
     {
         return (int)$this->ev_revision;
+    }
+
+
+    /**
+     * See if the current user is allowed to register.
+     *
+     * @return  boolean     True if allowed, False if not.
+     */
+    public function userCanRegister() : bool
+    {
+        global $_EV_CONF;
+
+        return (
+            $_EV_CONF['enable_rsvp'] == 1 &&
+            $this->getOption('use_rsvp') > 0 &&
+            SEC_inGroup($this->getOption('rsvp_signup_grp'))
+        );
     }
 
 }

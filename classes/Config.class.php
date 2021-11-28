@@ -117,6 +117,9 @@ final class Config
      */
     public static function set(string $key, $val=NULL)
     {
+        global $_EV_CONF;
+
+        $_EV_CONF[$key] = $val;     // legacy support
         return self::getInstance()->_set($key, $val);
     }
 

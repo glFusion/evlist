@@ -122,7 +122,7 @@
 	<li>
 {!endif}
 {!if summary}
-		<div class="uk-margin">
+		<div class="evEventItem uk-margin">
 			<label>{$LANG_EVLIST['what']}:</label>
 			<div id="what">
 				{summary}

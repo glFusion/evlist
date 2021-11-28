@@ -39,7 +39,7 @@ class Syndication //extends \glFusion\Syndication\Feed
             return self::getIcal($feed, $link, $update_data, $feedType);
             break;
         default:
-            return self::getXML($feed, $link, $update_data, $feedtype);
+            return self::getXML($feed, $link, $update_data, $feedType);
             break;
         }
     }

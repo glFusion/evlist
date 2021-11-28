@@ -13,6 +13,7 @@
  */
 namespace Evlist\Views;
 use Evlist\View;
+use Evlist\Config;
 use Evlist\Models\EventSet;
 use Evlist\Models\TimeRange;
 
@@ -40,25 +41,25 @@ class Centerblock
      */
     public function Render($where, $page, $topic = '')
     {
-        global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
+        global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
-        if ($_EV_CONF['pos_centerblock'] != $where ||
-            (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')) {
+        if (Config::get('pos_centerblock') != $where ||
+            (COM_isAnonUser() && Config::get('allow_anon_view') != '1')) {
             return '';
         }
 
         // If we show only on the homepage, check if that's where we are
         // If a topic is being displayed, then we're not on the homepage
         if (
-            $_EV_CONF['topic_centerblock'] == 'home' &&
+            Config::get('topic_centerblock') == 'home' &&
             ($page > 1 || !empty($topic))
         ) {
             return '';
         }
 
-        if ($_EV_CONF['topic_centerblock'] != 'all') {
+        if (Config::get('topic_centerblock') != 'all') {
             // display on topic page or not at all
-            if (!empty($topic) && $_EV_CONF['topic_centerblock'] != $topic) {
+            if (!empty($topic) && Config::get('topic_centerblock') != $topic) {
                 return '';
             }
         }
@@ -66,13 +67,13 @@ class Centerblock
         if (empty($display)) {  // not found in cache
             // overloading the previously-boolean enable_centerblock option to
             // indicate the centerblock format.
-            switch ($_EV_CONF['enable_centerblock']) {
+            switch (Config::get('enable_centerblock')) {
             case self::TABLE:       // table format
             case self::STORY:       // story format
                 $display = $this->getContent();
                 break;
             case self::CALENDAR:    // calendar format
-                $view = View::getView('month');
+                $view = View::getView(Config::get('default_view'));
                 $display = $view->Render();
                 break;
             case self::DISABLED:    // disabled
@@ -96,15 +97,15 @@ class Centerblock
      */
     private function getContent()
     {
-        global $_EV_CONF, $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
+        global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
         $retval = '';
 
-        switch ($_EV_CONF['enable_centerblock']) {
+        switch (Config::get('enable_centerblock')) {
         case self::TABLE:   // table format
             $tpl_file = 'centerblock.thtml';
-            $hidesmall = $_EV_CONF['cb_hide_small'];
-            $length = $_EV_CONF['limit_summary'];
+            $hidesmall = Config::get('cb_hide_small');
+            $length = Config::get('limit_summary');
             $allowed_tags = '';
             $use_outputfilter = false;
             $strip_tags = true;
@@ -121,11 +122,11 @@ class Centerblock
             return '';
         }
 
-        $range    = $_EV_CONF['range_centerblock'];
-        $limit    = (int)$_EV_CONF['limit_block'];
+        $range    = Config::get('range_centerblock');
+        $limit    = (int)Config::get('limit_block');
         // Retrieve Centerblock Settings
         $_dt = clone($_CONF['_now']);
-        $interval = (int)$_EV_CONF['max_upcoming_days'];
+        $interval = (int)Config::get('max_upcoming_days');
         if ($interval > 0) {
             $cb_max_date = $_dt
                 ->add(new \DateInterval("P{$interval}D"))
@@ -134,7 +135,7 @@ class Centerblock
             // no limit by days.
             $cb_max_date = '9999-12-31';
         }
-        $dup_chk = $_EV_CONF['cb_dup_chk'];
+        $dup_chk = Config::get('cb_dup_chk');
 
         $EventSet = EventSet::create()
             ->withLimit(empty($dup_chk) ? $limit : 0)
@@ -150,17 +151,17 @@ class Centerblock
         $Y = $_CONF['_now']->format('Y');
         $D = $_CONF['_now']->format('d');
         $M = $_CONF['_now']->format('m');
-        switch ($_EV_CONF['range_centerblock']) {
+        switch (Config::get('range_centerblock')) {
         case TimeRange::PAST:         // past events
-            $start = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 month"));
-            $end = date('Y-m-d', strtotime("{$_EV_CONF['_today']} - 1 day"));
+            $start = date('Y-m-d', strtotime(Config::get('_today')  . " - 1 month"));
+            $end = date('Y-m-d', strtotime(Config::get('_today') . " - 1 day"));
             $limit = 0;     // special, we need to get all events since we can't count back
             $EventSet->withOrder('DESC');
             break;
         case TimeRange::UPCOMING:         // upcoming events
         default:
             $EventSet->withUpcoming(true);
-            $start = $_EV_CONF['_today'];
+            $start = Config::get('_today');
             $end = $cb_max_date;
             break;
         case TimeRange::WEEK:         // this week
@@ -183,8 +184,8 @@ class Centerblock
 
         // Special handling needed to get the latest X past events.  We have a bunch
         // from the query (to make sure we got enough).  Now pick out the last X.
-        if ($_EV_CONF['range_centerblock'] == TimeRange::PAST) {
-            $limit = (int)$_EV_CONF['limit_block'];     // Need this value again
+        if (Config::get('range_centerblock') == TimeRange::PAST) {
+            $limit = (int)Config::get('limit_block');     // Need this value again
             $events = array_splice($events, ($limit * -1), $limit);
         }
 
@@ -221,7 +222,7 @@ class Centerblock
             if ($date == '_empty_') continue;
             foreach ($day as $A) {
                 // Don't display birthdays as story items
-                if ($_EV_CONF['enable_centerblock'] == self::STORY && $A['cal_id'] == -2) {
+                if (Config::get('enable_centerblock') == self::STORY && $A['cal_id'] == -2) {
                     continue;
                 }
 

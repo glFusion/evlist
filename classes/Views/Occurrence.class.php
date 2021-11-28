@@ -328,7 +328,7 @@ class Occurrence
         );
 
         // Show the user comments. Moderators and event owners can delete comments
-        if ($Event->commentsAllowed()) {
+        if ($Event->commentsEnabled()) {
             USES_lib_comment();
             $T->set_var(
                 'usercomments',

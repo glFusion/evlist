@@ -410,17 +410,16 @@ class Syndication //extends \glFusion\Syndication\Feed
                 $dtend = (new \Date($event['rp_end'], $_CONF['timezone']))
                     ->format('Ymd\THis\Z', false);
 
-                $summary = $event['title'];
+                $summary = self::_strip_tags($event['title']);
                 $permalink = COM_buildURL(EVLIST_URL . '/event.php?rp_id='. $event['rp_id']);
                 $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'] . $domain;
                 $created = max($event['rp_last_mod'], $event['ev_last_mod'], $event['det_last_mod']);
                 // Get the description. Prefer the text Summary, then HTML fulltext.
                 // Since a description is required, re-use the title if nothing else.
                 if (!empty($event['summary'])) {
-                    $description = $event['summary'];
+                    $description = self::_strip_tags($event['summary']);
                 } elseif (!empty($event['full_description'])) {
-                    // Strip HTML
-                    $description = strip_tags($event['full_description']);
+                    $description = self::_strip_tags($event['full_description']);
                 } else {
                     $description = $summary;    // Event title is required
                 }
@@ -503,6 +502,19 @@ class Syndication //extends \glFusion\Syndication\Feed
                 'version' => '1.0',
             ),
         );
+    }
+
+
+    /**
+     * Version of strip_tags to also take out trailing newline characters.
+     * Newlines may be added by the advanced editor.
+     *
+     * @param   string  $str    String to be modified
+     * @return  string      Modified string
+     */
+    private static function _strip_tags(string $str) : string
+    {
+        return strip_tags(trim($str));
     }
 
 }

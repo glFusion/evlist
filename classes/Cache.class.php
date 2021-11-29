@@ -38,7 +38,7 @@ class Cache
      * @param   integer $ttl    Optional TTL override, in seconds
      * @return  boolean         True on success, False on error.
      */
-    public static function set($key, $data, $tag='', $ttl = null)
+    public static function set($key, $data, $tag='', $ttl = 3600)
     {
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return true;
 

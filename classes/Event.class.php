@@ -2289,13 +2289,18 @@ class Event
      * Determine whether the current user has access to this event.
      *
      * @param   integer $level  Access level required
-     * @return  boolean         True = has sufficieng access, False = not
+     * @return  boolean         True = has sufficient access, False = not
      */
-    public function hasAccess($level=3)
+    public function hasAccess(int $level=3) : bool
     {
         // Admin & editor has all rights
         if ($this->isAdmin) {
             return true;
+        }
+
+        // If anonymous and anon not allowed, no need to check perms
+        if (!Config::get('allow_anon_view') && COM_isAnonUser()) {
+            return false;
         }
 
         $ev_access = SEC_hasAccess(
@@ -2322,8 +2327,6 @@ class Event
      */
     public function getCategories()
     {
-        global $_TABLES;
-
         $retval = array();
         if (!is_array($this->categories)) {
             return $retval;
@@ -2347,7 +2350,7 @@ class Event
      * @param   string  $cat_name   New category name.
      * @return  integer     ID of category
      */
-    public function saveCategory($cat_name)
+    public function saveCategory(string $cat_name) : int
     {
         $Cat = new Category();
         $Cat->setName($cat_name);
@@ -2624,26 +2627,23 @@ class Event
      * - Moderators
      * - All owners if moderation is not required
      * - Owners who have the evlist.submit privilege
+     * - Users and groups based on permissions matrix
      *
      * @return boolean     True if editing is allowed, False if not
      */
-    public function canEdit()
+    public function canEdit() : bool
     {
-        global $_CONF;
-
-        static $canedit = NULL;
-
-        if ($canedit === NULL) {
-            $canedit = false;
-            if (plugin_ismoderator_evlist()) {
+        $canedit = false;
+        if ($this->isAdmin || plugin_ismoderator_evlist()) {
+            $canedit = true;
+        } elseif ($this->isOwner()) {
+            if ($_CONF['storysubmission'] == 0) {
                 $canedit = true;
-            } elseif ($this->isOwner()) {
-                if ($_CONF['storysubmission'] == 0) {
-                    $canedit = true;
-                } elseif (plugin_issubmitter_evlist()) {
-                    $canedit = true;
-                }
+            } elseif (plugin_issubmitter_evlist()) {
+                $canedit = true;
             }
+        } else {
+            $canedit = $this->hasAccess(3);
         }
         return $canedit;
     }

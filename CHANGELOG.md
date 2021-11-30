@@ -35,6 +35,7 @@ Release TBD
 - Allow custom display ordering of ticket types.
 - Include event pass tickets in per-instance signup lists.
 - Enable advanced editor for event summary.
+- Improve Story-style centerblock
 
 ## v1.4.5
 Release 2018-04-14

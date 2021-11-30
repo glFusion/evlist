@@ -48,7 +48,7 @@ class EventSet
 
     /** Page number to show, based on the limit. Default is first page.
      * @var integer */
-    private $page = 0;
+    private $page = 1;
 
     /** Starting date in YYYY-MM-DD format.
      * @var string */
@@ -433,6 +433,7 @@ class EventSet
                     if (!isset($events[$A['rp_date_start']])) {
                         $events[$A['rp_date_start']] = array();
                     }
+
                     $A['options'] = @unserialize($A['options']);
                     $A['rec_data'] = @unserialize($A['rec_data']);
                     // Set a valid foreground and background color
@@ -442,17 +443,34 @@ class EventSet
                     if (empty($A['bgcolor'])) {
                         $A['bgcolor'] = 'inherit';
                     }
-                    if ($A['rp_date_start'] == $A['rp_date_end']) {
-                        // Single-day event just gets added to the array
+                    if (
+                        $A['rp_date_start'] == $A['rp_date_end'] ||
+                        ($this->ical == 1 && $A['allday'])
+                    ) {
+                        // Single-day repeats and allday repeats for ical feeds
+                        // just get added to the array.
                         $events[$A['rp_date_start']][] = $A;
                     } else {
-                        // Multi-day events get a record for each day up to the event end
-                        // or limit, whichever comes first
+                        // Multi-day repeats get a record for each day up to the event end
+                        // or limit, whichever comes first.  For timed repeats on ical feeds,
+                        // each instance gets a new record with the start and end
+                        // dates overridden.
                         $end_date = min($A['rp_date_end'], $this->end);
                         $newdate = max($A['rp_date_start'], $this->start);
+                        $count = 0;
+                        $rp_id = $A['rp_id'];
                         while ($newdate <= $end_date) {
-                            if (!isset($events[$newdate]))
+                            if ($this->ical == 1 && !$A['allday']) {
+                                // Override the id and dates for non-allday ical events
+                                $A['rp_id'] = $rp_id . '.' . $count++;
+                                $A['rp_date_start'] = $newdate;
+                                $A['rp_date_end'] = $newdate;
+                                $A['rp_start'] = $newdate . ' ' . $A['rp_time_start1'];
+                                $A['rp_end'] = $newdate . ' ' . $A['rp_time_end1'];
+                            }
+                            if (!isset($events[$newdate])) {
                                 $events[$newdate] = array();
+                            }
                             $events[$newdate][] = $A;
                             list($y, $m, $d) = explode('-', $newdate);
                             $newdate = DateFunc::nextDay($d, $m, $y);

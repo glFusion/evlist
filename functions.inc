@@ -54,17 +54,10 @@ Config::getInstance();
 
 require_once __DIR__ . '/evlist.php';
 
-// Check the version of the locator plugin and reset the use_locator
-// config value if it's inadequate.
-if (Config::get('use_locator') && !isset($_PLUGIN_INFO['locator'])) {
+// Check that the Locator plugin is enabled if the integration is used.
+if (Config::get('use_locator') && !in_array('locator', $_PLUGINS)) {
     Config::set('use_locator', 0);
 }
-/*if (isset($_EV_CONF) && $_EV_CONF['use_locator'] == 1) {
-    if (!isset($_PLUGIN_INFO['locator']) ||
-        !COM_checkVersion($_PLUGIN_INFO['locator']['pi_version'], $_EV_CONF['min_locator_ver'])) {
-        $_EV_CONF['use_locator'] = 0;
-    }
-}*/
 
 // Local configuration overrides can be set by having a config.php file.
 if (file_exists(__DIR__ . '/config.php')) {
@@ -75,11 +68,9 @@ if (file_exists(__DIR__ . '/config.php')) {
 // Override plugin config if login is required globally
 if ($_CONF['loginrequired'] == 1) {
     Config::set('allow_anon_view', 0);
-    //$_EV_CONF['allow_anon_view'] = '0';
 }
 
 // Include the user's language file, if found.  Default to englsh.
-
 $langpath = __DIR__ . '/language';
 require_once "$langpath/english_utf-8.php";
 if (file_exists("$langpath/custom/english_utf-8.php")) {

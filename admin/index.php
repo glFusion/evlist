@@ -392,7 +392,7 @@ case 'repeats':
     break;
 
 default:
-    $content .= Evlist\Event::adminList();
+    $content .= Evlist\Lists\AdminList::Render();
     $page = 'events';
     break;
 }

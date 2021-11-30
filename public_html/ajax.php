@@ -17,6 +17,26 @@ require_once __DIR__ . '/../lib-common.php';
 $content = '';
 
 switch ($_POST['action']) {
+case 'setStatus':
+    $newval = (int)$_POST['newval'];
+    $oldval = (int)$_POST['oldval'];
+    $uid = (int)$_USER['uid'];
+    if ($_POST['type'] == 'event') {
+        $newval = Evlist\Event::setEventStatus($_POST['id'], $newval, $oldval, $uid);
+    }
+    COM_errorLog(var_export($_POST,true));
+    $response = array(
+        'newval' => $newval,
+        'id'    => $_POST['id'],
+        'type'  => $_POST['type'],
+        'baseurl'   => EVLIST_URL,
+        'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
+    );
+    COM_errorLog("DONE");
+    COM_errorLog("repsonse is " . json_encode($response));
+    echo json_encode($response);
+    break;
+
 case 'savecalpref':
     if (!isset($_POST['id']) || empty($_POST['id'])) {
         break;

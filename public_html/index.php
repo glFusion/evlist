@@ -157,7 +157,7 @@ case 'myevents':
         COM_404();
         exit;
     }
-    $content = EVLIST_list_user_events();
+    $content = Evlist\Lists\UserList::Render();
     break;
 
 default:

@@ -12,6 +12,7 @@
  * @filesource
  */
 namespace Evlist\Views;
+use Evlist\Config;
 use Evlist\Calendar;
 use Evlist\Cache;
 use Evlist\Models\EventSet;
@@ -56,16 +57,11 @@ class ical extends \Evlist\View
      */
     public function Content()
     {
-        global $_EV_CONF, $LANG_EVLIST, $_CONF;
+        global $LANG_EVLIST, $_CONF;
 
-        if (!empty($_EV_CONF['ical_range'])) {
-            $ical_ranges = explode(',', $_EV_CONF['ical_range']);
-            $from_days = !empty($ical_ranges[0]) ? (int)$ical_ranges[0] : 180;
-            $to_days = !empty($ical_ranges[1]) ? (int)$ical_ranges[1] : $from_days;
-        } else {
-            $to_days = 180;
-            $from_days = 180;
-        }
+        $ical_ranges = explode(',', Config::get('ical_range', '180,180'));
+        $from_days = !empty($ical_ranges[0]) ? (int)$ical_ranges[0] : 180;
+        $to_days = !empty($ical_ranges[1]) ? (int)$ical_ranges[1] : $from_days;
 
         $from = clone($this->today);
         $start = $from->sub(new \DateInterval('P'.$from_days.'D'))->format('Y-m-d');

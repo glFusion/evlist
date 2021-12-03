@@ -1813,6 +1813,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'owner_id,group_id,recur_type,recur_interval,url,show_upcoming,' .
         'time_start,time_end,enable_comments,perms'
     );
+
     if (!is_array($info) || count($info) == 0) return;  // No data received
     if (!isset($info['is_event']) || !$info['is_event']) return;   // not an event
     if (!$info['title'])  {
@@ -1844,6 +1845,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         case 1:         // Anonymous (include Logged-In)
             $info['perms']['perm_anon'] = 2;
         case 13:        // Logged-In Users
+        default:
             $info['perms']['perm_members'] = 2;
             break;
         }
@@ -1877,10 +1879,10 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'rec_freq' => $info['recur_interval'],
         'show_upcoming' => isset($info['show_upcoming']) && $info['show_upcoming'] ? '1' : '0',
         'use_rsvp' => '0',
-        'perm_owner' => array ( 0 => $info['perms']['perm_owner'] || 3),
-        'perm_group' => array ( 0 => $info['perms']['perm_group'] || 2),
-        'perm_members' => array ( 0 => $info['perms']['perm_members'] || 2),
-        'perm_anon' => array ( 0 => $info['perms']['perm_anon'] || 2),
+        'perm_owner' => array ( 0 => $info['perms']['perm_owner'] ),
+        'perm_group' => array ( 0 => $info['perms']['perm_group'] ),
+        'perm_members' => array ( 0 => $info['perms']['perm_members'] ),
+        'perm_anon' => array ( 0 => $info['perms']['perm_anon'] ),
     );
 
     if ($info['time_start'] && $info['time_end']) {

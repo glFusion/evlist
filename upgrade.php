@@ -236,10 +236,15 @@ function evlist_upgrade($dvlp = false)
 
     if (!COM_checkVersion($currentVersion, '1.4.7')) {
         $currentVersion = '1.4.7';
+        $need_cal_reorder = !EVLIST_tableHasColumn('evlist_calenars', 'orderby');
+        $need_tt_reorder = !EVLIST_tableHasColumn('evlist_tickettypes', 'orderby');
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
-        // Order the calendars, initially by name;
-        Evlist\Calendar::reOrder('cal_name');
-        Evlist\TicketType::reOrder();
+        if ($need_cal_reorder) {
+            Evlist\Calendar::reOrder();
+        }
+        if ($need_tt_reorder) {
+            Evlist\TicketType::reOrder();
+        }
         if($_EV_CONF['default_view'] == 'list') {
             $_EV_CONF['default_view'] = 'agenda';
             $c = config::get_instance();
@@ -632,3 +637,21 @@ function EV_rmdir($dir)
         @unlink($dir);
     }
 }
+
+
+/**
+ * Check if a column exists in a table
+ *
+ * @param   string  $table      Table Key, defined in shop.php
+ * @param   string  $col_name   Column name to check
+ * @return  boolean     True if the column exists, False if not
+ */
+function EVLIST_tableHasColumn($table, $col_name)
+{
+    global $_TABLES;
+
+    $col_name = DB_escapeString($col_name);
+    $res = DB_query("SHOW COLUMNS FROM {$_TABLES[$table]} LIKE '$col_name'");
+    return DB_numRows($res) == 0 ? false : true;
+}
+

@@ -463,13 +463,11 @@ $evlistConfigData = array(
     ),
     array(
         'name' => 'pi_cal_map',
-        'default_value' => array(
-            'birthdays' => '-2',
-        ),
+        'default_value' => array('default' => 1),
         'type' => '*select',
         'subgroup' => 20,
         'fieldset' => 10,
-        'selection_array' => 2,
+        'selection_array' => 0,
         'sort' => 30,
         'set' => true,
         'group' => 'evlist',

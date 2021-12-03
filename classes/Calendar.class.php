@@ -389,11 +389,11 @@ class Calendar
                 self::reOrder();
             }
             if (!$this->isNew) {
-                // Clear the cache if updating an existing calendar.
                 // Clear events to force re-reading of permissions.
-                Cache::clear('calendars');
                 Cache::clear('events');
             }
+            // Clear the cache if updating an existing calendar.
+            Cache::clear('calendars');
             return true;
         } else {
             return false;
@@ -647,7 +647,7 @@ class Calendar
         // Read the calendar to verify that it actually exists.
         // Return the default calendar if it doesn't.
         $Cal = self::getInstance($cal_id);
-        if (!$Cal) {
+        if (!$Cal || $Cal->getID() < 1) {
             $Cal = self::getInstance(1);
         }
         return $Cal;

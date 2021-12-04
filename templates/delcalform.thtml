@@ -18,7 +18,7 @@
 {!endif}
 	<hr />
 	{$LANG_EVLIST['confirm_del']}:&nbsp;
-	<select class="uk-select uk-form-width-xsmall">
+	<select class="uk-select uk-form-width-xsmall" name="confirmdel">
 		<option value="0" selected="selected">{$LANG_EVLIST['no']}</option>
 		<option value="1">{$LANG_EVLIST['yes']}</option>
 	</select>

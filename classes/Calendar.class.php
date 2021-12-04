@@ -415,7 +415,7 @@ class Calendar
         // Can't delete calendar #1.  Shouldn't get to this point, but
         // return an error if we do. Also don't try to delete an invalid
         // calendar.
-        if ($this->cal_id == 0 || $this->cal_id == 1) {
+        if ($this->cal_id < 2) {
             return false;
         }
 
@@ -808,7 +808,7 @@ class Calendar
             if ($A['cal_id'] != 1) {
                 $retval = COM_createLink(
                     $_EV_CONF['icons']['delete'],
-                    EVLIST_ADMIN_URL. '/index.php?deletecal=x&id=' . $A['cal_id'],
+                    EVLIST_ADMIN_URL. '/index.php?deletecal=' . $A['cal_id'],
                 );
             }
             break;

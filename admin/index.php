@@ -90,7 +90,7 @@ case 'delcalconfirm':
         break;
     }
     $cal_id = isset($_POST['cal_id']) ? (int)$_POST['cal_id'] : 0;
-    if ($cal_id != 1) {
+    if ($cal_id > 1) {
         $newcal = isset($_POST['newcal']) ? (int)$_POST['newcal'] : 0;
         $Cal = new Evlist\Calendar($cal_id);
         $Cal->Delete($newcal);

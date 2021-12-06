@@ -6,10 +6,9 @@ Release TBD
 - Clear category lookup cache when an event is updated.
 - Provide location address to Locator plugin.
 - Leverage list item template to correctly show event date and time in lists.
-- Use calendar selector for plugin to calendar mapping config.
-- Update service functions for compatibility with Paypal 0.6.0/Shop 1.0.0
+- Update service functions for compatibility with Paypal 0.6.0/Shop 1.0.0.
 - Switch from Paypal plugin to Shop.
-- Add orderby field to calendars to control order in selection lists.
+- Add orderby field to calendars and ticket types to control order in selection lists.
 - Fix search results not excluding by calendar status or permissions.
 - Consider calendar perms in Event::hasAccess().
 - Request perms in `plugin_itemsaved`, calculate based on owner/group if not supplied.
@@ -20,10 +19,10 @@ Release TBD
 - Enable signups with custom fields, may be used instead of the forms plugin.
 - Add nofollow and noindex tags to subscription and print links/pages.
 - Condense header, better for small screens.
-- Fix iCal format for long descriptions.
 - Use glFusion built-in datetime picker instead of UIkit version.
 - Ical improvements:
-  - event sequences and statuses
+  - Fix format for long descriptions.
+  - Event sequences and statuses to track event changes.
   - Cancel instead of deleting events and occurrences.
   - Publish feeds as .ics files via Content Syndication model.
 - Smarter recreation of event occurrences when event is updated.
@@ -31,8 +30,8 @@ Release TBD
   - Add option to hide centerblock from small screens.
   - Add option to show or hide QRCodes on printed tickets.
   - Configurable key used to hide repeating events from centerblock.
-- Allow deleting calendars that were previously reserved (Birthdays and Meetup Events).
-- Allow custom display ordering of ticket types.
+  - Use calendar selector for plugin to calendar mapping config.
+    Previously reseerved calendars (Birthdays and Meetup Events) may now be deleted.
 - Include event pass tickets in per-instance signup lists.
 - Enable advanced editor for event summary.
 - Improve Story-style centerblock

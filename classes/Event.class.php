@@ -1266,9 +1266,9 @@ class Event
                 if ($access < 3) {
                     return false;
                 }
-            }
-            if ($A['status'] == Status::CANCELLED) {
-                $force_delete = true;
+                if ($A['status'] == Status::CANCELLED) {
+                    $force_delete = true;
+                }
             }
         }
 

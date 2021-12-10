@@ -1,7 +1,7 @@
 # evList plugin for glFusion - Changelog
 
 ## v1.5.0
-Release TBD
+Release 2021-12-10
 - Retire support for non-UIkit themes.
 - Clear category lookup cache when an event is updated.
 - Provide location address to Locator plugin.

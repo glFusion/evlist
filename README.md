@@ -22,7 +22,7 @@ evList has the following system requirements:
     * PHP 7.3 and higher.
     * glFusion v1.7.9 or newer
     * lgLib plugin v1.0.10 or newer
-    * Shop Plugin 0.7.0 or higher, if used.
+    * Shop Plugin 1.0.0 or higher, if used.
 
 evList makes use of the lgLib plugin to handle messages and PDF creation.
 
@@ -34,10 +34,6 @@ the Plugin Administration page.
 ## UPGRADING
 The upgrade process is identical to the installation process, simply upload
 the distribution from the Plugin Administration page.
-
-New in version 1.4.0 is a responsive monthly view. To enable the new template,
-select "JSON" as the template type under GUI Settings in the main plugin
-configuration.
 
 ## CONFIGURATION SETTINGS
 * Allow anonymous users to view events?
@@ -124,8 +120,5 @@ set this to "True". The Weather plugin must also be installed and configured.
 would normally not be included.  For example, creating an event to occur
 every third Tuesday, but selecting a Monday as the start date, causes the
 event to occur on that Monday as well as the following Tuesdays.
-* When the JSON calendar is used:
-  * the Mootools tooltip is not working except on the first calendar viewed. The normal browser hover style is used to show event information when hovering over an event title.
-  * the date selector always defaults to the date first viewed.
 * If ticket printing is used, and the event repeat occurrences are changed after
 tickets have been created, the tickets will be orphaned and can't be printed.

@@ -388,7 +388,7 @@ class Reminder
             ),
         );
         COM_emailNotification($msgData);
-        self::Delete($this->ev_id, $this->rp_id, $this->uid);
+        self::Delete($this->eid, $this->rp_id, $this->uid);
     }
 
 }

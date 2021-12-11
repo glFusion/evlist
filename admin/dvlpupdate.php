@@ -7,9 +7,9 @@
  * Only updates from the previous released version.
  *
  * @author      Mark R. Evans mark AT glfusion DOT org
- * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.0
  * @since       v1.4.5
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -29,7 +29,6 @@ if (!SEC_inGroup('Root')) {
     exit;
 }
 require_once EVLIST_PI_PATH . '/upgrade.php';   // needed for set_version()
-CACHE_clear();
 Evlist\Cache::clear();
 
 // Force the plugin version to the previous version and do the upgrade
@@ -37,8 +36,7 @@ $_PLUGIN_INFO['evlist']['pi_version'] = '1.4.5';
 plugin_upgrade_evlist(true);
 
 // need to clear the template cache so do it here
-CACHE_clear();
+Evlist\Cache::clear();
 header('Location: '.$_CONF['site_admin_url'].'/plugins.php?msg=600');
 exit;
 
-?>

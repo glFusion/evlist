@@ -85,6 +85,10 @@ class Cache
         if (!empty($tag)) {
             if (!is_array($tag)) $tag = array($tag);
             $tags = array_merge($tags, $tag);
+        } else {
+            // If no tags give, assume the system cache should be cleared.
+            // Only works in glFusion >= 2.0
+            CACHE_clear();
         }
         return \glFusion\Cache\Cache::getInstance()->deleteItemsByTagsAll($tags);
     }

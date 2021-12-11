@@ -402,6 +402,7 @@ $LANG_EVLIST = array(
 'cal_has_no_events' => 'This calendar has no events.',
 'shortcode'     => 'Short Code',
 'free_caps'     => 'FREE',
+'click_for_details' => 'Click for details.',
 );
 
 $LANG_EVLIST_HELP = array(

@@ -395,6 +395,7 @@ $LANG_EVLIST = array(
 'print_cal' => 'Print Calendar',
 'back_to_event' => 'Back to Event',
 'cal_has_no_events' => 'This calendar has no events.',
+'click_for_details' => 'Click for details.',
 );
 
 $LANG_EVLIST_HELP = array(

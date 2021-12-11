@@ -236,7 +236,7 @@ function evlist_upgrade($dvlp = false)
 
     if (!COM_checkVersion($currentVersion, '1.4.7')) {
         $currentVersion = '1.4.7';
-        $need_cal_reorder = !EVLIST_tableHasColumn('evlist_calenars', 'orderby');
+        $need_cal_reorder = !EVLIST_tableHasColumn('evlist_calendars', 'orderby');
         $need_tt_reorder = !EVLIST_tableHasColumn('evlist_tickettypes', 'orderby');
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
         if ($need_cal_reorder) {
@@ -650,8 +650,12 @@ function EVLIST_tableHasColumn($table, $col_name)
 {
     global $_TABLES;
 
-    $col_name = DB_escapeString($col_name);
-    $res = DB_query("SHOW COLUMNS FROM {$_TABLES[$table]} LIKE '$col_name'");
-    return DB_numRows($res) == 0 ? false : true;
+    if (isset($_TABLES[$table])) {
+        $col_name = DB_escapeString($col_name);
+        $res = DB_query("SHOW COLUMNS FROM {$_TABLES[$table]} LIKE '$col_name'");
+        return DB_numRows($res) == 0 ? false : true;
+    } else {
+        return false;
+    }
 }
 

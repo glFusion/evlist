@@ -234,8 +234,8 @@ function evlist_upgrade($dvlp = false)
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
-    if (!COM_checkVersion($currentVersion, '1.4.7')) {
-        $currentVersion = '1.4.7';
+    if (!COM_checkVersion($currentVersion, '1.5.0')) {
+        $currentVersion = '1.5.0';
         $need_cal_reorder = !EVLIST_tableHasColumn('evlist_calendars', 'orderby');
         $need_tt_reorder = !EVLIST_tableHasColumn('evlist_tickettypes', 'orderby');
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
@@ -251,6 +251,11 @@ function evlist_upgrade($dvlp = false)
             $c->set('default_view', 'agenda', 'evlist');
         }
         if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
+    if (!COM_checkVersion($currentVersion, '1.5.1')) {
+        $currentVersion = '1.5.1';
+        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
     }
 
     // Set the version if not previously set

@@ -163,6 +163,7 @@ $_SQL['evlist_tickets'] = "CREATE TABLE `{$_TABLES['evlist_tickets']}` (
   `comment` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`tic_id`),
   UNIQUE KEY `tic_num` (`tic_num`),
+  UNIQUE KEY `idx_tic_num` (`tic_num`),
   KEY `evt_rep` (`ev_id`,`rp_id`),
   KEY `user` (`uid`,`ev_id`),
   KEY `ev_dt` (`ev_id`,`dt`)
@@ -349,7 +350,7 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_events']}
         CHANGE cal_id cal_id int(10) not null DEFAULT 1",
     ),
-'1.4.7' => array(
+'1.5.0' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `orderby` int(5) NOT NULL DEFAULT 9999",
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD KEY (`orderby`)",
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `calshow_upcoming` tinyint(1) NOT NULL DEFAULT 1 AFTER `fgcolor`",
@@ -383,6 +384,9 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_remlookup']}
         ADD `rem_id` int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST",
     "DROP TABLE IF EXISTS {$_TABLES['evlist_rsvp']}",
+    ),
+'1.5.1' => array(
+    "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `cal_show_upcoming` tinyint(1) unsigned NOT NULL DEFAULT 1",
     ),
 
 );

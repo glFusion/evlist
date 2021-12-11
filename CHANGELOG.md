@@ -1,8 +1,9 @@
 # evList plugin for glFusion - Changelog
 
-## v1.5.1
+## v1.5.2
 Release 2021-12-11
 - Add missing `show_upcoming` field to clendar table during upgrade.
+- Fix extra comma in function calls.
 
 ## v1.5.0
 Release 2021-12-10

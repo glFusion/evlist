@@ -7,7 +7,7 @@
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
  * @copyright   Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.0
+ * @version     v1.5.1
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -256,6 +256,7 @@ function evlist_upgrade($dvlp = false)
     if (!COM_checkVersion($currentVersion, '1.5.1')) {
         $currentVersion = '1.5.1';
         if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
     // Set the version if not previously set
@@ -480,7 +481,7 @@ function EVLIST_do_upgrade_sql($version='', $dvlp = false)
     if (!is_array($_EV_UPGRADE[$version])) return true;
 
     // Execute SQL now to perform the upgrade
-    COM_errorLOG("--Updating {$_EV_CONF['pi_name']} to version $version");
+    COM_errorLog("--Updating {$_EV_CONF['pi_name']} to version $version");
     foreach($_EV_UPGRADE[$version] as $sql) {
         COM_errorLog("{$_EV_CONF['pi_name']} Plugin $version update: Executing SQL => $sql");
         DB_query($sql, '1');

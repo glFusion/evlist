@@ -808,7 +808,7 @@ class Calendar
             if ($A['cal_id'] != 1) {
                 $retval = COM_createLink(
                     $_EV_CONF['icons']['delete'],
-                    EVLIST_ADMIN_URL. '/index.php?deletecal=' . $A['cal_id'],
+                    EVLIST_ADMIN_URL. '/index.php?deletecal=' . $A['cal_id']
                 );
             }
             break;

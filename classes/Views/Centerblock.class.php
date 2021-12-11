@@ -275,7 +275,7 @@ class Centerblock
                 } else {
                     $ev_link = COM_createLink(
                         $A['title'],
-                        COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id']),
+                        COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id'])
                     );
                 }
 

@@ -119,7 +119,6 @@ class Calendar
             $this->perm_members = $_EV_CONF['default_permissions'][2];
             $this->perm_anon    = $_EV_CONF['default_permissions'][3];
             $this->owner_id     = $_USER['uid'];
-            $this->cal_name     = $LANG_EVLIST['all_calendars'];
         }
     }
 

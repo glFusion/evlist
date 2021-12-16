@@ -2311,7 +2311,7 @@ class Repeat
         );
         $filter = COM_createLink(
             $LANG_EVLIST['back_to_event'],
-            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $ev_id . '&from=ev_repeats',
+            EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $ev_id . '&from=ev_repeats'
         );
 
         $retval = ADMIN_list(

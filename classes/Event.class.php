@@ -35,6 +35,10 @@ class Event
     const RP_SINGLEEDIT     = 16;   // Single event changed date or time
     const RP_NEWSCHEDULE    = 64;   // Completely new schedule
 
+    const CMT_ENABLED   = 0;
+    const CMT_CLOSED    = 1;
+    const CMT_DISABLED  = -1;
+
 
     /** Event record ID.
      * @var string */
@@ -242,7 +246,7 @@ class Event
 
         if ($ev_id == '') {
             $this->owner_id = $_USER['uid'];
-            $this->enable_comments = $_EV_CONF['commentsupport'] ? 0 : 2;
+            $this->enable_comments = $_EV_CONF['commentsupport'] ? self::CMT_ENABLED : self::CMT_DISABLED;
 
             // Create dates & times based on individual URL parameters,
             // or defaults.
@@ -718,7 +722,7 @@ class Event
                 $row['enable_reminders'] == 1 ? 1 : 0;
         $this->setOwner(isset($row['owner_id']) ? $row['owner_id'] : 2);
         $this->setGroup(isset($row['group_id']) ? $row['group_id'] : 13);
-        $this->enable_comments = isset($row['enable_comments']) ? $row['enable_comments'] : 0;
+        $this->enable_comments = isset($row['enable_comments']) ? $row['enable_comments'] : self::CMT_ENABLED;
 
 
         // Categores get added to the row during Read if from a DB, or as part
@@ -1137,8 +1141,6 @@ class Event
                     id = '" . DB_escapeString($this->id) . "', ";
             $sql2 = '';
         }
-
-        if (!$_EV_CONF['commentsupport']) $this->enable_comments = 2;
 
         // Now save the categories
         // First save the new category if one was submitted
@@ -2827,9 +2829,15 @@ class Event
      *
      * @return  integer     Enabled status for comments
      */
-    public function commentsEnabled()
+    public function commentsEnabled() : int
     {
-        return (int)$this->enable_comments;
+        global $_EV_CONF;
+
+        if ($_EV_CONF['commentsupport']) {
+            return (int)$this->enable_comments;
+        } else {
+            return self::CMT_DISABLED;
+        }
     }
 
 

@@ -17,6 +17,7 @@ use Evlist\Icon;
 use Evlist\TicketType;
 use Evlist\Ticket;
 use Evlist\Reminder;
+use Evlist\Event;
 
 
 /**
@@ -327,8 +328,9 @@ class Occurrence
             HEADER_PRIO_NORMAL
         );
 
-        // Show the user comments. Moderators and event owners can delete comments
-        if ($Event->commentsEnabled()) {
+        // Show the user comments. Moderators and event owners can delete comments.
+        if ($Event->commentsEnabled() > Event::CMT_DISABLED) {
+            // comments either open or closed
             USES_lib_comment();
             $T->set_var(
                 'usercomments',

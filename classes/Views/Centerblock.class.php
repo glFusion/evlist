@@ -114,9 +114,9 @@ class Centerblock
             $tpl_file = 'cblock_stories.thtml';
             $hidesmall = false;
             $length = -1;
-            $allowed_tags = '<div><a><img>';
+            $allowed_tags = '<div><a><img><span>';
             $use_outputfilter = true;
-            $strip_tags = false;
+            $strip_tags = true;
             break;
         default:            // invalid format
             return '';
@@ -244,6 +244,7 @@ class Centerblock
                 if ($strip_tags) {
                     $summary = strip_tags($summary, $allowed_tags);
                 }
+                //$summary = preg_replace('!^<p>(.*?)</p>$!i', '$1', $summary);
                 if (!empty($patterns)) {
                     $summary = preg_replace($patterns, '', $summary);
                 }

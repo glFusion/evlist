@@ -388,7 +388,9 @@ $_EV_UPGRADE = array(
 '1.5.1' => array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `cal_show_upcoming` tinyint(1) unsigned NOT NULL DEFAULT 1",
     ),
-
+'1.5.3' => array(
+    "UPDATE {$_TABLES['evlist_events']} SET `enable_comments` = 0 WHERE `enable_comments` = 2",
+    ),
 );
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];
 

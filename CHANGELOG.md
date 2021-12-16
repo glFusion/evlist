@@ -1,5 +1,10 @@
 # evList plugin for glFusion - Changelog
 
+## 1.5.3
+Release 2021-12-16
+- Add read-more icon to story centerblock items.
+- Fix check whether comments are enabled.
+
 ## v1.5.2
 Release 2021-12-11
 - Add missing `show_upcoming` field to clendar table during upgrade.

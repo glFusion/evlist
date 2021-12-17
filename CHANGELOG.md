@@ -1,5 +1,10 @@
 # evList plugin for glFusion - Changelog
 
+## 1.5.4
+Release TBD
+- Leave advanced editor tags alone in story-style centerblock.
+- Template/CSS fix for event element alignment.
+
 ## 1.5.3
 Release 2021-12-16
 - Add read-more icon to story centerblock items.

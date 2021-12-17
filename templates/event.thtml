@@ -124,7 +124,7 @@
 {!if summary}
 		<div class="evEventItem uk-margin">
 			<label>{$LANG_EVLIST['what']}:</label>
-			<div id="what">
+			<div class="evEventElement" id="what">
 				{summary}
 			</div>
 		</div>
@@ -142,7 +142,7 @@
 {!if datetime_info}
 				<div class="evEventItem uk-margin">
 					<label>{$LANG_EVLIST['when']}:</label>
-					<div id="when">
+					<div class="evEventElement" id="when">
 						{datetime_info}
 					</div>
 				</div>
@@ -151,7 +151,7 @@
 {!if address_info}
 				<div class="evEventItem uk-margin">
 					<label>{$LANG_EVLIST['where']}:</label>
-					<div id="where">
+					<div class="evEventElement" id="where">
 						{address_info}
 					</div>
 				</div>
@@ -160,7 +160,7 @@
 {!if contact_info}
 				<div class="evEventItem uk-margin">
 					<label>{$LANG_EVLIST['ev_contact']}:</label>
-					<div id="contact">
+					<div class="evEventElement" id="contact">
 						{contact_info}
 					</div>
 				</div>
@@ -169,7 +169,7 @@
 {!if more_info_link}
 				<div class="evEventItem uk-margin">
 					<label>&nbsp;</label>
-					<div>
+					<div class="evEventElement">
 						{more_info_link}
 					</div>
 				</div>
@@ -177,13 +177,13 @@
 
 				<div class="evEventItem uk-margin uk-hidden-small">
 					<label>{$LANG_EVLIST['calendar']}:</label>
-					<div>{cal_name}</div>
+					<div class="evEventElement">{cal_name}</div>
 				</div>
 
 {!if category_link}
 				<div class="evEventItem uk-margin">
 					<label>{$LANG_EVLIST['categories']}</label>
-					<div id="categories">{category_link}</div>
+					<div class="evEventElement" id="categories">{category_link}</div>
 				</div>
 {!endif}
 

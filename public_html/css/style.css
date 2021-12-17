@@ -111,9 +111,10 @@ div.evEventItem {
 	/* Override uk-margin setting */
 	margin-top: 0px !important;
 }
-div.evEventItem div {
+div.evEventItem div.evEventElement {
 	margin-left:120px;
 }
+
 div.evEventItem label,
 #evlistEventDetail div label,
 #evlistPrtEventDetail div label,

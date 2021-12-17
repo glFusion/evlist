@@ -1282,7 +1282,6 @@ class Event
             DB_delete($_TABLES['evlist_detail'], 'ev_id', $eid);
             DB_delete($_TABLES['evlist_events'], 'id', $eid);
         } else {
-            COM_errorLog("deleting event $eid");
             Repeat::updateEventStatus($eid, Status::CANCELLED);
             DB_change($_TABLES['evlist_events'], 'status', Status::CANCELLED, 'id', $eid);
             DB_change($_TABLES['evlist_detail'], 'det_status', Status::CANCELLED, 'ev_id', $eid);

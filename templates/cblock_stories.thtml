@@ -5,7 +5,7 @@
       <a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
   </h1>
     <div class="story-body">
-        {summary} <a href="{site_url}/evlist/event.php?eid={eid}" alt="{$LANG_EVLIST['clic_for_details']}" title="{$LANG_EVLIST['click_for_details']}" class="tooltip"><i class="uk-icon uk-icon-forward uk-icon-mini"></i></a>
+        {summary} <a href="{site_url}/evlist/event.php?eid={eid}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
     </div>
 </article>
 <div class="block-divider"> </div>

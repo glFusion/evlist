@@ -105,26 +105,26 @@ class Centerblock
         case self::TABLE:   // table format
             $tpl_file = 'centerblock.thtml';
             $hidesmall = Config::get('cb_hide_small');
-            $length = Config::get('limit_summary');
+            $length = (int)Config::get('limit_summary');
             $allowed_tags = '';
             $use_outputfilter = false;
             $strip_tags = true;
             break;
         case self::STORY:   // story format
             $tpl_file = 'cblock_stories.thtml';
-            $hidesmall = false;
+            $hidesmall = false;     // not hidden on small screens
             $length = -1;
             $allowed_tags = '<div><a><img><span>';
             $use_outputfilter = true;
-            $strip_tags = true;
+            $strip_tags = false;
             break;
         default:            // invalid format
             return '';
         }
 
+        // Retrieve Centerblock Settings
         $range    = Config::get('range_centerblock');
         $limit    = (int)Config::get('limit_block');
-        // Retrieve Centerblock Settings
         $_dt = clone($_CONF['_now']);
         $interval = (int)Config::get('max_upcoming_days');
         if ($interval > 0) {
@@ -158,12 +158,6 @@ class Centerblock
             $limit = 0;     // special, we need to get all events since we can't count back
             $EventSet->withOrder('DESC');
             break;
-        case TimeRange::UPCOMING:         // upcoming events
-        default:
-            $EventSet->withUpcoming(true);
-            $start = Config::get('_today');
-            $end = $cb_max_date;
-            break;
         case TimeRange::WEEK:         // this week
             $start = DateFunc::beginOfWeek($D, $M, $Y);
             $end = DateFunc::endOfWeek($D, $M, $Y);
@@ -171,6 +165,12 @@ class Centerblock
         case TimeRange::MONTH:         // upcoming month
             $start = DateFunc::beginOfMonth($M, $Y);
             $end = DateFunc::dateFormat(DateFunc::daysInMonth($M, $Y), $M, $Y);
+            break;
+        case TimeRange::UPCOMING:         // upcoming events
+        default:
+            $EventSet->withUpcoming(true);
+            $start = Config::get('_today');
+            $end = $cb_max_date;
             break;
         }
 

@@ -84,7 +84,7 @@ class UserList extends AdminList
             'has_menu'  => true,
             'has_extras'=> true,
             'title'     => $LANG_EVLIST['pi_title'].': ' . $LANG_EVLIST['events'],
-            'form_url'  => EVLIST_URL . '/index.php',
+            'form_url'  => EVLIST_URL . '/index.php?view=myevents',
             'help_url'  => '',
         );
 

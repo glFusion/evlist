@@ -67,6 +67,10 @@ case 'event':
     }
 case 'instance':
     $View = new Evlist\Views\Occurrence($id);
+    if (!$View->getRepeat()->canView()) {
+        COM_setMsg($LANG_EVLIST['ev_not_found']);
+        echo COM_refresh(EVLIST_URL . '/index.php');
+    }
     $content .= $View->withQuery($query)
                      ->withTemplate('')
                      ->withCommentMode($mode)

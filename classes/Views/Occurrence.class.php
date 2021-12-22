@@ -79,6 +79,18 @@ class Occurrence
 
 
     /**
+     * Get the Repeat object for this view.
+     * Used to access the permissions, etc.
+     *
+     * @return  object      Repeat object
+     */
+    public function getRepeat() : Repeat
+    {
+        return $this->Repeat;
+    }
+
+
+    /**
      * Display the detail page for the event occurrence.
      *
      * @return  string      HTML for the page.
@@ -100,8 +112,8 @@ class Occurrence
         $email = '';
         $phone = '';
 
-        if ($this->rp_id == 0) {
-            return EVLIST_alertMessage($LANG_EVLIST['access_denied']);
+        if (!$this->Repeat->canView()) {    // should have already been checkec
+            return EVLIST_alertMessage($LANG_EVLIST['ev_not_found']);
         }
 
         $T = new \Template(EVLIST_PI_PATH . '/templates/');

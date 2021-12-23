@@ -136,6 +136,7 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `bgcolor` varchar(7) NOT NULL DEFAULT '#FFFFFF',
   `fgcolor` varchar(7) NOT NULL DEFAULT '#000000',
   `cal_show_upcoming` tinyint(1) unsigned NOT NULL DEFAULT 1,
+  `cal_show_cb` tinyint(1) unsigned NOT NULL DEFAULT 1,
   `owner_id` int(10) unsigned NOT NULL,
   `group_id` int(10) unsigned NOT NULL,
   `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT 3,
@@ -390,6 +391,10 @@ $_EV_UPGRADE = array(
     ),
 '1.5.3' => array(
     "UPDATE {$_TABLES['evlist_events']} SET `enable_comments` = 0 WHERE `enable_comments` = 2",
+    ),
+'1.5.4' => array(
+    "ALTER TABLE {$_TABLES['evlist_calendars']} DROP `calshow_upcoming`",
+    "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `cal_show_cb` tinyint(1) unsigned NOT NULL DEFAULT 1 AFTER `cal_show_upcoming`",
     ),
 );
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];

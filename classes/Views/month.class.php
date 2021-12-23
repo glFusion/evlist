@@ -14,6 +14,7 @@ namespace Evlist\Views;
 use Evlist\DateFunc;
 use Evlist\Icon;
 use Evlist\Models\EventSet;
+use Evlist\Detail;
 
 
 /**
@@ -136,19 +137,21 @@ class month extends \Evlist\View
                 $T->set_block('monthview', 'dayBlock', 'dBlock');
 
                 foreach ($events[$daydata] as $event) {
-
-                    if (empty($event['title'])) continue;
+                    $Det = Detail::getInstance($event['rp_det_id']);
+                    if (empty($Det->getTitle())) {
+                        continue;
+                    }
                     if (!isset($event['allday'])) $event['allday'] = 0;
                     if (!isset($event['split'])) $event['split'] = 0;
                     $ev_hover = '';
-                    $ev_title = COM_truncate($event['title'], 40, '...');
+                    $ev_title = COM_truncate($Det->getTitle(), 40, '...');
 
                     // Sanitize fields for display.  No HTML in the popup.
-                    $title = htmlentities(strip_tags($event['title']));
-                    $summary = htmlentities(strip_tags($event['summary']));
+                    $title = htmlentities(strip_tags($Det->getTitle()));
+                    $summary = htmlentities(strip_tags($Det->getSummary()));
 
                     // add the calendar to the array to create the JS checkboxes
-                    $this->addCalUsed($event);
+                    $this->addCalUsed($event['cal_id']);
 
                     // Create the hover tooltip.  Timed events show the times first
                     if ($event['allday'] == 0) {

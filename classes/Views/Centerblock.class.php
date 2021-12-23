@@ -14,6 +14,8 @@
 namespace Evlist\Views;
 use Evlist\View;
 use Evlist\Config;
+use Evlist\Detail;
+use Evlist\Calendar;
 use Evlist\Models\EventSet;
 use Evlist\Models\TimeRange;
 
@@ -177,6 +179,8 @@ class Centerblock
         $events = $EventSet
             ->withStart($start)
             ->withEnd($end)
+            ->withCenterblock(true)
+            ->withFields(array('det.title','det.summary','det.full_description'))
             ->getEvents();
         if (empty($events) || !is_array($events)) {
             return '';
@@ -222,9 +226,9 @@ class Centerblock
             if ($date == '_empty_') continue;
             foreach ($day as $A) {
                 // Don't display birthdays as story items
-                if (Config::get('enable_centerblock') == self::STORY && $A['cal_id'] == -2) {
+                /*if (Config::get('enable_centerblock') == self::STORY && $A['cal_id'] == -2) {
                     continue;
-                }
+            }*/
 
                 // Make sure we only show each event once for multiday
                 if ($dup_chk != '') {
@@ -237,7 +241,9 @@ class Centerblock
 
                 // Now increment and check the counter.
                 $count++;
-                if ($count > $limit) break;
+                if ($count > $limit) {
+                    break;
+                }
 
                 // Prepare the summary for display. Remove links and autotags
                 $summary = empty($A['summary']) ? $A['title'] : $A['summary'];
@@ -257,7 +263,6 @@ class Centerblock
                 }
                 $s_ts1 = strtotime($A['rp_start']);
                 $e_ts1 = strtotime($A['rp_end']);
-                $email = isset($A['email']) ? EVLIST_obfuscate($A['email']) : '';
                 $cssid = ($cssid == 1) ? 2: 1;
 
                 if (isset($A['postmode']) && $A['postmode'] != 'plaintext') {
@@ -280,6 +285,10 @@ class Centerblock
                     );
                 }
 
+                $Cal = Calendar::getInstance($A['cal_id']);
+                $Det = Detail::getInstance($A['rp_det_id']);
+                $email = EVLIST_obfuscate($Det->getEmail()); //isset($A['email']) ? EVLIST_obfuscate($A['email']) : '';
+
                 $T->set_var(array(
                     'cssid'     => $cssid,
                     'is_birthday' => $A['cal_id'] == -2 ? true : false,
@@ -288,15 +297,15 @@ class Centerblock
                     'title'     => $A['title'],
                     'summary'   => $summary,
                     'full_dscp' => $full_dscp,
-                    'contact'   => isset($A['contact']) ? $A['contact'] : '',
-                    'location'  => isset($A['location']) ? $A['location'] : '',
+                    'contact'   => $Det->getContact(), //isset($A['contact']) ? $A['contact'] : '',
+                    'location'  => $Det->getLocation(), //isset($A['location']) ? $A['location'] : '',
                     'ev_link'   => $ev_link,
-                    'street'    => isset($A['street']) ? $A['street'] : '',
-                    'city'      => isset($A['city']) ? $A['city'] : '',
-                    'province'  => isset($A['province']) ? $A['province'] : '',
-                    'country'   => isset($A['country']) ? $A['country'] : '',
+                    'street'    => $Det->getStreet(), //isset($A['street']) ? $A['street'] : '',
+                    'city'      => $Det->getCity(), //isset($A['city']) ? $A['city'] : '',
+                    'province'  => $Det->getProvince(), //isset($A['province']) ? $A['province'] : '',
+                    'country'   => $Det->getCountry(), //isset($A['country']) ? $A['country'] : '',
                     'email'     => $email,
-                    'phone'     => isset($A['phone']) ? $A['phone'] : '',
+                    'phone'     => $Det->getPhone(), //isset($A['phone']) ? $A['phone'] : '',
                     'startdate' => EVLIST_formattedDate($s_ts1),
                     'enddate'   => EVLIST_formattedDate($e_ts1),
                     'starttime1' => EVLIST_formattedTime($s_ts1),

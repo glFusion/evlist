@@ -13,6 +13,7 @@
  */
 namespace Evlist;
 use Evlist\Models\Syndication;
+use Evlist\Calendar;
 
 date_default_timezone_set('UTC');
 
@@ -536,11 +537,11 @@ class View
             $T->set_file('boxes', 'cal_checkboxes.thtml');
             $T->set_block('boxes', 'cal_item', 'item');
             asort($this->cal_used);
-            foreach ($this->cal_used as $key=>$cal) {
+            foreach ($this->cal_used as $key=>$Cal) {
                 $T->set_var(array(
-                    'fgcolor'   => $cal['fgcolor'],
+                    'fgcolor'   => $Cal->getFGcolor(),
                     'key'       => $key,
-                    'cal_name'  => $cal['cal_name'],
+                    'cal_name'  => $Cal->getName(),
                     'chk'   => self::getCalShowPref($key) ? EVCHECKED : ''
                 ) );
                 $T->parse('item', 'cal_item', true);
@@ -591,20 +592,13 @@ class View
      * Add calender info to the cal_used array.
      * Used later to build the calendar checkboxes.
      *
-     * @param   array   $event  Array of event info
+     * @param   object  $Cal    Calendar object to save
      * @return  void
      */
-    protected function addCalUsed($event)
+    protected function addCalUsed(int $cal_id) : void
     {
-        if (!isset($event['cal_id'])) return;   // invalid calendar info
-        if (!array_key_exists($event['cal_id'], $this->cal_used)) {
-            $this->cal_used[$event['cal_id']] = array(
-                'cal_name' => $event['cal_name'],
-                'cal_ena_ical' => $event['cal_ena_ical'],
-                'cal_id' => $event['cal_id'],
-                'fgcolor' => $event['fgcolor'],
-                'bgcolor' => $event['bgcolor'],
-            );
+        if (!array_key_exists($cal_id, $this->cal_used)) {
+            $this->cal_used[$cal_id] = Calendar::getInstance($cal_id);
         }
     }
 

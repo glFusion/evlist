@@ -13,6 +13,7 @@
 namespace Evlist\Views;
 use Evlist\Icon;
 use Evlist\Models\EventSet;
+use Evlist\Detail;
 
 
 /**
@@ -71,14 +72,14 @@ class day extends \Evlist\View
             ->withCategory($this->cat)
             ->withCalendar($this->cal)
             ->getEvents();
-        list($allday, $hourly) = $this->getViewData($events);
+        list($allday, $hourly) = $this->_getViewData($events);
 
         // Get allday events
         $alldaycount = count($allday);
         if ($alldaycount > 0) {
             for ($i = 1; $i <= $alldaycount; $i++) {
                 $A = current($allday);
-                $this->addCalUsed($A);
+                $this->addCalUsed($A['cal_id']);
 
                 $T->set_var(array(
                     'event_time'        => $LANG_EVLIST['allday'],
@@ -124,7 +125,8 @@ class day extends \Evlist\View
                 $s_dt = new \Date($A['data']['rp_date_start'] . ' ' . $A['data']['rp_time_start1'], $tz);
                 $e_dt = new \Date($A['data']['rp_date_end'] . ' ' . $A['data']['rp_time_end1'], $tz);
 
-                $this->addCalUsed($A['data']);
+                $this->addCalUsed($A['data']['cal_id']);
+                $Det = Detail::getInstance($A['data']['rp_det_id']);
 
                 if ($s_dt->format('Y-m-d', true) != $today->format('Y-m-d', true)) {
                     $start_time = $s_dt->format($_CONF['shortdate']) . ' @ ';
@@ -139,8 +141,8 @@ class day extends \Evlist\View
                 $T->set_var(array(
                     'eid'               => $A['data']['rp_ev_id'],
                     'rp_id'             => $A['data']['rp_id'],
-                    'event_title'       => stripslashes($A['data']['title']),
-                    'event_summary' => htmlspecialchars($A['data']['summary']),
+                    'event_title'       => stripslashes($Det->getTitle()),
+                    'event_summary' => htmlspecialchars($Det->getSummary()),
                     'fgcolor'       => $A['data']['fgcolor'],
                     'bgcolor'       => '',
                     'cal_id'        => $A['data']['cal_id'],
@@ -210,7 +212,7 @@ class day extends \Evlist\View
      * @param   array   $events     Array of all events
      * @return  array               Array of 2 arrays, allday and hourly
      */
-    function getViewData($events)
+    private function _getViewData(array $events) : array
     {
         global $_CONF, $_EV_CONF;
 
@@ -232,10 +234,11 @@ class day extends \Evlist\View
                 // with json encoding.
                 unset($A['rec_data']);
                 unset($A['options']);
-                if ($A['cal_name'] != 'meetup' &&
-                    ( $A['allday'] == 1 ||
-                    ( ($A['rp_date_start'] < $this->today_sql) &&
-                    ($A['rp_date_end'] > $this->today_sql) ) )
+                if (
+                    $A['allday'] == 1 ||
+                    (   ($A['rp_date_start'] < $this->today_sql) &&
+                        ($A['rp_date_end'] > $this->today_sql)
+                    )
                 ) {
                     // This is an allday event, or spans days
                     $alldaydata[] = $A;

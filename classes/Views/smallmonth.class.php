@@ -48,6 +48,7 @@ class smallmonth extends \Evlist\View
             ->withEnd($ending_date)
             ->withCategory($this->cat)
             ->withCalendar($this->cal)
+            ->withFields(array('det.title'))
             ->getEvents();
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
@@ -110,7 +111,7 @@ class smallmonth extends \Evlist\View
                             if ($event['tzid'] != 'local') $popup .= ' ' . $dt->format('T');
                             $popup .= ': ';
                         }
-                        $popup .= htmlentities($event['title']);    
+                        $popup .= htmlentities($event['title']);
                     }
                     $T->set_var('popup', $popup);
                 } else {

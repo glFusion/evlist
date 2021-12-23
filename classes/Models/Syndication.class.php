@@ -361,6 +361,9 @@ class Syndication //extends \glFusion\Syndication\Feed
             ->withStatus(Status::ALL)
             ->withIcal(true)
             ->withStart($start->format('Y-m-d', true))
+            ->withFields(array(
+                'det.det_revision', 'det.title', 'det.det_last_mod', 'det.lat', 'det.lng'
+            ))
             ->withLimit($limit);
         if ($end) {
             $ES->withEnd($end->format('Y-m-d', true));

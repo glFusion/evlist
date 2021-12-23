@@ -42,6 +42,10 @@ class EventSet
      * @var integer */
     private $show_upcoming = 0;
 
+    /** Nonzero if showing events for centerblock only.
+     * @var integer */
+    private $show_cb = 0;
+
     /** Limit the number of events returned, default is all.
      * @var integer */
     private $limit = 0;
@@ -67,9 +71,13 @@ class EventSet
      * @var string */
     private $order = 'ASC';
 
-    /** Fields to return.
+    /** Fields to return. Created as a full field string.
      * @var string */
     private $selection = '';
+
+    /** Extra fields to return. Appended to $selection.
+     * @var string */
+    private $extra_fields = '';
 
     /** Group by for results.
      * @var string */
@@ -156,6 +164,19 @@ class EventSet
     {
         $this->show_upcoming = $flag ? 1 : 0;
         $this->upcoming = $flag ? 1 : 0;
+        return $this;
+    }
+
+
+    /**
+     * Set the flag to indicate this search is for a centerblock.
+     *
+     * @param   boolean $flag   True = show only centerblock-eligible events
+     * @return  object  $this
+     */
+    public function withCenterblock(bool $flag) : self
+    {
+        $this->show_cb = $flag ? 1 : 0;
         return $this;
     }
 
@@ -266,6 +287,19 @@ class EventSet
 
 
     /**
+     * Add additional database fields to retrieve.
+     *
+     * @param   array   $flds   Array of field names
+     * @return  object  $this
+     */
+    public function withFields(array $flds) : self
+    {
+        $this->extra_fields = implode(',', $flds);
+        return $this;
+    }
+
+
+    /**
      * Set field used to detect unique events.
      *
      * @param   boolean $flag   True for event ID, False for repeat ID
@@ -308,16 +342,10 @@ class EventSet
         $db_end = DB_escapeString($this->end . ' 23:59:59');
 
         // Set up other search options.
-        //$selection = '';
-        $opt_select = '';
-        //$opt_order = 'ASC';
         $orderby = 'rep.rp_start';
         $grp_by = 'rep.rp_id';
-        //$limit = 0;
-        //$page = 0;
         $cat_status = '';
         $cat_join = '';
-        //$cat_status = ' AND (cat.status = 1 OR cat.status IS NULL)';
         // default date range for fixed calendars, "upcoming" may be different
         $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start' AND rep.rp_end <= '$db_end'";
         $ands = array();
@@ -336,7 +364,6 @@ class EventSet
             $ands[] = ' cal.cal_ena_ical = ' . $this->ical;
         }
         if ($this->cat > 0) {
-            //$opt_select .= ', cat.name AS cat_name';
             $ands[] = " (l.cid = '{$this->cat}' AND cat.status = 1) ";
             $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
                 "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
@@ -359,20 +386,28 @@ class EventSet
                 $dt_sql = "rep.rp_end >= '{$_EV_CONF['_today']}'";
                 break;
             }
-            // Always limit to events starting before the specified end date
+            // Always limit to events starting before the specified end date.
             $dt_sql .= " AND rep.rp_start <= '{$this->end}'";
             $dt_sql = ' (' . $dt_sql . ') ';
+        }
+        if ($this->show_cb) {
+            // Showing only centerblock items, limit the calendar selection.
+            $ands[] = ' cal.cal_show_cb = 1 ';
         }
         if ($this->status < Status::ALL) {
             // Limit by event status if requested
             $ands[] = " rep.rp_status = {$this->status} ";
         }
 
-        // By default, get all fields that the caller could possibly want.  If
-        // a selection option is specified, then that is used instead.  It's up
+        // By default, get all fields that the caller could possibly want. If
+        // a selection option is specified, then that is used instead. It's up
         // to the caller to request the value properly, including table prefix.
         if ($this->selection == '') {
-            $this->selection = "rep.*, det.*, cal.*, ev.* $opt_select";
+            //$this->selection = 'ev.*, rep.*, det.* ' .
+            $this->selection = 'ev.*, rep.*, cal.bgcolor, cal.fgcolor, cal.cal_icon';
+        }
+        if ($this->extra_fields != '') {
+            $this->extra_fields = ', ' . $this->extra_fields;
         }
         if (!empty($ands)) {
             $ands = ' AND ' . implode(' AND ', $ands);
@@ -382,7 +417,7 @@ class EventSet
 
         // All the "*" queries may be ineffecient, but we need to read all
         // fields that might be wanted by whoever calls this function
-        $sql = "SELECT {$this->selection}
+        $sql = "SELECT {$this->selection} {$this->extra_fields}
             FROM {$_TABLES['evlist_repeat']} rep
             LEFT JOIN {$_TABLES['evlist_events']} ev
                 ON ev.id = rep.rp_ev_id

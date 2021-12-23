@@ -368,7 +368,7 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
     }
 
     $query = DB_escapeString(htmlspecialchars(trim($query)));
-    $permSQL= COM_getPermSql('AND', 0, 2, 'e') . COM_getPermSql('AND', 0, 2, 'c');
+    $permSQL= COM_getPermSQL('AND', 0, 2, 'e') . COM_getPermSQL('AND', 0, 2, 'c');
 
     $url = '/evlist/view.php?rid=0&eid=';
     $q = '&query=' . urlencode($query);
@@ -1152,6 +1152,7 @@ function phpblock_evlist_upcoming($A='', $params='')
     $events = Evlist\Models\EventSet::create()
         ->withCategory($cat)
         ->withCalendar($cal)
+        ->withFields(array('det.title','det.summary','det.full_description'))
         ->withUpcoming(1)
         ->withLimit($limit)
         ->withStart($_EV_CONF['_today'])
@@ -1175,17 +1176,26 @@ function phpblock_evlist_upcoming($A='', $params='')
         $daycount = 0;      // Count events shown each day.
 
         foreach ($daydata as $ev_id=>$ev) {
+            $Cal = Evlist\Calendar::getInstance($ev['cal_id']);
+
             // Check that this event should be shown as upcoming at all, and
             // only show multi-day events once.
-            if ($ev['show_upcoming'] != 1 ||
-                array_key_exists($ev['rp_id'], $rp_shown)) {
+            if (
+                $ev['show_upcoming'] != 1 ||
+                array_key_exists($ev['rp_id'], $rp_shown) ||
+                !$Cal->showUpcoming()
+            ) {
                 continue;
             }
             $rp_shown[$ev['rp_id']] = 1;
 
             // TODO: displaying summaries in the block will be set from the
             // admin panels sometime later.
-            $summary = COM_truncate(htmlspecialchars(strip_tags(EVLIST_noquotes($ev['summary']))), $length, '...');
+            $summary = COM_truncate(
+                htmlspecialchars(strip_tags(EVLIST_noquotes($ev['summary']))),
+                $length,
+                '...'
+            );
             $title = htmlspecialchars($ev['title']);
             $tooltip = $title;
             if (!empty($summary)) {
@@ -1225,6 +1235,7 @@ function phpblock_evlist_upcoming($A='', $params='')
         }
         if ($count >= $limit) break;
     }
+
     if ($count > 0) {
         // Add the block footer only if at least one event is shown.  Otherwise
         // we want to return the empty $retval.
@@ -1694,10 +1705,10 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
     $where .= ' AND r.rp_status = ' . Status::ENABLED .
         ' AND c.cal_status = ' . Status::ENABLED;
     if ($uid > 0) {
-        $permsql = COM_getPermSql('AND', $uid, 2, 'e')
-                 . COM_getPermSql('AND', $uid, 2, 'c');
+        $permsql = COM_getPermSQL('AND', $uid, 2, 'e')
+                 . COM_getPermSQL('AND', $uid, 2, 'c');
     } else {
-        $permsql = COM_getPermSql('AND', 0, 2, 'e') . COM_getPermSql('AND', 0, 2, 'c');
+        $permsql = COM_getPermSQL('AND', 0, 2, 'e') . COM_getPermSQL('AND', 0, 2, 'c');
     }
     $sql .= $where . ' ' . $permsql . ' GROUP BY e.id';
     //echo $sql;die;

@@ -65,7 +65,7 @@ class sitemap_evlist extends sitemap_base
                 LEFT JOIN {$_TABLES['evlist_detail']} d ON d.ev_id=r.rp_ev_id
                 WHERE 1=1 ";
         if ($this->uid > 0) {
-            $sql .= COM_getPermSql('AND', $this->uid, 2, 'e');
+            $sql .= COM_getPermSQL('AND', $this->uid, 2, 'e');
         }
         if ($this->isHTML()) {
             // Includes events that end anytime today

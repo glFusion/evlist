@@ -14,6 +14,8 @@ namespace Evlist\Views;
 use Evlist\DateFunc;
 use Evlist\Icon;
 use Evlist\Models\EventSet;
+use Evlist\Calendar;
+use Evlist\Detail;
 
 
 /**
@@ -162,12 +164,13 @@ class week extends \Evlist\View
                         $event_time .= ' & ' . $starttime2 . ' - ' . $endtime2;
                     }
                 }
-                $this->addCalUsed($A);
+                $this->addCalUsed($A['cal_id']);
+                $Det = Detail::getInstance($A['rp_det_id']);
 
                 $T->set_var(array(
                     'event_times'   => $event_time,
-                    'event_title'   => $A['title'],
-                    'event_summary' => $A['summary'],
+                    'event_title'   => $Det->getTitle(),
+                    'event_summary' => $Det->getSummary(),
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
                     'pi_url'        => EVLIST_URL,

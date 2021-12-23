@@ -118,6 +118,7 @@ $LANG_EVLIST = array(
 'ev_contact'        => 'Kontakt',
 'ev_location'       => 'Ort',
 'show_upcoming'     => 'In bevorstehende Veranstaltungen anzeigen',
+'show_cb'           => 'Show in Centerblocks',
 'misc'              => 'Sonstiges',
 'foreground'        => 'Vordergrund',
 'background'        => 'Hintergrund',

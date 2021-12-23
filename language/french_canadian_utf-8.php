@@ -117,6 +117,7 @@ $LANG_EVLIST = array(
 'ev_contact'            => 'Contact',
 'ev_location'           => 'Emplacement',
 'show_upcoming'         => 'Show dans les prochains événements',
+'show_cb'           => 'Show in Centerblocks',
 'misc'              => 'Divers',
 'foreground'            => 'Foreground',
 'background'            => 'Historique',

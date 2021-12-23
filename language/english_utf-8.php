@@ -93,6 +93,7 @@ $LANG_EVLIST = array(
 'ev_contact'        => 'Contact',
 'ev_location'       => 'Location',
 'show_upcoming'     => 'Show in Upcoming Events Block',
+'show_cb'           => 'Show in Centerblocks',
 'misc'              => 'Miscellaneous',
 'foreground'        => 'Foreground',
 'background'        => 'Background',

@@ -81,6 +81,16 @@
 
 		<div class="uk-form-row uk-margin">
 			<label class="uk-form-label">
+				{$LANG_EVLIST['show_cb']}:
+				<span id="show_centerblock" class="tooltip_cfg tooltipstered"></span>
+			</label>
+			<div class="uk-form-controls uk-form-controls-text">
+				<input type="checkbox" class="uk-checkbox" id="fld_show_cb" name="cal_show_cb" value="1" {cb_chk} />
+			</div>
+		</div>
+
+		<div class="uk-form-row uk-margin">
+			<label class="uk-form-label">
 				{$LANG_ACCESS['owner']}:
 				<span id="owner" class="tooltip_cfg tooltipstered"></span>
 			</label>

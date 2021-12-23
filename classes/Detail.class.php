@@ -153,17 +153,7 @@ class Detail
     {
         static $records = array();
         if (!array_key_exists($det_id, $records)) {
-            $key = 'detail_' . $det_id;
-            $records[$det_id] = Cache::get($key);
-            if ($records[$det_id] === NULL) {
-                $records[$det_id] = new self($det_id);
-            }
-            $tags = array(
-                'events',
-                'detail',
-                'event_' . $records[$det_id]->ev_id,
-            );
-            Cache::set($key, $records[$det_id], $tags);
+            $records[$det_id] = new self($det_id);
         }
         return $records[$det_id];
     }
@@ -599,7 +589,6 @@ class Detail
             det_revision = det_revision + 1
             WHERE ev_id = '" . DB_escapeString($ev_id) . "' $ands";
         DB_query($sql);
-        //Cache::clear('repeats', 'event_' . $ev_id);
     }
 
 

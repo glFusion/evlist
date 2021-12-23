@@ -25,7 +25,6 @@ switch ($_POST['action']) {
 case 'setStatus':
     $newval = (int)$_POST['newval'];
     $oldval = (int)$_POST['oldval'];
-    COM_errorLog("changing $oldval to $newval");
     if ($_POST['type'] == 'event') {
         $newval = Evlist\Event::setEventStatus($_POST['id'], $newval, $oldval);
     } elseif ($_POST['type'] == 'repeat') {

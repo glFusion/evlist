@@ -1182,8 +1182,7 @@ function phpblock_evlist_upcoming($A='', $params='')
             // only show multi-day events once.
             if (
                 $ev['show_upcoming'] != 1 ||
-                array_key_exists($ev['rp_id'], $rp_shown) ||
-                !$Cal->showUpcoming()
+                array_key_exists($ev['rp_id'], $rp_shown)
             ) {
                 continue;
             }

@@ -118,16 +118,22 @@ case 'saveevent':
 case 'saverepeat':
 case 'savefuturerepeat':
     $rp_id = (isset($_POST['rp_id']) && !empty($_POST['rp_id'])) ? $_POST['rp_id'] : '';
-    $Rp = new Evlist\Repeat($rp_id);
-    $status = $Rp->Save($_POST);
-    if (!$status) {
-        $content .= $Rp->Edit();
-        $view = 'none';
-    } else {
-        if ($action == 'savefuturerepeat') {
-            $Rp->updateFuture();
+    if ($rp_id > 0) {
+        $_POST['save_type'] = $action;
+        $Rp = new Evlist\Repeat($rp_id);
+        $status = $Rp->Save($_POST);
+        if (!$status) {
+            $content .= $Rp->Edit();
+            $view = 'none';
+        } else {
+            if ($action == 'savefuturerepeat') {
+                $Rp->updateFuture();
+            }
+            COM_setMsg($LANG_EVLIST['messages'][2]);
+            COM_refresh(EVLIST_ADMIN_URL . '/index.php');
         }
-        COM_setMsg($LANG_EVLIST['messages'][2]);
+    } else {
+        COM_setMsg($LANG_EVLIST['ev_not_found']);
         COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     }
     break;

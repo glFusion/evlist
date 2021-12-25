@@ -16,6 +16,7 @@ if (!defined ('GVERSION')) {
 }
 
 global $_TABLES, $_SQL, $_EV_UPGRADE;
+$_SQL = array();
 
 $event_table = 
   "`id` varchar(128) NOT NULL,

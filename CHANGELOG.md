@@ -4,6 +4,11 @@
 Release TBD
 - Leave advanced editor tags alone in story-style centerblock.
 - Template/CSS fix for event element alignment.
+- Fix search and pagination on MyEvents page. (#39)
+- Add a flag to show or hide calendars from centerblocks.
+- Make EventSet more efficient, don't get all fields. (#37)
+- Check permission when viewing an event directly. (#40)
+- Fix bug when updating a single instance of a recurring event. (#41)
 
 ## 1.5.3
 Release 2021-12-16
@@ -48,7 +53,7 @@ Release 2021-12-10
   - Use calendar selector for plugin to calendar mapping config.
     Previously reseerved calendars (Birthdays and Meetup Events) may now be deleted.
 - Include event pass tickets in per-instance signup lists.
-- Enable advanced editor for event summary.
+- Enable advanced editor for event summary. (#38)
 - Improve Story-style centerblock
 
 ## v1.4.5

@@ -204,6 +204,28 @@ class Calendar
 
 
     /**
+     * Get the foreground color used for display.
+     *
+     * @return  string      Foreground color
+     */
+    public function getFGcolor() : string
+    {
+        return $this->fgcolor;
+    }
+
+
+    /**
+     * Get the background color used for display.
+     *
+     * @return  string      Background color
+     */
+    public function getBGcolor() : string
+    {
+        return $this->bgcolor;
+    }
+
+
+    /**
      * Check the current users's access to this calendar.
      *
      * @return  integer     3 for read/edit 2 for read only 0 for no access

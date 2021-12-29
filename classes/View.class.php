@@ -540,6 +540,7 @@ class View
             foreach ($this->cal_used as $key=>$Cal) {
                 $T->set_var(array(
                     'fgcolor'   => $Cal->getFGcolor(),
+                    'bgcolor'   => $Cal->getBGcolor(),
                     'key'       => $key,
                     'cal_name'  => $Cal->getName(),
                     'chk'   => self::getCalShowPref($key) ? EVCHECKED : ''

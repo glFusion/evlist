@@ -813,3 +813,11 @@ i#next_href, i#prev_href {
 .event_disabled {
     background-color: #dedede;
 }
+
+div.evCalCheckboxInner {
+	padding: 5px;
+}
+div.evCalCheckboxInner label {
+	font-weight: inherit;
+}
+

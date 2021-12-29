@@ -4,9 +4,9 @@
     <a href="#" title="{$LANG_EVLIST['select_cals']}" data-uk-tooltip="{cls:'evTooltip'}">{$LANG_EVLIST['calendars']}
       <i class="uk-icon-arrow-down"></i>
     </a>
-    <div class="uk-dropdown uk-dropdown-bottom">
+    <div class="uk-dropdown uk-dropdown-bottom evCalCheckboxInner">
 <!-- BEGIN cal_item -->
-      <div style="float:left;width:100%;color:{fgcolor}">
+      <div style="float:left;width:100%;color:{fgcolor};background-color:{bgcolor};">
         <input {chk} type="checkbox" id="cal{key}" onclick="SelectCal(this)"><label for="cal{key}">&nbsp{cal_name}</label>
       </div>
  <!-- END cal_item -->

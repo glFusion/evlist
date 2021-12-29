@@ -397,6 +397,11 @@ $_EV_UPGRADE = array(
     "ALTER TABLE {$_TABLES['evlist_calendars']} DROP `calshow_upcoming`",
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `cal_show_cb` tinyint(1) unsigned NOT NULL DEFAULT 1 AFTER `cal_show_upcoming`",
     ),
+'1.5.4' => array(
+    // Fix invalid permissions, probably from plugin-supplied events
+    "UPDATE {$_TABLES['evlist_events']} SET perm_members = 0 WHERE perm_members = 3",
+    "UPDATE {$_TABLES['evlist_events']} SET perm_anon = 0 WHERE perm_anon = 3",
+    ),
 );
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];
 

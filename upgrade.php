@@ -265,6 +265,12 @@ function evlist_upgrade($dvlp = false)
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
+    if (!COM_checkVersion($currentVersion, '1.5.4')) {
+        $currentVersion = '1.5.4';
+        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
+        if (!EVLIST_do_set_version($currentVersion)) return false;
+    }
+
     // Set the version if not previously set
     if (!COM_checkVersion($currentVersion, $installed_ver)) {
         if (!EVLIST_do_set_version($installed_ver)) return false;

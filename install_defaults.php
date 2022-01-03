@@ -383,7 +383,7 @@ $evlistConfigData = array(
     ),
     array(
         'name' => 'rsvp_print',
-        'default_value' => 0,
+        'default_value' => 1,
         'type' => 'select',
         'subgroup' => 10,
         'fieldset' => 0,

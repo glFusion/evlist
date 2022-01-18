@@ -64,22 +64,13 @@
 
 #evlistEventHeader, #evEventButtons {
     clear: both;
-    /*margin-left: 15px;
-    margin-right: 15px;*/
     margin-bottom:20px;
-}
-
-@media (max-width: 1249px) {
-  #evlistEventDetail {
-    /*width: 100%;*/
-  }
 }
 
 /* Large screen and bigger */
 @media (min-width: 1250px) {
   #evlistEventDetail {
     min-width: 400px;
-    width: 50%;
   }
   div.evdata {
     max-width: 80%;
@@ -90,8 +81,6 @@
     clear: left;
     position: relative;
     float: left;
-   /* min-width: 300px;
-    width: 60%;*/
 }
 
 div.#evlistPrtEventDetail {
@@ -103,7 +92,6 @@ div.#evlistPrtEventDetail {
 }
 
 div.evEventItem {
-    /*padding-top: 15px;*/
 	margin-bottom: 10px;
     clear: left;
 }

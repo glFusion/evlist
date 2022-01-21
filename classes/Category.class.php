@@ -251,22 +251,14 @@ class Category
     public static function getAll()
     {
         global $_TABLES;
-        static $cats = NULL;
 
-        // First check if the calendars have been read already
-        if ($cats === NULL) {
-            // Then check the cache
-            $cats = Cache::get('categories');
-            if ($cats === NULL) {
-                // Still nothing? Then read from the DB
-                $cats = array();
-                $sql = "SELECT * FROM {$_TABLES['evlist_categories']}
-                        ORDER BY id ASC";
-                $res = DB_query($sql);
-                while ($A = DB_fetchArray($res, false)) {
-                    $cats[$A['id']] = new self($A);
-                }
-                Cache::set('categories', $cats, 'categories');
+        $cats = array();
+        $sql = "SELECT * FROM {$_TABLES['evlist_categories']}
+            ORDER BY id ASC";
+        $res = DB_query($sql);
+        if ($res && DB_numRows($res) > 0) {
+            while ($A = DB_fetchArray($res, false)) {
+                $cats[$A['id']] = new self($A);
             }
         }
         return $cats;

@@ -355,17 +355,7 @@ class Event
         static $records = array();
 
         if (!array_key_exists($ev_id, $records)) {
-            $key = 'event_' . $ev_id . '_' . $det_id;
-            //$records[$ev_id] = Cache::get($key);
-            $records[$ev_id] = null;
-            if ($records[$ev_id] === NULL) {
-                $records[$ev_id] = new self($ev_id, $det_id);
-                $tags = array(
-                    'events',
-                    'event_' . $ev_id,
-                );
-                Cache::set($key, $records[$ev_id], $tags);
-            }
+            $records[$ev_id] = new self($ev_id, $det_id);
         }
         return $records[$ev_id];
     }

@@ -617,20 +617,15 @@ class Calendar
     {
         global $_TABLES;
 
-        $cals = Cache::get('calendars');
-        if ($cals === NULL) {
-                // Still nothing? Then read from the DB
-            $cals = array();
-            $sql = "SELECT * FROM {$_TABLES['evlist_calendars']} ";
-            if ($enabled) {
-                $sql .= "WHERE cal_status = 1 ";
-            }
-            $sql .= "ORDER BY orderby ASC";
-            $res = DB_query($sql);
-            while ($A = DB_fetchArray($res, false)) {
-                $cals[$A['cal_id']] = new self($A);
-            }
-            Cache::set('calendars', $cals, 'calendars');
+        $cals = array();
+        $sql = "SELECT * FROM {$_TABLES['evlist_calendars']} ";
+        if ($enabled) {
+            $sql .= "WHERE cal_status = 1 ";
+        }
+        $sql .= "ORDER BY orderby ASC";
+        $res = DB_query($sql);
+        while ($A = DB_fetchArray($res, false)) {
+            $cals[$A['cal_id']] = new self($A);
         }
         return $cals;
     }
@@ -680,7 +675,7 @@ class Calendar
         // Read the calendar to verify that it actually exists.
         // Return the default calendar if it doesn't.
         $Cal = self::getInstance($cal_id);
-        if (!$Cal || $Cal->getID() < 1) {
+        if (!$Cal || $Cal->getID() == 0) {
             $Cal = self::getInstance(1);
         }
         return $Cal;

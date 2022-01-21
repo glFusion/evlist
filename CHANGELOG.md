@@ -9,6 +9,10 @@ Release TBD
 - Make EventSet more efficient, don't get all fields. (#37)
 - Check permission when viewing an event directly. (#40)
 - Fix bug when updating a single instance of a recurring event. (#41)
+- Fix invalid members and anon permissions, assume none.
+- Better display of calendar checkboxes with light or dark themes.
+- Reduce use of caching where it doesn't improve performance.
+- Fix saving birthdays to correct calendar.
 
 ## 1.5.3
 Release 2021-12-16

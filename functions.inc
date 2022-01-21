@@ -1870,7 +1870,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
         'ev_id' => $ev_id,
         'owner_id' => $info['owner_id'] ? $info['owner_id'] : 2,
         'group_id' => $info['group_id'] !== NULL ? $info['group_id'] : 13,
-        'cal_id' => max($Cal->getID(), 1),
+        'cal_id' => $Cal->getID(),
         'title' => $info['title'],
         'summary' => $summary,
         'full_description' => $full_dscp,

@@ -1395,7 +1395,7 @@ class Ticket
 
         switch($fieldname) {
         case 'waitlist':
-            $retval = $fieldvalue == 0 ? '' : $LANG_EVLIST['yes'];
+            $retval = empty($fieldvalue) ? '' : $LANG_EVLIST['yes'];
             break;
 
         case 'uid':
@@ -1403,7 +1403,7 @@ class Ticket
             break;
 
         case 'rank':
-            if ($fieldvalue > $A['max_signups']) {
+            if ((int)$fieldvalue > $A['max_signups']) {
                 $retval = $LANG_EVLIST['yes'];
             } else {
                 $retval = $LANG_EVLIST['no'];
@@ -1412,7 +1412,7 @@ class Ticket
 
         case 'dt':
         case 'used':
-            if ($fieldvalue > 0) {
+            if ((int)$fieldvalue > 0) {
                 $d = new \Date($fieldvalue);
                 $retval = $d->format($_CONF['shortdate'] . ' ' . $_CONF['timeonly'], false);
             } else {

@@ -73,11 +73,12 @@
 			<i title="{$LANG_ADMIN['delete']}" class="{icon_remove} uk-icon-small uk-icon-justify ev-icon-danger tooltip"></i>
 		</a>
 	{!endif}
+{!endif}
+{!if can_clone}
 		<a href="{pi_url}/event.php?clone=x&eid={ev_id}&rp_id={rp_id}">
 			<i title="{$LANG_ADMIN['copy']}" class="{icon_copy} uk-icon-small uk-icon-justify ev-icon-info tooltip"></i>
 		</a>
 {!endif}
-
 {!if can_subscribe_DEPRECATED}
 		<div class="uk-button-dropdown" data-uk-dropdown="{mode:'click'}" uk-dropdown="mode:click">
 			<a href="#"><i title="{$LANG_EVLIST['subscribe']}" class="{icon_subscribe} ev-icon-info tooltip"></i></a>

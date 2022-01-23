@@ -264,6 +264,7 @@ class Occurrence
             'summary' => $summary,
             'full_description' => $full_description,
             'can_edit' => $Event->canEdit() ? 'true' : '',
+            'can_clone' => $Event->hasAccess(3),
             'start_time1' => $time_start1,
             'end_time1' => $time_end1,
             'start_time2' => $time_start2,
@@ -387,7 +388,7 @@ class Occurrence
                     (
                         $Event->getOption('max_rsvp') == 0 ||
                         $Event->getOption('rsvp_waitlist') == 1 ||
-                        $Event->getOption('max_rsvp') > $this->TotalRegistrations()
+                        $Event->getOption('max_rsvp') > $this->Repeat->TotalRegistrations()
                     )
                     &&
                     (

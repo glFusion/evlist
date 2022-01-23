@@ -946,11 +946,10 @@ class Event
         if (is_array($A)) {
             $this->SetVars($A);
             $this->MakeRecData($A);
-            //DB_delete($_TABLES['evlist_lookup'], 'eid', $this->id);
         }
 
         // Authorized to bypass the queue
-        if ($this->isAdmin || plugin_ismoderator_evlist()) {
+        if (plugin_issubmitter_evlist()) {
             $this->asSubmission(false);
         }
 
@@ -1091,21 +1090,6 @@ class Event
             }
         } else {
             // New event
-            if (!$this->isAdmin) {
-                // Override any submitted permissions if user is not an admin
-                $this->setPermOwner()
-                    ->setPermGroup()
-                    ->setPermMembers()
-                    ->setPermAnon()
-                    ->setGroup(DB_getItem(
-                        $_TABLES['groups'],
-                        'grp_id',
-                        'grp_name="evList Admin"'
-                    ) )
-                    // Set the owner to the submitter
-                    ->setOwner();
-            }
-
             // Create a detail record
             $this->Detail = new Detail();
             $this->getDetail()->setVars($A);
@@ -1371,6 +1355,7 @@ class Event
      */
     public function Edit($eid = '', $rp_id = 0, $saveaction = '')
     {
+        COM_errorLog(__CLASS__ . '::' . __FUNCTION__ . ' -- Deprecated');
         global $_CONF, $_EV_CONF, $_TABLES, $_USER, $LANG_EVLIST,
                 $LANG_ADMIN, $_GROUPS, $LANG_ACCESS, $_SYSTEM;
 
@@ -1833,6 +1818,7 @@ class Event
 
             $T->set_var(array(
                 'enable_rsvp' => 'true',
+                'rsvp_enabled' => 'true',
                 'reg_chk'.(int)$this->getOption('use_rsvp') => EVCHECKED,
                 'rsvp_wait_chk' => $this->getOption('rsvp_waitlist') == 1 ?
                                 EVCHECKED : '',
@@ -1979,6 +1965,7 @@ class Event
                 ) );
             }
         }
+
         $T->parse('tooltipster_js', 'tips');
         $T->parse('output', 'editor');
         $retval .= $T->finish($T->get_var('output'));
@@ -2624,15 +2611,15 @@ class Event
      */
     public function canEdit() : bool
     {
+        global $_CONF;
+
         $canedit = false;
         if ($this->isAdmin || plugin_ismoderator_evlist()) {
             $canedit = true;
         } elseif ($this->isOwner()) {
-            if ($_CONF['storysubmission'] == 0) {
-                $canedit = true;
-            } elseif (plugin_issubmitter_evlist()) {
-                $canedit = true;
-            }
+            // special check so owners subject to the submission queue
+            // can't edit their own events.
+            $canedit = plugin_issubmitter_evlist();
         } else {
             $canedit = $this->hasAccess(3);
         }

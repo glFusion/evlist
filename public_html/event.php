@@ -337,14 +337,15 @@ case 'clone':
             EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
         }
         $Ev = Evlist\Event::getInstance($_GET['eid']);
-        if ($Ev->getID() == '' || !$Ev->canEdit()) {    // Event not found
+        if ($Ev->getID() == '' || !$Ev->hasAccess(3)) {    // Event not found
             COM_404();
         }
         // Now prep it to be saved as a new record
         $Ev->setID('');
         $Ev->forceNew();
+        $Editor = new Evlist\Views\Editor;
+        $content .= $Editor->withEvent($Ev)->withSaveAction('event')->Render();
         $add_link = false;
-        $content .= $Ev->Edit();
     } else {
         COM_404();
     }

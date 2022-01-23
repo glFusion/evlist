@@ -18,6 +18,7 @@ use Evlist\Repeat;
 use Evlist\Calendar;
 use Evlist\DateFunc;
 use Evlist\TicketType;
+use Evlist\Config;
 
 
 /**
@@ -699,11 +700,16 @@ class Editor
         }
 
         if ($this->isAdmin) {
-            $T->set_var(array(
-                //'owner_username' => COM_stripslashes($ownerusername),
-                'owner_dropdown' => COM_optionList(
+            $T->set_var(
+                'owner_dropdown',
+                COM_optionList(
                     $_TABLES['users'], 'uid,username', $this->Event->getOwnerID(), 1
-                ),
+                )
+            );
+        }
+
+        if (Config::get('enable_rsvp')) {
+            $T->set_var(array(
                 'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
                     (int)$this->Event->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
                 ),
@@ -711,17 +717,10 @@ class Editor
                     (int)$this->Event->getOption('rsvp_signup_grp', 1), 3, 'rsvp_signup_grp'
                 ),
             ) );
-            if ($rp_id == 0) {  // can only change permissions on main event
-                $T->set_var('permissions_editor', SEC_getPermissionsHTML(
-                    $this->Event->getPerms()['perm_owner'],
-                    $this->Event->getPerms()['perm_group'],
-                    $this->Event->getPerms()['perm_members'],
-                    $this->Event->getPerms()['perm_anon']
-                ) );
-            }
         }
 
-        if ($rp_id == 0) {  // can only change permissions on main event
+        // can only change permissions on main event
+        if ($rp_id == 0) {
             $T->set_var(array(
                 'permissions_editor' => SEC_getPermissionsHTML(
                     $this->Event->getPerms()['perm_owner'],

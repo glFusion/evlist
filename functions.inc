@@ -817,12 +817,16 @@ function plugin_moderationvalues_evlist()
 function plugin_issubmitter_evlist()
 {
     static $retval = NULL;
+
     if ($retval === NULL) {
-        if (plugin_ismoderator_evlist()) {
-            // moderators automatically have submit access
+        if (
+            !Config::get('submission_queue', 1) ||  // not using the queue
+            plugin_ismoderator_evlist() ||          // moderator or admin
+            SEC_hasRights('evlist.submit')          // has the submit privilege
+        ) {
             $retval = true;
         } else {
-            $retval = SEC_hasRights('evlist.submit');
+            $retval = false;
         }
     }
     return $retval;
@@ -1980,12 +1984,14 @@ function EVLIST_canSubmit()
     static $canSubmit = NULL;
 
     if ($canSubmit === NULL) {
-        // Determine if the current user is allowed to add an event, and borrow
-        // some space in $_EV_CONF to store a flag for other functions to use.
-        if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD ||
-            (!COM_isAnonUser() &&
-            ($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) ||
-            plugin_ismoderator_evlist()) {
+        if (plugin_ismoderator_evlist() || plugin_issubmitter_evlist()) {
+            // moderators and evlist.submit privilege can always submit
+            $canSubmit = true;
+        } elseif (COM_isAnonUser()) {
+            if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD) {
+                $canSubmit = true;
+            }
+        } elseif (($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) {
             $canSubmit = true;
         } else {
             $canSubmit = false;

@@ -293,7 +293,7 @@ function toggleRSVPdetail(val)
 <div class="uk-alert uk-alert-danger"><ul>{errors}</ul></div>
 {!endif}
 
-<ul uk-switcher="connect: #ev_forms" data-uk-switcher="{connect:'#ev_forms'}" class="uk-tab">
+<ul uk-switcher="connect: #ev_forms" data-uk-switcher="{connect:'#ev_forms',swiping:false}" class="uk-tab">
     <li><a href="#">{$LANG_EVLIST['ev_info']}</a></li>
     <li><a href="#">{$LANG_EVLIST['ev_location']}</a></li>
     <li><a href="#">{$LANG_EVLIST['ev_contact']}</a></li>

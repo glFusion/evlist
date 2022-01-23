@@ -471,6 +471,7 @@ $LANG_confignames['evlist'] = array(
     'enable_rsvp'           => 'Enable Registration/Ticketing?',
     'rsvp_print'            => 'Enable Ticket Printing?',
     'commentsupport'        => 'Enable Comments?',
+    'submission_queue'      => 'Use submission queue?',
     'ticket_format'         => 'Ticket Format String',
     'pi_cal_map'            => 'Plugin-Calendar Mapping',
     'cb_dup_chk'            => 'Key to hide duplicate instances',

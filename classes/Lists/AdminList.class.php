@@ -66,6 +66,7 @@ class AdminList
                 'text' => $LANG_EVLIST['start_date'],
                 'field' => 'date_start1',
                 'sort' => true,
+                'nowrap' => true,
             ),
             array(
                 'text' => 'Repeats',

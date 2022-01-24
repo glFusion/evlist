@@ -4,9 +4,9 @@
  *
  * @author     Mark R. Evans mark AT glfusion DOT org
  * @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright  Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2010 - 2022 Lee Garner <lee@leegarner.com>
  * @package    evlist
- * @version    v1.5.3
+ * @version    v1.5.4
  * @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -25,7 +25,7 @@ global $_DB_table_prefix, $_TABLES;
 */
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.5.3';
+$_EV_CONF['pi_version']      = '1.5.4';
 $_EV_CONF['gl_version']      = '1.7.8';
 $_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 

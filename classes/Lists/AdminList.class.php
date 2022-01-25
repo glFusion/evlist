@@ -188,14 +188,12 @@ class AdminList
             );
             break;
         case 'title':
-            $rp_id = Repeat::getNearest($A['id']);
-            if ($rp_id) {
-                $retval = COM_createLink(
-                    $fieldvalue, EVLIST_URL . '/event.php?eid=' . $rp_id
-                );
-            } else {
-                $retval = $fieldvalue;
-            }
+            $retval = COM_createLink(
+                $fieldvalue,
+                COM_buildUrl(
+                    EVLIST_URL . '/event.php?view=event&eid=' . $A['id']
+                )
+            );
             if ($A['status'] == '2') {
                 $retval = '<span class="event_disabled">' . $retval . '</span>';
             }

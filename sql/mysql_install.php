@@ -394,13 +394,14 @@ $_EV_UPGRADE = array(
     "UPDATE {$_TABLES['evlist_events']} SET `enable_comments` = 0 WHERE `enable_comments` = 2",
     ),
 '1.5.4' => array(
+    // Mis-named column added in 1.5.0, correctly created in 1.5.1
     "ALTER TABLE {$_TABLES['evlist_calendars']} DROP `calshow_upcoming`",
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `cal_show_cb` tinyint(1) unsigned NOT NULL DEFAULT 1 AFTER `cal_show_upcoming`",
-    ),
-'1.5.4' => array(
     // Fix invalid permissions, probably from plugin-supplied events
     "UPDATE {$_TABLES['evlist_events']} SET perm_members = 0 WHERE perm_members = 3",
     "UPDATE {$_TABLES['evlist_events']} SET perm_anon = 0 WHERE perm_anon = 3",
+    // Unused field
+    "ALTER TABLE {$_TABLES['evlist_remlookup']} DROP `timestamp`",
     ),
 );
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];

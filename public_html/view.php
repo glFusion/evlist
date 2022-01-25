@@ -19,9 +19,8 @@ if (!in_array('evlist', $_PLUGINS)) {
     exit;
 }
 
-// If global loginrequired is set, override the plugin's setting
-if ($_CONF['loginrequired'] == 1) $_EV_CONF['allow_anon_view'] = '0';
-if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
+// Check if the current user can even view the calendar
+if (!EVLIST_canView()) {
     $display = EVLIST_siteHeader();
     $display .= SEC_loginRequiredForm();
     $display .= EVLIST_siteFooter();

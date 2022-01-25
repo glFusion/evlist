@@ -17,6 +17,7 @@
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
+use Evlist\Config;
 
 global $_CONF;
 require_once __DIR__ . "/sql/mysql_install.php";
@@ -267,7 +268,58 @@ function evlist_upgrade($dvlp = false)
 
     if (!COM_checkVersion($currentVersion, '1.5.4')) {
         $currentVersion = '1.5.4';
-        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
+        // Convert some config settings to privileges, if not already done
+        $have_ft_nq = DB_count($_TABLES['features'], 'ft_name', 'evlist.noqueue');
+        if (!$have_ft_nq) {
+            // Change "submit" feature to "noqueue"
+            COM_errorLog("... changing old submit privilege to noqueue");
+            $res = DB_query("UPDATE {$_TABLES['features']} SET
+                ft_name = 'evlist.noqueue',
+                ft_descr = 'May bypass the Evlist submission queue'
+                WHERE ft_name = 'evlist.submit'"
+            );
+            // Now reset the submit privilege to indicate who can submit
+            COM_errorLog("... creating evlist.submit privilege");
+            $res = DB_query("INSERT INTO {$_TABLES['features']} SET
+                ft_name = 'evlist.submit',
+                ft_descr = 'May submit events to the Evlist calendar'"
+            );
+            $ft_id = (int)DB_insertId($res);
+            if ($ft_id) {
+                switch (Config::get('can_add', 2)) {
+                case 0:
+                    $grp_id = 1;    // admins only
+                    break;
+                case 1:
+                    $grp_id = 13;   // logged-in only
+                    break;
+                default:
+                    $grp_id = 2;    // all users
+                    break;
+                }
+                $res = DB_query("INSERT INTO {$_TABLES['access']} SET
+                    acc_ft_id = $ft_id,
+                    acc_grp_id = $grp_id"
+                );
+            }
+
+            // Add the evlist.view permission
+            COM_errorLog("... Creating evlist.view privilege");
+            $res = DB_query("INSERT INTO {$_TABLES['features']} SET
+                ft_name = 'evlist.view',
+                ft_descr = 'May view the Evlist calendar'"
+            );
+            $ft_id = (int)DB_insertId($res);
+            if ($ft_id) {
+                $val = Config::get('allow_anon_view', 1) ? 2 : 13;
+                $res = DB_query("INSERT INTO {$_TABLES['access']} SET
+                    acc_ft_id = $ft_id,
+                    acc_grp_id = $val"
+                );
+                $config = \config::get_instance();
+                $config->del('allow_anon_view', Config::PI_NAME);
+            }
+        }
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
@@ -302,10 +354,10 @@ function evlist_upgrade_1_3_0()
     global $_CONF, $_EV_CONF, $_TABLES;
 
     // Combine users allowed to add events into one variable
-    $config = config::get_instance();
+    $config = \config::get_instance();
     $can_add = 0;
-    if ($_EV_CONF['allow_anon_add'] > 0) $can_add += EV_ANON_CAN_ADD;
-    if ($_EV_CONF['allow_user_add'] > 0) $can_add += EV_USER_CAN_ADD;
+    if (Config::get('allow_anon_add', 1)) $can_add += EV_ANON_CAN_ADD;
+    if (Config::get('allow_user_add', 1)) $can_add += EV_USER_CAN_ADD;
     $c->add('can_add', $can_add, 'select', 0, 1, 15, 20, true, 'evlist');
 
     // Date & Time formats moved from the DB to simple $_CONF  variables

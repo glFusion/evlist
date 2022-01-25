@@ -45,8 +45,10 @@ class Centerblock
     {
         global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
-        if (Config::get('pos_centerblock') != $where ||
-            (COM_isAnonUser() && Config::get('allow_anon_view') != '1')) {
+        if (
+            Config::get('pos_centerblock') != $where ||
+            !EVLIST_canView()
+        ) {
             return '';
         }
 

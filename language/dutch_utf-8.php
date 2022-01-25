@@ -440,10 +440,6 @@ $LANG_configsections['evlist'] = array(
     'title'                 => 'evList Instellingen'
 );
 $LANG_confignames['evlist'] = array(
-    'allow_anon_view'       => 'Anonieme gebruikers kunnen evenementen bekijken?',
-    'allow_anon_add'        => 'Anonieme inzendingen toestaan?',
-    'allow_user_add'        => 'Inzendingen van aangemelde gebruikers toestaan?',
-    'can_add'               => 'Users allowed to add events',
     'allow_html'            => 'HTML toestaan bij opmaken?',
     'usermenu_option'       => 'Gebruiker menu link optie',
     'enable_menuitem'       => 'Menu Item inschakelen?',
@@ -585,7 +581,6 @@ $LANG_configselects['evlist'] = array(
     12 => array('Geen Toegang' => 0, 'Alleen-Lezen' => 2, 'Lezen-Schrijven' => 3),
     13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
     14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),
-    15 => array('Admins Only' => 0, 'Logged-In Users' => 1, 'Logged-In+Anon Users' => 2),
     16 => array('HTML' => 'html', 'JSON' => 'json'),
     17 => array('No' => 0, 'Default No' => 1, 'Default Paid Only' => 2,
                 'Default Paid or Unpaid' => 3),

@@ -39,7 +39,7 @@ class UserList extends AdminList
 
         // Allow editing if the queue is not used or this is an autorized
         // submitter.
-        if (!$_CONF['storysubmission'] || plugin_issubmitter_evlist()) {
+        if (EVLIST_skipqueue()) {
             $header_arr[] = array(
                 'text'  => $LANG_EVLIST['edit'],
                 'field' => 'edit', 'sort' => false,
@@ -80,6 +80,11 @@ class UserList extends AdminList
             'field' => 'date_start1',
             'direction' => 'DESC',
         );
+        $options = array(
+            'chkdelete' => 'true',
+            'chkfield' => 'id',
+            'chkname' => 'delevent',
+        );
         $text_arr = array(
             'has_menu'  => true,
             'has_extras'=> true,
@@ -110,7 +115,7 @@ class UserList extends AdminList
             'evlist_event_user',
             array(__CLASS__, 'getAdminField'),
             $header_arr, $text_arr, $query_arr, $defsort_arr,
-            '', $extra
+            '', $extra, $options
         );
         return $retval;
     }

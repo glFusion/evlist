@@ -264,7 +264,7 @@ class Occurrence
             'summary' => $summary,
             'full_description' => $full_description,
             'can_edit' => $Event->canEdit() ? 'true' : '',
-            'can_clone' => $Event->hasAccess(3),
+            'can_clone' => EVLIST_canSubmit(),
             'start_time1' => $time_start1,
             'end_time1' => $time_end1,
             'start_time2' => $time_start2,

@@ -103,20 +103,32 @@ $INSTALL_plugin['evlist'] = array(
     array(
         'type' => 'feature',
         'feature' => 'evlist.submit',
-        'desc' => 'May bypass the evList submission queue',
+        'desc' => 'May submit events to the calendar',
         'variable' => 'submit_feature_id',
     ),
     array(
+        'type' => 'feature',
+        'feature' => 'evlist.noqueue',
+        'desc' => 'May bypass the evList submission queue',
+        'variable' => 'noqueue_feature_id',
+    ),
+    array(
         'type' => 'mapping',
-        'findgroup' => 'Root',
+        'group' => 1,
         'feature' => 'admin_feature_id',
         'log' => 'Adding Admin feature to the Root group',
     ),
     array(
         'type' => 'mapping',
-        'findgroup' => 'Root',
+        'group' => 1,
+        'feature' => 'noqueue_feature_id',
+        'log' => 'Adding NoQueue feature to the Root group',
+    ),
+    array(
+        'type' => 'mapping',
+        'group' => 13,
         'feature' => 'submit_feature_id',
-        'log' => 'Adding evList Submit feature to the Root group',
+        'log' => 'Adding evList Submit feature to the Logged-In Users group',
     ),
     array(
         'type' => 'sql',

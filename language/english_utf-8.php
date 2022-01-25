@@ -437,11 +437,7 @@ $LANG_configsections['evlist'] = array(
     'title'                 => 'evList Configuration'
 );
 $LANG_confignames['evlist'] = array(
-    'allow_anon_view'       => 'Allow anonymous users to view events?',
-    'allow_anon_add'        => 'Allow anonymous submissions?',
-    'allow_user_add'        => 'Allow logged in user submissions?',
     'allow_html'            => 'Allow html when posting?',
-    'can_add'               => 'Users allowed to add events',
     'usermenu_option'       => 'User menu link option',
     'enable_menuitem'       => 'Enable the menu item?',
     'week_begins'           => 'Week begins on',
@@ -547,6 +543,7 @@ $LANG_configSelect['evlist'] = array(
         'year' => 'Year',
         'agenda' => 'Agenda',
     ),
+    15 => array(0 => 'Admins Only', 1 => 'Logged-In Users', 2 => 'Logged-In+Anon Users'),
 );
 
 // Legacy config selections, requires glFusion 2.0

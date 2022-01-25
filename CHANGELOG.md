@@ -13,6 +13,10 @@ Release TBD
 - Better display of calendar checkboxes with light or dark themes.
 - Reduce use of caching where it doesn't improve performance.
 - Fix saving birthdays to correct calendar.
+- Regular users can set permissions and signups when editing events.
+- Event ownership not required to clone an event.
+- Add config var to enable event submission queue (was using story config).
+- Add queue bypass and overall view privileges.
 
 ## 1.5.3
 Release 2021-12-16

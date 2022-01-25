@@ -65,11 +65,6 @@ if (file_exists(__DIR__ . '/config.php')) {
     include_once __DIR__ . '/config.php';
 }
 
-// Override plugin config if login is required globally
-if ($_CONF['loginrequired'] == 1) {
-    Config::set('allow_anon_view', 0);
-}
-
 // Include the user's language file, if found.  Default to englsh.
 $langpath = __DIR__ . '/language';
 require_once "$langpath/english_utf-8.php";
@@ -246,33 +241,19 @@ function plugin_getuseroption_evlist()
         0
     );
 
-    switch ($_EV_CONF['can_add']) {
-    case 0:     // only admins can add events
-        if (plugin_ismoderator_evlist()) {
-            $retval[] = $add_option;
-        }
-        break;
-    case 1:     // logged-in users can add events
-        if (!COM_isAnonUser()) {
-            $retval[] = $add_option;
-        }
-        break;
-    case 2:     // logged-in + anonymous users can add
+    if (EVLIST_canSubmit()) {
         $retval[] = $add_option;
-        break;
-    }
-
-    if (!COM_isAnonUser()) {
-        $count = DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']);
-        if ($count > 0) {
-            $retval[] = array(
-                $LANG_EVLIST['my_events'],
-                EVLIST_URL . '/index.php?view=myevents',
-                $count
-            );
+        if (!COM_isAnonUser()) {
+            $count = DB_count($_TABLES['evlist_events'], 'owner_id', $_USER['uid']);
+            if ($count > 0) {
+                $retval[] = array(
+                    $LANG_EVLIST['my_events'],
+                    EVLIST_URL . '/index.php?view=myevents',
+                    $count
+                );
+            }
         }
     }
-
     return $retval;
 }
 
@@ -287,7 +268,8 @@ function plugin_getmenuitems_evlist()
     global $_EV_CONF, $LANG_EVLIST;
 
     $menuitems = array();
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
+    // Check if the current user can even view the calendar
+    if (!EVLIST_canView()) {
         return $menuitems;
     }
 
@@ -308,7 +290,8 @@ function plugin_statssummary_evlist()
 {
     global $_EV_CONF, $_TABLES, $LANG_EVLIST;
 
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
+    // Check if the current user can even view the calendar
+    if (!EVLIST_canView()) {
         return false;
     }
 
@@ -336,7 +319,8 @@ function plugin_searchtypes_evlist()
 {
     global $_EV_CONF, $LANG_EVLIST;
 
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
+    // Check if the current user can even view the calendar
+    if (!EVLIST_canView()) {
         return '';
     }
 
@@ -363,7 +347,8 @@ function plugin_dopluginsearch_evlist($query, $datestart, $dateend,
 ) {
     global $_CONF, $_EV_CONF,$_TABLES;
 
-    if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
+    // Check if the current user can even view the calendar
+    if (!EVLIST_canView()) {
         return NULL;
     }
 
@@ -808,21 +793,23 @@ function plugin_moderationvalues_evlist()
 
 
 /**
- * Determine if the current user has the "submit" privilege.
+ * Determine if the current user has the "noqueue" privilege.
  *
  * @see     SEC_hasRights()
  * @uses    plugin_ismoderator_evlist()
  * @return  boolean     True if the user has access, False if not
  */
-function plugin_issubmitter_evlist()
+function EVLIST_skipqueue()
 {
     static $retval = NULL;
-
     if ($retval === NULL) {
         if (
-            !Config::get('submission_queue', 1) ||  // not using the queue
-            plugin_ismoderator_evlist() ||          // moderator or admin
-            SEC_hasRights('evlist.submit')          // has the submit privilege
+            EVLIST_canSubmit() &&
+            (
+                plugin_ismoderator_evlist() ||          // moderator or admin
+                !Config::get('submission_queue', 1) ||  // not using the queue
+                SEC_hasRights('evlist.noqueue')         // has the submit privilege
+            )
         ) {
             $retval = true;
         } else {
@@ -1039,7 +1026,7 @@ function EVLIST_getCatLinks($eid, $andrange = '')
  * @param   mixed   $timestamp  Timestamp to return as formatted.
  * @return  string      Formatted date
  */
-function EVLIST_formattedDate($timestamp)
+function EVLIST_formattedDate($timestamp=NULL) : string
 {
     global $_CONF;
 
@@ -1064,7 +1051,7 @@ function EVLIST_formattedDate($timestamp)
  * @param   mixed   $timestamp  Timestamp to return as formatted.
  * @return  string      Formatted date
  */
-function EVLIST_formattedTime($timestamp)
+function EVLIST_formattedTime($timestamp=NULL) : string
 {
     global $_CONF, $_EV_CONF;
 
@@ -1973,25 +1960,38 @@ function EVLIST_noquotes($str)
 
 
 /**
+ * Check if the current user can view the calendar.
+ *
+ * @return  boolean     True if view allowed, False if not
+ */
+function EVLIST_canView() : bool
+{
+    global $_CONF;
+
+    // Override plugin config if login is required globally
+    if (COM_isAnonUser() && $_CONF['loginrequired'] == 1) {
+        return false;
+    } else {
+        return SEC_hasRights('evlist.view');
+    }
+}
+
+
+/**
  * Determine if the current user can submit an event.
  * Checks config and logged-in status.
  *
  * @return  boolean     True if subbmission is allowed, False if not
  */
-function EVLIST_canSubmit()
+function EVLIST_canSubmit() : bool
 {
-    global $_EV_CONF;
     static $canSubmit = NULL;
 
     if ($canSubmit === NULL) {
-        if (plugin_ismoderator_evlist() || plugin_issubmitter_evlist()) {
-            // moderators and evlist.submit privilege can always submit
-            $canSubmit = true;
-        } elseif (COM_isAnonUser()) {
-            if (($_EV_CONF['can_add'] & EV_ANON_CAN_ADD) == EV_ANON_CAN_ADD) {
-                $canSubmit = true;
-            }
-        } elseif (($_EV_CONF['can_add'] & EV_USER_CAN_ADD) == EV_USER_CAN_ADD) {
+        if (
+            plugin_ismoderator_evlist() ||      // moderator or admin
+            SEC_hasRights('evlist.submit')
+        ) {
             $canSubmit = true;
         } else {
             $canSubmit = false;

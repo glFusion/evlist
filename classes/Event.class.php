@@ -419,11 +419,11 @@ class Event
      * @param   integer $id     Owner's user ID, 0 for current user
      * @return  object  $this
      */
-    public function setOwner($id=0)
+    public function setOwner(?int $id=NULL) : self
     {
         global $_USER;
 
-        if ($id == 0) $id = $_USER['uid'];
+        if ($id == NULL) $id = $_USER['uid'];
         $this->owner_id = (int)$id;
         return $this;
     }
@@ -435,7 +435,7 @@ class Event
      * @param   integer $id     Group ID
      * @return  object  $this
      */
-    public function setGroup($id)
+    public function setGroup(int $id) : self
     {
         $this->group_id = (int)$id;
         return $this;
@@ -445,13 +445,13 @@ class Event
     /**
      * Set the owner permission.
      *
-     * @param   integer $perm   Permission value, -1 for default
+     * @param   integer $perm   Permission value, NULL for default
      */
-    public function setPermOwner($perm = -1)
+    public function setPermOwner(?int $perm=NULL) : self
     {
         global $_EV_CONF;
 
-        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][0];
+        if ($perm == NULL) $perm = $_EV_CONF['default_permissions'][0];
         $this->perm_owner = (int)$perm;
         return $this;
     }
@@ -460,13 +460,13 @@ class Event
     /**
      * Set the group permission.
      *
-     * @param   integer $perm   Permission value, -1 for default
+     * @param   integer $perm   Permission value, NULL for default
      */
-    public function setPermGroup($perm = -1)
+    public function setPermGroup(?int $perm=NULL) : self
     {
         global $_EV_CONF;
 
-        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][1];
+        if ($perm == NULL) $perm = $_EV_CONF['default_permissions'][1];
         $this->perm_group = (int)$perm;
         return $this;
     }
@@ -477,11 +477,11 @@ class Event
      *
      * @param   integer $perm   Permission value, -1 for default
      */
-    public function setPermMembers($perm = -1)
+    public function setPermMembers(?int $perm=NULL) : self
     {
         global $_EV_CONF;
 
-        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][2];
+        if ($perm == NULL) $perm = $_EV_CONF['default_permissions'][2];
         $this->perm_members = (int)$perm;
         return $this;
     }
@@ -492,11 +492,11 @@ class Event
      *
      * @param   integer $perm   Permission value, -1 for default
      */
-    public function setPermAnon($perm = -1)
+    public function setPermAnon(?int $perm=NULL) : self
     {
         global $_EV_CONF;
 
-        if ($perm == -1) $perm = $_EV_CONF['default_permissions'][3];
+        if ($perm == NULL) $perm = $_EV_CONF['default_permissions'][3];
         $this->perm_anon = (int)$perm;
         return $this;
     }
@@ -507,7 +507,7 @@ class Event
      *
      * @return  array   Array of all options
      */
-    public function getOptions()
+    public function getOptions() : array
     {
         return $this->options;
     }
@@ -549,7 +549,7 @@ class Event
      * @param   boolean $submission True to use the submission table
      * @return  object  $this
      */
-    public function asSubmission($submission=true)
+    public function asSubmission(?bool $submission=true) : self
     {
         $this->table = $submission ? 'evlist_submissions' : 'evlist_events';
         return $this;
@@ -949,7 +949,7 @@ class Event
         }
 
         // Authorized to bypass the queue
-        if (plugin_issubmitter_evlist()) {
+        if (EVLIST_skipqueue()) {
             $this->asSubmission(false);
         }
 
@@ -962,6 +962,12 @@ class Event
 
         // Insert or update the record, as appropriate
         if (!$this->isNew) {
+
+            // Subject to the submission queue, can't edit even their
+            // own events.
+            if ($this->isSubmission()) {
+                return false;
+            }
 
             // Existing event, we already have a Detail object instantiated
             $this->getDetail()->setVars($A);
@@ -1090,6 +1096,8 @@ class Event
             }
         } else {
             // New event
+            $this->asSubmission(!EVLIST_skipqueue());
+
             // Create a detail record
             $this->Detail = new Detail();
             $this->getDetail()->setVars($A);
@@ -2271,28 +2279,28 @@ class Event
      */
     public function hasAccess(int $level=3) : bool
     {
-        // Admin & editor has all rights
+        $retval = true;
+
         if ($this->isAdmin) {
-            return true;
+            // Admin & editor has all rights
+            $retval = true;
+        } elseif (!EVLIST_canView()) {
+            // If anonymous and anon not allowed, no need to check perms
+            $retval = false;
+        } else {
+            $ev_access = SEC_hasAccess(
+                $this->owner_id, $this->group_id,
+                $this->perm_owner, $this->perm_group,
+                $this->perm_members, $this->perm_anon
+            );
+            if (
+                $ev_access < $level ||
+                $this->Calendar->getSecAccess() < $level
+            ) {
+                $retval = false;
+            }
         }
-
-        // If anonymous and anon not allowed, no need to check perms
-        if (!Config::get('allow_anon_view') && COM_isAnonUser()) {
-            return false;
-        }
-
-        $ev_access = SEC_hasAccess(
-            $this->owner_id, $this->group_id,
-            $this->perm_owner, $this->perm_group,
-            $this->perm_members, $this->perm_anon
-        );
-        if (
-            $ev_access < $level ||
-            $this->Calendar->getSecAccess() < $level
-        ) {
-            return false;
-        }
-        return true;
+        return $retval;
     }
 
 
@@ -2303,7 +2311,7 @@ class Event
      * @uses    Category::getall()
      * @return  array   Array of (id, name)
      */
-    public function getCategories()
+    public function getCategories() : array
     {
         $retval = array();
         if (!is_array($this->categories)) {
@@ -2619,7 +2627,7 @@ class Event
         } elseif ($this->isOwner()) {
             // special check so owners subject to the submission queue
             // can't edit their own events.
-            $canedit = plugin_issubmitter_evlist();
+            $canedit = EVLIST_skipqueue();
         } else {
             $canedit = $this->hasAccess(3);
         }

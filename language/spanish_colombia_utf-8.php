@@ -448,11 +448,7 @@ $LANG_configsections['evlist'] = array(
     'title'                 => 'Eventos - Configuracion'
 );
 $LANG_confignames['evlist'] = array(
-    'allow_anon_view'       => 'Allow anonymous users to view events?',
-    'allow_anon_add'        => 'Allow anonymous submissions?',
-    'allow_user_add'        => 'Allow logged in user submissions?',
     'allow_html'            => 'Allow html when posting?',
-    'can_add'               => 'Users allowed to add events',
     'usermenu_option'       => 'User menu link option',
     'enable_menuitem'       => 'Enable the menu item?',
     'week_begins'           => 'Week begins on',
@@ -594,7 +590,6 @@ $LANG_configselects['evlist'] = array(
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('Left Blocks' => 0, 'Right Blocks' => 1, 'Left & Right Blocks' => 2, 'None' => 3),
     14 => array('Day' => 'day', 'Week' => 'week', 'Month' => 'month', 'Year' => 'year', 'List' => 'list'),
-    15 => array('Admins Only' => 0, 'Logged-In Users' => 1, 'Logged-In+Anon Users' => 2),
     16 => array('HTML' => 'html', 'JSON' => 'json'),
     17 => array('No' => 0, 'Default No' => 1, 'Default Paid Only' => 2,
                 'Default Paid or Unpaid' => 3),

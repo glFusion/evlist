@@ -439,10 +439,6 @@ $LANG_configsections['evlist'] = array(
     'title'                 => 'evList-Konfiguration'
 );
 $LANG_confignames['evlist'] = array(
-    'allow_anon_view'       => 'Anzeige für Gästen erlauben',
-    'allow_anon_add'        => 'Gast-Einsendungen erlauben',
-    'allow_user_add'        => 'Benutzer-Einsendungen erlauben',
-    'can_add'               => 'Einsendungen erlauben für',
     'allow_html'            => 'Erlaube HTML beim Schreiben',
     'usermenu_option'       => 'Benutzer-Menüeintrag',
     'enable_menuitem'       => 'Menü-Eintrag erstellen',
@@ -582,7 +578,6 @@ $LANG_configselects['evlist'] = array(
     12 => array('Kein Zugriff' => 0, 'Nur-Lesen' => 2, 'Lesen-Schreiben' => 3),
     13 => array('Linke Blöcke' => 0, 'Rechte Blöcke' => 1, 'Linke & Rechte Blöcke' => 2, 'Keine' => 3),
     14 => array('Tages-Ansicht' => 'day', 'Wochen-Ansicht' => 'week', 'Monats-Ansicht' => 'month', 'Jahres-Ansicht' => 'year', 'Listen-Ansicht' => 'list'),
-    15 => array('Nur Admins' => 0, 'Angemeldete Benutzer' => 1, 'Angemeldete Benutzer & Gäste' => 2),
     16 => array('HTML' => 'html', 'JSON' => 'json'),
     17 => array('Nein' => 0, 'Standart Nein' => 1, 'Standart Bezahlt' => 2, 'Standart Bezahlt & Unbezahlt' => 3),
 );

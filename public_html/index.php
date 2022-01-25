@@ -18,8 +18,8 @@ if (!in_array('evlist', $_PLUGINS)) {
     COM_404();
 }
 
-// allow_anon_view is set by functions.inc if global login_required is on
-if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1')  {
+// Check if the current user can even view the calendar
+if (!EVLIST_canView()) {
     $content = COM_siteHeader();
     $content .= SEC_loginRequiredForm();
     $content .= COM_siteFooter();
@@ -39,14 +39,6 @@ if (isset($_GET['view'])) {
 } else {
     $view = COM_applyFilter(COM_getArgument('view'));
 }
-
-/*if (isset($_GET['range'])) {
-    $range = COM_applyFilter($_GET['range'], true);
-} elseif (isset($_POST['range'])) {
-    $range = COM_applyFilter($_POST['range'], true);
-} else {
-    $range = COM_applyFilter(COM_getArgument('range'),true);
-}*/
 
 if (isset($_GET['cat'])) {
     $category = COM_applyFilter($_GET['cat'], true);
@@ -87,6 +79,15 @@ if (empty($month)) {
 }
 if (empty($day)) {
     $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
+}
+
+// If deleting events from the "myevents" page, handle them first.
+if (isset($_POST['delevent']) && is_array($_POST['delevent'])) {
+    foreach ($_POST['delevent'] as $eid) {
+        Evlist\Event::Delete($eid);
+        Evlist\Cache::clear();
+    }
+    echo COM_refresh(EVLIST_URL . '/index.php?view=' . $view);
 }
 
 EVLIST_setReturn(EVLIST_URL . '/index.php?view=' . $view);
@@ -176,164 +177,4 @@ if (!empty($msg)) {
 $display .= $content;
 $display .= EVLIST_siteFooter();
 echo $display;
-exit;
 
-
-/**
-*   Get the list of events owned by the current user
-*
-*   @return string      HTML for admin list
-*/
-function EVLIST_list_user_events()
-{
-    global $_CONF, $_TABLES, $LANG_EVLIST, $LANG_ADMIN, $_USER;
-
-    USES_lib_admin();
-
-    $retval = '';
-
-    $header_arr = array();
-
-    // Allow editing if the queue is not used or this is an autorized
-    // submitter.
-    if (!$_CONF['storysubmission'] || plugin_issubmitter_evlist()) {
-        $header_arr[] = array(
-            'text'  => $LANG_EVLIST['edit'],
-            'field' => 'edit', 'sort' => false,
-            'align' => 'center',
-        );
-    }
-    $header_arr[] = array(
-        'text'  => $LANG_EVLIST['id'],
-        'field' => 'ev_id',
-        'sort'  => true,
-    );
-    $header_arr[] = array(
-        'text'  => $LANG_EVLIST['title'],
-        'field' => 'title',
-        'sort'  => true,
-    );
-    $header_arr[] = array(
-        'text'  => $LANG_EVLIST['start_date'],
-        'field' => 'date_start1',
-        'sort'  => true,
-    );
-    $header_arr[] = array(
-        'text'  => $LANG_EVLIST['enabled'],
-        'field' => 'status',
-        'sort'  => false,
-        'align' => 'center',
-    );
-    if (!$_CONF['storysubmission'] || plugin_ismoderator_evlist()) {
-        $header_arr[] = array(
-            'text'  => $LANG_ADMIN['delete'],
-            'field' => 'delete',
-            'sort'  => false,
-            'align' => 'center',
-        );
-    }
-
-    $defsort_arr = array(
-        'field' => 'date_start1',
-        'direction' => 'DESC',
-    );
-    $text_arr = array(
-        'has_menu'  => true,
-        'has_extras'=> true,
-        'title'     => $LANG_EVLIST['pi_title'].': ' . $LANG_EVLIST['events'],
-        'form_url'  => EVLIST_URL . '/index.php',
-        'help_url'  => '',
-    );
-
-    // Select distinct to get only one entry per event.  We can only edit/modify
-    // events here, not repeats
-    $sql = "SELECT DISTINCT(ev.id) as ev_id, det.title, ev.date_start1, ev.status
-            FROM {$_TABLES['evlist_events']} ev
-            LEFT JOIN {$_TABLES['evlist_detail']} det
-                ON det.ev_id = ev.id
-            WHERE owner_id = " . (int)$_USER['uid'] .
-                " AND ev.det_id = det.det_id ";
-    $query_arr = array(
-        'table' => 'users',
-        'sql' => $sql,
-        'query_fields' => array('id', 'title', 'summary',
-        'full_description', 'location', 'date_start1', 'status'),
-    );
-    $retval .= ADMIN_list('evlist', 'EVLIST_user_getEventListField',
-        $header_arr, $text_arr, $query_arr, $defsort_arr);
-    return $retval;
-}
-
-
-/**
- * Return the display value for an event field.
- *
- * @param   string  $fieldname  Name of the field
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Name-value pairs for all fields
- * @param   array   $icon_arr   Array of system icons
- * @return  string      HTML to display for the field
- */
-function EVLIST_user_getEventListField($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $LANG_ADMIN, $LANG_EVLIST, $_TABLES, $_EV_CONF;
-
-    static $del_icon = NULL;
-
-    switch($fieldname) {
-    case 'ev_id':
-        $retval = COM_createLink(
-            $fieldvalue,
-            COM_buildUrl(
-                EVLIST_URL . '/view.php?&id=0&eid=' . $fieldvalue
-            )
-        );
-        break;
-    case 'edit':
-        $retval = COM_createLink(
-            '',
-            EVLIST_URL . '/event.php?eid=' . $A['ev_id'] . '&amp;edit=event&from=myevents',
-            array(
-                'class' => 'uk-icon-edit',
-            )
-        );
-        break;
-    case 'copy':
-        $retval = COM_createLink(
-            '',
-            EVLIST_URL . '/event.php?clone=x&amp;eid=' . $A['id'],
-            array(
-                'title' => $LANG_EVLIST['copy'],
-                'class' => 'uk-icon-clone',
-            )
-        );
-        break;
-    case 'status':
-        if ($A['status'] == '1') {
-            $switch = EVCHECKED;
-            $enabled = 1;
-        } else {
-            $switch = '';
-            $enabled = 0;
-        }
-        $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"ev_check\"
-                id=\"event_{$A['ev_id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['ev_id']}\",\"enabled\",".
-                '"event","'.EVLIST_URL."\");' />" . LB;
-        break;
-    case 'delete':
-        $retval = COM_createLink(
-            $_EV_CONF['icons']['delete'],
-            EVLIST_URL. '/actions.php?delevent=x&eid=' . $A['ev_id'] . '&from=myevents',
-            array(
-                'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
-                'title' => $LANG_ADMIN['delete'],
-            )
-        );
-        break;
-    default:
-        $retval = $fieldvalue;
-        break;
-    }
-    return $retval;
-}

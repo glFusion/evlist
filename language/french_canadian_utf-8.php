@@ -456,11 +456,7 @@ $LANG_configsections[ 'evlist'] = array(
 );
 
 $LANG_confignames[ 'evlist'] = array(
-'allow_anon_view'       => 'Autoriser les utilisateurs anonymes pour afficher les événements? ',
-'allow_anon_add'        => 'Autoriser soumissions anonymes? ',
-'allow_user_add'        => "Autoriser l'utilisateur connecté mémoires? ",
 'allow_html'            => "Autoriser html lors de l'imputation? ",
-'can_add'           => 'Utilisateurs autorisés à ajouter des événements',
 'usermenu_option'       => 'User menu option lien',
 'enable_menuitem'       => "Activer l'élément de menu? ",
 'week_begins'           => 'Semaine commence sur',
@@ -650,11 +646,6 @@ $LANG_configselects[ 'evlist'] = array(
         'Mois' => 'mois',
         'année' => 'année',
         'Liste' => 'liste',
-    ),
-    15 => array(
-        'Admins uniquement' => 0,
-        'connecté les utilisateurs' => 1,
-        'connecté +Anon Utilisateurs' => 2,
     ),
     16 => array(
         'HTML' => 'html',

@@ -22,10 +22,14 @@
         </select>
     </div>
     <div class="uk-hidden-small uk-visible@m uk-width-medium-1-6 uk-width-1-6@m">
+{!if add_event_link}
         <a class="uk-button uk-button-success" href="{add_event_link}">{add_event_text}</a>
+{!endif}
     </div>
     <div class="uk-visible-small uk-hidden@m uk-width-small-1-3 uk-width-1-3@s">
+{!if add_event_link}
         <a class="uk-button uk-button-success" href="{add_event_link}">+</a>
+{!endif}
     </div>
 {!if cal_checkboxes}
     <div class="uk-width-medium-1-6 uk-width1-6@m uk-width-small-1-3 uk-width-1-3@s">

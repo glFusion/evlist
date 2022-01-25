@@ -20,9 +20,8 @@ if (!in_array('evlist', $_PLUGINS)) {
     exit;
 }
 
-// If global loginrequired is set, override the plugin's setting
-if ($_CONF['loginrequired'] == 1) $_EV_CONF['allow_anon_view'] = '0';
-if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != '1') {
+// Check if the current user can even view the calendar
+if (!EVLIST_canView()) {
     $display = EVLIST_siteHeader();
     $display .= SEC_loginRequiredForm();
     $display .= EVLIST_siteFooter();
@@ -74,6 +73,7 @@ if (isset($_POST['eid'])) {
 } else {
     $eid = '';
 }
+
 $mode = isset($_POST['mode']) ? $_POST['mode'] : 'nested';
 $order = isset($_POST['order']) ? $_POST['order'] : 'ASC';
 $cal_id = isset($_GET['cal']) ? (int)$_GET['cal'] : 0;
@@ -332,17 +332,18 @@ case 'edit':
     break;
 
 case 'clone':
-    if (isset($_GET['eid'])) {
+    if (isset($_GET['eid']) && EVLIST_canSubmit()) {
         if (isset($_GET['rp_id'])) {
             EVLIST_setReturn(EVLIST_URL . '/event.php?view=instance&eid=' . $_GET['rp_id']);
         }
         $Ev = Evlist\Event::getInstance($_GET['eid']);
-        if ($Ev->getID() == '' || !$Ev->hasAccess(3)) {    // Event not found
+        if ($Ev->getID() == '') {   // Event not found
             COM_404();
         }
         // Now prep it to be saved as a new record
-        $Ev->setID('');
-        $Ev->forceNew();
+        $Ev->setID('')
+           ->setOwner()
+           ->forceNew();
         $Editor = new Evlist\Views\Editor;
         $content .= $Editor->withEvent($Ev)->withSaveAction('event')->Render();
         $add_link = false;
@@ -406,7 +407,7 @@ default:
         // Given an event ID, get the nearest instance to display
         $rp_id = Evlist\Repeat::getNearest($eid);
         if (!$rp_id) {
-            COM_refresh($EVLIST_URL . '/index.php');
+            COM_refresh(EVLIST_URL . '/index.php');
         }
         break;
     case 'instance':
@@ -416,16 +417,16 @@ default:
         break;
     }
     if (!empty($rp_id)) {
-        $View = new Evlist\Views\Occurrence($rp_id);
+        $V = new Evlist\Views\Occurrence($rp_id);
         if ($view == 'print') {
             $template = 'print';
         }
         $query = isset($_GET['query']) ? $_GET['query'] : '';
-        $content .= $View->withQuery($query)
-                         ->withTemplate($template)
-                         ->withCommentMode($mode)
-                         ->withCommentOrder($order)
-                         ->Render();
+        $content .= $V->withQuery($query)
+                      ->withTemplate($template)
+                      ->withCommentMode($mode)
+                      ->withCommentOrder($order)
+                      ->Render();
         break;
     } else {
         // Shouldn't be in this file without an event ID to display or edit

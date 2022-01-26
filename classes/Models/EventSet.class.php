@@ -91,6 +91,10 @@ class EventSet
      * @var integer */
     private $status = Status::ENABLED;
 
+    /** Optionally override the user making the query. Default = current user.
+     * @var integer */
+    private $uid = 0;
+
 
     /**
      * Create a new EventSet.
@@ -313,6 +317,20 @@ class EventSet
 
 
     /**
+     * Set the user ID making the query.
+     * Normally the current user, but for feeds use the anonymous user ID
+     *
+     * @param   integer $uid    User ID for forcing access check
+     * @return  object  $this
+     */
+    public function withUid(int $uid) : self
+    {
+        $this->uid = (int)$uid;
+        return $this;
+    }
+
+
+    /**
      * Create the SQL query to get all events that fall within a range.
      *
      * @return string          SQL query to retrieve events
@@ -430,8 +448,8 @@ class EventSet
             AND ($dt_sql)
             $ands
             $cat_status " .
-            COM_getPermSQL('AND', 0, 2, 'ev') . ' ' .
-            COM_getPermSQL('AND', 0, 2, 'cal') .
+            COM_getPermSQL('AND', $this->uid, 2, 'ev') . ' ' .
+            COM_getPermSQL('AND', $this->uid, 2, 'cal') .
             " ORDER BY $orderby {$this->order}";
         if ($this->limit > 0) {
             if ($this->page > 1) {

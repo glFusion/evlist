@@ -184,9 +184,9 @@ class Syndication
      * @param   integer $limit  Configured limit on item count for this feed
      * @return  boolean         True if feed needs updating, False otherwise
      */
-    public function feedUpdateCheck(
-        /*$feed, $topic, $update_data, $limit,
-        $updated_type = '', $updated_topic = '', $updated_id = ''*/
+    public static function feedUpdateCheck(
+        $feed, $topic, $update_data, $limit,
+        $updated_type = '', $updated_topic = '', $updated_id = ''
     ) {
         global $_EV_CONF, $_CONF, $_TABLES;
 

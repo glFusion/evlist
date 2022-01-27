@@ -400,8 +400,6 @@ $_EV_UPGRADE = array(
     // Fix invalid permissions, probably from plugin-supplied events
     "UPDATE {$_TABLES['evlist_events']} SET perm_members = 0 WHERE perm_members = 3",
     "UPDATE {$_TABLES['evlist_events']} SET perm_anon = 0 WHERE perm_anon = 3",
-    // Unused field
-    "ALTER TABLE {$_TABLES['evlist_remlookup']} DROP `timestamp`",
     ),
 );
 $_SQL['evlist_cache'] = $_EV_UPGRADE['1.4.0'][0];

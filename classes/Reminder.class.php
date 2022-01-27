@@ -197,12 +197,14 @@ class Reminder
                     uid = '$uid',
                     name = '" . DB_escapeString(COM_getDisplayName($_USER['uid'])) . "',
                     email = '" . DB_escapeString($email) . "',
+                    timestamp = UNIX_TIMESTAMP(),
                     date_start = '{$this->Repeat->getDateStart1()->toUnix()}',
                     days_notice = '" . (int)$days . "'";
         } else {
             $sql = "UPDATE {$_TABLES['evlist_remlookup']} SET
                     date_start = '{$this->Repeat->getDateStart1()->toUnix()}',
                     days_notice = '" . (int)$days . "'
+                    timestamp = UNIX_TIMESTAMP(),
                     WHERE  eid = '{$this->eid}'
                     AND rp_id = '{$this->rp_id}'
                     AND uid = '$uid'";

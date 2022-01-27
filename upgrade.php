@@ -268,6 +268,7 @@ function evlist_upgrade($dvlp = false)
 
     if (!COM_checkVersion($currentVersion, '1.5.4')) {
         $currentVersion = '1.5.4';
+        if (!EVLIST_do_upgrade_sql($currentVersion, $dvlp)) return false;
         // Convert some config settings to privileges, if not already done
         $have_ft_nq = DB_count($_TABLES['features'], 'ft_name', 'evlist.noqueue');
         if (!$have_ft_nq) {

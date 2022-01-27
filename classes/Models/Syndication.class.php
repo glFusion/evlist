@@ -20,7 +20,7 @@ use Evlist\Event;
  * Class for syndiation feeds.
  * @package evlist
  */
-class Syndication //extends \glFusion\Syndication\Feed
+class Syndication
 {
 
     /**
@@ -32,11 +32,13 @@ class Syndication //extends \glFusion\Syndication\Feed
      * @param   string  $feedType   Feed type (RSS, ICS, etc.) We only do ICS.
      * @return  array               Array of event data
      */
-    public static function getFeedContent($feed, &$link, &$update_data, $feedType, $feedVersion)
+    public static function getFeedContent(
+        $feed, &$link, &$update_data, $feedType, $feedVersion
+    ) : array
     {
-        switch ($feedType) {
-        case 'ICS':
-            return self::getIcal($feed, $link, $update_data, $feedType);
+        switch (strtolower($feedType)) {
+        case 'ics':
+            return self::getICS($feed, $link, $update_data, $feedType);
             break;
         default:
             return self::getXML($feed, $link, $update_data, $feedType);
@@ -48,22 +50,22 @@ class Syndication //extends \glFusion\Syndication\Feed
     /**
      * Get an XML feed.
      *
-     * @deprecated
+     * @param   integer $feed   Feed ID in the syndication table
+     * @param   string  $link   Pointer to update the link
+     * @param   string  $update_data    Comma-separated list of IDs
+     * @param   string  $feedType   Feed type, e.g. 'ICAL'
+     * @param   array   $A      Complete record from syndication table
+     * @return  array       Array of elements for the XML handler
      */
-    private static function getXML($feed, &$link, &$update_data, $feedtype)
+    private static function getXML($feed, &$link, &$update_data, $feedtype) : array
     {
         global $_CONF, $_EV_CONF, $_TABLES, $LANG_EVLIST;
 
         $content = array();
+
         $lids = array();
         $eids = array();
         $feed = (int)$feed;
-
-        // Feeds are not authenticated, so anonymous uers must be
-        // allowed to view events
-        if ($_EV_CONF['allow_anon_view'] != 1) {
-            return $content;
-        }
 
         $F = self::_getFeedInfo($feed);
 
@@ -75,13 +77,19 @@ class Syndication //extends \glFusion\Syndication\Feed
 
         // Get all upcoming events
         $events = EventSet::create()
+            ->withUid(1)
             ->withIcal(true)
             ->withStart($_EV_CONF['_today'])
             ->withEnd(date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])))
             ->withCategory($F['topic'])
             ->withLimit($limit)
+            ->withFields(array(
+                'det.det_revision', 'det.title', 'det.det_last_mod', 'det.lat', 'det.lng',
+                'det.summary', 'det.full_description', 'det.location',
+            ))
             ->getEvents();
 
+        $domain = '@' . preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
         $rp_shown = array();    // Store repeat ids to avoid dups
         foreach ($events as $daydata) {
             foreach ($daydata as $event) {
@@ -95,6 +103,7 @@ class Syndication //extends \glFusion\Syndication\Feed
                 }
                 $rp_shown[$event['rp_id']] = 1;
 
+                $guid = $event['rp_ev_id'] . '-' . $event['rp_id'] . $domain;
                 $url = EVLIST_URL . '/event.php?eid=' . urlencode($event['rp_id']);
                 $postmode = $event['postmode'] == '2' ? 'html' : 'plaintext';
                 if ($event['postmode'] == '1' ) {       //plaintext
@@ -103,14 +112,9 @@ class Syndication //extends \glFusion\Syndication\Feed
 
                 // Track the event IDs that we're actually including
                 $eids[] = $event['rp_id'];
-                /*if ($event['postmode'] != 'plaintext') {
-                    $summary = PLG_replaceTags(COM_stripslashes($event['summary']));
-                } else {*/
-                    //$summary = ($event['summary']);
-                //}
                 $content[] = array(
                     'title'     => $event['title'],
-                    'summary'   => $event['summary'],
+                    'summary'   => PLG_replaceTags(COM_stripslashes($event['summary'])),
                     'description' => $event['full_description'],
                     'link'      => $url,
                     'url'       => $url,
@@ -120,6 +124,7 @@ class Syndication //extends \glFusion\Syndication\Feed
                     'format'    => $postmode,
                     'location'  => $event['location'],
                     'categories' => isset($event['cat_name']) ? $event['cat_name'] : '',
+                    'guid'      => $guid,
                 );
             }
         }
@@ -179,9 +184,9 @@ class Syndication //extends \glFusion\Syndication\Feed
      * @param   integer $limit  Configured limit on item count for this feed
      * @return  boolean         True if feed needs updating, False otherwise
      */
-    public static function feedUpdateCheck(
-        $feed, $topic, $update_data, $limit,
-        $updated_type = '', $updated_topic = '', $updated_id = ''
+    public function feedUpdateCheck(
+        /*$feed, $topic, $update_data, $limit,
+        $updated_type = '', $updated_topic = '', $updated_id = ''*/
     ) {
         global $_EV_CONF, $_CONF, $_TABLES;
 
@@ -220,6 +225,7 @@ class Syndication //extends \glFusion\Syndication\Feed
             $limit = 100;
         }
         $ES = EventSet::create()
+            ->withUid(1)            // Anonymous must be able to view feeds
             ->withStart($start->format('Y-m-d', true))
             ->withCalendar($F['topic'])
             ->withSelection('rep.rp_id, rep.rp_revision, ev.ev_revision, det.det_revision')
@@ -250,7 +256,7 @@ class Syndication //extends \glFusion\Syndication\Feed
 
         $retval = array();
 
-        if (COM_isAnonUser() && $_EV_CONF['allow_anon_view'] != 1) {
+        if (!EVLIST_canView()) {
             return $retval;
         }
 
@@ -287,8 +293,7 @@ class Syndication //extends \glFusion\Syndication\Feed
 
         $retval = '';
 
-        // Anon access required for feed access anyway
-        if ($_EV_CONF['allow_anon_view'] != 1) {
+        if (!EVLIST_canView()) {
             return $retval;
         }
 
@@ -323,15 +328,13 @@ class Syndication //extends \glFusion\Syndication\Feed
      * @param   string  $update_data    Comma-separated list of IDs
      * @param   string  $feedType   Feed type, e.g. 'ICAL'
      * @param   array   $A      Complete record from syndication table
-     * @return  string      iCal output
+     * @return  array       Array of elements for the ICS handler
      */
-    private static function getIcal(
-        $feed, &$link, &$update_data, $feedType
-    ) {
+    private static function getICS($feed, &$link, &$update_data, $feedType) : array
+    {
         global $_EV_CONF, $LANG_EVLIST, $_CONF;
 
         $retval = array();
-
         $start = clone $_CONF['_now'];
         $start->sub(new \DateInterval('P30D'));
         $end = NULL;
@@ -358,6 +361,7 @@ class Syndication //extends \glFusion\Syndication\Feed
         }
 
         $ES = EventSet::create()
+            ->withUid(1)
             ->withStatus(Status::ALL)
             ->withIcal(true)
             ->withStart($start->format('Y-m-d', true))
@@ -386,15 +390,12 @@ class Syndication //extends \glFusion\Syndication\Feed
         $domain = '@' . preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
 
         $events = $ES->getEvents();
+
         $ical = '';
         $rp_shown = array();
         $eids = array();
         foreach ($events as $day) {
             foreach ($day as $event) {
-
-                /*if ($event['rp_status'] != Status::ENABLED) {
-                    continue;
-            }*/
 
                 // Check if this repeat is already shown.  We only want multi-day
                 // events included once instead of each day
@@ -415,7 +416,7 @@ class Syndication //extends \glFusion\Syndication\Feed
 
                 $summary = self::_strip_tags($event['title']);
                 $permalink = COM_buildURL(EVLIST_URL . '/event.php?rp_id='. $event['rp_id']);
-                $uuid = $event['rp_ev_id'] . '-' . $event['rp_id'] . $domain;
+                $guid = $event['rp_ev_id'] . '-' . $event['rp_id'] . $domain;
                 $created = max($event['rp_last_mod'], $event['ev_last_mod'], $event['det_last_mod']);
                 // Get the description. Prefer the text Summary, then HTML fulltext.
                 // Since a description is required, re-use the title if nothing else.
@@ -431,7 +432,7 @@ class Syndication //extends \glFusion\Syndication\Feed
                     'date' => $dtstart,
                     'title' => $summary,
                     'summary' => $description,
-                    'guid' => $uuid,
+                    'guid' => $guid,
                     'link' => $permalink,
                     'dtstart' => $dtstart,
                     'dtend' => $dtend,
@@ -493,7 +494,7 @@ class Syndication //extends \glFusion\Syndication\Feed
 
     /**
      * Get the available feed formats.
-     * Only ICS is supporteb by Evlist.
+     * Only ICS is supported by Evlist.
      *
      * @return  array   Array of name & version arrays
      */

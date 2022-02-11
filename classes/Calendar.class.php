@@ -743,10 +743,9 @@ class Calendar
             ),
             array(
                 'text'  => $LANG_ADMIN['delete'] .
-                    '&nbsp;' . Icon::getHTML(
-                    'question-circle', 'tooltip',
-                        array('title' => $LANG_EVLIST_HELP['del_hdr1'])
-                    ),
+                    '&nbsp;' . FieldList::info(array(
+                        'title' => $LANG_EVLIST_HELP['del_hdr1'],
+                    ) ),
                 'field' => 'delete',
                 'sort'  => 'false',
                 'align' => 'center',
@@ -768,12 +767,11 @@ class Calendar
         );
 
         $retval .= COM_createLink(
-            $LANG_EVLIST['new_calendar'],
-            EVLIST_ADMIN_URL . '/index.php?editcal=x',
-            array(
-                'class' => 'uk-button uk-button-success',
-                'style' => 'float:left',
-            )
+            FieldList::button(array(
+                'text' => $LANG_EVLIST['new_calendar'],
+                'style' => 'success',
+            ) ),
+            EVLIST_ADMIN_URL . '/index.php?editcal=x'
         );
         $retval .= ADMIN_list(
             'evlist_cal_admin',
@@ -800,44 +798,35 @@ class Calendar
         $retval = '';
         switch($fieldname) {
         case 'edit':
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['edit'],
-                EVLIST_ADMIN_URL . '/index.php?editcal=' . $A['cal_id'],
+            $retval = FieldList::edit(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?editcal=' . $A['cal_id'],
                 array(
                     'title' => $LANG_EVLIST['editcal'],
                 )
-            );
+            ) );
             break;
         case 'orderby':
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['arrow-up'],
-                EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
-            );
-            $retval .= COM_createLink(
-                $_EV_CONF['icons']['arrow-down'],
-                EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
-            );
+            $retval = FieldList::up(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?movecal=up&id=' . $A['cal_id']
+            ) );
+            $retval .= FieldList::down(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?movecal=down&id=' . $A['cal_id']
+            ) );
             break;
         case 'cal_status':
         case 'cal_ena_ical':
-            if ($fieldvalue == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval = "<input type=\"checkbox\" $switch value=\"1\" name=\"{$fieldname}_check\"
-                id=\"tog{$fieldname}enabled{$A['cal_id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['cal_id']}\",\"{$fieldname}\",".
-                '"calendar","'.EVLIST_ADMIN_URL."\");' />".LB;
+            $retval = FieldList::checkbox(array(
+                'checked' => $fieldvalue == 1,
+                'id' => "tog{$fieldname}enabled{$A['cal_id']}",
+                'onclick' => "EVLIST_toggle(this,'{$A['cal_id']}','" .
+                    $fieldname . "','calendar','" . EVLIST_ADMIN_URL . "');",
+                ) );
             break;
         case 'delete':
             if ($A['cal_id'] != 1) {
-                $retval = COM_createLink(
-                    $_EV_CONF['icons']['delete'],
-                    EVLIST_ADMIN_URL. '/index.php?deletecal=' . $A['cal_id']
-                );
+                $retval = FieldList::delete(array(
+                    'delete_url' => EVLIST_ADMIN_URL. '/index.php?deletecal=' . $A['cal_id']
+                ) );
             }
             break;
         case 'cal_name':

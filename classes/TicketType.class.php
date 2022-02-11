@@ -327,22 +327,18 @@ class TicketType
             ),
             array(
                 'text' => $LANG_EVLIST['event_pass'] .
-                    '&nbsp;' . Icon::getHTML(
-                        'question-circle',
-                        'tooltip',
-                        array('title' => $LANG_EVLIST_HELP['event_pass'])
-                    ),
+                    '&nbsp;' . FieldList::info(array(
+                        'title' => $LANG_EVLIST_HELP['event_pass'],
+                    ) ),
                 'field' => 'event_pass',
                 'sort' => false,
                 'align' => 'center',
             ),
             array(
                 'text'  => $LANG_ADMIN['delete'] .
-                    '&nbsp;' . Icon::getHTML(
-                        'question-circle',
-                        'tooltip',
-                        array('title' => $LANG_EVLIST_HELP['del_hdr1'])
-                    ),
+                    '&nbsp;' . FieldList::info(array(
+                        'title' => $LANG_EVLIST_HELP['del_hdr1'],
+                    ) ),
                 'field' => 'delete',
                 'sort' => false,
                 'align' => 'center',
@@ -370,12 +366,11 @@ class TicketType
         );
 
         $retval .= COM_createLink(
-            $LANG_EVLIST['new_ticket_type'],
-            EVLIST_ADMIN_URL . '/index.php?editticket=x',
-            array(
-                'class' => 'uk-button uk-button-success',
-                'style' => 'float:left',
-            )
+            FieldList::button(array(
+                'text' => $LANG_EVLIST['new_ticket_type'],
+                'style' => 'success',
+            ) ),
+            EVLIST_ADMIN_URL . '/index.php?editticket=x'
         );
 
         $retval .= ADMIN_list(
@@ -404,13 +399,12 @@ class TicketType
         $retval = '';
         switch($fieldname) {
         case 'edit':
-            $retval = COM_createLInk(
-                Icon::getHTML('edit'),
-                EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['tt_id'],
+            $retval = FieldList::edit(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?editticket=' . $A['tt_id'],
                 array(
                     'title' => $LANG_ADMIN['edit'],
-                )
-            );
+                ),
+            ) );
             break;
 
         case 'enabled':
@@ -422,24 +416,25 @@ class TicketType
                 $switch = '';
                 $enabled = 0;
             }
-            $retval = "<input type=\"checkbox\" $switch value=\"1\"
-                name=\"cat_check\"
-                tt_id=\"tog{$fieldname}{$A['tt_id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['tt_id']}\",\"{$fieldname}\",".
-                "\"tickettype\",\"".EVLIST_ADMIN_URL."\");' />".LB;
+            $retval = FieldList::checkbox(array(
+                'checked' => (int)$fieldvalue == 1,
+                'name' => 'cat_check',
+                'id' => "tog{$fieldname}{$A['tt_id']}",
+                'onclick' => "EVLIST_toggle(this,'{$A['tt_id']}','{$fieldname}',".
+                "'tickettype','" . EVLIST_ADMIN_URL ."');",
+            ) );
             break;
 
         case 'delete':
             if (!self::isUsed($A['tt_id'])) {
-                $retval = COM_createLink(
-                    Icon::getHTML('delete'),
-                    EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['tt_id'],
+                $retval = FieldList::delete(array(
+                    'delete_url' => EVLIST_ADMIN_URL. '/index.php?deltickettype=' . $A['tt_id'],
                     array(
                         'class' => 'tooltip',
                         'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                         'title' => $LANG_ADMIN['delete'],
-                    )
-                );
+                    ),
+                ) );
             }
             break;
 
@@ -448,26 +443,18 @@ class TicketType
             if ($fieldvalue == 999) {
                 return '';
             } elseif ($fieldvalue > 10) {
-                $retval = COM_createLink(
-                    Icon::getHTML(
-                        'arrow-up',
-                        'uk-icon-justify'
-                    ),
-                    EVLIST_ADMIN_URL . '/index.php?tt_move=up&tt_id=' . $A['tt_id']
-                );
+                $retval = FieldList::up(array(
+                    'url' => EVLIST_ADMIN_URL . '/index.php?tt_move=up&tt_id=' . $A['tt_id'],
+                ) );
             } else {
-                $retval = '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+                $retval = FieldList::space();
             }
             if ($fieldvalue < $extra['tt_count'] * 10) {
-                $retval .= COM_createLink(
-                    Icon::getHTML(
-                        'arrow-down',
-                        'uk-icon-justify'
-                    ),
-                    EVLIST_ADMIN_URL . '/index.php?tt_move=down&tt_id=' . $A['tt_id']
-                );
+                $retval .= FieldList::down(array(
+                    'url' => EVLIST_ADMIN_URL . '/index.php?tt_move=down&tt_id=' . $A['tt_id'],
+                ) );
             } else {
-                $retval .= '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+                $retval .= FieldList::space();
             }
             break;
 

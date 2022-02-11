@@ -15,6 +15,7 @@ namespace Evlist\Lists;
 use Evlist\Models\Status;
 use Evlist\Repeat;
 use Evlist\Calendar;
+use Evlist\FieldList;
 
 
 /**
@@ -130,12 +131,11 @@ class AdminList
         );
 
         $retval .= COM_createLink(
-            $LANG_EVLIST['new_event'],
-            EVLIST_ADMIN_URL . '/index.php?edit=x',
-            array(
-                'class' => 'uk-button uk-button-success',
-                'style' => 'float:left',
-            )
+            FieldList::button(array(
+                'text' => $LANG_EVLIST['new_event'],
+                'style' => 'success',
+            ) ),
+            EVLIST_ADMIN_URL . '/index.php?edit=x'
         );
 
         $extra = array(
@@ -170,22 +170,20 @@ class AdminList
 
         switch($fieldname) {
         case 'edit':
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['edit'],
-                EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $A['id'] . '&from=admin',
+            $retval = FieldList::edit(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?edit=event&amp;eid=' . $A['id'] . '&from=admin',
                 array(
                     'title' => $LANG_EVLIST['edit_event'],
-                )
-            );
+                ),
+            ) );
             break;
         case 'copy':
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['copy'],
-                EVLIST_URL . '/event.php?clone=x&amp;eid=' . $A['id'],
+            $retval = FieldList::copy(array(
+                'url' => EVLIST_URL . '/event.php?clone=x&amp;eid=' . $A['id'],
                 array(
                     'title' => $LANG_EVLIST['copy'],
-                )
-            );
+                ),
+            ) );
             break;
         case 'title':
             $retval = COM_createLink(
@@ -200,24 +198,30 @@ class AdminList
             break;
         case 'status':
             $base_url = $extra['is_admin'] ? EVLIST_ADMIN_URL : EVLIST_URL;
-            $retval = "<select name=\"status[{$A['id']}]\"
-                onchange='EVLIST_updateStatus(this, \"event\", \"{$A['id']}\", \"{$A['status']}\", \"" . $base_url . "\");'>" . LB;
-            foreach (
-                array(
-                    1 => $LANG_EVLIST['enabled'],
-                    2 => $LANG_EVLIST['cancelled'],
-                    0 => $LANG_EVLIST['disabled'],
-                ) as $val=>$dscp) {
-                $sel = ($val == $A['status']) ? EVSELECTED : '';
-                $retval .= "<option value=\"$val\" $sel>$dscp</option>" . LB;
-            }
-            $retval .= '</select>';
+            $fieldvalue = (int)$fieldvalue;
+            $retval = FieldList::select(array(
+                'name' => 'status[' . $A['id'] . ']',
+                'onchange' => "EVLIST_updateStatus(this, 'repeat', '{$A['id']}', '{$fieldvalue}', '$base_url');",
+                'options' => array(
+                    $LANG_EVLIST['enabled'] => array(
+                        'value' => '1',
+                        'selected' => (1 == $fieldvalue),
+                    ),
+                    $LANG_EVLIST['cancelled'] => array(
+                        'value' => '2',
+                        'selected' => (2 == $fieldvalue),
+                    ),
+                    $LANG_EVLIST['disabled'] => array(
+                        'value' => '0',
+                        'selected' => (0 == $fieldvalue),
+                    ),
+                ),
+            ) );
             break;
         case 'repeats':
-            $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-repeat"></i>',
-                EVLIST_ADMIN_URL . '/index.php?repeats=x&eid=' . $A['id'],
-            );
+            $retval = FieldList::repeat(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?repeats=x&eid=' . $A['id'],
+            ) );
             break;
         case 'delete':
             // Enabled events get cancelled, others get immediately deleted.
@@ -225,15 +229,14 @@ class AdminList
             if (isset($_REQUEST['cal_id'])) {
                 $url .= '&cal_id=' . (int)$_REQUEST['cal_id'];
             }
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['delete'],
-                $url,
+            $retval = FieldList::delete(array(
+                'delete_url' => $url,
                 array(
                     'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_event']}');",
                     'title' => $LANG_ADMIN['delete'],
                     'class' => 'tooltip',
-                )
-            );
+                ),
+            ) );
             break;
         default:
             $retval = $fieldvalue;

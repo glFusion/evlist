@@ -375,12 +375,11 @@ class Category
         );
 
         $retval .= COM_createLink(
-            $LANG_EVLIST['new_category'],
-            EVLIST_ADMIN_URL . '/index.php?editcat=x',
-            array(
-                'class' => 'uk-button uk-button-success',
-                'style' => 'float:left',
-            )
+            FieldList::button(array(
+                'text' => $LANG_EVLIST['new_category'],
+                'style' => 'success',
+            ) ),
+            EVLIST_ADMIN_URL . '/index.php?editcat=0'
         );
         $retval .= ADMIN_list(
             'evlist_cat_admin',
@@ -407,38 +406,30 @@ class Category
         $retval = '';
         switch($fieldname) {
         case 'edit':
-            $retval = COM_createLink(
-                '<i class="uk-icon-edit"></i>',
-                EVLIST_ADMIN_URL . '/index.php?editcat=x&amp;id=' . $A['id'],
+            $retval = FieldList::edit(array(
+                'url' => EVLIST_ADMIN_URL . '/index.php?editcat=' . $A['id'],
                 array(
                     'title' => $LANG_ADMIN['edit'],
-                )
-            );
+                ),
+            ) );
             break;
         case 'status':
-            if ($A['status'] == '1') {
-                $switch = EVCHECKED;
-                $enabled = 1;
-            } else {
-                $switch = '';
-                $enabled = 0;
-            }
-            $retval .= "<input type=\"checkbox\" $switch value=\"1\"
-                name=\"cat_check\"
-                id=\"togenabled{$A['id']}\"
-                onclick='EVLIST_toggle(this,\"{$A['id']}\",\"enabled\",".
-                '"category","'.EVLIST_ADMIN_URL."\");' />".LB;
+            $retval = FieldList::checkbox(array(
+                'checked' => $fieldvalue == 1,
+                'id' => "togenabled{$A['id']}",
+                'onclick' => "EVLIST_toggle(this,'{$A['id']}','enabled'," .
+                    "'category','" . EVLIST_ADMIN_URL . "');",
+            ) );
             break;
         case 'delete':
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['delete'],
-                EVLIST_ADMIN_URL. '/index.php?delcat=x&id=' . $A['id'],
+            $retval = FieldList::delete(array(
+                'delete_url' => EVLIST_ADMIN_URL. '/index.php?delcat=x&id=' . $A['id'],
                 array(
                     'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                     'title' => $LANG_ADMIN['delete'],
                     'class' => 'tooltip',
-                )
-            );
+                ),
+            ) );
             break;
         default:
             $retval = $fieldvalue;

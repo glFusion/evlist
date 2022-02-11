@@ -1129,14 +1129,13 @@ class Ticket
             $retval = $A['rp_id'] == 0 ? $LANG_EVLIST['yes'] : $LANG_EVLIST['no'];
             break;
         case 'delete':
-            $retval = COM_createLink(
-                $_EV_CONF['icons']['delete'],
-                EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
+            $retval = FieldList::delete(array(
+                'delete_url' => EVLIST_ADMIN_URL. '/index.php?delticket=' . $A['id'],
                 array(
                     'onclick'=>"return confirm('{$LANG_EVLIST['conf_del_item']}');",
                     'title' => $LANG_ADMIN['delete'],
-                )
-            );
+                ),
+            ) );
             break;
         case 'uid':
             $retval = COM_getDisplayName($fieldvalue);

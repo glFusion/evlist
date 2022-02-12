@@ -1676,7 +1676,7 @@ class Repeat
             rp_time_end2 = '{$this->time_end2}',
             rp_start = CONCAT(rp_date_start, ' ', '{$this->time_start1}'),
             rp_end = CONCAT(rp_date_end, ' ', '{$t_end}'),
-            rp_status = {$this->rp_status}
+            rp_status = {$this->rp_status},
             rp_revision = rp_revision + 1
             WHERE rp_date_start >= '{$this->getDateStart1()->toMySQL(true)}'
             AND rp_ev_id = '{$this->getEventID()}'";

@@ -397,6 +397,7 @@ $LANG_EVLIST = array(
 'back_to_event' => 'Back to Event',
 'cal_has_no_events' => 'This calendar has no events.',
 'click_for_details' => 'Click for details.',
+'logo_image' => 'Logo Image',
 );
 
 $LANG_EVLIST_HELP = array(

@@ -5,9 +5,9 @@
  * @author      Mark R. Evans mark AT glfusion DOT org
  * @author      Lee Garner lee AT leegarner DOT com
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright   Copyright (c) 2010 - 2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2010 - 2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.1
+ * @version     v1.5.4
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -321,6 +321,8 @@ function evlist_upgrade($dvlp = false)
                 $config->del('allow_anon_view', Config::PI_NAME);
             }
         }
+        // Add path for calendar topic icons
+        @mkdir($_CONF['path'] . 'data/evlist/images/calendar', 0755, true);
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 

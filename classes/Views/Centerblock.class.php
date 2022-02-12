@@ -67,8 +67,9 @@ class Centerblock
                 return '';
             }
         }
-        $display = '';
-        if (empty($display)) {  // not found in cache
+
+        //$display = '';
+        //if (empty($display)) {  // not found in cache
             // overloading the previously-boolean enable_centerblock option to
             // indicate the centerblock format.
             switch (Config::get('enable_centerblock')) {
@@ -84,7 +85,7 @@ class Centerblock
                 default:
                 $display = '';
             }
-        }
+        //}
         if (!empty($display)) {
             if ($where == 0) {      // replacing home page
                 $display = EVLIST_siteHeader() . $display . EVLIST_siteFooter();
@@ -225,13 +226,10 @@ class Centerblock
                 // Reached the maximum date to show
                 break;
             }
-            if ($date == '_empty_') continue;
+            if ($date == '_empty_') {
+                continue;
+            }
             foreach ($day as $A) {
-                // Don't display birthdays as story items
-                /*if (Config::get('enable_centerblock') == self::STORY && $A['cal_id'] == -2) {
-                    continue;
-            }*/
-
                 // Make sure we only show each event once for multiday
                 if ($dup_chk != '') {
                    if (array_key_exists($A[$dup_chk], $rp_shown)) {
@@ -289,8 +287,27 @@ class Centerblock
 
                 $Cal = Calendar::getInstance($A['cal_id']);
                 $Det = Detail::getInstance($A['rp_det_id']);
-                $email = EVLIST_obfuscate($Det->getEmail()); //isset($A['email']) ? EVLIST_obfuscate($A['email']) : '';
+                $email = EVLIST_obfuscate($Det->getEmail());
 
+                if ($_CONF['show_topic_icon']) {
+                    $cal_image = $Cal->getImageUrl();
+                    if (!empty($cal_image['url'])) {
+                        $T->set_var(
+                            'cal_image',
+                            COM_createImage(
+                                $cal_image['url'],
+                                $Cal->getName(),
+                                array(
+                                    'width' => $cal_image['width'],
+                                    'height' => $cal_image['height'],
+                                    'nosmartresize' => 'true',
+                                    'align' => 'right',
+                                    'title' => $Cal->getName(),
+                                )
+                            )
+                        );
+                    }
+                }
                 $T->set_var(array(
                     'cssid'     => $cssid,
                     'is_birthday' => $A['cal_id'] == -2 ? true : false,
@@ -299,15 +316,15 @@ class Centerblock
                     'title'     => $A['title'],
                     'summary'   => $summary,
                     'full_dscp' => $full_dscp,
-                    'contact'   => $Det->getContact(), //isset($A['contact']) ? $A['contact'] : '',
-                    'location'  => $Det->getLocation(), //isset($A['location']) ? $A['location'] : '',
+                    'contact'   => $Det->getContact(),
+                    'location'  => $Det->getLocation(),
                     'ev_link'   => $ev_link,
-                    'street'    => $Det->getStreet(), //isset($A['street']) ? $A['street'] : '',
-                    'city'      => $Det->getCity(), //isset($A['city']) ? $A['city'] : '',
-                    'province'  => $Det->getProvince(), //isset($A['province']) ? $A['province'] : '',
-                    'country'   => $Det->getCountry(), //isset($A['country']) ? $A['country'] : '',
+                    'street'    => $Det->getStreet(),
+                    'city'      => $Det->getCity(),
+                    'province'  => $Det->getProvince(),
+                    'country'   => $Det->getCountry(),
                     'email'     => $email,
-                    'phone'     => $Det->getPhone(), //isset($A['phone']) ? $A['phone'] : '',
+                    'phone'     => $Det->getPhone(),
                     'startdate' => EVLIST_formattedDate($s_ts1),
                     'enddate'   => EVLIST_formattedDate($e_ts1),
                     'starttime1' => EVLIST_formattedTime($s_ts1),
@@ -329,7 +346,6 @@ class Centerblock
                         'endtime2' => '',
                     ) );
                 }
-                //$T->parse('eventrow', 'item', true);
                 $T->parse('eRow', 'eventRow', true);
             }
         }

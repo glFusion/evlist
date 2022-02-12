@@ -144,7 +144,8 @@ $_SQL['evlist_calendars'] = "CREATE TABLE {$_TABLES['evlist_calendars']} (
   `perm_group` tinyint(1) unsigned NOT NULL DEFAULT 2,
   `perm_members` tinyint(1) unsigned NOT NULL DEFAULT 2,
   `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT 2,
-  `cal_icon` varchar(40) DEFAULT NULL,
+  `cal_icon` varchar(40) NOT NULL DEFAULT '',
+  `cal_image` varchar(127) NOT NULL DEFAULT '',
   `orderby` int(5) NOT NULL DEFAULT 9999,
   PRIMARY KEY (`cal_id`),
   KEY `orderby` (`orderby`)
@@ -397,6 +398,8 @@ $_EV_UPGRADE = array(
     // Mis-named column added in 1.5.0, correctly created in 1.5.1
     "ALTER TABLE {$_TABLES['evlist_calendars']} DROP `calshow_upcoming`",
     "ALTER TABLE {$_TABLES['evlist_calendars']} ADD `cal_show_cb` tinyint(1) unsigned NOT NULL DEFAULT 1 AFTER `cal_show_upcoming`",
+    "ALTER TABLE {$_TABLES['evlist_calendars']} CHANGE cal_icon cal_icon varchar(40) NOT NULL DEFAULT ''",
+    "ALTER TABLE {$_TABLES['evlist_calendars']} ADD cal_image varchar(127) NOT NULL DEFAULT '' AFTER cal_icon",
     // Fix invalid permissions, probably from plugin-supplied events
     "UPDATE {$_TABLES['evlist_events']} SET perm_members = 0 WHERE perm_members = 3",
     "UPDATE {$_TABLES['evlist_events']} SET perm_anon = 0 WHERE perm_anon = 3",

@@ -67,6 +67,8 @@ final class Config
         $this->properties['_now'] = new \Date('now', $_CONF['timezone']);
         $this->properties['_today'] = $this->properties['_now']->format('Y-m-d', true);
         $this->properties['_today_ts'] = $this->properties['_now']->toUnix();
+        $this->properties['datapath'] = "{$_CONF['path']}/data/" . self::PI_NAME . '/';
+        $this->properties['imagepath'] = "{$_CONF['path']}/data/" . self::PI_NAME . '/images/';
 
         $_EV_CONF = $this->properties;
     }

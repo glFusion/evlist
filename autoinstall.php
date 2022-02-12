@@ -175,6 +175,14 @@ $INSTALL_plugin['evlist'] = array(
         'group_id'      => 'admin_group_id',
         'is_enabled'    => 0,
     ),
+    array(
+        'type'  => 'mkdir',
+        'dirs' => array(
+            $_CONF['path'] . 'data/evlist',
+            $_CONF['path'] . 'data/evlist/images',
+            $_CONF['path'] . 'data/evlist/images/calendar',
+        ),
+    ),
 );
 
 

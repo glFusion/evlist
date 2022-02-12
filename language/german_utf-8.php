@@ -404,6 +404,7 @@ $LANG_EVLIST = array(
 'shortcode'     => 'Short Code',
 'free_caps'     => 'FREE',
 'click_for_details' => 'Click for details.',
+'logo_image' => 'Logo Image',
 );
 
 $LANG_EVLIST_HELP = array(

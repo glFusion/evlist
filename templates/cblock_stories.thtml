@@ -1,13 +1,18 @@
 {# begin {templatelocation} #}
+<div class="uk-margin-top"></div>
 <!-- BEGIN eventRow -->
-<article class="uk-article tm-article uk-margin-bottom">
-  <h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
-      <a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
-  </h1>
-    <div class="story-body">
-        {summary} <a href="{site_url}/evlist/event.php?eid={eid}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
-    </div>
+<div class="infinite-item">
+<article class="uk-article tm-article uk-margin-large-bottom" itemprop="headline" style="clear:both;">
+	<h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
+		<a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
+{!if cal_image}
+		<span style="float:right:">{cal_image}</span>
+{!endif}
+	</h1>
+	<div class="story-body">
+		{summary} <a href="{site_url}/evlist/event.php?eid={eid}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
+	</div>
 </article>
-<div class="block-divider"> </div>
+</div>
 <!-- END eventRow -->
 {# end {templatelocation} #}

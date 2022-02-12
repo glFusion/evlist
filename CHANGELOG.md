@@ -17,6 +17,7 @@ Release TBD
 - Event ownership not required to clone an event.
 - Add config var to enable event submission queue (was using story config).
 - Add queue bypass and overall view privileges.
+- Add topic-style icons for calendars, for story centerblocks.
 
 ## 1.5.3
 Release 2021-12-16

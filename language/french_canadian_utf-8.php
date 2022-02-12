@@ -415,6 +415,8 @@ $LANG_EVLIST = array(
 'dates'         => 'Dates',
 'shortcode'     => 'Short Code',
 'free_caps'     => 'FREE',
+'click_for_details' => 'Click for details.',
+'logo_image' => 'Logo Image',
 );
 
 $LANG_EVLIST_HELP = array(

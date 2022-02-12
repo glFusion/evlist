@@ -1,5 +1,6 @@
 {# begin {templatelocation} #}
 <form id="calendaredit" method="post" class="uk-form uk-form-horizontal evForm"
+	enctype="multipart/form-data"
 	action="{site_admin_url}/plugins/evlist/index.php">
 	<input type="hidden" name="cal_id" value="{cal_id}" />
 	<fieldset class="evForm">
@@ -45,6 +46,19 @@
 				<input type="text" class="uk-input uk-form-small uk-form-width-medium" maxlength="40" name="cal_icon" value="{icon}" />
 {!if disp_icon}
 				<i class="{disp_icon}"></i>
+{!endif}
+			</div>
+		</div>
+
+		<div class="uk-form-row">
+			<label class="uk-form-label">{$LANG_EVLIST['logo_image']}
+				<span id="cal_image" class="tooltip_cfg tooltipstered"></span>
+			</label>
+			<div class="uk-form-controls">
+				<input type="file" name="logofile" id="logofile" />
+{!if logo_img}
+				<img class="evlistLogoImage" src="{logo_img}" />
+				<input type="checkbox" name="del_logo" value="1" />&nbsp;{$LANG_ADMIN['delete']}
 {!endif}
 			</div>
 		</div>

@@ -3,9 +3,9 @@
  * Class to manage calendars.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.1
+ * @version     v1.5.4
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -96,6 +96,10 @@ class Calendar
     /** Icon name. Just the unique portion from the UIkit icon set.
      * @var string */
     private $cal_icon = '';
+
+    /** Logo or Topic image filename.
+     * @var string */
+    private $cal_image = '';
 
 
     /**
@@ -226,6 +230,47 @@ class Calendar
 
 
     /**
+     * Set the calendar topic image filename.
+     *
+     * @param   string  $filename   Image filename
+     * @return  object  $this
+     */
+    public function setImageName(string $filename) : self
+    {
+        $this->cal_image = $filename;
+        return $this;
+    }
+
+
+    /**
+     * Get the filename for the calender topic image.
+     *
+     * @return  string      Image filename
+     */
+    public function getImageName() : string
+    {
+        return $this->cal_image;
+    }
+
+
+    /**
+     * Get the URL components to an calendar topic image.
+     *
+     * @return  array   Array of URL parts (path, url, width, height)
+     */
+    public function getImageUrl() : array
+    {
+        global $_CONF;
+
+        return Images\Calendar::getUrl(
+            $this->cal_image,
+            $_CONF['max_topicicon_width'],
+            $_CONF['max_topicicon_height'],
+        );
+    }
+
+
+    /**
      * Check the current users's access to this calendar.
      *
      * @return  integer     3 for read/edit 2 for read only 0 for no access
@@ -253,7 +298,8 @@ class Calendar
 
         // These fields come in the same way from DB or form
         $fields = array('cal_name', 'fgcolor', 'bgcolor',
-            'owner_id', 'group_id', 'cal_icon');
+            'owner_id', 'group_id', 'cal_icon',
+        );
         foreach ($fields as $field) {
             if (isset($A[$field]))
                 $this->$field = $A[$field];
@@ -287,6 +333,7 @@ class Calendar
             $this->perm_group   = $A['perm_group'];
             $this->perm_members = $A['perm_members'];
             $this->perm_anon    = $A['perm_anon'];
+            $this->cal_image    = $A['cal_image'];
         } else {
             if (isset($A['fg_inherit'])) $this->fgcolor = '';
             if (isset($A['bg_inherit'])) $this->bgcolor = '';
@@ -357,7 +404,9 @@ class Calendar
             'orderby_sel'   => $orderby_sel,
             'orderby'       => $this->orderby,
         ) );
-
+        if (!empty($this->cal_image)) {
+            $T->set_var('logo_img', $this->getImageUrl()['url']);
+        }
         $T->parse('tooltipster_js', 'tips');
         $T->parse('output','modify');
         return $T->finish($T->get_var('output'));
@@ -387,6 +436,28 @@ class Calendar
             $this->orderby += 5;
         }
 
+        // Handle the image upload first.
+        if (
+            !empty($_FILES) &&
+            is_array($_FILES['logofile']) &&
+            !empty($_FILES['logofile']['tmp_name'])
+        ) {
+            $Img = new Images\Calendar($this->getID(), 'logofile');
+            $Img->setFieldName('logofile')->uploadFiles();
+            if (!empty($Img->getErrors())) {
+                COM_setMsg('<ul><li>' . implode('</li><li>', $Img->getErrors()) . '</li></ul>');
+                return false;
+            } else {
+                if (!empty($this->getImageName())) {
+                    // Replacing the image
+                    $this->deleteImage();
+                }
+                $this->setImageName($Img->getFilenames()[0]);
+            }
+        } elseif (isset($_POST['del_logo']) && !empty($_POST['del_logo'])) {
+            $this->deleteImage();
+        }
+
         $fld_sql = "cal_name = '" . DB_escapeString($this->cal_name) ."',
             fgcolor = '" . DB_escapeString($this->fgcolor) . "',
             bgcolor = '" . DB_escapeString($this->bgcolor) . "',
@@ -401,6 +472,7 @@ class Calendar
             owner_id = '{$this->owner_id}',
             group_id = '{$this->group_id}',
             cal_icon = '" . DB_escapeString($this->cal_icon) . "',
+            cal_image = '" . DB_escapeString($this->cal_image) . "',
             orderby = '{$this->orderby}'";
 
         if ($this->isNew) {
@@ -431,7 +503,7 @@ class Calendar
         } else {
             return false;
         }
-    }   // function Save()
+    }
 
 
     /**
@@ -475,6 +547,7 @@ class Calendar
                 DB_delete($_TABLES['evlist_events'], 'id', $A['id']);
             }
         }
+        $this->deleteImage();
         DB_delete($_TABLES['evlist_calendars'], 'cal_id', $this->cal_id);
         Cache::clear();     // Just clear all cache items
     }
@@ -690,6 +763,20 @@ class Calendar
     public function getIcon($style='')
     {
         return $this->cal_icon;
+    }
+
+
+    /**
+     * Deletes a single image from disk.
+     */
+    public function deleteImage() : void
+    {
+        $fname = $this->getImageName();
+        $path = Config::get('imagepath') . 'calendar';
+        if (is_file("{$path}/{$fname}")) {
+            @unlink("{$path}/{$fname}");
+        }
+        $this->setImageName('');
     }
 
 

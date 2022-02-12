@@ -151,7 +151,7 @@
 	<button type="reset" class="uk-button uk-button-primary" name="reset" value="{$LANG_EVLIST['reset']}" />{$LANG_EVLIST['reset']}</button>
 	<a class="uk-button" name="cancel" href="{site_admin_url}/plugins/evlist/index.php?calendars">{$LANG_ADMIN['cancel']}</a>
 {!if can_delete}
-	<button type="submit" style="float:right;" class="uk-button uk-button-danger" name="deletecal" value="{$LANG_ADMIN['delete']}" />{$LANG_ADMIN['delete']}</button>
+	<button type="submit" style="float:right;" class="uk-button uk-button-danger" name="deletecal" value="{cal_id}" />{$LANG_ADMIN['delete']}</button>
 {!endif}
 </form>
 {colorpicker_js}

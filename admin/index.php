@@ -313,7 +313,7 @@ default:
 $page = $view;      // Default for menu creation
 switch ($view) {
 case 'deletecal':
-    $cal_id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
+    $cal_id = (int)$actionval;
     if ($cal_id != 1) {
         $Cal = new Evlist\Calendar($cal_id);
         $content .= $Cal->DeleteForm();

@@ -476,7 +476,7 @@ class UploadDownload
      *
      * @return  string    returns destination file name
      */
-    private function _getDestinationName()
+    private function _getDestinationName() : string
     {
         if (is_array($this->_fileNames)) {
             $name = $this->_fileNames[$this->_imageIndex];
@@ -484,8 +484,12 @@ class UploadDownload
 
         if (empty($name)) {
             $name = $this->_currentFile['name'];
+        } elseif (
+            isset($this->_currentFile['extension']) &&
+            !empty($this->_currentFile['extension'])
+        ) {
+            $name .= '.' . $this->_currentFile['extension'];
         }
-
         return $name;
     }
 
@@ -537,6 +541,7 @@ class UploadDownload
                 $sizeOK = false;
             }
         }
+
         if (isset($this->_currentFile['_data_dir']) && $this->_currentFile['_data_dir']) {
             $returnMove = @copy($this->_currentFile['tmp_name'], $this->_filePath . '/' . $this->_getDestinationName());
             @unlink($this->_currentFile['tmp_name']);
@@ -615,7 +620,7 @@ class UploadDownload
      * @param   boolean $switch  True to turn on, false to turn off
      * @return  object  $this
      */
-    public function setAutomaticResize($switch)
+    public function setAutomaticResizing(bool $switch) : self
     {
         $this->_autoResize = $switch;
         return $this;
@@ -1183,10 +1188,9 @@ class UploadDownload
                 empty($this->_currentFile['localerror'])
             ) {
                 if ($this->_copyFile()) {
-                    $this->_uploadedFiles[] = $this->_filePath . '/' . $this->_getDestinationName();
+                    $this->_uploadedFiles[] = $this->_filePath . $this->_getDestinationName();
                 }
             }
-
             $this->_currentFile = array();
         }
     }
@@ -1449,7 +1453,12 @@ class UploadDownload
      */
     public function getFilenames()
     {
-        return $this->_fileNames;
+        $names = array();
+        foreach ($this->_uploadedFiles as $path) {
+            $parts = pathinfo($path);
+            $names[] = $parts['basename'];
+        }
+        return $names;
     }
 
 }

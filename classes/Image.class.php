@@ -53,10 +53,10 @@ class Image extends UploadDownload
      * Constructor.
      * Sets various elements from the base `upload` class.
      *
-     * @param   integer $record_id Product ID number
+     * @param   string  $record_id  Item record ID
      * @param   string  $varname    Name of form field
      */
-    public function __construct($record_id, $varname='photo')
+    public function __construct($record_id='0', $varname='photo')
     {
         $this->record_id = trim($record_id);
         $this->setFieldName($varname);
@@ -105,22 +105,22 @@ class Image extends UploadDownload
 
 
     /**
-     * Create the target filename for the image file.
+     * Create the target filename for the image file, excluding extension.
      *
      * @return  string      File name
      */
     protected function makeFileName()
     {
-        return uniqid($this->record_id . '_' . rand(100,999)) . '.jpg';
+        return uniqid($this->record_id . '_' . rand(100,999));
     }
 
 
     /**
-    * Seed the image cache with the product image thumbnails.
-    *
-    * @uses     LGLIB_ImageUrl()
-    * @return   string      Blank, error messages are now in parent::_errors
-    */
+     * Seed the image cache with the product image thumbnails.
+     *
+     * @uses     LGLIB_ImageUrl()
+     * @return   string      Blank, error messages are now in parent::_errors
+     */
     protected function MakeThumbs()
     {
         $thumbsize = (int)Config::get('max_thumb_size');
@@ -139,7 +139,7 @@ class Image extends UploadDownload
             }
         }
         return '';
-    }   // function MakeThumbs()
+    }
 
 
     /**

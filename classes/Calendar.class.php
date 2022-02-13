@@ -260,13 +260,7 @@ class Calendar
      */
     public function getImageUrl() : array
     {
-        global $_CONF;
-
-        return Images\Calendar::getUrl(
-            $this->cal_image,
-            $_CONF['max_topicicon_width'],
-            $_CONF['max_topicicon_height'],
-        );
+        return Images\Calendar::getUrl($this->cal_image);
     }
 
 
@@ -405,7 +399,12 @@ class Calendar
             'orderby'       => $this->orderby,
         ) );
         if (!empty($this->cal_image)) {
-            $T->set_var('logo_img', $this->getImageUrl()['url']);
+            $img = $this->getImageUrl();
+            $T->set_var(array(
+                'logo_url' => $img['url'],
+                'logo_width' => $img['width'],
+                'logo_height' => $img['height'],
+            ) );
         }
         $T->parse('tooltipster_js', 'tips');
         $T->parse('output','modify');
@@ -442,8 +441,8 @@ class Calendar
             is_array($_FILES['logofile']) &&
             !empty($_FILES['logofile']['tmp_name'])
         ) {
-            $Img = new Images\Calendar($this->getID(), 'logofile');
-            $Img->setFieldName('logofile')->uploadFiles();
+            $Img = new Images\Calendar($this->cal_id, 'logofile');
+            $Img->uploadFiles();
             if (!empty($Img->getErrors())) {
                 COM_setMsg('<ul><li>' . implode('</li><li>', $Img->getErrors()) . '</li></ul>');
                 return false;

@@ -178,9 +178,9 @@ $INSTALL_plugin['evlist'] = array(
     array(
         'type'  => 'mkdir',
         'dirs' => array(
-            $_CONF['path'] . 'data/evlist',
-            $_CONF['path'] . 'data/evlist/images',
-            $_CONF['path'] . 'data/evlist/images/calendar',
+            $_CONF['path_html'] . 'data/evlist',
+            $_CONF['path_html'] . 'data/evlist/images',
+            $_CONF['path_html'] . 'data/evlist/images/calendar',
         ),
     ),
 );

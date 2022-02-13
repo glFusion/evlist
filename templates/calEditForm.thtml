@@ -56,8 +56,8 @@
 			</label>
 			<div class="uk-form-controls">
 				<input type="file" name="logofile" id="logofile" />
-{!if logo_img}
-				<img class="evlistLogoImage" src="{logo_img}" />
+{!if logo_url}
+				<img class="evlistLogoImage" src="{logo_url}" width="{logo_width}" height="{logo_height}"/>
 				<input type="checkbox" name="del_logo" value="1" />&nbsp;{$LANG_ADMIN['delete']}
 {!endif}
 			</div>

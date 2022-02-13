@@ -26,13 +26,39 @@ class Calendar extends \Evlist\Image
      * @var string */
     protected static $pathkey = 'calendar';
 
-    /** Maximum width, in pixels. Used if no width is given in getImage functions.
-     * @var integer */
-    protected static $maxwidth = 300;
 
-    /** Maximum height, in pixels. Used if no width is given in getImage functions.
-     * @var integer */
-    protected static $maxheight = 300;
+    /**
+     * Turn off automatic resizing, to allow transparent PNG images to work.
+     *
+     * @param   string  $record_id  Item record ID
+     * @param   string  $varname    Name of form field
+     */
+    public function __construct($record_id='0', $varname='logofile')
+    {
+        $this->setAutomaticResizing(false);
+        parent::__construct($record_id, $varname);
+    }
+
+
+    /**
+     * Get the image URL, width and height.
+     * Calendar icons don't use resizing to preserve transparency.
+     *
+     * @param   string  $filename   Image filename
+     * @param   integer $width      Desired display width (not used)
+     * @param   integer $height     Desired display height (not used)
+     * @return  array       Array of (url, width, height)
+     */
+    public static function getUrl($filename, $width=0, $height=0)
+    {
+        global $_CONF;
+
+        return array(
+            'url' => Config::get('imageurl') . '/' . static::$pathkey . '/' . $filename,
+            'width' => $_CONF['max_topicicon_width'],
+            'height' => $_CONF['max_topicicon_height'],
+        );
+    }
 
 
     /**

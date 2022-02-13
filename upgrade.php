@@ -322,7 +322,7 @@ function evlist_upgrade($dvlp = false)
             }
         }
         // Add path for calendar topic icons
-        @mkdir($_CONF['path'] . 'data/evlist/images/calendar', 0755, true);
+        @mkdir($_CONF['path_html'] . 'data/evlist/images/calendar', 0755, true);
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 

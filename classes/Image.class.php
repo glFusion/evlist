@@ -61,6 +61,7 @@ class Image extends UploadDownload
         $this->record_id = trim($record_id);
         $this->setFieldName($varname);
         $this->pathImage = Config::get('imagepath') . static::$pathkey;
+        parent::__construct($record_id, $varname);
     }
 
 

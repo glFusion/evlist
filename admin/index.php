@@ -142,13 +142,13 @@ case 'savecal':
     $cal_id = isset($_POST['cal_id']) ? $_POST['cal_id'] : 0;
     $Cal = new Evlist\Calendar($cal_id);
     $status = $Cal->Save($_POST);
-    $view = 'calendars';
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php?calendars');
     break;
 
 case 'savecat':
     $C = new Evlist\Category($_POST['id']);
     $status = $C->Save($_POST);
-    $view = 'categories';
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php?categories');
     break;
 
 case 'saveticket':
@@ -159,6 +159,7 @@ case 'saveticket':
     } else {
         $view = '';
     }
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php?' . $view);
     break;
 
 case 'deltickettype':

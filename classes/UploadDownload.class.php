@@ -51,10 +51,10 @@ class UploadDownload
      * @var string */
     private $_fieldName = '';
 
-    /** Array of all available mimetypes.
+    /** Array of all available mimetypes. NULL indicates not set.
      * @see self::$_allowedMimeTypes
      * @var array */
-    private $_availableMimeTypes = array();
+    private $_availableMimeTypes = NULL;
 
     /** Array of files to be uploaded.
      * @var array */
@@ -81,9 +81,9 @@ class UploadDownload
      * @var integer */
     private $_maxImageHeight = 300;
 
-    /** Maximum uploaded file size, in bytes.
+    /** Maximum uploaded file size, in bytes. 0 = unlimited.
      * @var integer */
-    private $_maxFileSize = 1048576;
+    private $_maxFileSize = 0;
 
     /** Auto-resize images upon upload?
      * @var boolean */
@@ -142,7 +142,12 @@ class UploadDownload
      */
     public function __construct()
     {
-        $this->setAvailableMimeTypes();
+        if ($this->_availableMimeTypes === NULL) {
+            $this->setAvailableMimeTypes();
+        }
+        if ($this->_maxFileSize == 0) {
+            $this->setMaxFileSize();
+        }
     }
 
 
@@ -326,13 +331,13 @@ class UploadDownload
      *
      * @return  boolean   returns true of file size is within our limits otherwise false
      */
-    private function _fileSizeOk()
+    private function _fileSizeOk() : bool
     {
         if ($this->_debug) {
             $this->_addDebugMsg('File size for ' . $this->_currentFile['name'] . ' is ' . $this->_currentFile['size'] . ' bytes');
         }
 
-        if ($this->_currentFile['size'] > $this->_maxFileSize) {
+        if ($this->_maxFileSize > 0 && $this->_currentFile['size'] > $this->_maxFileSize) {
             EVLIST_log(
                 "Uploaded file: ".$this->_currentFile['name']." exceeds max file size of " . $this->_maxFileSize
             );
@@ -633,11 +638,18 @@ class UploadDownload
      * @param   integer $size_in_bytes  Max. size for uploaded files
      * @return  object  $this
      */
-    public function setMaxFileSize($size_in_bytes)
+    public function setMaxFileSize(int $size = 0) : self
     {
-        if (is_numeric($size_in_bytes)) {
-            $this->_maxFileSize = (int)$size_in_bytes;
+        if ($size == 0) {
+            $size = ini_get('upload_max_filesize');
+            if (preg_match('/^([\d\.]+)([KMG])$/i', $size, $match)) {
+                $pos = array_search($match[2], array("K", "M", "G"));
+                if ($pos !== false) {
+                    $size = (int)$match[1] * pow(1024, $pos + 1);
+                }
+            }
         }
+        $this->_maxFileSize = (int)$size;
         return $this;
     }
 

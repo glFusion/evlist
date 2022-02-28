@@ -3,9 +3,9 @@
  * List View functions for the evList plugin.
  *
  * @author      Lee P. Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2017 Lee Garner <lee@leegarner.com
+ * @copyright   Copyright (c) 2017-2022 Lee Garner <lee@leegarner.com
  * @package     evlist
- * @version     v1.4.3
+ * @version     v1.5.4
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -15,6 +15,8 @@ use Evlist\DateFunc;
 use Evlist\Menu;
 use Evlist\Models\EventSet;
 use Evlist\Models\TimeRange;
+use Evlist\Detail;
+use Evlist\Calendar;
 
 
 /**
@@ -24,7 +26,7 @@ use Evlist\Models\TimeRange;
 class agenda extends \Evlist\View
 {
     /**
-     * Construct the list view.
+     * Construct the agenda view.
      *
      * @param   integer $year   Year to display, default is current year
      * @param   integer $month  Starting month
@@ -146,19 +148,23 @@ class agenda extends \Evlist\View
                     } else {
                         $already_shown[$A['rp_id']] = 1;
                     }
+                    $Det = Detail::getInstance($A['rp_det_id']);
+                    if (empty($Det->getTitle())) {
+                        continue;
+                    }
 
                     // Prepare the link to the event, internal for internal
                     // events, new window for meetup events
                     $url_attr = array();
                     $url = COM_buildURL(EVLIST_URL . '/view.php?&rid=' . $A['rp_id']);
-                    $title = COM_stripslashes($A['title']);
+                    $title = COM_stripslashes($Det->getTitle());
                     if (!empty($url)) {
                         $titlelink = COM_createLink($title, $url, $url_attr);
                     } else {
-                        $titlelink = $A['title'];
+                        $titlelink = $title;
                     }
 
-                    $summary = PLG_replaceTags(COM_stripslashes($A['summary']));
+                    $summary = PLG_replaceTags(COM_stripslashes($Det->getSummary()));
                     $tz = $A['tzid'] == 'local' ? $_USER['tzid'] : $A['tzid'];
                     $d = new \Date($A['rp_date_start'] . ' ' . $A['rp_time_start1'], $tz);
                     if (isset($A['options']['contactlink']) && $A['options']['contactlink']) {
@@ -174,6 +180,7 @@ class agenda extends \Evlist\View
                     } else {
                         $contactlink = '';
                     }
+                    $Cal = Calendar::getInstance($A['cal_id']);
                     $T->set_var(array(
                         'title' => $titlelink,
                         'allday' => isset($A['allday']) && $A['allday'],
@@ -187,9 +194,9 @@ class agenda extends \Evlist\View
                         //'block_title' => $block_title,
                         'category_links' => isset($A['ev_id']) ? EVLIST_getCatLinks($A['ev_id']) : '',
                         'cal_id' => $A['cal_id'],
-                        'cal_name' => $A['cal_name'],
-                        'cal_fgcolor' => $A['fgcolor'],
-                        'cal_bgcolor' => $A['bgcolor'],
+                        'cal_name' => $Cal->getName(),
+                        'cal_fgcolor' => $Cal->getFGcolor(),
+                        'cal_bgcolor' => $Cal->getBGcolor(),
                     ) );
                     $T->parse('event_item','item', true);
                 }
@@ -205,4 +212,3 @@ class agenda extends \Evlist\View
     }
 }
 
-?>

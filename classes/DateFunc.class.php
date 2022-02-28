@@ -14,6 +14,7 @@
  * @filesource
  */
 namespace Evlist;
+use \Date;
 
 // The constant telling us what day starts the week. Monday (1) is the
 // international standard. Redefine this to 0 if you want weeks to
@@ -41,6 +42,8 @@ if (!defined('DATE_CALC_BEGIN_WEEKDAY')) {
 class DateFunc
 {
     const DEF_FORMAT = 'Y-m-d';
+    const SUNDAY = 0;
+    const MONDAY = 1;
 
     /**
      * Returns the current local date. NOTE: This function
@@ -55,10 +58,23 @@ class DateFunc
     {
         global $_CONF;
 
-        if ($format == '') {
+        return $_CONF['_now']->format(self::getFormat($format), true);
+    }
+
+
+    /**
+     * Get the format for a date string.
+     * Use the default format if none provided.
+     *
+     * @param   string  $format     Date format
+     * @return  string      Format to use
+     */
+    public static function getFormat(string $format='')
+    {
+        if (empty($format)) {
             $format = self::DEF_FORMAT;
         }
-        return $_CONF['_now']->format($format, true);
+        return $format;
     }
 
 
@@ -75,7 +91,7 @@ class DateFunc
         global $_CONF;
 
         list($day, $month, $year) = self::validateParams($day, $month, $year);
-        $dt = new \Date(sprintf('%d-%02d-%02d', $year, $month, $day), $_CONF['timezone']);
+        $dt = new \Date(sprintf('%d-%02d-%02d 12:00:00', $year, $month, $day), $_CONF['timezone']);
         return $dt;
     }
 
@@ -148,7 +164,7 @@ class DateFunc
      * @param   string  $year   Year in format CCYY
      * @return  boolean true/false
      */
-    public static function isFutureDate($day=0, $month=0, $year=0)
+    public static function XisFutureDate($day=0, $month=0, $year=0)
     {
         list($day, $month, $year) = self::validateParams($day, $month, $year);
         $this_year = self::getYear();
@@ -179,7 +195,7 @@ class DateFunc
      * @param   string  $year   Year in format CCYY
      * @return  boolean true/false
      */
-    public static function isPastDate($day, $month, $year)
+    public static function XisPastDate($day, $month, $year)
     {
         list($day, $month, $year) = self::validateParams($day, $month, $year);
         $this_year = self::getYear();
@@ -212,7 +228,8 @@ class DateFunc
      */
     public static function dayOfWeek($day=0, $month=0, $year=0)
     {
-        return self::getDate($day, $month, $year)->format('w');
+        $dt = self::getDate($day, $month, $year);
+        return $dt->format('w');
     }
 
 
@@ -299,7 +316,7 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function beginOfNextMonth($day=0, $month=0, $year=0, $format='')
+    public static function XbeginOfNextMonth($day=0, $month=0, $year=0, $format='')
     {
         if (empty($year)) {
             $year = self::getYear();
@@ -331,7 +348,7 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function endOfNextMonth($day=0, $month=0, $year=0, $format='')
+    public static function XendOfNextMonth($day=0, $month=0, $year=0, $format='')
     {
         if (empty($year)) {
             $year = self::getYear();
@@ -363,7 +380,7 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function beginOfPrevMonth($day=0, $month=0, $year=0, $format='')
+    public static function XbeginOfPrevMonth($day=0, $month=0, $year=0, $format='')
     {
         if (empty($year)) {
             $year = self::getYear();
@@ -396,7 +413,7 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function endOfPrevMonth($day=0, $month=0, $year=0, $format='')
+    public static function XendOfPrevMonth($day=0, $month=0, $year=0, $format='')
     {
         if (empty($year)) {
             $year = self::getYear();
@@ -441,16 +458,16 @@ class DateFunc
             $day = self::getDay();
         }
 
-        $days = self::dateToDays($day, $month, $year);
-        $dow = self::dayOfWeek($day, $month, $year);
-        if ($dow  == 5) {
-            $days += 3;
-        } elseif ($dow == 6) {
-            $days += 2;
-        } else {
-            $days += 1;
+        $dt = self::getDate($day, $month, $year);
+        $interval = new \DateInterval('P1D');
+        while (true) {
+            $dt->add($interval);
+            $dow = $dt->format('w',true);
+            if ($dow != 0 && $dow != 6) {
+                break;
+            }
         }
-        return self::daysToDate($days, $format);
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -465,25 +482,16 @@ class DateFunc
      */
     public static function prevWeekday($day=0, $month=0, $year=0, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
+        $dt = self::getDate($day, $month, $year);
+        $interval = new \DateInterval('P1D');
+        while (true) {
+            $dt->sub($interval);
+            $dow = $dt->format('w',true);
+            if ($dow != 0 && $dow != 6) {
+                break;
+            }
         }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $days = self::dateToDays($day, $month, $year);
-        if (self::dayOfWeek($day, $month, $year) == 1) {
-            $days -= 3;
-        } elseif (self::dayOfWeek($day, $month, $year) == 0) {
-            $days -= 2;
-        } else {
-            $days -= 1;
-        }
-        return(self::daysToDate($days, $format));
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -495,34 +503,29 @@ class DateFunc
      * @param   string  $day    Day in format DD, default current local day
      * @param   string  $month  Month in format MM, default current local month
      * @param   string  $year   Year in format CCYY, default current local year
-     * @param   string  $format Format for returned date
      * @param   boolean $onOrAfter  If true and days are same, returns current day
-     * @return  string          Ddate in given format
+     * @param   string  $format Format for returned date
+     * @return  string          Next date in given format
      */
-    public static function nextDayOfWeek($dow, $day=0, $month=0, $year=0, $format='', $onOrAfter=false)
+    public static function nextDayOfWeek($dow, $day=0, $month=0, $year=0, $onOrAfter=false, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $days = self::dateToDays($day, $month, $year);
-        $curr_weekday = self::dayOfWeek($day, $month, $year);
+        $dow = (int)$dow;
+        $dt = self::getDate($day, $month, $year);
+        $curr_weekday = $dt->format('w', true);
+        $days = 0;
         if ($curr_weekday == $dow) {
             if (!$onOrAfter) {
-                $days += 7;
+                $days = 7;
             }
         } elseif ($curr_weekday > $dow) {
-            $days += 7 - ($curr_weekday - $dow);
+            $days = 7 - ($curr_weekday - $dow);
         } else {
-            $days += $dow - $curr_weekday;
+            $days = $dow - $curr_weekday;
         }
-        return self::daysToDate($days, $format);
+        if ($days != 0) {
+            $dt->add(new \DateInterval('P' . $days . 'D'));
+        }
+        return $dt->format(self::getformat($format), true);
     }
 
 
@@ -538,30 +541,25 @@ class DateFunc
      * @param   boolean $onOrBefore True for before current date, False for after
      * @return  string          Date in given format
      */
-    public static function prevDayOfWeek($dow, $day=0, $month=0, $year=0, $format='', $onOrBefore=false)
+    public static function prevDayOfWeek($dow, $day=0, $month=0, $year=0, $onOrBefore=false, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $days = self::dateToDays($day, $month, $year);
-        $curr_weekday = self::dayOfWeek($day, $month, $year);
+        $dow = (int)$dow;
+        $dt = self::getDate($day, $month, $year);
+        $days = 0;
+        $curr_weekday = $dt->format('w', true);
         if ($curr_weekday == $dow) {
             if (!$onOrBefore) {
-                $days -= 7;
+                $days = 7;
             }
         } elseif ($curr_weekday < $dow) {
-            $days -= (7 - ($dow - $curr_weekday));
+            $days = (7 - ($dow - $curr_weekday));
         } else {
-            $days -= $curr_weekday - $dow;
+            $days = $curr_weekday - $dow;
         }
-        return(self::daysToDate($days, $format));
+        if ($days != 0) {
+            $dt->sub(new \DateInterval('P' . $days . 'D'));
+        }
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -577,7 +575,7 @@ class DateFunc
      */
     public static function nextDayOfWeekOnOrAfter($dow, $day=0, $month=0, $year=0, $format='')
     {
-        return self::nextDayOfWeek($dow, $day, $month, $year, $format, true);
+        return self::nextDayOfWeek($dow, $day, $month, $year, true, $format);
     }
 
 
@@ -593,7 +591,7 @@ class DateFunc
      */
     public static function prevDayOfWeekOnOrBefore($dow, $day=0, $month=0, $year=0, $format='')
     {
-        return self::prevDayOfWeek($dow, $day, $month, $year, $format, true);
+        return self::prevDayOfWeek($dow, $day, $month, $year, true, $format);
     }
 
 
@@ -606,20 +604,11 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function nextDay($day=0, $month=0, $year=0, $format='')
+    public static function XnextDay($day, $month, $year, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $days = self::dateToDays($day, $month, $year);
-        return(self::daysToDate($days + 1, $format));
+        $dt = self::getDate($day, $month, $year);
+        $dt->add(new \DateInterval('P1D'));
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -632,20 +621,11 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function prevDay($day=0, $month=0, $year=0, $format='')
+    public static function prevDay($day, $month, $year, $format='') : string
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $days = self::dateToDays($day, $month, $year);
-        return self::daysToDate($days - 1, $format);
+        $dt = self::getDate($day, $month, $year);
+        $dt->sub(new \DateInterval('P1D'));
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -668,8 +648,8 @@ class DateFunc
         ) {
             return -1;
         }
-        $date1 = new \Date(sprintf('%d-%02d-%02d', $year1, $month1, $day1));
-        $date2 = new \Date(sprintf('%d-%02d-%02d', $year2, $month2, $day2));
+        $date1 = self::getDate($day1, $month1, $year1);
+        $date2 = self::getDate($day2, $month2, $year2);
         $diff = $date1->diff($date2);
         return $diff->days;
     }
@@ -698,27 +678,20 @@ class DateFunc
      * @param   string  $year   Year in format CCYY, default current local year
      * @return  integer         Number of weeks or partial weeks
      */
-    public static function weeksInMonth($month="",$year="")
+    public static function weeksInMonth($month=0,$year=0)
     {
         if (empty($year)) {
-            $year = self::dateNow("%Y");
+            $year = self::getYear();
         }
         if (empty($month)) {
-            $month = self::dateNow("%m");
+            $month = self::getMonth();
         }
-        if (DATE_CALC_BEGIN_WEEKDAY == 1) {
+        if (DATE_CALC_BEGIN_WEEKDAY == self::MONDAY) {
             // starts on monday
             if (self::firstOfMonthWeekday($month,$year) == 0) {
                 $first_week_days = 1;
             } else {
                 $first_week_days = 7 - (self::firstOfMonthWeekday($month,$year) - 1);
-            }
-        } elseif (DATE_CALC_BEGIN_WEEKDAY == 6) {
-            // starts on saturday
-            if (self::firstOfMonthWeekday($month,$year) == 0) {
-                $first_week_days = 6;
-            } else {
-                $first_week_days = 7 - (self::firstOfMonthWeekday($month,$year) + 1);
             }
         } else {
             // starts on sunday
@@ -779,29 +752,11 @@ class DateFunc
      */
     public static function beginOfWeek($day=0, $month=0, $year=0, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $this_weekday = self::dayOfWeek($day, $month, $year);
-        if (DATE_CALC_BEGIN_WEEKDAY == 1) {
-            if ($this_weekday == 0) {
-                $beginOfWeek = self::dateToDays($day, $month, $year) - 6;
-            } else {
-                $beginOfWeek = self::dateToDays($day, $month, $year) - $this_weekday + 1;
-            }
-        } else {
-            $beginOfWeek = self::dateToDays($day, $month, $year) - $this_weekday;
-            /*  $beginOfWeek = (self::dateToDays($day, $month, $year)
-                - ($this_weekday - DATE_CALC_BEGIN_WEEKDAY)); */
-        }
-        return self::daysToDate($beginOfWeek, $format);
+        $dt = self::getDate($day, $month, $year);
+        $dow = $dt->format('w', true);
+        $sub_days = 'P' . $dow - DATE_CALC_BEGIN_WEEKDAY . 'D';
+        $dt->sub(new \DateInterval($sub_days));
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -814,24 +769,15 @@ class DateFunc
      * @param   string  $month  Month in format MM, default current local month
      * @param   string  $year   Year in format CCYY, default current local year
      * @param   string  $format Format for returned date
-     * @return  string          Date in given format
+     * @return  string      YYYY-MM-DD string for last day
      */
-    public static function endOfWeek($day=0, $month=0, $year=0, $format='')
+    public static function endOfWeek($day=0, $month=0, $year=0, $format='') : Date
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
-        $this_weekday = self::dayOfWeek($day, $month, $year);
-        $last_dayOfWeek = self::dateToDays($day, $month, $year) + (6 - $this_weekday + DATE_CALC_BEGIN_WEEKDAY);
-
-        return self::daysToDate($last_dayOfWeek, $format);
+        $dt = self::getDate($day, $month, $year);
+        $dow = $dt->format('w', true);
+        $add_days = 'P' . (6 - $dow + DATE_CALC_BEGIN_WEEKDAY) . 'D';
+        $dt->add(new \DateInterval($add_days));
+        return $dt->format(self::getFormat($format));
     }
 
 
@@ -845,18 +791,9 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function beginOfNextWeek($day=0, $month=0, $year=0, $format='')
+    public static function XXbeginOfNextWeek($day=0, $month=0, $year=0, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
+        list($day, $month, $year) = self::validateParams($day, $month, $year);
         $date = self::daysToDate(self::dateToDays($day+7, $month, $year));
         $next_week_year = substr($date, 0, 4);
         $next_week_month = substr($date, 5, 2);
@@ -877,18 +814,9 @@ class DateFunc
      * @param   string  $format Format for returned date
      * @return  string          Date in given format
      */
-    public static function beginOfPrevWeek($day=0, $month=0, $year=0, $format='')
+    public static function XXbeginOfPrevWeek($day=0, $month=0, $year=0, $format='')
     {
-        if (empty($year)) {
-            $year = self::getYear();
-        }
-        if (empty($month)) {
-            $month = self::getMonth();
-        }
-        if (empty($day)) {
-            $day = self::getDay();
-        }
-
+        list($day, $month, $year) = self::validateParams($day, $month, $year);
         $date = self::daysToDate(self::dateToDays($day-7, $month, $year));
         $next_week_year = substr($date,0,4);
         $next_week_month = substr($date,4,2);
@@ -916,11 +844,11 @@ class DateFunc
         list($day, $month, $year) = self::validateParams($day, $month, $year);
         $week_array = array();
 
-        // date for the column of week
-        $curr_day = self::beginOfWeek($day, $month, $year, 'E');
-        for ($counter=0; $counter <= 6; $counter++) {
-            $week_array[$counter] = self::daysToDate($curr_day, $format);
-            $curr_day++;
+        $dt = self::beginOfWeek($day, $month, $year, 'U');
+        $week_array[] = $dt->format('Y-m-d');
+        for ($i = 0; $i < 6; $i++) {
+            $dt = self::nextDay($dt);
+            $week_array[] = $dt->format('Y-m-d');
         }
         return $week_array;
     }
@@ -936,33 +864,34 @@ class DateFunc
      */
     public static function getCalendarMonth($month=0, $year=0, $format='')
     {
+        global $_CONF;
+
         list($day, $month, $year) = self::validateParams(1, $month, $year);
         $month_array = array();
+        $fom_weekday = self::firstOfMonthWeekday($month, $year);
+
         // starts on monday
-        if (DATE_CALC_BEGIN_WEEKDAY == 1) {
-            if (self::firstOfMonthWeekday($month, $year) == 0) {
-                $curr_day = self::dateToDays(1, $month, $year) - 6;
-            } else {
-                $curr_day = self::dateToDays(1, $month, $year) - self::firstOfMonthWeekday($month, $year) + 1;
+        if (DATE_CALC_BEGIN_WEEKDAY == self::MONDAY) {
+            if ($fom_weekday > 0) {
+                $fom_weekday--;
             }
-        // starts on saturday
-        } elseif (DATE_CALC_BEGIN_WEEKDAY == 6) {
-            if (self::firstOfMonthWeekday($month, $year) == 0) {
-                $curr_day = self::dateToDays(1, $month, $year) - 1;
-            } else {
-                $curr_day = self::dateToDays(1, $month, $year) - self::firstOfMonthWeekday($month, $year) - 1;
-            }
-        // starts on sunday
-        } else {
-            $curr_day = (self::dateToDays(1, $month, $year) - self::firstOfMonthWeekday($month, $year));
         }
+
+        // Get the first of month date and the first date to appear on the calendar
+        $fom = self::getDate(1, $month, $year);
+        $curr_dt = (clone $fom)->sub(new \DateInterval(sprintf('P%dD', $fom_weekday)));
+
         // number of days in this month
         $daysInMonth = self::daysInMonth($month, $year);
         $weeksInMonth = self::weeksInMonth($month, $year);
+
         for ($row = 0; $row < $weeksInMonth; $row++) {
             for ($col = 0; $col < 7; $col++) {
-                $month_array[$row][$col] = self::daysToDate($curr_day, $format);
-                $curr_day++;
+                //$dt_str = self::daysToDate($curr_day, $format);
+                //$dt_str = self::tsToDate($curr_ts, $format);
+                $dt_str = $curr_dt->format('Y-m-d', true);
+                $month_array[$row][$col] = $dt_str;
+                $curr_dt = self::nextDay($curr_dt);
             }
         }
         return $month_array;
@@ -998,8 +927,35 @@ class DateFunc
      * @param   string  $year   Year in format CCYY, default current local year
      * @return  integer         Number of days
      */
+    public static function dateToTimestamp($day=0, $month=0, $year=0) : int
+    {
+        $dt = self::getDate($day, $month, $year);
+        return $dt->toUnix();
+    }
+
+
+    public static function tsToDate(int $ts, string $format='') : string
+    {
+        global $_CONF;
+
+        $dt = new \Date($ts, $_CONF['timezone']);
+        //echo $dt->format(self::getFormat($format), true);die;
+        return $dt->format(self::getFormat($format), true);
+    }
+
+
+    /**
+     * Converts a date to number of days since a distant unspecified epoch.
+     *
+     * @param   string  $day    Day in format DD, default current local day
+     * @param   string  $month  Month in format MM, default current local month
+     * @param   string  $year   Year in format CCYY, default current local year
+     * @return  integer         Number of days
+     */
     public static function dateToDays($day=0, $month=0, $year=0)
     {
+        global $_CONF;
+
         list($day, $month, $year) = self::validateParams($day, $month, $year);
 
         $century = (int)($year / 100);
@@ -1017,10 +973,13 @@ class DateFunc
             }
         }
 
-        return ( floor((  146097 * $century)    /  4 ) +
+        $ts = ( floor((  146097 * $century)    /  4 ) +
                 floor(( 1461 * $year)        /  4 ) +
                 floor(( 153 * $month +  2) /  5 ) +
-                    $day +  1721119);
+                $day +  1721119);
+        //echo "$year $month $day<br />\n";
+        //echo "$ts<br />" . time();die;
+        return $ts;
     }
 
 
@@ -1055,8 +1014,6 @@ class DateFunc
                 $century++;
             }
         }
-        //$century = sprintf("%02d", $century);
-        //$year = sprintf("%02d", $year);
         return self::dateFormat($day, $month, ($century*100) + $year, $format);
     }
 
@@ -1111,8 +1068,6 @@ class DateFunc
      */
     public static function dateFormat($day, $month, $year, $format='')
     {
-        global $_CONF;
-
         if (!self::isValidDate($day, $month, $year)) {
             $year = self::getYear();
             $month = self::getMonth();
@@ -1127,7 +1082,7 @@ class DateFunc
             $output = self::dateToDays($day, $month, $year);
             break;
         default:
-            $dt = new \Date(sprintf('%d-%02d-%02d', $year, $month, $day), $_CONF['timezone']);
+            $dt = self::getDate($day, $month, $year);
             $output = $dt->format($format);
             break;
         }
@@ -1182,8 +1137,6 @@ class DateFunc
 
         $month_names = self::getMonthNames();
         return $month_names[$month];
-        // getMonthNames returns months with correct indexes
-        //return $month_names[($month - 1)];
     }
 
 
@@ -1488,6 +1441,19 @@ class DateFunc
             'minute'    => $minuteselect,
             'ampm'      => $ampm_select
         );
+    }
+
+
+    /**
+     * Get the next day from a given date object.
+     *
+     * @param   object  $dt     Date object
+     * @return  object      Date object for next day
+     */
+    public static function nextDay(Date $dt, int $days=1) : Date
+    {
+        $interval = new \DateInterval('P' . (int)$days . 'D');
+        return $dt->add($interval);
     }
 
 }

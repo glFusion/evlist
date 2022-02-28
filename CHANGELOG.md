@@ -1,7 +1,7 @@
 # evList plugin for glFusion - Changelog
 
 ## 1.5.4
-Release TBD
+Release 2022-02-27
 - Leave advanced editor tags alone in story-style centerblock.
 - Template/CSS fix for event element alignment.
 - Fix search and pagination on MyEvents page. (#39)
@@ -18,6 +18,8 @@ Release TBD
 - Add config var to enable event submission queue (was using story config).
 - Add queue bypass and overall view privileges.
 - Add topic-style icons for calendars, for story centerblocks.
+- Fixes to date calculations, use PHP Date type.
+- Fix agenda display of Calendar and Detail information.
 
 ## 1.5.3
 Release 2021-12-16

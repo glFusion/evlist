@@ -887,11 +887,9 @@ class DateFunc
 
         for ($row = 0; $row < $weeksInMonth; $row++) {
             for ($col = 0; $col < 7; $col++) {
-                //$dt_str = self::daysToDate($curr_day, $format);
-                //$dt_str = self::tsToDate($curr_ts, $format);
                 $dt_str = $curr_dt->format('Y-m-d', true);
                 $month_array[$row][$col] = $dt_str;
-                $curr_dt = self::nextDay($curr_dt);
+                $curr_dt = self::nextDay($curr_dt->format('d'), $curr_dt->format('m'), $curr_dt->format('Y'));
             }
         }
         return $month_array;
@@ -1450,8 +1448,9 @@ class DateFunc
      * @param   object  $dt     Date object
      * @return  object      Date object for next day
      */
-    public static function nextDay(Date $dt, int $days=1) : Date
+    public static function nextDay($day, $month, $year, $days=1) : Date
     {
+        $dt = self::getDate($day, $month, $year);
         $interval = new \DateInterval('P' . (int)$days . 'D');
         return $dt->add($interval);
     }

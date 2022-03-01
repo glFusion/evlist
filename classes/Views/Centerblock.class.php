@@ -288,22 +288,10 @@ class Centerblock
                 $Cal = Calendar::getInstance($A['cal_id']);
                 $Det = Detail::getInstance($A['rp_det_id']);
                 $email = EVLIST_obfuscate($Det->getEmail());
-                $cal_image_url = '';
                 if ($_CONF['show_topic_icon']) {
                     $cal_image = $Cal->getImageUrl();
-                    if (!empty($cal_image['url'])) {
-                        $cal_image_url = COM_createImage(
-                            $cal_image['url'],
-                            $Cal->getName(),
-                            array(
-                                'width' => $cal_image['width'],
-                                'height' => $cal_image['height'],
-                                'nosmartresize' => 'true',
-                                'align' => 'right',
-                                'title' => $Cal->getName(),
-                            )
-                        );
-                    }
+                } else {
+                    $cal_image_url = array('url' => '', 'height' => '', 'width' => '');
                 }
                 $T->set_var(array(
                     'cssid'     => $cssid,
@@ -329,7 +317,10 @@ class Centerblock
                     'allday'    => $A['allday'],
                     'adblock'   => PLG_displayAdBlock('evlist_centerblock', $count),
                     'multiday'  => ($A['rp_date_start'] != $A['rp_date_end']),
-                    'cal_image' => $cal_image_url,
+                    'cal_img_title' => $Cal->getName(),
+                    'cal_img_url' => $cal_image['url'],
+                    'cal_img_height' => $cal_image['height'],
+                    'cal_img_width' => $cal_image['width'],
                 ) );
                 if (isset($A['split']) && $A['split'] == 1) {
                     $s_ts2 = strtotime($A['rp_date_start'] . ' ' . $A['rp_time_start2']);

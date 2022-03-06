@@ -1,5 +1,9 @@
 # evList plugin for glFusion - Changelog
 
+## 1.5.5
+Release 2022-03-07
+- Fix call to core config class when upgrading.
+
 ## 1.5.4
 Release 2022-02-27
 - Leave advanced editor tags alone in story-style centerblock.

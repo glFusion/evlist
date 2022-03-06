@@ -204,7 +204,7 @@ function evlist_upgrade($dvlp = false)
 
     if (!COM_checkVersion($currentVersion, '1.4.3')) {
         $currentVersion = '1.4.3';
-        $config = config::get_instance();
+        $config = \config::get_instance();
         $config->del('cal_tmpl', 'evlist');
         if (!empty($_EV_CONF['meetup_gid'])) {
             // Changing meetup_gid type to array, first get the current
@@ -248,7 +248,7 @@ function evlist_upgrade($dvlp = false)
         }
         if($_EV_CONF['default_view'] == 'list') {
             $_EV_CONF['default_view'] = 'agenda';
-            $c = config::get_instance();
+            $c = \config::get_instance();
             $c->set('default_view', 'agenda', 'evlist');
         }
         if (!EVLIST_do_set_version($currentVersion)) return false;

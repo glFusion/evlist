@@ -1,5 +1,9 @@
 # evList plugin for glFusion - Changelog
 
+## 1.5.6
+Release TBD
+- Fix determing beginning of week day when week starts on Monday.
+
 ## 1.5.5
 Release 2022-03-07
 - Fix call to core config class when upgrading.

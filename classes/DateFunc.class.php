@@ -844,14 +844,19 @@ class DateFunc
      */
     public static function getCalendarWeek($day=0, $month=0, $year=0, $format='')
     {
+        global $_CONF;
+
         list($day, $month, $year) = self::validateParams($day, $month, $year);
         $week_array = array();
 
-        $dt = self::beginOfWeek($day, $month, $year, 'U');
-        $week_array[] = $dt->format('Y-m-d');
+        $dt = self::beginOfWeek($day, $month, $year);
+        //$week_array[] = $dt->format('Y-m-d');
+        $week_array[] = $dt;
         for ($i = 0; $i < 6; $i++) {
-            $dt = self::nextDay($dt);
+            list($day, $month, $year) = explode('-', $dt);
+            $dt = self::nextDay((int)$day, (int)$month, (int)$year);
             $week_array[] = $dt->format('Y-m-d');
+            //$week_array[] = $dt;
         }
         return $week_array;
     }

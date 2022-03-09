@@ -757,7 +757,7 @@ class DateFunc
         if ($dow == 0 && DATE_CALC_BEGIN_WEEKDAY == self::MONDAY) {
             $dow = 7;
         }
-        $sub_days = 'P' . $dow - DATE_CALC_BEGIN_WEEKDAY . 'D';
+        $sub_days = 'P' . ($dow - DATE_CALC_BEGIN_WEEKDAY) . 'D';
         $dt->sub(new \DateInterval($sub_days));
         return $dt->format(self::getFormat($format));
     }

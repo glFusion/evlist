@@ -114,19 +114,19 @@ $INSTALL_plugin['evlist'] = array(
     ),
     array(
         'type' => 'mapping',
-        'group' => 1,
+        'findgroup' => 'Root',
         'feature' => 'admin_feature_id',
         'log' => 'Adding Admin feature to the Root group',
     ),
     array(
         'type' => 'mapping',
-        'group' => 1,
+        'findgroup' => 'Root',
         'feature' => 'noqueue_feature_id',
         'log' => 'Adding NoQueue feature to the Root group',
     ),
     array(
         'type' => 'mapping',
-        'group' => 13,
+        'findgroup' => 'Logged-In Users',
         'feature' => 'submit_feature_id',
         'log' => 'Adding evList Submit feature to the Logged-In Users group',
     ),

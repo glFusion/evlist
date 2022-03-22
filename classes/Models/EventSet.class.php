@@ -521,12 +521,12 @@ class EventSet
                                 $A['rp_start'] = $newdate . ' ' . $A['rp_time_start1'];
                                 $A['rp_end'] = $newdate . ' ' . $A['rp_time_end1'];
                             }
-                            if (!isset($events[$newdate])) {
+                            if (!array_key_exists($newdate, $events)) {
                                 $events[$newdate] = array();
                             }
                             $events[$newdate][] = $A;
                             list($y, $m, $d) = explode('-', $newdate);
-                            $newdate = DateFunc::nextDay($d, $m, $y);
+                            $newdate = DateFunc::nextDay($d, $m, $y)->format('Y-m-d');
                         }
                     }
                 }   // while

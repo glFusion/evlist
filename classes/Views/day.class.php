@@ -79,13 +79,13 @@ class day extends \Evlist\View
         if ($alldaycount > 0) {
             for ($i = 1; $i <= $alldaycount; $i++) {
                 $A = current($allday);
+                $Det = Detail::getInstance($A['rp_det_id']);
                 $this->addCalUsed($A['cal_id']);
-
                 $T->set_var(array(
                     'event_time'        => $LANG_EVLIST['allday'],
                     'rp_id'             => $A['rp_id'],
-                    'event_title'       => stripslashes($A['title']),
-                    'event_summary'     => stripslashes($A['summary']),
+                    'event_title'       => stripslashes($Det->getTitle()),
+                    'event_summary'     => stripslashes($Det->getSummary()),
                     'bgcolor'           => $A['bgcolor'],
                     'fgcolor'       => $A['fgcolor'],
                     'cal_id'        => $A['cal_id'],

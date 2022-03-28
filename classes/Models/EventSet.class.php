@@ -365,7 +365,7 @@ class EventSet
         $cat_status = '';
         $cat_join = '';
         // default date range for fixed calendars, "upcoming" may be different
-        $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start' AND rep.rp_end <= '$db_end'";
+        $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start'"; // AND rep.rp_end <= '$db_end'";
         $ands = array();
 
         // Create the SQL elements from the properties

@@ -754,10 +754,8 @@ class DateFunc
     {
         $dt = self::getDate($day, $month, $year);
         $dow = $dt->format('w', true);
-        if ($dow == 0 && DATE_CALC_BEGIN_WEEKDAY == self::MONDAY) {
-            $dow = 7;
-        }
-        $sub_days = 'P' . ($dow - DATE_CALC_BEGIN_WEEKDAY) . 'D';
+        $sub_days = sprintf('P%dD', $dow - DATE_CALC_BEGIN_WEEKDAY);
+        //$sub_days = 'P' . ($dow - DATE_CALC_BEGIN_WEEKDAY . 'D';
         $dt->sub(new \DateInterval($sub_days));
         return $dt->format(self::getFormat($format));
     }
@@ -845,18 +843,15 @@ class DateFunc
     public static function getCalendarWeek($day=0, $month=0, $year=0, $format='')
     {
         global $_CONF;
-
         list($day, $month, $year) = self::validateParams($day, $month, $year);
         $week_array = array();
 
-        $dt = self::beginOfWeek($day, $month, $year);
-        //$week_array[] = $dt->format('Y-m-d');
-        $week_array[] = $dt;
+        $ts = self::beginOfWeek($day, $month, $year, 'U');
+        $dt = new \Date($ts, $_CONF['timezone']);
+        $week_array[] = $dt->format('Y-m-d', true);
         for ($i = 0; $i < 6; $i++) {
-            list($day, $month, $year) = explode('-', $dt);
-            $dt = self::nextDay((int)$day, (int)$month, (int)$year);
+            $dt = self::nextDay($dt->format('d'), $dt->format('m'), $dt->format('Y'));
             $week_array[] = $dt->format('Y-m-d');
-            //$week_array[] = $dt;
         }
         return $week_array;
     }
@@ -895,6 +890,8 @@ class DateFunc
 
         for ($row = 0; $row < $weeksInMonth; $row++) {
             for ($col = 0; $col < 7; $col++) {
+                //$dt_str = self::daysToDate($curr_day, $format);
+                //$dt_str = self::tsToDate($curr_ts, $format);
                 $dt_str = $curr_dt->format('Y-m-d', true);
                 $month_array[$row][$col] = $dt_str;
                 $curr_dt = self::nextDay($curr_dt->format('d'), $curr_dt->format('m'), $curr_dt->format('Y'));

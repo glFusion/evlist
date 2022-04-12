@@ -84,8 +84,8 @@ class day extends \Evlist\View
                 $T->set_var(array(
                     'event_time'        => $LANG_EVLIST['allday'],
                     'rp_id'             => $A['rp_id'],
-                    'event_title'       => stripslashes($Det->getTitle()),
-                    'event_summary'     => stripslashes($Det->getSummary()),
+                    'event_title'       => strip_tags($Det->getTitle()),
+                    'event_summary'     => strip_tags($Det->getSummary()),
                     'bgcolor'           => $A['bgcolor'],
                     'fgcolor'       => $A['fgcolor'],
                     'cal_id'        => $A['cal_id'],

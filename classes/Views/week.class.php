@@ -169,8 +169,8 @@ class week extends \Evlist\View
 
                 $T->set_var(array(
                     'event_times'   => $event_time,
-                    'event_title'   => $Det->getTitle(),
-                    'event_summary' => $Det->getSummary(),
+                    'event_title'   => strip_tags($Det->getTitle()),
+                    'event_summary' => strip_tags($Det->getSummary()),
                     'event_id'      => $A['rp_id'],
                     'cal_id'        => $A['cal_id'],
                     'pi_url'        => EVLIST_URL,

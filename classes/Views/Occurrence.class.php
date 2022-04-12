@@ -762,9 +762,13 @@ class Occurrence
      * @param   string  $url    Return URL. Could be null if direct access.
      * @return  object  $this
      */
-    public function withReferer(?string $url) : self
+    public function withReferer(?string $url=NULL) : self
     {
-        $this->_referer = $url;
+        if ($url === NULL && isset($_SERVER['HTTP_REFERER'])) {
+            $this->_referer = $_SERVER['HTTP_REFERER'];
+        } else {
+            $this->_referer = $url;
+        }
         return $this;
     }
 

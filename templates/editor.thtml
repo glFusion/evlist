@@ -987,16 +987,21 @@ function toggleRSVPdetail(val)
 	// Update the end date based on the start date.
 	function checkDate1()
 	{
-		var d_start = document.getElementById("f_startdate1");
-		var dt1 = dateFromYMD(d_start.value);
+		//var d_start = document.getElementById("f_startdate1");
+		//var dt1 = dateFromYMD(d_start.value);
+		d_start = $("#f_startdate1");
+		var dt1 = dateFromYMD(d_start.val());
 		ts1 = dt1.getTime();
-
 		var ts2 = ts1 + days_diff;
 		tmp = new Date(ts2);
-		field = document.getElementById("f_enddate1");
-		field.value = tmp.print(fld_format);
+		$("#f_enddate1").val(tmp.print(fld_format));
+		$('#f_enddate1').datetimepicker({
+			setValue: tmp,
+			minDate: dt1,
+			format:'Y-m-d',
+			timepicker: false
+		});
 	}
-
 
 	function calcdate2(cal)
 	{
@@ -1009,10 +1014,8 @@ function toggleRSVPdetail(val)
 			// Update date1 if it was empty before
 			ts1 = ts2 - (days_diff * 86400000);
 			tmp = new Date(ts1);
-			/*var field = document.getElementById("d_startdate1");
-			field.innerHTML = tmp.print(disp_format);*/
-			field = document.getElementById("f_startdate1");
-			field.value = tmp.print(fld_format);
+			field = $("#f_startdate1");
+			field.val(tmp.print(fld_format));
 		}
 
 		// Disable split on multi-day events

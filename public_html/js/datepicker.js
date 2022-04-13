@@ -11,20 +11,18 @@ $(document).ready(function(){
 });
 function ev_datetimepicker_datepicker( selector ) {
 	var currentDT = $("#"+selector).val();
-	$('#'+selector).val( currentDT );
 	$('#'+selector).datetimepicker({
 		lazyInit: true,
-		value:currentDT,
+		setValue: currentDT,
 		format:'Y-m-d',
 		timepicker: false,
 	});
 }
 function ev_datetimepicker_timepicker( selector ) {
 	var currentDT = $("#"+selector).val();
-	$('#'+selector).val( currentDT );
 	$('#'+selector).datetimepicker({
 		lazyInit: true,
-		value:currentDT,
+		setValue: currentDT,
 		format:'H:i',
 		datepicker: false,
 		step: 15,

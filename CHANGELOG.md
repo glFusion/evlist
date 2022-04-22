@@ -3,6 +3,7 @@
 ## 1.5.6
 Release TBD
 - Fix determing beginning of week day when week starts on Monday.
+- Fix month starting date where start is Sunday and first of week is Monday (#44).
 
 ## 1.5.5
 Release 2022-03-07

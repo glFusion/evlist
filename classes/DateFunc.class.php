@@ -875,7 +875,9 @@ class DateFunc
 
         // starts on monday
         if (DATE_CALC_BEGIN_WEEKDAY == self::MONDAY) {
-            if ($fom_weekday > 0) {
+            if ($fom_weekday == 0) {
+                $fom_weekday = 6;
+            } else {
                 $fom_weekday--;
             }
         }
@@ -890,8 +892,6 @@ class DateFunc
 
         for ($row = 0; $row < $weeksInMonth; $row++) {
             for ($col = 0; $col < 7; $col++) {
-                //$dt_str = self::daysToDate($curr_day, $format);
-                //$dt_str = self::tsToDate($curr_ts, $format);
                 $dt_str = $curr_dt->format('Y-m-d', true);
                 $month_array[$row][$col] = $dt_str;
                 $curr_dt = self::nextDay($curr_dt->format('d'), $curr_dt->format('m'), $curr_dt->format('Y'));

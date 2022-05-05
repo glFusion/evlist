@@ -477,7 +477,7 @@ function toggleRSVPdetail(val)
 							<label style="width:50%;text-align:left;">
 								{dailystop_label}:
 							</label>
-							<input class="uk-input uk-form-small uk-form-width-small" type="text" name="stopdate" id="f_stopdate" data-ev-datepicker
+							<input class="uk-input uk-form-width-small" type="text" name="stopdate" id="f_stopdate" data-ev-datepicker
 								value="{stopdate}" />
 						</p>
 
@@ -561,14 +561,14 @@ function toggleRSVPdetail(val)
 							<input class="uk-checkbox" type="checkbox" value="3" name="interval[]" {dom_int_chk_3} />&nbsp;{dom_int_txt_3}&nbsp;&nbsp;
 							<input class="uk-checkbox" type="checkbox" value="4" name="interval[]" {dom_int_chk_4} />&nbsp;{dom_int_txt_4}&nbsp;&nbsp;
 							<input class="uk-checkbox" type="checkbox" value="5" name="interval[]" {dom_int_chk_5} />&nbsp;{dom_int_txt_5}&nbsp;&nbsp;
-							<select class="uk-select uk-form-small uk-form-width-small" name="weekday" id="weekday">
+							<select class="uk-select uk-form-width-small" name="weekday" id="weekday">
 								{recurring_weekday_options}
 							</select>
 						</p>
 
 						<p {freq_div_show} id="freq_div">
 							<label style="width:50%;text-align:left;">{$LANG_EVLIST['recur_freq_txt']}</label>
-							<input class="uk-input uk-form-small uk-form-width-xsmall" type="text" maxlength="3" name="rec_freq" id="rec_freq" value="{rec_freq}" />
+							<input class="uk-input uk-form-width-xsmall" type="text" maxlength="3" name="rec_freq" id="rec_freq" value="{rec_freq}" />
 							<span id="freq_type">{freq_text}</span>
 						</p>
 
@@ -855,7 +855,7 @@ function toggleRSVPdetail(val)
                                         <input name="tickets[{tick_id}]" class="uk-checkbox" type="checkbox" {!if tick_checked}checked="checked"{!endif} value="1" />
                                     </td>
                                     <td>{tick_dscp}</td>
-                                    <td><input class="uk-input uk-form-small uk-form-width-small" type="text" name="tick_fees[{tick_id}]" value="{tick_fee}"/></td>
+                                    <td><input class="uk-input uk-form-width-small" type="text" name="tick_fees[{tick_id}]" value="{tick_fee}"/></td>
                                 </tr>
 <!-- END Tickets -->
                             </table>
@@ -912,7 +912,7 @@ function toggleRSVPdetail(val)
 					<label class="uk-form-label">{$LANG_ACCESS['owner']}:</label>
 					<div class="uk-form-controls">
 {!if is_admin}
-						<select class="uk-select uk-form-small uk-form-width-small" id="owner" name="owner_id">
+						<select class="uk-select uk-form-width-small" id="owner" name="owner_id">
 						{owner_dropdown}
 						</select>
 {!else}

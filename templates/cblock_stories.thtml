@@ -1,17 +1,27 @@
 {# begin {templatelocation} #}
 <div class="uk-margin-top"></div>
+{!if adblock_0}
+<div style="text-align:center" class="uk-width-1-1 uk-margin-bottom">
+{adblock_0}
+</div>
+{!endif}
 <!-- BEGIN eventRow -->
 <div class="infinite-item">
 <article class="uk-article tm-article uk-margin-large-bottom" itemprop="headline" style="clear:both;">
 	<h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
-		<a href="{site_url}/evlist/event.php?eid={eid}" >{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
+		<a href="{ev_url}">{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
 {!if cal_img_url}
 		<span style="float:right:"><img src="{cal_img_url}" width="{cal_img_width}" height="{cal_img_height}" class="tooltip" nosmartresize="true" title="{cal_img_title}" alt="{cal_img_title}" /></span>
 {!endif}
 	</h1>
 	<div class="story-body">
-		{summary} <a href="{site_url}/evlist/event.php?eid={eid}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
+		{summary} <a href="{ev_link}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
 	</div>
+{!if adblock}
+<div style="text-align:center" class="uk-width-1-1 uk-margin-top">
+	{adblock_0}
+</div>
+{!endif}
 </article>
 </div>
 <!-- END eventRow -->

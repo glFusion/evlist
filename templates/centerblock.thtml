@@ -14,7 +14,11 @@
             <b>{$LANG_EVLIST['start_date']}</b>
         </div>
     </div>
-    {adblock}
+{!if adblock_0}
+<div style="text-align:center" class="uk-width-1-1 uk-margin-top">
+	{adblock_0}
+</div>
+{!endif}
 <!-- BEGIN eventRow -->
     <div class="uk-grid uk-grid-match uk-width-1-1 uk-match ev-cb-table evCBcontent">
         <div class="uk-width-1-3@m uk-width-medium-2-6 uk-width-1-1" style="margin-bottom:10px;">
@@ -33,7 +37,11 @@
 {!endif}
         </div>
     </div>
-    {adblock}
+{!if adblock}
+<div style="text-align:center" class="uk-width-1-1 uk-margin-top">
+	{adblock}
+</div>
+{!endif}
 <!-- END eventRow -->
 </div>
 {# end {templatelocation} #}

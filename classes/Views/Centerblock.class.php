@@ -131,7 +131,7 @@ class Centerblock
         $range    = Config::get('range_centerblock');
         $limit    = (int)Config::get('limit_block');
         $_dt = clone($_CONF['_now']);
-        $interval = (int)Config::get('max_upcoming_days');
+        $interval = (int)Config::get('cb_max_upcoming_days');
         if ($interval > 0) {
             $cb_max_date = $_dt
                 ->add(new \DateInterval("P{$interval}D"))
@@ -158,8 +158,10 @@ class Centerblock
         $M = $_CONF['_now']->format('m');
         switch (Config::get('range_centerblock')) {
         case TimeRange::PAST:         // past events
-            $start = date('Y-m-d', strtotime(Config::get('_today')  . " - 1 month"));
-            $end = date('Y-m-d', strtotime(Config::get('_today') . " - 1 day"));
+            $dt = clone ($_CONF['_now']);
+            $start = $dt->sub(new \DateInterval('P1M'))->format('Y-m-d');
+            $dt = clone ($_CONF['_now']);
+            $end = $dt->sub(new \DateInterval('P1D'))->format('Y-m-d');
             $limit = 0;     // special, we need to get all events since we can't count back
             $EventSet->withOrder('DESC');
             break;
@@ -174,7 +176,7 @@ class Centerblock
         case TimeRange::UPCOMING:         // upcoming events
         default:
             $EventSet->withUpcoming(true);
-            $start = Config::get('_today');
+            $start = $_CONF['_now']->format('Y-m-d');
             $end = $cb_max_date;
             break;
         }
@@ -270,6 +272,7 @@ class Centerblock
                 } else {
                     $full_dscp = $A['full_description'];
                 }
+                $ev_url = COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id']);
                 if (isset($A['url']) && !empty($url)) {
                     $ev_link = COM_createLink(
                         $A['title'],
@@ -279,10 +282,7 @@ class Centerblock
                         )
                     );
                 } else {
-                    $ev_link = COM_createLink(
-                        $A['title'],
-                        COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id'])
-                    );
+                    $ev_link = COM_createLink($A['title'], $ev_url);
                 }
 
                 $Cal = Calendar::getInstance($A['cal_id']);
@@ -304,6 +304,7 @@ class Centerblock
                     'contact'   => $Det->getContact(),
                     'location'  => $Det->getLocation(),
                     'ev_link'   => $ev_link,
+                    'ev_url'    => $ev_url,
                     'street'    => $Det->getStreet(),
                     'city'      => $Det->getCity(),
                     'province'  => $Det->getProvince(),

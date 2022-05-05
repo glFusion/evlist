@@ -5,7 +5,8 @@ var newmonth = 0;
 var newday = 0;
 function ChangeView(sel)
 {
-	ChangeDate(newyear, newmonth, newday, sel.value);
+	window.location.href = glfusionSiteUrl + "/evlist/index.php?view=" + sel.value;
+	//ChangeDate(newyear, newmonth, newday, sel.value);
 }
 
 // Placeholders for newly-selected date values

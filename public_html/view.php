@@ -62,7 +62,7 @@ case 'event':
     // Given an event ID, get the nearest instance to display
     $id = Evlist\Repeat::getNearest($eid);
     if (!$id) {
-        COM_refresh($EVLIST_URL . '/index.php');
+        echo COM_refresh(EVLIST_URL . '/index.php');
     }
 case 'instance':
     $View = new Evlist\Views\Occurrence($id);
@@ -74,7 +74,7 @@ case 'instance':
                      ->withTemplate('')
                      ->withCommentMode($mode)
                      ->withCommentOrder($order)
-                     ->withReferer($_SERVER['HTTP_REFERER'])
+                     ->withReferer()
                      ->Render();
     break;
 }

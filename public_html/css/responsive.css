@@ -41,7 +41,7 @@
 }
 
 #calendar .days li {
-    height: 180px;
+    min-height: 130px;
 }
 
 #calendar .days li:hover {

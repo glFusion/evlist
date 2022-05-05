@@ -53,10 +53,9 @@ final class Config
      */
     private function __construct()
     {
-        global $_CONF, $_EV_CONF;
+        global $_CONF, $_PLUGINS, $_EV_CONF;
 
-        $cfg = \config::get_instance();
-        $this->properties = $cfg->get_config(self::PI_NAME);
+        $this->properties = \config::get_instance()->get_config(self::PI_NAME);
 
         $this->properties['pi_name'] = self::PI_NAME;
         $this->properties['pi_display_name'] = 'Evlist';
@@ -64,12 +63,17 @@ final class Config
         $this->properties['url'] = $_CONF['site_url'] . '/' . self::PI_NAME;
         $this->properties['admin_url'] = $_CONF['site_admin_url'] . '/plugins/' . self::PI_NAME;
         $this->properties['path'] = $_CONF['path'] . 'plugins/' . self::PI_NAME . '/';
-        $this->properties['_now'] = new \Date('now', $_CONF['timezone']);
-        $this->properties['_today'] = $this->properties['_now']->format('Y-m-d', true);
-        $this->properties['_today_ts'] = $this->properties['_now']->toUnix();
         $this->properties['datapath'] = "{$_CONF['path_html']}/data/" . self::PI_NAME . '/';
         $this->properties['imagepath'] = "{$_CONF['path_html']}/data/" . self::PI_NAME . '/images/';
         $this->properties['imageurl'] = "{$_CONF['site_url']}/data/" . self::PI_NAME . '/images';
+
+        // Check that the Locator and Weather plugins are enabled if used.
+        if ($this->properties['use_locator'] && !in_array('locator', $_PLUGINS)) {
+            $this->properties['use_locator'] = 0;
+        }
+        if ($this->properties['use_weather'] && !in_array('weather', $_PLUGINS)) {
+            $this->properties['use_weather'] = 0;
+        }
 
         $_EV_CONF = $this->properties;
     }

@@ -648,6 +648,8 @@ function EVLIST_remove_old_files()
             'classes/Views/smallmonthView.class.php',
             'classes/Views/detailView.class.php',
             'calendar_import.php',
+            // 1.5.6
+            'templates/monthview.thtml',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

@@ -105,7 +105,9 @@ case 'pyear':
     exit;
 
 case 'today':
-    list($year, $month, $day) = explode('-', $_EV_CONF['_today']);
+    $year = $_CONF['_now']->format('Y');
+    $month = $_CONF['_now']->format('m');
+    $day = $_CONF['_now']->format('d');
     $V = Evlist\View::getView('', $year, $month, $day, $category, $calendar);
     $content .= $V->Render();
     break;
@@ -114,7 +116,7 @@ case 'day':
 case 'week':
 case 'month':
 case 'year':
-case 'list':
+case 'agenda':
     $V = Evlist\View::getView($view, $year, $month, $day, $category, $calendar);
     if ($V) {
         $content .= $V->Render();
@@ -162,7 +164,7 @@ case 'myevents':
     break;
 
 default:
-    $V = Evlist\View::getView('', 0, 0, 0);
+    $V = Evlist\View::getView('', $year, $month, $day);
     $content = $V->Render();
     break;
 }

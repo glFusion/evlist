@@ -339,9 +339,10 @@ class EventSet
     {
         global $_TABLES, $_EV_CONF, $_CONF, $_USER;
 
+        $today = $_CONF['_now']->format('Y-m-d', true);
         // Set starting and ending dates if not set.
         if ($this->start == '') {
-            $this->start = $_EV_CONF['_today'];
+            $this->start = $today;
         }
         if ($this->end == '') {
             $this->withEnd($this->start);
@@ -350,7 +351,7 @@ class EventSet
         // Split up the date parts and validate
         list($y, $m, $d) = explode('-', $this->start);
         if (!DateFunc::isValidDate($d, $m, $y)){
-            $this->start = $_EV_CONF['_today'];
+            $this->start = $today;
         }
         list($y, $m, $d) = explode('-', $this->end);
         if (!DateFunc::isValidDate($d, $m, $y)) {
@@ -392,16 +393,16 @@ class EventSet
             // events.
             switch ($_EV_CONF['event_passing']) {
             case 1:     // include if start time has not passed
-                $dt_sql = "rep.rp_start >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
+                $dt_sql = "rep.rp_start >= '" . $_CONF['_now']->toMySQL(true) . "'";
                 break;
             case 2:     // include if start date has not passed
-                $dt_sql = "rep.rp_start >= '{$_EV_CONF['_today']}'";
+                $dt_sql = "rep.rp_start >= '$today'";
                 break;
             case 3:     // include if end time has not passed
-                $dt_sql = "rep.rp_end >= '" . $_EV_CONF['_now']->toMySQL(true) . "'";
+                $dt_sql = "rep.rp_end >= '" . $_CONF['_now']->toMySQL(true) . "'";
                 break;
             case 4:     // include if end date has not passed
-                $dt_sql = "rep.rp_end >= '{$_EV_CONF['_today']}'";
+                $dt_sql = "rep.rp_end >= '$today'";
                 break;
             }
             // Always limit to events starting before the specified end date.

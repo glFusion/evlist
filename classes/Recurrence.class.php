@@ -115,7 +115,7 @@ class Recurrence
                 (int)$this->rec_data['skip'] : 0;
 
         $this->date_start = $this->Event->getDateStart1() != '' ?
-            $this->Event->getDateStart1() : $_EV_CONF['_today'];
+            $this->Event->getDateStart1() : $_CONF['_now']->format('Y-m-d', true);
         $this->date_end = $this->Event->getDateEnd1() > $this->Event->getDateStart1() ?
             $this->Event->getDateEnd1() : $this->Event->getDateStart1();
 

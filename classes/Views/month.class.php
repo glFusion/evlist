@@ -111,7 +111,7 @@ class month extends \Evlist\View
 
             foreach ($weekdata as $daynum => $daydata) {
                 list($y, $m, $d) = explode('-', $daydata);
-                if ($daydata == $_EV_CONF['_today']) {
+                if ($daydata == $_CONF['_now']->format('Y-m-d', true)) {
                     $dayclass = 'today';
                 } elseif ($m == $this->month) {
                     $dayclass = 'on';

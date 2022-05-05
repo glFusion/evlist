@@ -104,7 +104,7 @@ class week extends \Evlist\View
             list($curyear, $curmonth, $curday) = explode('-', $weekData);
             $dtToday->setDateTimestamp($curyear, $curmonth, $curday, 1, 0, 0);
             $T->clear_var('eBlk');
-            if ($weekData == $_EV_CONF['_today']) {
+            if ($weekData == $_CONF['_now']->format('Y-m-d', true)) {
                 $T->set_var('dayclass', 'weekview-curday');
             } else {
                 $T->set_var('dayclass', 'weekview-offday');

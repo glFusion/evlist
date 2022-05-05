@@ -106,8 +106,8 @@ class agenda extends \Evlist\View
         case TimeRange::UPCOMING:
         default:
             $EventSet->withUpcoming(true);
-            $start = $_EV_CONF['_today'];
-            $dt = new \Date($_EV_CONF['_today_ts'] + (86400 * $_EV_CONF['max_upcoming_days']), $_CONF['timezone']);
+            $start = $_CONF['_now']->format('Y-m-d', true);
+            $dt = new \Date(time() + (86400 * $_EV_CONF['max_upcoming_days']), $_CONF['timezone']);
             $end = $dt->format('Y-m-d', true);
             break;
         }

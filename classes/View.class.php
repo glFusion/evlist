@@ -111,7 +111,7 @@ class View
      */
     public static function getView($type='', $year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
-        global $_EV_CONF;
+        global $_CONF, $_EV_CONF;
 
         if (!is_array($opts)) $opts = array();
 
@@ -126,7 +126,9 @@ class View
         } else {
             // no previous session created, default to the current date
             // unless other values provided
-            list($cyear, $cmonth, $cday) = explode('-', $_EV_CONF['_today']);
+            $cyear = $_CONF['_now']->format('Y', true);
+            $cmonth = $_CONF['_now']->format('m', true);
+            $cday = $_CONF['_now']->format('d', true);
             if ($year == 0) $year = $cyear;
             if ($month == 0) $month = $cmonth;
             if ($day == 0) $day = $cday;
@@ -164,9 +166,9 @@ class View
      */
     public function __construct($year=0, $month=0, $day=0, $cat=0, $cal=0, $opts=array())
     {
-        global $_EV_CONF;
+        global $_CONF;
 
-        $this->today = $_EV_CONF['_now'];
+        $this->today = $_CONF['_now'];
         $this->today_sql = $this->today->format('Y-m-d');
         $this->year = (int)$year;
         $this->month = (int)$month;
@@ -243,7 +245,6 @@ class View
             $add_event_link = '';
         }
         $T->set_var('today_str', $this->getDisplayDate());
-
         $T->set_var(array(
             'pi_url'    => EVLIST_URL,
             'year'      => $this->year,

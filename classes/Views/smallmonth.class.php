@@ -83,7 +83,7 @@ class smallmonth extends \Evlist\View
             foreach ($weekdata as $daynum => $daydata) {
                 list($y, $m, $d) = explode('-', $daydata);
                 $T->clear_var('no_day_link');
-                if ($daydata == $_EV_CONF['_today']) {
+                if ($daydata == $_CONF['_now']->format('Y-m-d', true)) {
                     $dayclass = 'today';
                 } elseif ($m == $monthnum_str) {
                     $dayclass = 'on';

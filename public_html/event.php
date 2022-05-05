@@ -106,10 +106,11 @@ case 'search':
     // search result returned.  eid value is the event ID, not the repeat
     $view = 'home';         // default on failure
     if (!empty($_GET['eid'])) {
+        $today = $_CONF['_now']->format('Y-m-d');
         $sql = "SELECT rp.rp_id
                 FROM {$_TABLES['evlist_repeat']} rp
                 WHERE rp.rp_ev_id = '$eid'
-                AND rp.rp_date_start >= '{$_EV_CONF['_today']}'
+                AND rp.rp_date_start >= '{$today}'
                 ORDER BY rp.rp_date_start ASC
                 LIMIT 1";
         $res = DB_query($sql);

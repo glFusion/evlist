@@ -6,7 +6,7 @@
  * @copyright  Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
  * @copyright  Copyright (c) 2010 - 2022 Lee Garner <lee@leegarner.com>
  * @package    evlist
- * @version    v1.5.5
+ * @version    v1.5.6
  * @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -25,7 +25,7 @@ global $_DB_table_prefix, $_TABLES;
 */
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.5.5';
+$_EV_CONF['pi_version']      = '1.5.6';
 $_EV_CONF['gl_version']      = '1.7.8';
 $_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 
@@ -71,14 +71,3 @@ define('EV_ANON_CAN_ADD',   2);
 $_EV_CONF['min_locator_ver'] = '1.0.3'; // minimum locator version required
 $_EV_CONF['max_repeats'] = 1000;    // Max repeats created for events
 
-// Define icons here. These can be overridden by redefining in a config.php file.
-$_EV_CONF['icons'] = array(
-    'delete'    => '<i class="uk-icon-remove uk-text-danger"></i>',
-    'copy'      => '<i class="uk-icon-clone"></i>',
-    'edit'      => '<i class="uk-icon-edit"></i>',
-    'arrow-up'  => '<i class="uk-icon-arrow-up"></i>',
-    'arrow-down'=> '<i class="uk-icon-arrow-down"></i>',
-    'reset'     => '<i class="uk-icon-refresh"></i>',
-);
-
-?>

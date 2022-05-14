@@ -76,11 +76,12 @@ class Syndication
         }
 
         // Get all upcoming events
+        $now_ts = $_CONF['_now']->toUnix(true);
         $events = EventSet::create()
             ->withUid(1)
             ->withIcal(true)
-            ->withStart($_EV_CONF['_today'])
-            ->withEnd(date('Y-m-d', strtotime('+1 year', $_EV_CONF['_today_ts'])))
+            ->withStart($now_ts)
+            ->withEnd($now_ts + (365 * 86400))
             ->withCategory($F['topic'])
             ->withLimit($limit)
             ->withFields(array(
@@ -96,7 +97,7 @@ class Syndication
                 // Check if this event has an earlier date, or if it has
                 // already been included.  Could happen with multi-day events.
                 if (
-                    $event['rp_date_start'] < $_EV_CONF['_today'] ||
+                    $event['rp_date_start'] < $_CONF['_now']->format('Y-m-d') ||
                     array_key_exists($event['rp_id'], $rp_shown)
                 ) {
                     continue;
@@ -366,7 +367,9 @@ class Syndication
             ->withIcal(true)
             ->withStart($start->format('Y-m-d', true))
             ->withFields(array(
-                'det.det_revision', 'det.title', 'det.det_last_mod', 'det.lat', 'det.lng'
+                'det.det_revision', 'det.title', 'det.det_last_mod', 'det.lat', 'det.lng',
+                'det.summary', 'det.full_description', 'det.location', 'det.street',
+                'det.city', 'det.province', 'det.postal'
             ))
             ->withLimit($limit);
         if ($end) {
@@ -428,8 +431,16 @@ class Syndication
                     $description = $summary;    // Event title is required
                 }
 
+                // Assemble the location parts into a string
+                $loc_parts = array();
+                foreach (array('location', 'street', 'city', 'province', 'postal') as $elem) {
+                    if (isset($event[$elem]) && !empty($event[$elem])) {
+                        $loc_parts[] = $event[$elem];
+                    }
+                }
+                $location = implode(',', $loc_parts);
                 $tmp = array(
-                    'date' => $dtstart,
+                    'date' => $created,
                     'title' => $summary,
                     'summary' => $description,
                     'guid' => $guid,
@@ -439,6 +450,9 @@ class Syndication
                     'allday' => $event['allday'],
                     'sequence' => $sequence,
                 );
+                if (!empty($location)) {
+                    $tmp['location'] = $location;
+                }
 
                 switch ($event['rp_status']) {
                 case Status::DISABLED:
@@ -450,7 +464,7 @@ class Syndication
                 default:
                     //$status = 'CONFIRMED';
                     if ($event['lat'] != 0 && $event['lng'] != 0) {
-                        $tmp['location'] = "{$event['lat']},{$event['lng']}";
+                        $tmp['geo'] = "{$event['lat']},{$event['lng']}";
                     }
                     break;
                 }

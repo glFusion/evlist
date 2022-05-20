@@ -53,8 +53,13 @@ class Calendar extends \Evlist\Image
     {
         global $_CONF;
 
+        $url = '';
+        if (is_file(Config::get('imagepath') . '/' . static::$pathkey . '/' . $filename)) {
+            $url = Config::get('imageurl') . '/' . static::$pathkey . '/' . $filename;
+
+        }
         return array(
-            'url' => Config::get('imageurl') . '/' . static::$pathkey . '/' . $filename,
+            'url' => $url,
             'width' => $_CONF['max_topicicon_width'],
             'height' => $_CONF['max_topicicon_height'],
         );

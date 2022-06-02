@@ -15,7 +15,7 @@
 {!endif}
 	</h1>
 	<div class="story-body">
-		{summary} <a href="{ev_link}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
+		{summary} <a href="{ev_url}" alt="{$LANG_EVLIST['clic_for_details']}">{$LANG01[2]}...</a>
 	</div>
 {!if adblock}
 <div style="text-align:center" class="uk-width-1-1 uk-margin-top">

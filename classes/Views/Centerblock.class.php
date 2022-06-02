@@ -41,7 +41,7 @@ class Centerblock
      * @param   string  $topic  Topic currently being displayed
      * @return  string          HTML for centerblock
      */
-    public function Render($where, $page, $topic = '')
+    public function Render(string $where, string $page, ?string $topic = NULL) : string
     {
         global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
@@ -100,7 +100,7 @@ class Centerblock
      *
      * @return  string      HTML for centerblock section
      */
-    private function getContent()
+    private function getContent() : string
     {
         global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
 
@@ -124,7 +124,7 @@ class Centerblock
             $strip_tags = false;
             break;
         default:            // invalid format
-            return '';
+            return $retval;
         }
 
         // Retrieve Centerblock Settings
@@ -188,7 +188,7 @@ class Centerblock
             ->withFields(array('det.title','det.summary','det.full_description'))
             ->getEvents();
         if (empty($events) || !is_array($events)) {
-            return '';
+            return $retval;
         }
 
         // Special handling needed to get the latest X past events.  We have a bunch

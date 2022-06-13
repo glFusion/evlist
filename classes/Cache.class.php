@@ -43,11 +43,11 @@ class Cache
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return true;
 
         if ($tag == '') {
-                $tag = array(self::TAG);
+            $tag = array(self::TAG);
         } elseif (is_array($tag)) {
-                array_push($tag, self::TAG);
+            array_push($tag, self::TAG);
         } else {
-                $tag = array($tag, self::TAG);
+            $tag = array($tag, self::TAG);
         }
         $key = self::_makeKey($key);
         return \glFusion\Cache\Cache::getInstance()->set($key, $data, $tag, $ttl);

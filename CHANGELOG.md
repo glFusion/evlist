@@ -5,6 +5,7 @@ Release TBD
 - Fix determing beginning of week day when week starts on Monday.
 - Fix month starting date where start is Sunday and first of week is Monday (#44).
 - Implement popup calendar date switcher.
+- Allow changing URL when editing current or future instances.
 
 ## 1.5.5
 Release 2022-03-07

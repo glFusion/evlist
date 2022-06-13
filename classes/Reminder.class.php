@@ -11,6 +11,8 @@
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\Models\Status;
 
 
@@ -97,27 +99,35 @@ class Reminder
     /**
      * Read a specific record and populate the local values.
      *
-     * @return  boolean     True if a record was read, False on failure.
+     * @return  boolean     True if a record was found and read, False on failure.
      */
-    public function Read()
+    public function Read() : bool
     {
         global $_TABLES;
 
         $sql = "SELECT * FROM {$_TABLES['evlist_remlookup']}
-                WHERE eid='{$this->eid}'
-                AND uid = '{$this->uid}'";
+                WHERE eid = ?
+                AND uid = ?";
+        $params = array($this->eid, $this->uid);
+        $types = array(Database::STRING, Database::INTEGER);
         if ($this->rp_id > 0) {
-            $sql .= " AND rp_id = '{$this->rp_id}'";
+            $sql .= " AND rp_id = ?";
+            $params[] = $this->rp_id;
+            $types[] = Database::INTEGER;
         }
-        $res = DB_query($sql);
-        if (!$res || DB_numRows($res) != 1) {
-            $this->isNew = true;
-            return false;
-        } else {
-            $A = DB_fetchArray($res, false);
-            $this->setVars($A);
+        try {
+            $data = $db->conn->executeQuery($sql, $params, $types)->fetchAssociative();
+        } catch (\Exception $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data = false;
+        }
+        if (is_array($data)) {
+            $this->setVars($data);
             $this->isNew = false;
             return true;
+        } else {
+            $this->isNew = true;
+            return false;
         }
     }
 
@@ -172,45 +182,86 @@ class Reminder
      * @param   string  $email  Email address submitted
      * @return  boolean         True on success, False on failure or no access
      */
-    public function Add($days, $email='')
+    public function Add(int $days, string $email='') : bool
     {
         global $_USER, $_TABLES;
 
+        $retval = true;
         if (
             COM_isAnonUser() ||
             $this->Repeat->getID() == 0 ||
             !$this->Repeat->getEvent()->hasAccess(2)
         ) {
-            return false;
+            return $retval;
         }
 
+        $db = Database::getInstance();
         $uid = (int)$_USER['uid'];
         if ($email == '') {
-            $email = DB_getItem($_TABLES['users'], 'email', "uid = $uid");
+            $db = Database::getInstance();
+            try {
+                $email = $db->getItem($_TABLES['users'], 'email', array('uid' => $uid));
+            } catch (\Exception $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $email = false;
+            }
+            $email = (string)$email;
         }
         if ($days < 1) $days = 7;
 
+        $vals = array(
+            'date_start' => $this->Repeat->getDateStart1()->toUnix(),
+            'days_notice' => (int)$days,
+            'timestamp' => time(),
+        );
+        $types = array(
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+        );
         if ($this->isNew) {
-            $sql = "INSERT INTO {$_TABLES['evlist_remlookup']} SET
-                    eid = '{$this->eid}',
-                    rp_id = '{$this->rp_id}',
-                    uid = '$uid',
-                    name = '" . DB_escapeString(COM_getDisplayName($_USER['uid'])) . "',
-                    email = '" . DB_escapeString($email) . "',
-                    timestamp = UNIX_TIMESTAMP(),
-                    date_start = '{$this->Repeat->getDateStart1()->toUnix()}',
-                    days_notice = '" . (int)$days . "'";
+            try {
+                $vals['eid'] = $this->eid;
+                $vals['rp_id'] = $this->rp_id;
+                $vals['uid'] = $uid;
+                $vals['name'] = COM_getDisplayName($_USER['uid']);
+                $vals['email'] =$email;
+                $types[] = Database::STRING;
+                $types[] = Database::INTEGER;
+                $types[] = Database::INTEGER;
+                $types[] = Database::STRING;
+                $types[] = Database::STRING;
+                $db->conn->insert(
+                    $_TABLES['evlist_remlookup'],
+                    $vals,
+                    $types
+                );
+            } catch (\Exception $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $retval = false;
+            }
         } else {
-            $sql = "UPDATE {$_TABLES['evlist_remlookup']} SET
-                    date_start = '{$this->Repeat->getDateStart1()->toUnix()}',
-                    days_notice = '" . (int)$days . "'
-                    timestamp = UNIX_TIMESTAMP(),
-                    WHERE  eid = '{$this->eid}'
-                    AND rp_id = '{$this->rp_id}'
-                    AND uid = '$uid'";
+            try {
+                $conds = array(
+                    'eid' => $this->eid,
+                    'rp_id' => $this->rp_id,
+                    'uid' => $this->uid,
+                );
+                $types[] = Database::STRING;
+                $types[] = Database::INTEGER;
+                $types[] = Database::INTEGER;
+                $db->conn->update(
+                    $_TABLES['evlist_remlookup'],
+                    $vals,
+                    $conds,
+                    $types
+                );
+            } catch (\Exception $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $retval = false;
+            }
         }
-        DB_query($sql, 1);
-        return DB_error() ? false : true;
+        return $retval;
     }
 
 
@@ -222,21 +273,27 @@ class Reminder
      * @param   intger  $uid    User ID to delete for a single user
      * @return  boolean     Tue on success, False on error
      */
-    public static function Delete($ev_id, $rp_id=0, $uid=0)
+    public static function Delete(string $ev_id, int $rp_id=0, int $uid=0) : bool
     {
         global $_TABLES;
 
-        $flds = array('eid');
-        $vals = array(DB_escapeString($ev_id));
+        $db = Database::getInstance();
+        $criteria = array('eid' => $ev_id);
+        $types = array(Database::STRING);
         if ($rp_id != '') {
-            $flds[] = 'rp_id';
-            $vals[] = (int)$rp_id;
+            $criteria['rp_id'] = $rp_id;
+            $types[] = Database::INTEGER;
         }
         if ($uid > 0) {
-            $flds[] = 'uid';
-            $vals[] = (int)$uid;
+            $criteria['uid'] = $uid;
+            $types[] = Database::INTEGER;
         }
-        DB_delete($_TABLES['evlist_remlookup'], $flds, $vals);
+        try {
+            $db->conn->delete($_TABLES['evlist_remlookup'], $criteria, $types);
+        } catch (\Exception $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return false;
+        }
         return true;
     }
 
@@ -246,48 +303,36 @@ class Reminder
      *
      * @return  array   Array of Reminder objects
      */
-    public static function getCurrent()
+    public static function getCurrent() : array
     {
         global $_TABLES;
 
         $Rems = array();
-        $sql = "SELECT rem.* FROM {$_TABLES['evlist_remlookup']} rem
-            LEFT JOIN {$_TABLES['evlist_events']} ev ON ev.id = rem.eid
-            LEFT JOIN {$_TABLES['evlist_repeat']} rp ON rp.rp_ev_id = rem.eid
-            WHERE rem.date_start <= (UNIX_TIMESTAMP() + (rem.days_notice * 86400))
-            AND ev.status = " . Status::ENABLED . "
-            AND rp.rp_status = " . Status::ENABLED;
-        //echo $sql;die;
-        $res = DB_query($sql);
-        while ($A = DB_fetchArray($res, false)) {
-            $Rems[] = new self($A['rp_id'], $A['uid']);
+        $db = Database::getInstance();
+        $qb = $db->conn->createQueryBuilder();
+        try {
+            $data = $qb->select('rem.*')
+               ->from($_TABLES['evlist_remlookup'], 'rem')
+               ->leftJoin('rem', $_TABLES['evlist_events'], 'ev', 'ev.id = rem.eid')
+               ->leftJoin('rem', $_TABLES['evlist_repeat'], 'rp', 'rp.rp_ev_id = rem.eid')
+               ->where('rem.date_start <= (UNIX_TIMESTAMP() + (rem.days_notice * 86400)')
+               ->andWhere('ev.status = :status')
+               ->andWhere('rp.rp_status = :enabled')
+               ->setParameter('status', Status::ENABLED, Database::INTEGER)
+               ->setParameter('enabled', Status::ENABLED, Database::INTEGER)
+               ->excute()
+               ->fetchAllAssociative();
+        } catch (\Exception $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data = false;
+        }
+
+        if (is_array($data)) {
+            foreach ($data as $A) {
+                $Rems[] = new self($A['rp_id'], $A['uid']);
+            }
         }
         return $Rems;
-    }
-
-
-    /**
-     * Count reminders for a specific event, repeat and user.
-     * This is used to determine whether the reminder form is shown or not.
-     *
-     * @deprecated
-     * @param   string  $ev_id  Event ID
-     * @param   integer $rp_id  Repeat ID
-     * @param   integer $uid    User ID, default to current user
-     * @return  integer         Count of reminders, should be 0 or 1
-     */
-    public static function XXcountReminders($ev_id, $rp_id, $uid = 0)
-    {
-        global $_TABLES, $_USER;
-
-        if ($uid < 1) {
-            $uid = $_USER['uid'];
-        }
-        return DB_count(
-            $_TABLES['evlist_remlookup'],
-            array('eid', 'rp_id', 'uid'),
-            array($ev_id, $rp_id, $uid)
-        );
     }
 
 
@@ -304,8 +349,12 @@ class Reminder
         }
         // Load the user's language
         if (!isset(self::$langs[$this->uid])) {
-            self::$langs[$this->uid] = DB_getItem($_TABLES['users'], 'language',
-                    "uid = '{$this->uid}'");
+            $db = Database::getInstance();
+            self::$langs[$this->uid] = $db->getItem(
+                $_TABLES['users'],
+                'language',
+                array('uid', $this->uid)
+            );
         }
         $LANG = plugin_loadlanguage_evlist(self::$langs[$this->uid]);
         $Detail = $this->Repeat->getEvent()->getDetail();

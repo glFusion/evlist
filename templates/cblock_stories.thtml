@@ -7,7 +7,7 @@
 {!endif}
 <!-- BEGIN eventRow -->
 <div class="infinite-item">
-<article class="uk-article tm-article uk-margin-large-bottom" itemprop="headline" style="clear:both;">
+<article class="uk-article tm-article uk-margin-bottom" itemprop="headline" style="clear:both;">
 	<h1 class="uk-article-title tm-article-title uk-margin-bottom-remove">
 		<a href="{ev_url}">{title} {startdate}{!if multiday} - {enddate}{!endif}</a>
 {!if cal_img_url}

@@ -314,13 +314,13 @@ class Reminder
             $data = $qb->select('rem.*')
                ->from($_TABLES['evlist_remlookup'], 'rem')
                ->leftJoin('rem', $_TABLES['evlist_events'], 'ev', 'ev.id = rem.eid')
-               ->leftJoin('rem', $_TABLES['evlist_repeat'], 'rp', 'rp.rp_ev_id = rem.eid')
-               ->where('rem.date_start <= (UNIX_TIMESTAMP() + (rem.days_notice * 86400)')
+               ->leftJoin('rem', $_TABLES['evlist_repeat'], 'rp', 'rp.rp_id = rem.rp_id')
+               ->where('rem.date_start <= (UNIX_TIMESTAMP() + (rem.days_notice * 86400))')
                ->andWhere('ev.status = :status')
                ->andWhere('rp.rp_status = :enabled')
                ->setParameter('status', Status::ENABLED, Database::INTEGER)
                ->setParameter('enabled', Status::ENABLED, Database::INTEGER)
-               ->excute()
+               ->execute()
                ->fetchAllAssociative();
         } catch (\Exception $e) {
             Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
@@ -390,6 +390,12 @@ class Reminder
             $T->set_var('have_address', true);
         }
 
+        // Convert the image to create full URLs from relative.
+        \LGLib\SmartResizer::create()
+            ->withLightbox(false)
+            ->withFullUrl(true)
+            ->convert($summary);
+
         $T->set_var(array(
             'lang_what' => $LANG['what'],
             'lang_when' => $LANG['when'],
@@ -403,7 +409,7 @@ class Reminder
             'postal'    => $Detail->getPostal(),
             'country'   => $Detail->getCountry(),
             'url'       => sprintf($LANG_EVLIST['rem_url'], $event_url),
-            'summary'   => COM_stripSlashes($Detail->getSummary()),
+            'summary'   => $summary,
             //'msg1'      => $LANG['rem_msg1'],
             //'msg2'      => $LANG['rem_msg2'],
         ) );

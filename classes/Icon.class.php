@@ -1,6 +1,7 @@
 <?php
 /**
  * Class to standardize icons.
+ * Similar to the FieldList class, but only creates icon strings, no links.
  *
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2019 Lee Garner <lee@leegarner.com>
@@ -13,79 +14,107 @@
  */
 namespace Evlist;
 
+
 /**
  * Class for product and category sales.
  * @package photocomp
  */
 class Icon
 {
-    /** Icon key-value pairs.
-     * @var array */
-    static $icons = array(
-        'edit'      => 'uk-icon-edit',
-        'delete'    => 'uk-icon-minus-square uk-text-danger',
-        'delete-disabled' => 'uk-icon-minus-square uk-text-disabled',
-        'copy'      => 'uk-icon-clone',
-        'edit'      => 'uk-icon-edit',
-        'arrow-up'  => 'uk-icon-arrow-up',
-        'arrow-down'=> 'uk-icon-arrow-down',
-        'reset'     => 'uk-icon-refresh',
-        'trash'     => 'uk-icon-trash uk-icon-danger',
-        'envelope'  => 'uk-icon-envelope',
-        'checked'   => 'uk-icon-check uk-text-success',
-        'question'  => 'uk-icon-question-circle',
-        'blocked'   => 'uk-icon-minus-circle uk-text-danger',
-        'alert'     => 'uk-icon-exclamation-triangle uk-text-danger',
-        'toggle-on' => 'uk-icon-toggle-on uk-text-success',
-        'toggle-off' => 'uk-icon-toggle-off',
-        'subscribe' => 'uk-icon-calendar',
-        'print' => 'uk-icon-print',
-    );
-
-
     /**
-     * Get the base icon text for a particular type.
+     * Return a cached template object to avoid repetitive path lookups.
      *
-     * @param   string  $str    Key string, index into self::$icons
-     * @return  string      Icon string
+     * @return  object      Template object
      */
-    public static function getIcon($str)
+    protected static function init()
     {
-        $str = strtolower($str);
-        if (empty($str)) {
-            return '';
-        } elseif (array_key_exists($str, self::$icons)) {
-            return 'uk-icon ' . self::$icons[$str];
+        global $_CONF;
+
+        static $t = NULL;
+
+        if ($t === NULL) {
+            $t = new \Template(EVLIST_PI_PATH . '/templates');
+            $t->set_file('field', 'icon.thtml');
         } else {
-            return 'uk-icon uk-icon-' . $str;
+            $t->unset_var('output');
+            $t->unset_var('attributes');
         }
+        return $t;
     }
 
 
-    /**
-     * Get the HTML string for an icon.
-     * If the requested icon is not found, returns nothing.
-     *
-     * @uses    self::getIcon()
-     * @param   string  $str    Key string, index into self::$icons
-     * @param   string  $cls    Additional class strings to insert
-     * @param   array   $extra  Array of any extra HTML to add, e.g. style, etc.
-     * @return  string      Complete HTML string to create the icon
-     */
-    public static function getHTML($str, $cls = '', $extra = array())
+    public static function get(string $name, array $args=array())
     {
-        $icon = self::getIcon($str);
-        if ($cls != '') {
-            // If addition class values are included, add them
-            $icon .= ' ' . $cls;
+        $t = self::init();
+        $block = 'icon-' . $name;
+        $t->set_block('field', $block);
+
+        if (isset($args['class'])) {
+            $t->set_var('class', $args['class']);
         }
-        $extras = '';
-        // Assemble the extra HTML, if any, into the string
-        foreach ($extra as $key=>$val) {
-            $extras .= ' ' . $key . '="' . $val . '"';
+        if (isset($args['attr']) && is_array($args['attr'])) {
+            $t->set_block($block, 'attr','attributes');
+            foreach($args['attr'] AS $name => $value) {
+                $t->set_var(array(
+                    'name' => $name,
+                    'value' => $value)
+                );
+                $t->parse('attributes','attr',true);
+            }
         }
-        $icon = '<i class="' . $icon . '" ' . $extras . '></i>';
-        return $icon;
+        $t->parse('output', $block, true);
+        return $t->finish($t->get_var('output'));
+    }
+
+
+    public static function copy(array $args=array())
+    {
+        $t = self::init();
+        $t->set_block('field','icon-copy');
+
+        if (isset($args['class'])) {
+            $t->set_var('class', $args['class']);
+        }
+        if (isset($args['attr']) && is_array($args['attr'])) {
+            $t->set_block('icon-copy', 'attr','attributes');
+            foreach($args['attr'] AS $name => $value) {
+                $t->set_var(array(
+                    'name' => $name,
+                    'value' => $value)
+                );
+                $t->parse('attributes','attr',true);
+            }
+        }
+        $t->parse('output','icon-copy',true);
+        return $t->finish($t->get_var('output'));
+    }
+
+
+    public static function custom(string $name, array $args=array()) : string
+    {
+        if (empty($name)) {
+            return '';
+        }
+
+        $t = self::init();
+        $t->set_block('field','icon-custom');
+
+        $t->set_var('name', $name);
+        if (isset($args['class'])) {
+            $t->set_var('class', $args['class']);
+        }
+        if (isset($args['attr']) && is_array($args['attr'])) {
+            $t->set_block('icon-custom', 'attr','attributes');
+            foreach($args['attr'] AS $name => $value) {
+                $t->set_var(array(
+                    'name' => $name,
+                    'value' => $value)
+                );
+                $t->parse('attributes','attr',true);
+            }
+        }
+        $t->parse('output','icon-custom',true);
+        return $t->finish($t->get_var('output'));
     }
 
 }

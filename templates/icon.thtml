@@ -1,0 +1,36 @@
+<!-- BEGIN icon-delete -->
+    <i class="uk-icon uk-icon-justifiy uk-icon-minus-square uk-text-danger {class}"
+    <!-- BEGIN attr -->
+      {name}="{value}"
+    <!-- END attr -->
+	></i>
+<!-- END icon-delete -->
+<!-- BEGIN icon-copy -->
+    <i class="uk-icon uk-icon-justifiy uk-icon-copy {class}"
+    <!-- BEGIN attr -->
+      {name}="{value}"
+    <!-- END attr -->
+	></i>
+<!-- END icon-copy -->
+<!-- BEGIN icon-edit -->
+    <i class="uk-icon uk-icon-justifiy uk-icon-edit {class}"
+    <!-- BEGIN attr -->
+      {name}="{value}"
+    <!-- END attr -->
+	></i>
+<!-- END icon-edit -->
+<!-- BEGIN icon-calendar -->
+    <i class="uk-icon uk-icon-justifiy uk-icon-calendar {class}"
+    <!-- BEGIN attr -->
+      {name}="{value}"
+    <!-- END attr -->
+	></i>
+<!-- END icon-calendar -->
+<!-- BEGIN icon-custom -->
+    <i class="uk-icon uk-icon-justifiy uk-icon-{name} {class}"
+    <!-- BEGIN attr -->
+      {name}="{value}"
+    <!-- END attr -->
+	></i>
+<!-- END icon-custom -->
+

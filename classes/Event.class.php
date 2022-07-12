@@ -253,16 +253,16 @@ class Event
             // Start date/time defaults to now
             $startday1 = isset($_GET['day']) ? (int)$_GET['day'] : '';
             if ($startday1 < 1 || $startday1 > 31) {
-                $startday1 = $_EV_CONF['_now']->format('j', true);
+                $startday1 = $_CONF['_now']->format('j', true);
             }
             $startmonth1 = isset($_GET['month']) ? (int)$_GET['month'] : '';
             if ($startmonth1 < 1 || $startmonth1 > 12) {
-                $startmonth1 = $_EV_CONF['_now']->format('n', true);
+                $startmonth1 = $_CONF['_now']->format('n', true);
             }
             $startyear1 = isset($_GET['year']) ?
-                    (int)$_GET['year'] : $_EV_CONF['_now']->format('Y', true);
+                    (int)$_GET['year'] : $_CONF['_now']->format('Y', true);
             $starthour1 = isset($_GET['hour']) ?
-                    (int)$_GET['hour'] : $_EV_CONF['_now']->format('H', true);
+                    (int)$_GET['hour'] : $_CONF['_now']->format('H', true);
             $startminute1 = '0';
 
             // End date & time defaults to same day, 1 hour ahead
@@ -1203,7 +1203,8 @@ class Event
             }*/
             if (!$this->isSubmission()) {
                 Cache::clear('events');
-                PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');
+                PLG_itemSaved($this->id. ':', 'evlist');
+                //PLG_itemSaved(Repeat::getFirst($this->id), 'evlist');
                 COM_rdfUpToDateCheck('evlist', 'events', $this->id);
             }
             return true;

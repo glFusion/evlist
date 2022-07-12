@@ -27,7 +27,7 @@
 	></i>
 <!-- END icon-calendar -->
 <!-- BEGIN icon-custom -->
-    <i class="uk-icon uk-icon-justifiy uk-icon-{name} {class}"
+    <i class="uk-icon uk-icon-justifiy uk-icon-{icon_name} {class}"
     <!-- BEGIN attr -->
       {name}="{value}"
     <!-- END attr -->

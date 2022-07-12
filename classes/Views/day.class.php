@@ -91,7 +91,7 @@ class day extends \Evlist\View
                     'cal_id'        => $A['cal_id'],
                     'br'            => $i < $alldaycount ? '<br />' : '',
                     'show'      => self::getCalShowPref($A['cal_id']) ? 'block' : 'none',
-                    'icon'      => Icon::getIcon($A['cal_icon']),
+                    'icon'      => Icon::custom($A['cal_icon']),
                     'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id']),
                 ) );
                 $T->parse('allday_events', 'event', true);
@@ -148,7 +148,7 @@ class day extends \Evlist\View
                     'cal_id'        => $A['data']['cal_id'],
                     'event_time'    => $start_time . ' - ' . $end_time,
                     'show'      => self::getCalShowPref($A['data']['cal_id']) ? 'block' : 'none',
-                    'icon'      => Icon::getIcon($A['data']['cal_icon']),
+                    'icon'      => Icon::custom($A['data']['cal_icon']),
                     'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['data']['rp_id']),
                 ) );
 

@@ -6,7 +6,7 @@
 {!endif}
 		<a class="cal-event" style="color:{fgcolor};" href="{ev_url}">
 {!if icon}
-			<i class="{icon}"></i>
+			{icon}
 {!endif}
 			{event_title}
 		</a>

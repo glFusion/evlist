@@ -132,7 +132,7 @@
 <div id="evlistCalendarPrintLink">
   <p>
     <a href="{pi_url}/index.php?view=pday&amp;year={year}&amp;month={month}&amp;day={day}" target="_blank" title="Print">
-      <i class="uk-icon-print"></i>
+      <i class="uk-icon uk-icon-print"></i>
     </a>
   </p>
 </div>

@@ -185,7 +185,11 @@ class month extends \Evlist\View
                         'pi_url'    => EVLIST_URL,
                         'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $event['rp_id']),
                         'show'      => $this->getCalShowPref($event['cal_id']) ? 'block' : 'none',
-                        'icon'      => Icon::getIcon($event['cal_icon']),
+                        'icon'      => Icon::custom($event['cal_icon'], array(
+                            'attr' => array(
+                                'style' => "color:{$event['fgcolor']};",
+                            ),
+                        ) ),
                     ) );
                     if ($event['allday'] == 1) {
                         $dayentries .= $T->parse('output', 'allday_event', true);

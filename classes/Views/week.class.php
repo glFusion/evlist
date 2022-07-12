@@ -176,7 +176,7 @@ class week extends \Evlist\View
                     'pi_url'        => EVLIST_URL,
                     'fgcolor'       => $A['fgcolor'],
                     'show'      => $this->getCalShowPref($A['cal_id']) ? 'block' : 'none',
-                    'icon'      => Icon::getIcon($A['cal_icon']),
+                    'icon'      => Icon::custom($A['cal_icon']),
                     'ev_url'    => COM_buildUrl(EVLIST_URL . '/view.php?rid=' . $A['rp_id']),
                 ) );
                 $T->parse('event', 'event', false);

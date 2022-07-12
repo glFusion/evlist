@@ -30,7 +30,7 @@
 <div id="evlistCalendarPrintLink">
     <p>
         <a href="{pi_url}/index.php?view=pmonth&amp;year={thisyear}&amp;month={thismonth}}" target="_blank" title="{$LANG_EVLIST['print_cal']}" rel="nofollow noindex">
-            <i class="uk-icon-print"></i>
+            <i class="uk-icon uk-icon-print"></i>
         </a>
     </p>
 </div>

@@ -5,7 +5,7 @@
 		<span style="color:#000;background-color:{bgcolor};">
 {!endif}
 {!if icon}
-			<i class="{icon}"></i>&nbsp;
+			 {icon}&nbsp;
 {!endif}
 			<a class="cal-event" style="color:{fgcolor};" href="{ev_url}">{event_title}</a>
 		</span>{br}

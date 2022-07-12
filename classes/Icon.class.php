@@ -99,7 +99,7 @@ class Icon
         $t = self::init();
         $t->set_block('field','icon-custom');
 
-        $t->set_var('name', $name);
+        $t->set_var('icon_name', $name);
         if (isset($args['class'])) {
             $t->set_var('class', $args['class']);
         }

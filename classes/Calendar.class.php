@@ -394,7 +394,7 @@ class Calendar
             'fg_inherit_chk' => $this->fgcolor == '' ? EVCHECKED : '',
             'bg_inherit_chk' => $this->bgcolor == '' ? EVCHECKED : '',
             'icon'          => $this->cal_icon,
-            'disp_icon'     => Icon::getIcon($this->cal_icon),
+            'disp_icon'     => Icon::custom($this->cal_icon),
             'orderby_sel'   => $orderby_sel,
             'orderby'       => $this->orderby,
         ) );
@@ -919,7 +919,7 @@ class Calendar
             $retval = '<span style="color:' . $A['fgcolor'] . ';background-color:' . $A['bgcolor'] .
                 ';">' . $fieldvalue;
             if (isset($A['cal_icon']) && !empty($A['cal_icon'])) {
-                $retval .= '&nbsp;' . Icon::getHTML($A['cal_icon']);
+                $retval .= '&nbsp;' . Icon::custom($A['cal_icon']);
             }
             $retval .= '</span>';
             break;

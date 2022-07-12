@@ -18,6 +18,7 @@ use Evlist\TicketType;
 use Evlist\Ticket;
 use Evlist\Reminder;
 use Evlist\Event;
+use Evlist\FieldList;
 
 
 /**
@@ -98,7 +99,7 @@ class Occurrence
     public function Render() : string
     {
         global $_CONF, $_USER, $_EV_CONF, $LANG_EVLIST, $LANG_WEEK,
-                $LANG_LOCALE, $_SYSTEM, $LANG_EVLIST_HELP;
+                $LANG_LOCALE, $_SYSTEM, $LANG_EVLIST_HELP, $LANG_ADMIN;
 
         $retval = '';
         $url = '';
@@ -287,11 +288,14 @@ class Occurrence
             'timezone'  => $Event->getTZID(),
             'tz_offset' => sprintf('%+d', $this->Repeat->getDateStart1()->getOffsetFromGMT(true)),
             'social_icons'  => $this->Repeat->getShareIcons($permalink),
-            'icon_remove' => Icon::getIcon('delete'),
-            'icon_edit' => Icon::getIcon('edit'),
-            'icon_copy' => Icon::getIcon('copy'),
-            'icon_subscribe' => Icon::getIcon('subscribe'),
-            'icon_print' => Icon::getIcon('print'),
+            'icon_remove' => Icon::get('delete'),
+            'icon_edit' => Icon::get('edit'),
+            'icon_copy' => Icon::get('copy', array(
+                'class' => 'tooltip',
+                'attr' => array(
+                    'title' => $LANG_ADMIN['copy'],
+                ),
+            ) ),
             'lang_prt_title' => $LANG_EVLIST_HELP['prt_tickets_btn'],
             '_referer' => $this->_referer,
         ) );

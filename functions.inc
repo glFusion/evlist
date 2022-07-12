@@ -4,9 +4,9 @@
  *
  * @author      Mark R. Evans mark AT glfusion DOT org
  * @copyright   Copyright (c) 2008 - 2010 Mark R. Evans mark AT glfusion DOT org
- * @copyright   Copyright (c) 2010 - 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2010 - 2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.5
+ * @version     v1.5.6
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -53,11 +53,6 @@ use Evlist\Config;
 Config::getInstance();
 
 require_once __DIR__ . '/evlist.php';
-
-// Check that the Locator plugin is enabled if the integration is used.
-if (Config::get('use_locator') && !in_array('locator', $_PLUGINS)) {
-    Config::set('use_locator', 0);
-}
 
 // Local configuration overrides can be set by having a config.php file.
 if (file_exists(__DIR__ . '/config.php')) {
@@ -274,7 +269,7 @@ function plugin_getmenuitems_evlist()
     }
 
     if ($_EV_CONF['enable_menuitem'] == '1') {
-        $icon = '&nbsp;' . Evlist\Icon::gethTML('calendar');
+        $icon = '&nbsp;' . Evlist\Icon::get('calendar');
         $menuitems[$LANG_EVLIST['pi_title'] . $icon] = EVLIST_URL . '/index.php';
     }
     return $menuitems;
@@ -431,6 +426,7 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
         $HTML = '';
         switch ($autotag['tag']) {
         case 'event':
+            // Link to an event
             $eid = COM_applyFilter($autotag['parm1']);
             $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $eid);
             if (empty($autotag['parm2'])) {
@@ -443,34 +439,14 @@ function plugin_autotags_evlist($op, $content = '', $autotag = '')
             $HTML = '<a href="' . $url . '">' . $text . '</a>';
             break;
         case 'evlist_signups':
+            // Show the signup list for a specific instance
             $AT = new Evlist\Autotags\signups;
             $HTML = $AT->parse($autotag);
             break;
         }
         break;
-    case 'parse':
-        $HTML = '';
-        switch ($autotag['tag']) {
-        case 'event':
-            $eid = COM_applyFilter($autotag['parm1']);
-            $url = COM_buildURL(EVLIST_URL . '/event.php?eid=' . $eid);
-            if (empty($autotag['parm2'])) {
-                $text = COM_stripslashes(
-                    DB_getItem($_TABLES['evlist_detail'], 'title', "ev_id='$eid'")
-                );
-            } else {
-                $text = $autotag['parm2'];
-            }
-            $HTML = '<a href="' . $url . '">' . $text . '</a>';
-            break;
-        case 'evlist_signups':
-            $HTML .= Evlist\Ticket::userList_RSVP($autotag['parm1'], $autotag['parm2']);
-            break;
-        }
-
-        $content = str_replace($autotag['tagstr'], $HTML, $content);
-        return $content;
     }
+    return str_replace($autotag['tagstr'], $HTML, $content);
 }
 
 
@@ -487,6 +463,7 @@ function plugin_getheaderjs_evlist()
     $files = array(
         $path . '/toggleEnabled.js',
         $path . '/datepicker.js',
+        $path . '/util.js',
     );
     return $files;
 }
@@ -1060,7 +1037,7 @@ function EVLIST_formattedTime($timestamp=NULL) : string
     }
     if (!is_numeric($timestamp)) {
         $retval = date($_CONF['timeonly'],
-                strtotime($_EV_CONF['_today'] . $timestamp));
+                strtotime($_CONF['_now']->format('Y-m-d') . $timestamp));
     } else {
         $retval = date($_CONF['timeonly'], $timestamp);
     }
@@ -1113,7 +1090,8 @@ function phpblock_evlist_upcoming($A='', $params='')
     $max_days = (int)$_EV_CONF['max_upcoming_days'];
 
     // Set the start & ending periods.
-    $dt = new Date($_EV_CONF['_today_ts'] + (86400 * $max_days));
+    $dt = clone $_CONF['_now'];
+    $dt->add(new \DateInterval('P' . $max_days . 'D'));
     $end = $dt->format('Y-m-d', true);
 
     // Figure out the selected category & calendar.  Only one supported now,
@@ -1146,7 +1124,7 @@ function phpblock_evlist_upcoming($A='', $params='')
         ->withFields(array('det.title','det.summary','det.full_description'))
         ->withUpcoming(1)
         ->withLimit($limit)
-        ->withStart($_EV_CONF['_today'])
+        ->withStart($_CONF['_now']->format('Y-m-d'))
         ->withEnd($end)
         ->getEvents();
     if (empty($events)) {
@@ -1543,10 +1521,12 @@ function EVLIST_siteFooter()
  */
 function phpblock_evlist_smallmonth($blk=array(), $cal=0)
 {
-    global $_EV_CONF;
+    global $_CONF;
 
     // PHP block calendar is always current, regardless of session vars
-    list($y, $m, $d) = explode('-', $_EV_CONF['_today']);
+    $y = $_CONF['_now']->format('Y');
+    $m = $_CONF['_now']->format('m');
+    $d = $_CONF['_now']->format('d');
     $Cal = Evlist\View::getView('smallmonth', $y, $m, $d, 0, $cal);
     return $Cal->Render();
 }
@@ -1625,44 +1605,79 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
     $fields = array();
     $retval = array();
     $buildingIndex = false;
+    $rp_id = NULL;
+    $eid = NULL;
+    $link_to = 'repeat';
     foreach ($properties as $p) {
         switch ($p) {
         case 'id':
-            $fields[] = 'e.id';
+            if (strpos($id, ':') !== false) {
+                list($eid, $rp_id) = explode(':', $id);
+                $rp_id = (int)$rp_id;
+                $fields[] = 'e.id';
+                if (!empty($rp_id)) {
+                    $fields[] = 'r.rp_id';
+                    //$rp_id = $id;
+                } else {
+                    $fields[] = '0 as rp_id';
+                    //$eid = $id;
+                }
+            } else {
+                $fields[] = 'r.rp_id';
+                $fields[] = 'e.id';
+                $eid = $id;
+            }
             break;
         case 'title':
-            $fields[] = 'MAX(d.title) AS title';
+            //$fields[] = 'MAX(d.title) AS title';
+            $fields[] = 'd.title';
             break;
         case 'excerpt':
         case 'introtext':
         case 'description':
-            $fields[] = 'MAX(d.summary) AS summary';
+            //$fields[] = 'MAX(d.summary) AS summary';
+            $fields[] = 'd.summary';
         case 'bodytext':
-            $fields[] = 'MAX(d.full_description) AS full_description';
+            //$fields[] = 'MAX(d.full_description) AS full_description';
+            $fields[] = 'd.full_description';
             break;
         case 'searchidx':
         case 'content':
-            $fields[] = 'MAX(d.title) AS title';
-            $fields[] = 'MAX(d.summary) AS summary';
-            $fields[] = 'MAX(d.full_description) AS full_description';
+            //$fields[] = 'MAX(d.title) AS title';
+            //$fields[] = 'MAX(d.summary) AS summary';
+            //$fields[] = 'MAX(d.full_description) AS full_description';
+            $fields[] = 'd.title';
+            $fields[] = 'd.summary';
+            $fields[] = 'd.full_description';
+            $link_to = 'event';
             break;
         case 'date':
             $fields[] = 'UNIX_TIMESTAMP(MIN(r.rp_start)) AS unixtime';
             break;
         case 'search_index':
-            $fields[] = "group_concat(' ', d.title) as idx_title";
+            /*$fields[] = "group_concat(' ', d.title) as idx_title";
             $fields[] = "group_concat(' ', d.summary) as idx_summary";
             $fields[] = "group_concat(' ', d.full_description) as idx_dscp";
-            $fields[] = "group_concat(' ', d.location) as idx_location";
+            $fields[] = "group_concat(' ', d.location) as idx_location";*/
+            $fields[] = "d.title as idx_title";
+            $fields[] = "d.summary as idx_summary";
+            $fields[] = "d.full_description as idx_dscp";
+            $fields[] = "d.location as idx_location";
             $buildingIndex = true;
             break;
         case 'perms':
-            $fields[] = 'MAX(e.owner_id) AS owner_id';
+            /*$fields[] = 'MAX(e.owner_id) AS owner_id';
             $fields[] = 'MAX(e.group_id) AS group_id';
             $fields[] = 'MAX(e.perm_owner) AS perm_owner';
             $fields[] = 'MAX(e.perm_group) AS perm_group';
             $fields[] = 'MAX(e.perm_members) AS perm_members';
-            $fields[] = 'MAX(e.perm_anon) AS perm_anon';
+            $fields[] = 'MAX(e.perm_anon) AS perm_anon';*/
+            $fields[] = 'e.owner_id';
+            $fields[] = 'e.group_id';
+            $fields[] = 'e.perm_owner';
+            $fields[] = 'e.perm_group';
+            $fields[] = 'e.perm_members';
+            $fields[] = 'e.perm_anon';
             break;
         case 'author':
             $fields[] = 'e.owner_id';
@@ -1682,15 +1697,14 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             LEFT JOIN {$_TABLES['evlist_repeat']} r
                 ON r.rp_ev_id = e.id
             LEFT JOIN {$_TABLES['evlist_calendars']} c
-                ON c.cal_id = e.cal_id";
-    if ($id == '*') {
-        $where = ' WHERE 1 = 1 ';
-    /*} elseif ($buildingIndex) {
-        // If building the index, the repeat ID is passed in.
-        $where = " WHERE (r.rp_id = '" . DB_escapeString($id) . "') ";
-        echo $where;die;*/
-    } else {
-        $where = " WHERE (e.id = '" . DB_escapeString($id) . "') ";
+                ON c.cal_id = e.cal_id
+            WHERE 1=1";
+    $where = '';
+    if (!empty($eid)) {
+        $where .= " AND (e.id = '" . DB_escapeString($eid) . "') ";
+    }
+    if (!empty($rp_id)) {
+        $where .= " AND (r.rp_id = " . (int)$rp_id . ") ";
     }
     $where .= ' AND r.rp_status = ' . Status::ENABLED .
         ' AND c.cal_status = ' . Status::ENABLED;
@@ -1708,6 +1722,13 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
     while ($A = DB_fetchArray($res, false)) {
         foreach ($properties as $p) {
             switch ($p) {
+            case 'id':
+                if (isset($A['rp_id']) && $A['rp_id'] > 0) {
+                    $props[$p] = $A['rp_id'];
+                } elseif (isset($A['id'])) {
+                    $props[$p] = $A['id'];
+                }
+                break;
             case 'title':
                 if ($buildingIndex) {
                     $props[$p] = $A['idx_title'];
@@ -1757,8 +1778,11 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
                 break;
             }
         }
-        //$props['url'] = COM_buildUrl(EVLIST_URL . '/event.php?eid=' . $A['id'], 0);
-        $props['url'] = EVLIST_URL . '/view.php?&eid=' . $A['id'];
+        if ($link_to == 'repeat' && $A['rp_id'] > 0) {
+            $props['url'] = EVLIST_URL . '/view.php?&rid=' . $A['rp_id'];
+        } else {
+            $props['url'] = EVLIST_URL . '/view.php?&eid=' . $A['id'];
+        }
         $mapped = array();
         foreach ($props as $key => $value) {
             if ($id == '*') {
@@ -1777,7 +1801,6 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
             break;
         }
     }
-
     if (($id != '*') && (count($retval) == 1)) {
         $tRet = array_values($retval);
         $retval = $tRet[0];
@@ -1806,7 +1829,7 @@ function plugin_supportadblock_evlist()
  */
 function plugin_itemsaved_evlist($id, $type, $old_id = '')
 {
-    global $_EV_CONF;
+    global $_CONF;
 
     $info = PLG_getItemInfo(
         $type, $id,
@@ -1823,7 +1846,7 @@ function plugin_itemsaved_evlist($id, $type, $old_id = '')
     }
 
     if (!$info['year']) {
-        $info['year'] = $_EV_CONF['_now']->format('Y');
+        $info['year'] = $_CONF['_now']->format('Y');
     }
     if ($info['date']) {
         $date = $info['date'];
@@ -2061,25 +2084,6 @@ function EVLIST_getReturn()
         // Nothing set in the session var, return the home URL
         return $urls['home'];
     }
-}
-
-
-/**
- * Get an icon from the CSS icon set, either UIkit or FontAwesome.
- *
- * @param   string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
- * @param   string  $style  Style name from local CSS
- * @return  string      Class names for icon
- */
-function XEVLIST_getIcon($name, $style='')
-{
-    global $_EV_CONF;
-
-    if ($name == '') return '';
-    if ($style != '') {
-        $style = ' ev-icon-' . $style;
-    }
-    return 'uk-icon-' . $name . $style;
 }
 
 

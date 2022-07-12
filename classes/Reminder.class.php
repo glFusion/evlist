@@ -105,6 +105,7 @@ class Reminder
     {
         global $_TABLES;
 
+        $db = Database::getInstance();
         $sql = "SELECT * FROM {$_TABLES['evlist_remlookup']}
                 WHERE eid = ?
                 AND uid = ?";

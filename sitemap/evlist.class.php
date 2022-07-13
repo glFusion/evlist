@@ -69,7 +69,7 @@ class sitemap_evlist extends sitemap_base
         }
         if ($this->isHTML()) {
             // Includes events that end anytime today
-            $sql .= " AND r.rp_end >= '{$_EV_CONF['_today']}'";
+            $sql .= " AND r.rp_end >= '" . $_CONF['_now']->format('Y-m-d') . "'";
         }
         $sql .= ' GROUP BY e.id ORDER BY r.rp_date_start DESC';
         $result = DB_query($sql, 1);

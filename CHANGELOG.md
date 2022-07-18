@@ -1,7 +1,7 @@
 # evList plugin for glFusion - Changelog
 
 ## 1.5.6
-Release TBD
+Release 2022-07-19
 - Fix determing beginning of week day when week starts on Monday.
 - Fix month starting date where start is Sunday and first of week is Monday (#44).
 - Implement popup calendar date switcher.

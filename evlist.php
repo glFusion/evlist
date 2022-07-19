@@ -20,12 +20,12 @@ if (!defined ('GVERSION')) {
 global $_DB_table_prefix, $_TABLES;
 
 /**
-*   Define global variables.
-*   The arrays have already been created; these are effectively overrides
-*/
+ * Define global variables.
+ * The arrays have already been created; these are effectively overrides.
+ */
 $_EV_CONF['pi_name']         = 'evlist';
 $_EV_CONF['pi_display_name'] = 'Event Calendar';
-$_EV_CONF['pi_version']      = '1.5.6';
+$_EV_CONF['pi_version']      = '1.5.6.1';
 $_EV_CONF['gl_version']      = '2.0.0';
 $_EV_CONF['pi_url']          = 'https://www.glfusion.org';
 

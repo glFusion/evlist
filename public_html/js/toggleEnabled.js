@@ -18,9 +18,8 @@ var EVLIST_toggle = function(cbox, id, type, component, base_url) {
         success: function(result) {
             cbox.checked = result.newval == 1 ? true : false;
             try {
-                $.UIkit.notify("<i class='uk-icon-check'></i>&nbsp;" + result.statusMessage, {timeout: 1000,pos:'top-center'});
-            }
-            catch(err) {
+				Evlist.notify(result.statusMessage, 'success');
+            } catch(err) {
                 alert(result.statusMessage);
             }
         }

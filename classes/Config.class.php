@@ -75,6 +75,7 @@ final class Config
             $this->properties['use_weather'] = 0;
         }
 
+        $this->properties['log_level'] = $_CONF['log_level'];   // for now
         $_EV_CONF = $this->properties;
     }
 

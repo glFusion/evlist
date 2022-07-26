@@ -11,13 +11,14 @@
  * @copyright   Copyright (c) 2002-2009 Tony Bibbs <tony AT tonybibbs DOT com>
  *
  * @package     evlist
- * @version     v1.5.4
+ * @version     v1.5.6
  * @since       v1.5.4
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use glFusion\Log\Log;
 
 
 /**
@@ -162,7 +163,7 @@ class UploadDownload
         $nwarnings = $nwarnings + 1;
         $this->_warnings[$nwarnings] = $warningText;
         if ($this->loggingEnabled()) {
-            EVLIST_log($warningText);
+            Log::write('evlist', Log::WARNING, __METHOD__ . ': ' . $warningText);
         }
     }
 
@@ -178,7 +179,7 @@ class UploadDownload
         $nerrors = $nerrors + 1;
         $this->_errors[$nerrors] = $errorText;
         if ($this->loggingEnabled()) {
-            EVLIST_log($errorText);
+            Log::write('evlist', Log::ERROR, __METHOD__ . ': ' . $errorText);
         }
     }
 
@@ -194,7 +195,7 @@ class UploadDownload
         $nmsgs = $nmsgs + 1;
         $this->_debugMessages[$nmsgs] = $debugText;
         if ($this->loggingEnabled()) {
-            EVLIST_log($debugText);
+            Log::write('evlist', Log::DEBUG, __METHOD__ . ': ' . $debugText);
         }
     }
 
@@ -338,7 +339,7 @@ class UploadDownload
         }
 
         if ($this->_maxFileSize > 0 && $this->_currentFile['size'] > $this->_maxFileSize) {
-            EVLIST_log(
+            Log::write('evlist', Log::WARNING, __METHOD__ . ': ' .
                 "Uploaded file: ".$this->_currentFile['name']." exceeds max file size of " . $this->_maxFileSize
             );
             return false;

@@ -63,7 +63,7 @@ class Icon
             }
         }
         $t->parse('output', $block, true);
-        return $t->finish($t->get_var('output'));
+        return trim($t->finish($t->get_var('output')));
     }
 
 
@@ -86,7 +86,7 @@ class Icon
             }
         }
         $t->parse('output','icon-copy',true);
-        return $t->finish($t->get_var('output'));
+        return trim($t->finish($t->get_var('output')));
     }
 
 
@@ -114,7 +114,7 @@ class Icon
             }
         }
         $t->parse('output','icon-custom',true);
-        return $t->finish($t->get_var('output'));
+        return trim($t->finish($t->get_var('output')));
     }
 
 }

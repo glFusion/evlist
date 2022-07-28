@@ -351,11 +351,20 @@ class Reminder
         // Load the user's language
         if (!isset(self::$langs[$this->uid])) {
             $db = Database::getInstance();
-            self::$langs[$this->uid] = $db->getItem(
-                $_TABLES['users'],
-                'language',
-                array('uid', $this->uid)
-            );
+            try {
+                $lang = $db->getItem(
+                    $_TABLES['users'],
+                    'language',
+                    array('uid' => $this->uid)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $lang = false;
+            }
+            if (empty($lang)) {
+                $lang = $_CONF['language'];
+            }
+            self::$langs[$this->uid] = $lang;
         }
         $LANG = plugin_loadlanguage_evlist(self::$langs[$this->uid]);
         $Detail = $this->Repeat->getEvent()->getDetail();

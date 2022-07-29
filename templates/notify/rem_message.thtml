@@ -25,5 +25,6 @@
 {!endif}
 <p>
     {$LANG_EVLIST['rem_footer1']}<br />
-    {$LANG_EVLIST['rem_footer2']}
+    {$LANG_EVLIST['rem_footer2']}<br />
+    {$LANG_EVLIST['rem_footer3']}
 </p>

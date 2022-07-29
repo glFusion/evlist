@@ -181,6 +181,7 @@ $LANG_EVLIST = array(
 'rem_subject' => "An event reminder from {$_CONF['site_name']}",
 'rem_footer1'  => "You are receiving this event reminder because your address was submitted to {$_CONF['site_name']}.",
 'rem_footer2'  => 'This is a one-time message. You will not receive another message unless you subscribe to other events.',
+'rem_footer3'  => "Contact {$_CONF['site_mail']} with questions or concerns.",
 'rem_title' => 'Event Reminder',
 'rem_subject' => 'Reminder: %s',
 'rem_url'   => 'For more information please visit %s',

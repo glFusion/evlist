@@ -48,6 +48,16 @@ spl_autoload_register(function ($class)
 use Evlist\DateFunc;
 use Evlist\Models\Status;
 use Evlist\Config;
+use glFusion\Log\Log;
+
+Log::config(Config::PI_NAME,
+    array(
+      'type'  => 'file',
+      'path'  => $_CONF['path_log'],
+      'file'  => Config::PI_NAME . '.log',
+      'level' => Config::get('log_level'),
+    )
+);
 
 /** Initialize the configuration */
 Config::getInstance();
@@ -260,18 +270,19 @@ function plugin_getuseroption_evlist()
  */
 function plugin_getmenuitems_evlist()
 {
-    global $_EV_CONF, $LANG_EVLIST;
+    global $LANG_EVLIST;
 
     $menuitems = array();
     // Check if the current user can even view the calendar
-    if (!EVLIST_canView()) {
+    if (!Config::get('enable_menuitem') || !EVLIST_canView()) {
         return $menuitems;
     }
 
-    if ($_EV_CONF['enable_menuitem'] == '1') {
-        $icon = '&nbsp;' . Evlist\Icon::get('calendar');
-        $menuitems[$LANG_EVLIST['pi_title'] . $icon] = EVLIST_URL . '/index.php';
+    $icon = Evlist\Icon::get('calendar');
+    if (!empty($icon)) {
+        $icon = '&nbsp;' . $icon;
     }
+    $menuitems[$LANG_EVLIST['pi_title'] . $icon] = EVLIST_URL . '/index.php';
     return $menuitems;
 }
 

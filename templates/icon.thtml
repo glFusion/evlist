@@ -1,3 +1,4 @@
+{# begin {templatelocation} #}
 <!-- BEGIN icon-delete -->
     <i class="uk-icon uk-icon-justifiy uk-icon-minus-square uk-text-danger {class}"
     <!-- BEGIN attr -->
@@ -26,6 +27,13 @@
     <!-- END attr -->
 	></i>
 <!-- END icon-calendar -->
+<!-- BEGIN icon-print -->
+    <i class="uk-icon uk-icon-justifiy uk-icon-print {class}"
+    <!-- BEGIN attr -->
+      {name}="{value}"
+    <!-- END attr -->
+	></i>
+<!-- END icon-print -->
 <!-- BEGIN icon-custom -->
     <i class="uk-icon uk-icon-justifiy uk-icon-{icon_name} {class}"
     <!-- BEGIN attr -->
@@ -33,4 +41,4 @@
     <!-- END attr -->
 	></i>
 <!-- END icon-custom -->
-
+{# end {templatelocation} #}

@@ -296,6 +296,7 @@ class Occurrence
                     'title' => $LANG_ADMIN['copy'],
                 ),
             ) ),
+            'icon_print' => Icon::get('print'),
             'lang_prt_title' => $LANG_EVLIST_HELP['prt_tickets_btn'],
             '_referer' => $this->_referer,
         ) );

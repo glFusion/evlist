@@ -3,15 +3,17 @@
  * Class to manage tickets and registrations.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2015-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2015-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.0
+ * @version     v1.5.6
  * @since       v1.4.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 
 /**
@@ -100,18 +102,24 @@ class Ticket
         if ($tic_id != '')
             $this->tic_id = $tic_id;
 
-        $sql = "SELECT * FROM {$_TABLES['evlist_tickets']}
-            WHERE tic_id='{$this->tic_id}'";
-        //echo $sql;
-        $result = DB_query($sql);
-
-        if (!$result || DB_numRows($result) == 0) {
+        $db = Database::getInstance();
+        try {
+            $data = $db->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_tickets']}
+                WHERE tic_id = ?",
+                array($this->tic_id),
+                array(Database::STRING)
+            )->fetchAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data = false;
+        }
+        if (is_array($data) && count($data) == 1) {
+            $this->setVars($data, true);
+            return true;
+        } else {
             $this->tic_id = '';
             return false;
-        } else {
-            $row = DB_fetchArray($result, false);
-            $this->setVars($row, true);
-            return true;
         }
     }
 
@@ -352,9 +360,9 @@ class Ticket
     /**
      * Create a ticket.
      *
-     * @return  string      Ticket identifier
+     * @return  integer Ticket identifier
      */
-    public function Create()
+    public function Create() : ?string
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
@@ -369,24 +377,44 @@ class Ticket
         if (!is_array($this->_comments) || empty($this->_comments)) {
             $this->_comments = array();
         }
-        $cmt = DB_escapeString(json_encode($this->_comments));
-        $sql = "INSERT INTO {$_TABLES['evlist_tickets']} SET
-            tic_num = '" . DB_escapeString($tic_num) . "',
-            tic_type = {$this->tic_type},
-            ev_id = '" . DB_escapeString($this->ev_id) . "',
-            rp_id = {$this->rp_id},
-            fee = {$this->fee},
-            paid = 0,
-            uid = {$this->uid},
-            used = 0,
-            dt = UNIX_TIMESTAMP(),
-            waitlist = {$this->waitlist},
-            comment = '$cmt'";
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (!DB_error()) {
-            return DB_insertId();
-        } else {
+        $db = Database::getInstance();
+        try {
+            $cmt = @json_encode($this->_comments);
+            if (!$cmt) {
+                $cmt = '';      // on json_encode failure
+            }
+            $db->conn->insert(
+                $_TABLES['evlist_tickets'],
+                array(
+                    'tic_num' => $tic_num,
+                    'tic_type' => $this->tic_type,
+                    'ev_id' => $this->ev_id,
+                    'rp_id' => $this->rp_id,
+                    'fee' => $this->fee,
+                    'paid' => 0,
+                    'uid' => $this->uid,
+                    'used' => 0,
+                    'dt' => time(),
+                    'waitlist' => $this->waitlist,
+                    'comment' => $cmt,
+                ),
+                array(
+                    Database::STRING,
+                    Database::INTEGER,
+                    Database::STRING,
+                    Database::INTEGER,
+                    Database::STRING,
+                    Database::INTEGER,
+                    Database::INTEGER,
+                    Database::INTEGER,
+                    Database::INTEGER,
+                    Database::INTEGER,
+                    Database::STRING,
+                )
+            );
+            return $db->conn->lastInsertId();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
             return NULL;
         }
     }
@@ -475,7 +503,7 @@ class Ticket
         if ($max_rsvp > 0 && $Ev->getOption('rsvp_waitlist')) {
             self::resetWaitlist($max_rsvp, $Ev->getID(), $tic->getID());
         }
-        EVLIST_log("Deleted tickets $where");
+        Log::write('evlist', Log::INFO, __METHOD__ . ": Deleted tickets $where");
     }
 
 
@@ -500,7 +528,7 @@ class Ticket
         $sql = "UPDATE {$_TABLES['evlist_tickets']}
                 SET used = 0 WHERE tic_id $where";
         DB_query($sql);
-        EVLIST_log("Reset usage for tickets $where");
+        Log::write('evlist', Log::INFO, __METHOD__ . ": Reset usage for tickets $where");
     }
 
 

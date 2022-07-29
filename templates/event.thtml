@@ -226,7 +226,7 @@
 			{$LANG_EVLIST['cancel_free']}<br />
 			<form id="cancelreg" action="{site_url}/evlist/event.php" method="post">
 				<input type="hidden" name="rp_id" value="{rp_id}" />
-				<input type="submit" name="cancelreg" value="{$LANG_ADMIN['cancel']}" class="uk-button uk-button-mini uk-button-danger" />
+				<input type="submit" name="cancelreg" value="{$LANG_ADMIN['cancel']}" class="uk-button uk-button-small uk-button-danger" />
 				<input type="text" name="num_cancel" size="3" value="{num_free_reg}" /> {$LANG_EVLIST['free_rsvp']}
 			</form>
 		</div>
@@ -295,9 +295,7 @@
 
 {!if have_tickets}
 		<div class="evEventRegInfo">
-			<a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}&rp_id={tic_rp_id}" class="lgButton blue tooltip" target="_blank" title="{lang_prt_title}">
-				{$LANG_EVLIST['print_my_tickets']}
-			</a>
+			<a href="{site_url}/evlist/event.php?printtickets&eid={ev_id}&rp_id={tic_rp_id}" class="uk-button uk-button-small uk-button-primary tooltip" target="_blank" title="{lang_prt_title}">{$LANG_EVLIST['print_my_tickets']}</a>
 		</div>
 {!endif}
 

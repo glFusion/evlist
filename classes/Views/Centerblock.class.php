@@ -16,6 +16,7 @@ use Evlist\View;
 use Evlist\Config;
 use Evlist\Detail;
 use Evlist\Calendar;
+use Evlist\Menu;
 use Evlist\Models\EventSet;
 use Evlist\Models\TimeRange;
 
@@ -88,7 +89,7 @@ class Centerblock
         //}
         if (!empty($display)) {
             if ($where == 0) {      // replacing home page
-                $display = EVLIST_siteHeader() . $display . EVLIST_siteFooter();
+                $display = Menu::siteHeader() . $display . Menu::siteFooter();
             }
         }
         return $display;

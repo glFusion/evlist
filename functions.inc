@@ -1319,10 +1319,10 @@ function plugin_savecomment_evlist($title,$comment,$id,$pid,$postmode)
             'evlist', $postmode);
 
     if ($ret > 0) {         // failure, return to comment form
-        return EVLIST_siteHeader()
+        return Evlist\Menu::siteHeader()
             . CMT_commentform($title, $comment, $id, $pid,
                     'evlist', $LANG03[14], $postmode)
-            . EVLIST_siteFooter();
+            . Evlist\Menu::siteFooter();
     }
     return (COM_refresh(EVLIST_URL . '/event.php?eid='.$id));
 }
@@ -1461,62 +1461,6 @@ function EVLIST_getDocURL($file='', $doclang='english')
         $doc_url = EVLIST_URL . "/docs/$doclang/";
     }
     return $doc_url;
-}
-
-
-/**
- * Get the site header, with or without left blocks according to config.
- *
- * @see     COM_siteHeader()
- * @param   string  $title  Optional text for the title bar
- * @param   string  $meta   Optional additional meta text
- * @return  string          HTML for site header
- */
-function EVLIST_siteHeader($title='', $meta='')
-{
-    global $_EV_CONF;
-
-    $retval = '';
-
-    switch( $_EV_CONF['displayblocks'] ) {
-        case 1 :    // right only
-        case 3 :    // none
-            $retval .= COM_siteHeader('none', $title, $meta);
-            break;
-        case 0 :    // left only
-        case 2 :    // both
-        default :
-            $retval .= COM_siteHeader('menu', $title, $meta);
-            break;
-    }
-    return $retval;
-}
-
-
-/**
- * Get the site footer, with or without right blocks according to config.
- *
- * @see     COM_siteFooter()
- * @return  string      HTML for site footer
- */
-function EVLIST_siteFooter()
-{
-    global $_CONF, $_EV_CONF;
-
-    $retval = '';
-
-    switch( $_EV_CONF['displayblocks'] ) {
-        case 1 :    // right only
-        case 2 :    // left and right
-            $retval .= COM_siteFooter( true );
-            break;
-        case 0 :    // left only
-        case 3 :    // none
-        default :
-            $retval .= COM_siteFooter();
-            break;
-    }
-    return $retval;
 }
 
 

@@ -22,9 +22,9 @@ if (!in_array('evlist', $_PLUGINS)) {
 
 // Check if the current user can even view the calendar
 if (!EVLIST_canView()) {
-    $display = EVLIST_siteHeader();
+    $display = Evlist\Menu::siteHeader();
     $display .= SEC_loginRequiredForm();
-    $display .= EVLIST_siteFooter();
+    $display .= Evlist\Menu::siteFooter();
     echo $display;
     exit;
 }
@@ -206,9 +206,9 @@ case 'register':
         COM_setMsg($LANG_EVLIST['ev_not_found']);
         break;
     } elseif (COM_isAnonUser()) {
-        $display = EVLIST_siteHeader();
+        $display = Evlist\Menu::siteHeader();
         $display .= SEC_loginRequiredForm();
-        $display .= EVLIST_siteFooter();
+        $display .= Evlist\Menu::siteFooter();
         echo $display;
         exit;
     }
@@ -437,7 +437,7 @@ default:
     break;
 }
 
-$display = EVLIST_siteHeader($pagetitle);
+$display = Evlist\Menu::siteHeader($pagetitle);
 $V = \Evlist\View::getView('detail');
 $display .= $V->Header($add_link);
 
@@ -448,6 +448,6 @@ if (!empty($msg)) {
 }
 
 $display .= $content;
-$display .= EVLIST_siteFooter();
+$display .= Evlist\Menu::siteFooter();
 echo $display;
 

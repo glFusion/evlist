@@ -169,7 +169,7 @@ default:
     break;
 }
 
-$display = EVLIST_siteHeader($LANG_EVLIST['pi_title']);
+$display = Evlist\Menu::siteHeader($LANG_EVLIST['pi_title']);
 if (!empty($msg)) {
     //msg block
     $display .= COM_startBlock('','','blockheader-message.thtml');
@@ -177,6 +177,6 @@ if (!empty($msg)) {
     $display .= COM_endBlock('blockfooter-message.thtml');
 }
 $display .= $content;
-$display .= EVLIST_siteFooter();
+$display .= Evlist\Menu::siteFooter();
 echo $display;
 

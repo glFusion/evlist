@@ -21,9 +21,9 @@ if (!in_array('evlist', $_PLUGINS)) {
 
 // Check if the current user can even view the calendar
 if (!EVLIST_canView()) {
-    $display = EVLIST_siteHeader();
+    $display = Evlist\Menu::siteHeader();
     $display .= SEC_loginRequiredForm();
-    $display .= EVLIST_siteFooter();
+    $display .= Evlist\Menu::siteFooter();
     echo $display;
     exit;
 }
@@ -70,6 +70,7 @@ case 'instance':
         COM_setMsg($LANG_EVLIST['ev_not_found']);
         echo COM_refresh(EVLIST_URL . '/index.php');
     }
+    $pagetitle = $View->getRepeat()->getTitle();
     $content .= $View->withQuery($query)
                      ->withTemplate('')
                      ->withCommentMode($mode)

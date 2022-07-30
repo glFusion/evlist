@@ -1323,6 +1323,17 @@ class Repeat
 
 
     /**
+     * Helper function to get the title from the Detail object.
+     *
+     * @return  string      Event title
+     */
+    public function getTitle() : string
+    {
+        return $this->getDetail()->getTitle();
+    }
+
+
+    /**
      * Get the first starting date/time object.
      *
      * @return  object      Starting date object

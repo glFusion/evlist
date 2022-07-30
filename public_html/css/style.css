@@ -809,3 +809,6 @@ div.evCalCheckboxInner label {
 	font-weight: inherit;
 }
 
+a.ev_icon {
+	text-decoration: none;
+}

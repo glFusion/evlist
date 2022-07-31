@@ -327,7 +327,7 @@ function evlist_upgrade($dvlp = false)
     }
 
     // Set the version if not previously set
-    if (!COM_checkVersion($currentVersion, $installed_ver)) {
+    if ($currentVersion != $installed_ver) {
         if (!EVLIST_do_set_version($installed_ver)) return false;
     }
 
@@ -396,20 +396,6 @@ function evlist_upgrade_1_3_0()
     }
 
     EVLIST_do_upgrade_sql('1.3.0');
-
-    // Add the new fields to the event & submission tables
-    /*$new_sql = "ADD det_id int(10) NOT NULL,
-            ADD show_upcoming tinyint(1) unsigned NOT NULL DEFAULT '1',
-            ADD cal_id int(10) unsigned NOT NULL DEFAULT '1',
-            ADD options varchar(255)";
-    DB_query("ALTER TABLE {$_TABLES['evlist_events']} $new_sql");
-    DB_query("ALTER TABLE {$_TABLES['evlist_submissions']} $new_sql");*/
-
-    // Create the new tables
-    /*DB_query($_SQL['evlist_repeat']);
-    DB_query($_SQL['evlist_calendars']);
-    DB_query($_SQL['evlist_detail']);
-    DB_query($DEFVALUES['evlist_calendars']);*/
 
     // Now split out the detail and create the repeats
     $result = DB_query("SELECT * FROM {$_TABLES['evlist_events']}");

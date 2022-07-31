@@ -812,3 +812,7 @@ div.evCalCheckboxInner label {
 a.ev_icon {
 	text-decoration: none;
 }
+
+div.evlist_list_item {
+	clear:both;
+}

@@ -1,5 +1,9 @@
 # evList plugin for glFusion - Changelog
 
+## 1.5.8
+Release TBD
+- Fix layout for Agenda view
+
 ## 1.5.7
 Release 2022-07-30
 - Fix adding tooltip class to icons with no title.

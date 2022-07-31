@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div class="evlist">
+<div class="evlist evlist_list_item">
     <div class="floatright">
       <span style="color:{cal_fgcolor};">{cal_name}</span>
     </div>

@@ -38,6 +38,7 @@ class Icon
         } else {
             $t->unset_var('output');
             $t->unset_var('attributes');
+            $t->unset_var('class');
         }
         return $t;
     }

@@ -6,6 +6,7 @@ Release 2022-07-19
 - Fix month starting date where start is Sunday and first of week is Monday (#44).
 - Implement popup calendar date switcher.
 - Allow changing URL when editing current or future instances.
+- Fix adding tooltip class to icons with no title.
 
 ## 1.5.5
 Release 2022-03-07

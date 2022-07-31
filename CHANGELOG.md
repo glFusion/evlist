@@ -3,6 +3,7 @@
 ## 1.5.8
 Release TBD
 - Fix layout for Agenda view
+- Allow different displayblock settings for list vs. calendar views.
 
 ## 1.5.7
 Release 2022-07-30

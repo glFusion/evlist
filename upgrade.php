@@ -326,6 +326,22 @@ function evlist_upgrade($dvlp = false)
         if (!EVLIST_do_set_version($currentVersion)) return false;
     }
 
+    if (!COM_checkVersion($currentVersion, '1.5.8')) {
+        $currentVersion = '1.5.8';
+        // Set the block display config to use the new values
+        if (!array_key_exists('displayblocks_blk', $_EV_CONF)) {
+            // Haven't already upgraded.
+            if (
+                $_EV_CONF['displayblocks'] == 3) {
+                $_EV_CONF['displayblocks'] = 0;
+            } else {
+                $_EV_CONF['displayblocks']++;
+            }
+            $c = \config::get_instance();
+            $c->set('displayblocks', $_EV_CONF['displayblocks'], 'evlist');
+        }
+    }
+
     // Set the version if not previously set
     if ($currentVersion != $installed_ver) {
         if (!EVLIST_do_set_version($installed_ver)) return false;

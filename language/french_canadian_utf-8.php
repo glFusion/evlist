@@ -477,7 +477,8 @@ $LANG_confignames[ 'evlist'] = array(
 'event_passing'         => "un événement cesse d'être <i>prochaine< /i> ",
 'default_permissions'       => 'Les autorisations par défaut (propriétaire,groupe,membres,anon) ',
 'reminder_days'         => 'Nombre de jours avant un événement pour permettre des rappels',
-'displayblocks'         => 'Affichage glFusion blocs',
+'displayblocks'         => 'Display Blocks in List Views',
+'displayblocks_blk'     => 'Display Blocks in Month/Year Views',
 'default_view'          => 'Vue par défaut',
 'max_upcoming_days'         => 'Max. Les prochains jours à afficher dans la liste',
 'use_locator'           => 'intégrer avec le Locator plugin ? ',
@@ -556,10 +557,10 @@ $LANG_configSelect[ 'evlist'] = array(
         3 => 'lecture-ecriture',
     ),
     13 => array(
-        0 => 'Gauche Blocs',
-        1 => 'droit Blocs',
-        2 => 'gauche & droit bloque',
-        3 => 'None',
+        0 => 'None',
+        1 => 'Gauche Blocs',
+        2 => 'droit Blocs',
+        3 => 'gauche & droit bloque',
     ),
     14 => array(
         'day' => 'Jour',
@@ -570,93 +571,3 @@ $LANG_configSelect[ 'evlist'] = array(
     ),
 );
 
-// Legacy config selections, requires glFusion 2.0
-
-$LANG_configselects[ 'evlist'] = array(
-    0 => array(
-        'true' => 1,
-        'false' => 0,
-    ),
-    1 => array(
-        'true' => TRUE,
-        'false' => FALSE,
-    ),
-    2 => array(
-        'None' => 0,
-        'Ajouter événement' => 1,
-        'liste les événements' => 2,
-    ),
-    3 => array(
-        'Dimanche' => 1,
-        'Lundi' => 2,
-    ),
-    4 => array(
-        'Jeu 20 Nov 2008'       => ' %a %b %d, %Y',
-        'Jeu Nov 20'            => ' %a %b %d',
-        'JEUDI 20 Nov 2008'         => ' %A %b %d, %Y',
-        'jeudi Nov 20'          => ' %A %b %d',
-        'jeudi 20 novembre '        => ' %A %B %d',
-        '20 Novembre 2008'      => ' %B %d, %Y',
-        '20/11/ 08'             => ' %m/ %d/ %y',
-        '11-20 -08'             => ' %m- %d- %y',
-        '2008 11 20'            => ' %Y %m %d',
-        '20 Nov 2008'           => ' %b %d %Y',
-        '20 Nov 2008'           => ' %b %d, %Y',
-    ),
-    5 => array(
-        '14:38' => ' %I: %M %p',
-        '14:48' => ' %H: %M',
-    ),
-    6 => array(
-        "dès que l'heure de début A adopté (si existe) " => 1,
-        "dès que la date de début n'est pas écoulé, ie, le jour suivant," => 2,
-        "dès que l'heure de fin a adopté (si il existe) ," => 3,
-        'dès que la date de fin a été dépassée,' => 4,
-    ),
-    7 => array(
-        'Haut de page' => 1,
-        'après une…' => 2,
-        'Bas de page' => 3,
-        'page entière' => 0,
-    ),
-    8 => array(
-        'passé' => 1,
-        'venir' => 2,
-        'cette semaine' => 3,
-        'ce mois' => 4,
-    ),
-    9 => array(
-        'Disabled' => 0,
-        'Table' => 1,
-        'Story' => 2,
-        'Calendar' => 3,
-    ),
-    12 => array(
-        'Aucun accès' => 0,
-        'Lecture seule' => 2,
-        'lecture-ecriture' => 3,
-    ),
-    13 => array(
-        'Gauche Blocs' => 0,
-        'droit Blocs'=> 1,
-        'gauche & droit bloque' => 2,
-        'None' => 3,
-    ),
-    14 => array(
-        'Jour' => 'jour',
-        'Semaine' => 'semaine',
-        'Mois' => 'mois',
-        'année' => 'année',
-        'Liste' => 'liste',
-    ),
-    16 => array(
-        'HTML' => 'html',
-        'JSON' => 'json',
-    ),
-    17 => array(
-        'No' => 0,
-        'Default No' => 1,
-        'Default Paid Only' => 2,
-        'Default Paid or Unpaid' => 3,
-    ),
-);

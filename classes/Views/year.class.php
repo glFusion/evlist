@@ -19,6 +19,11 @@ namespace Evlist\Views;
  */
 class year extends \Evlist\View
 {
+    /** Display Blocks config var to use based on the layout.
+     * @var string */
+    protected $displayblock_var = 'displayblocks_blk';
+
+
     /**
      * Construct the yearly view.
      *
@@ -70,4 +75,5 @@ class year extends \Evlist\View
         $T->parse('output', 'yearview');
         return $T->finish($T->get_var('output'));
     }
+
 }

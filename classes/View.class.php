@@ -96,6 +96,10 @@ class View
 
     protected $show_date_sel = true;
 
+    /** Display Blocks config var to use based on the layout.
+     * @var string */
+    protected $displayblock_var = 'displayblocks';
+
 
     /**
      * Get a calendar view object for the specifiec type.
@@ -602,6 +606,19 @@ class View
         if (!array_key_exists($cal_id, $this->cal_used)) {
             $this->cal_used[$cal_id] = Calendar::getInstance($cal_id);
         }
+    }
+
+
+    /**
+     * Get the value of the displayblocks config var corresponding to the view.
+     *
+     * @return  integer     Appropriate display blocks setting
+     */
+    public function getDisplayBlocks() : int
+    {
+        global $_EV_CONF;
+
+        return (int)$_EV_CONF[$this->displayblock_var];
     }
 
 }

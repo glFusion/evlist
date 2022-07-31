@@ -112,13 +112,14 @@ case 'today':
     $content .= $V->Render();
     break;
 
-case 'day':
-case 'week':
 case 'month':
 case 'year':
+case 'day':
+case 'week':
 case 'agenda':
     $V = Evlist\View::getView($view, $year, $month, $day, $category, $calendar);
     if ($V) {
+        $_EV_CONF['displayblocks'] = $V->getDisplayBlocks();
         $content .= $V->Render();
     }
     break;
@@ -165,6 +166,7 @@ case 'myevents':
 
 default:
     $V = Evlist\View::getView('', $year, $month, $day);
+    $_EV_CONF['displayblocks'] = $V->getDisplayBlocks();
     $content = $V->Render();
     break;
 }

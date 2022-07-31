@@ -24,6 +24,11 @@ use Evlist\Detail;
 class month extends \Evlist\View
 {
 
+    /** Display Blocks config var to use based on the layout.
+     * @var string */
+    protected $displayblock_var = 'displayblocks_blk';
+
+
     /**
      * Constructor to set up the monthly view.
      * Dates that have events scheduled are highlighted.

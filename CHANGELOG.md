@@ -1,12 +1,18 @@
 # evList plugin for glFusion - Changelog
 
+## 1.5.7
+Release 2022-07-30
+- Fix adding tooltip class to icons with no title.
+- Include event title in page title attribute.
+- Use the glFusion system log level.
+- Trim icon code to avoid extra spaces within links.
+
 ## 1.5.6
 Release 2022-07-19
 - Fix determing beginning of week day when week starts on Monday.
 - Fix month starting date where start is Sunday and first of week is Monday (#44).
 - Implement popup calendar date switcher.
 - Allow changing URL when editing current or future instances.
-- Fix adding tooltip class to icons with no title.
 
 ## 1.5.5
 Release 2022-03-07

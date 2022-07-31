@@ -46,6 +46,10 @@ function ChangeDate(year, month, day, view)
 			try {
 				$("#evlist_content").html(result.content);
 				$("#evlist_header").html(result.header);
+				// Activate the popup calendar date switcher
+				$('[data-ev-calswitcher]').each (function(i, obj) {
+					ev_calswitcher($(this).attr('id'));
+				});
 			}
 			catch(err) {
 			}

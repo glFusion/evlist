@@ -6,6 +6,7 @@ Release 2022-07-30
 - Include event title in page title attribute.
 - Use the glFusion system log level.
 - Trim icon code to avoid extra spaces within links.
+- Fix weekly view when week starts on Monday (v1.5.7.1).
 
 ## 1.5.6
 Release 2022-07-19

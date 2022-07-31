@@ -754,10 +754,15 @@ class DateFunc
     {
         $dt = self::getDate($day, $month, $year);
         $dow = $dt->format('w', true);
-        $sub_days = sprintf('P%dD', $dow - DATE_CALC_BEGIN_WEEKDAY);
-        //$sub_days = 'P' . ($dow - DATE_CALC_BEGIN_WEEKDAY . 'D';
-        $dt->sub(new \DateInterval($sub_days));
-        return $dt->format(self::getFormat($format));
+        if (DATE_CALC_BEGIN_WEEKDAY == self::MONDAY) {
+            if ($dow == 0) {
+                $dow = 6;
+            } else {
+                $dow--;
+            }
+        }
+        $curr_dt = (clone $dt)->sub(new \DateInterval(sprintf('P%dD', $dow)));
+        return $curr_dt->format(self::getFormat($format));
     }
 
 

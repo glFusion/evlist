@@ -1,7 +1,7 @@
 {# begin {templatelocation} #}
 <div class="monthview_timed show_cal{cal_id} event" style="display:{show};">
 {!if icon}
-	<i style="color:{fgcolor}" class="{icon}"></i>
+	{icon}
 {!endif}
 	<a style="color:{fgcolor};" title="{ev_hover}" class="tooltip" href="{ev_url}">{ev_title}</a>
 </div>

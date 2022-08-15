@@ -45,7 +45,7 @@
 			<div class="uk-form-controls">
 				<input type="text" class="uk-input uk-form-small uk-form-width-medium" maxlength="40" name="cal_icon" value="{icon}" />
 {!if disp_icon}
-				<i class="{disp_icon}"></i>
+				{disp_icon}
 {!endif}
 			</div>
 		</div>

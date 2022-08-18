@@ -1448,17 +1448,19 @@ class Ticket
             break;
 
         case 'comment':
-            $data = json_decode($fieldvalue, true);
-            $item_count = max(count($data), count($extra['cmt_prompts']));
-            if (is_array($data)) {
-                if ($item_count == 1) {
-                    $retval .= array_pop($data);
-                } else {
-                    $comments = array();
-                    foreach ($data as $prompt=>$val) {
-                        $comments[] = $prompt . ': ' . $val;
+            if (!empty($fieldvalue)) {
+                $data = json_decode($fieldvalue, true);
+                if (is_array($data)) {
+                    $item_count = max(count($data), count($extra['cmt_prompts']));
+                    if ($item_count == 1) {
+                        $retval .= array_pop($data);
+                    } else {
+                        $comments = array();
+                        foreach ($data as $prompt=>$val) {
+                            $comments[] = $prompt . ': ' . $val;
+                        }
+                        $retval .= implode(', ', $comments);
                     }
-                    $retval .= implode(', ', $comments);
                 }
             }
             break;

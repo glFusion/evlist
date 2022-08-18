@@ -12,6 +12,7 @@
  * @filesource
  */
 namespace Evlist;
+use Evlist\DateFunc;
 
 
 /**
@@ -47,7 +48,7 @@ class RecurMonthly extends Recurrence
             $occurrence <= $this->rec_data['stop'] &&
             $count < $_EV_CONF['max_repeats']
         ) {
-            $lastday = cal_days_in_month(CAL_GREGORIAN, $m, $y);
+            $lastday = DateFunc::cal_days_in_month($m, $y);
 
             foreach ($days_on as $dom) {
                 if ($dom == 32) {

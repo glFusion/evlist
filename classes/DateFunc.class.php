@@ -665,7 +665,7 @@ class DateFunc
     public static function daysInMonth($month=0, $year=0)
     {
         list($day, $month, $year) = self::validateParams(1, $month, $year);
-        return cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        return self::cal_days_in_month($month, $year);
     }
 
 
@@ -1463,6 +1463,23 @@ class DateFunc
         $dt = self::getDate($day, $month, $year);
         $interval = new \DateInterval('P' . (int)$days . 'D');
         return $dt->add($interval);
+    }
+
+
+    /**
+     * Replacement for PHP cal_days_in_month() if not compiled with calendar.
+     *
+     * @param   integer $month  Month to check
+     * @param   integer $year   year to check
+     * @return  integer     Number of days in the month
+     */
+    public static function cal_days_in_month(int $month, int $year) : int
+    {
+        if (function_exists('cal_days_in_month')) {
+            return cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        } else {
+            return \date('t', mktime(0, 0, 0, $month, 1, $year));
+        }
     }
 
 }

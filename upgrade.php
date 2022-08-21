@@ -18,6 +18,8 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 use Evlist\Config;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 global $_CONF;
 require_once __DIR__ . "/sql/mysql_install.php";
@@ -46,6 +48,7 @@ function evlist_upgrade($dvlp = false)
     }
     $installed_ver = plugin_chkVersion_evlist();
 
+    $db = Database::getInstance();
     $_TABLES['evlist_settings'] = $_DB_table_prefix . 'evlist_settings';
 
     switch ($currentVersion) {
@@ -340,6 +343,39 @@ function evlist_upgrade($dvlp = false)
             $c = \config::get_instance();
             $c->set('displayblocks', $_EV_CONF['displayblocks'], 'evlist');
         }
+
+        try {
+            $stmt = $db->conn->executeQuery(
+                "SELECT id, rec_data, options FROM {$_TABLES['evlist_events']}"
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            $stmt = false;
+        }
+        if ($stmt) {
+            while ($A = $stmt->fetchAssociative()) {
+                $rec_data = @unserialize($A['rec_data']);
+                $options = @unserialize($A['options']);
+                if ($rec_data !== false && $options !== false) {
+                    $RD = new Evlist\Models\RecurData($options);
+                    $Opt = new Evlist\Models\EventOptions($options);
+                    try {
+                        $db->conn->update(
+                            $_TABLES['evlist_events'],
+                            array(
+                                'rec_data' => json_encode($RD),
+                                'options' => json_encode($Opt),
+                            ),
+                            array('id' => $A['id']),
+                            array(Database::STRING, Database::STRING, Database::STRING)
+                        );
+                    } catch (\Throwable $e) {
+                        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                    }
+                }
+            }
+        }
+
     }
 
     // Set the version if not previously set

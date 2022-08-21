@@ -8,11 +8,11 @@ class RecurData implements \ArrayAccess, \JsonSerializable
         'type' => 0,
         'stop' => '2037-12-31',
         'freq' => 1,
-        'listdays' => array(),
+        'listdays' => array(),  // weekdays
         'skip' => 0,
         'weekday' => 0,
         'interval' => 0,
-        'custom' => array(),
+        'custom' => array(),    // array of custom dates
     );
 
     public function __construct(?array $A=NULL)
@@ -49,18 +49,16 @@ class RecurData implements \ArrayAccess, \JsonSerializable
         return $this->properties;
     }
 
-    public function matches($obj2)
+
+    /**
+     * Check if this data object matches another.
+     *
+     * @param   object  $obj2   Object to check against this one
+     * @return  boolean     True if matching, False if not
+     */
+    public function matches(RecurData $obj2) : bool
     {
-        if (array_diff_assoc($this->properties, $obj2->toArray)) {
-            return false;
-        } else {
-            foreach ($this->properties as $key->$v1) {
-                if ($obj2[$key] != $v1) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return $this->properties == $obj2->toArray();
     }
 
     private function _matchRecursive($obj1, $obj2)

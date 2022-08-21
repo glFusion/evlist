@@ -11,8 +11,12 @@
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\Models\Status;
 //use Evlist\Models\Intervals;
+use Evlist\Models\RecurData;
+use Evlist\Models\EventOptions;
 
 
 /**
@@ -243,6 +247,8 @@ class Event
         global $_CONF, $_EV_CONF, $_USER;
 
         $this->isNew = true;
+        $this->rec_data = new RecurData;    // Make sure it's a valid object
+        $this->options = new EventOptions;
 
         if ($ev_id == '') {
             $this->owner_id = $_USER['uid'];
@@ -302,19 +308,6 @@ class Event
             $this->perm_group   = $_EV_CONF['default_permissions'][1];
             $this->perm_members = $_EV_CONF['default_permissions'][2];
             $this->perm_anon    = $_EV_CONF['default_permissions'][3];
-            $this->options      = array(
-                'use_rsvp'   => 0,
-                'max_rsvp'   => 0,
-                'rsvp_cutoff' => 0,
-                'rsvp_waitlist' => 0,
-                'ticket_types' => array(),
-                'contactlink' => '',
-                'max_user_rsvp' => 1,
-                'rsvp_comments' => 0,
-                'rsvp_signup_grp' => 1,
-                'rsvp_view_grp' => 1,
-                'rsvp_cmt_prompts' => array(),
-            );
             if ($_EV_CONF['rsvp_print'] <= 1) { // default "no"
                 $this->options['rsvp_print'] = 0;
             } else {
@@ -350,7 +343,7 @@ class Event
      * @param   integer $det_id     Optional specific detail record ID
      * @return  object              Event object
      */
-    public static function getInstance($ev_id, $det_id = 0)
+    public static function getInstance(string $ev_id, int $det_id = 0) : self
     {
         static $records = array();
 
@@ -503,17 +496,6 @@ class Event
 
 
     /**
-     * Get the options set for the event.
-     *
-     * @return  array   Array of all options
-     */
-    public function getOptions() : array
-    {
-        return $this->options;
-    }
-
-
-    /**
      * Get a single option value, NULL if not set.
      *
      * @param   string  $key    Key to retrieve
@@ -522,12 +504,10 @@ class Event
      */
     public function getOption($key, $default=NULL)
     {
-        if (array_key_exists($key, $this->options)) {
+        if (isset($key, $this->options)) {
             return $this->options[$key];
-        } elseif ($default !== NULL) {
-            return $default;
         } else {
-            return NULL;
+            return $default;
         }
     }
 
@@ -724,6 +704,7 @@ class Event
             // dates are YYYY-MM-DD
             $this->setID(isset($row['id']) ? $row['id'] : '');
             $this->setRecData($row['rec_data']);
+            $this->setOptions($row['options']);
             $this->det_id = (int)$row['det_id'];
             $this->setPermOwner($row['perm_owner'])
                 ->setPermGroup($row['perm_group'])
@@ -733,10 +714,6 @@ class Event
             $this->time_end1 = substr($row['time_end1'], 0, 5);
             $this->time_start2 = substr($row['time_start2'], 0, 5);
             $this->time_end2 = substr($row['time_end2'], 0, 5);
-            $this->options = @unserialize($row['options']);
-            if (!$this->options) {
-                $this->options = array();
-            }
             $this->tzid = $row['tzid'];
             $this->ev_revision = (int)$row['ev_revision'];
         } else {        // Coming from the form
@@ -814,9 +791,10 @@ class Event
                 foreach ($row['tickets'] as $tick_id=>$tick_data) {
                     $tick_fee = isset($row['tick_fees'][$tick_id]) ?
                         (float)$row['tick_fees'][$tick_id] : 0;
-                    $this->options['tickets'][$tick_id] = array(
+                    $this->options->setTicket($tick_id, array('fee' => $tick_fee));
+                    /*$this->options['tickets'][$tick_id] = array(
                         'fee' => $tick_fee,
-                    );
+                    );*/
                 }
                 $this->options['rsvp_print'] = isset($row['rsvp_print']) ? $row['rsvp_print'] : 0;
             } else {
@@ -890,18 +868,28 @@ class Event
      * @param   mixed   $val    New value for key
      * @return  object  $this
      */
-    public function updateRecData($key='', $val='')
+    public function updateRecData(?string $key, $val=NULL) : self
     {
         global $_TABLES;
 
-        if ($key != '') {
+        if (!empty($key)) {
+            if ($val === NULL) {
+                $val = '';
+            }
             $this->rec_data[$key] = $val;
         }
-        $sql = "UPDATE {$_TABLES['evlist_events']} SET
-            rec_data = '" . DB_escapeString(serialize($this->rec_data)) . "',
-            ev_revision = ev_revision + 1
-            WHERE id = '{$this->id}'";
-        DB_query($sql);
+        try {
+            Database::getInstance()->conn->executeStatement(
+                "UPDATE {$_TABLES['evlist_events']} SET
+                    rec_data = ?,
+                    ev_revision = ev_revision + 1
+                    WHERE id = ?",
+                array(json_encode($this->rec_data), $this->id),
+                array(Database::STRING, Database::STRING)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
         return $this;
     }
 
@@ -1149,7 +1137,7 @@ class Event
             time_start2 = '" . DB_escapeString($this->time_start2) . "',
             time_end2 = '" . DB_escapeString($this->time_end2) . "',
             recurring = '{$this->recurring}',
-            rec_data = '" . DB_escapeString(serialize($this->rec_data)) . "',
+            rec_data = '" . DB_escapeString(json_encode($this->rec_data)) . "',
             allday = '{$this->allday}',
             split = '{$this->split}',
             status = '{$this->status}',
@@ -1166,7 +1154,8 @@ class Event
             cal_id = '{$this->cal_id}',
             show_upcoming = '{$this->show_upcoming}',
             tzid = '" . DB_escapeString($this->tzid) . "',
-            options = '" . DB_escapeString(serialize($this->options)) . "' ";
+            options = '" . DB_escapeString(json_encode($this->options)) . "' ";
+        //var_dump($this->options);die;
 
         $sql = $sql1 . $fld_sql . $sql2;
         //echo $sql;die;
@@ -1355,636 +1344,6 @@ class Event
 
 
     /**
-     * Creates the edit form.
-     *
-     * @param   string  $eid    Optional Event ID, current record used if zero
-     * @param   integer $rp_id  Optional Repeat ID
-     * @param   string  $saveaction     Action when saving
-     * @return  string      HTML for edit form
-     */
-    public function Edit($eid = '', $rp_id = 0, $saveaction = '')
-    {
-        COM_errorLog(__CLASS__ . '::' . __FUNCTION__ . ' -- Deprecated');
-        global $_CONF, $_EV_CONF, $_TABLES, $_USER, $LANG_EVLIST,
-                $LANG_ADMIN, $_GROUPS, $LANG_ACCESS, $_SYSTEM;
-
-        // If an eid is specified and this is an object, then read the
-        // event data- UNLESS a repeat ID is given in which case we're
-        // editing a repeat and already have the info we need.
-        // This probably needs to change, since we should always read event
-        // data during construction.
-        if (!EVLIST_canSubmit()) {
-            // At least submit privilege required
-            COM_404();
-        } elseif ($eid != ''  && $rp_id == 0) {
-            // If an id is passed in, then read that record
-            if (!$this->Read($eid)) {
-                return 'Invalid object ID';
-            }
-        } elseif ($rp_id == 0 && isset($_POST['eid']) && !empty($_POST['eid'])) {
-            // Returning to an existing event form, probably due to errors.
-            // If $rp_id > 0 then this object has already been created.
-            $this->SetVars($_POST);
-
-            // Make sure the current user has access to this event.
-            if (!$this->hasAccess(3)) COM_404();
-        }
-
-        if (!$this->isNew && !plugin_ismoderator_evlist()) {
-            COM_404();
-        }
-
-        $T = new \Template(EVLIST_PI_PATH . '/templates');
-        $T->set_file(array(
-            'editor'    => 'editor.thtml',
-            'tips'      => 'tooltipster.thtml',
-        ) );
-
-        // Set up the wysiwyg editor, if available
-        switch (PLG_getEditorType()) {
-        case 'ckeditor':
-            $T->set_var('show_htmleditor', true);
-            PLG_requestEditor('evlist','evlist_entry','ckeditor_evlist.thtml');
-            PLG_templateSetVars('evlist_entry', $T);
-            $this->postmode = 'html';
-            SEC_setCookie(
-                $_CONF['cookie_name'].'adveditor',
-                SEC_createTokenGeneral('advancededitor'),
-                time() + 1200,
-                $_CONF['cookie_path'],
-                $_CONF['cookiedomain'],
-                $_CONF['cookiesecure'],
-                false
-            );
-            break;
-        case 'tinymce' :
-            $T->set_var('show_htmleditor',true);
-            PLG_requestEditor('evlist','evlist_entry','tinymce_evlist.thtml');
-            PLG_templateSetVars('evlist_entry', $T);
-            $this->postmode = 'html';
-            break;
-        default :
-            // don't support others right now
-            $T->set_var('show_htmleditor', false);
-            break;
-        }
-
-        if (!empty($this->Errors)) {
-            $T->set_var('errors', $this->PrintErrors());
-        }
-
-        if (
-            isset($this->rec_data['stop']) &&
-            !empty($this->rec_data['stop'])
-        ) {
-            $T->set_var(array(
-                'stopdate'      => $this->rec_data['stop'],
-            ) );
-        }
-
-        // Set up the recurring options needed for the current event
-        $recweekday  = '';
-        switch ($this->recurring) {
-        case 0:
-            // Not a recurring event
-            break;
-        case EV_RECUR_MONTHLY:
-            if (is_array($this->rec_data['listdays'])) {
-                foreach ($this->rec_data['listdays'] as $mday) {
-                    $T->set_var('mdchk'.$mday, EVCHECKED);
-                }
-            }
-            break;
-        case EV_RECUR_WEEKLY:
-            //$T->set_var('listdays_val', COM_stripslashes($rec_data[0]));
-            if (
-                isset($this->rec_data['listdays']) &&
-                is_array($this->rec_data['listdays']) &&
-                !empty($this->rec_data['listdays'])
-            ) {
-                foreach($this->rec_data['listdays'] as $day) {
-                    $day = (int)$day;
-                    if ($day > 0 && $day < 8) {
-                        $T->set_var('daychk'.$day, EVCHECKED);
-                    }
-                }
-            }
-            break;
-        case EV_RECUR_DOM:
-            $recweekday = $this->rec_data['weekday'];
-            break;
-        case EV_RECUR_DATES:
-            $T->set_var(array(
-                'stopshow'      => 'style="display:none;"',
-                'custom_val' => implode(',', $this->rec_data['custom']),
-            ) );
-            break;
-        }
-
-        // Basic tabs for editing both events and instances, show up on
-        // all edit forms
-        $tabs = array('ev_info', 'ev_location', 'ev_contact',);
-        $alert_msg = '';
-        $rp_id = (int)$rp_id;
-        if ($rp_id > 0) {   // Editing a single occurrence
-            // Make sure the current user has access to this event.
-            if (!$this->hasAccess(3)) COM_404();
-
-            if ($saveaction == 'savefuturerepeat') {
-                $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_future'],
-                        'warning');
-            } else {
-                $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_instance'],
-                        'info');
-            }
-
-            //$T->clear_var('contact_section');
-            $T->clear_var('category_section');
-            $T->clear_var('permissions_editor');
-
-            // Set the static calendar name for the edit form.  Can't
-            // change it for a single instance.
-            $cal_name = DB_getItem($_TABLES['evlist_calendars'], 'cal_name',
-                "cal_id='" . (int)$this->cal_id . "'");
-
-            $T->set_var(array(
-                'contact_section' => 'true',
-                'is_repeat'     => 'true',    // tell the template it's a repeat
-                'cal_name'      => $cal_name,
-            ) );
-
-            // Override our dates & times with those from the repeat.
-            // $rp_id is passed when this is called from class Repeat.
-            // Maybe that should pass in the repeat's data instead to avoid
-            // another DB lookup.  An array of values could be used.
-            $Rep = DB_fetchArray(DB_query("SELECT *
-                    FROM {$_TABLES['evlist_repeat']}
-                    WHERE rp_id='$rp_id'"), false);
-            if ($Rep) {
-                $this->date_start1 = $Rep['rp_date_start'];
-                $this->date_end1 = $Rep['rp_date_end'];
-                $this->time_start1 = $Rep['rp_time_start1'];
-                $this->time_end1 = $Rep['rp_time_end1'];
-                $this->time_start2 = $Rep['rp_time_start2'];
-                $this->time_end2 = $Rep['rp_time_end2'];
-            }
-
-        } else {            // Editing the main event record
-
-            if ($this->id != '' && $this->recurring == 1) {
-                $alert_msg = EVLIST_alertMessage($LANG_EVLIST['editing_series'],
-                    'error');
-            }
-            if ($this->isAdmin) {
-                $tabs[] = 'ev_perms';   // Add permissions tab, event edit only
-                $T->set_var('permissions_editor', 'true');
-            }
-            //$Intervals = new Models\Intervals;
-            $T->set_var(array(
-                'recurring' => $this->recurring,
-                'recur_section' => 'true',
-                'contact_section' => 'true',
-                'category_section' => 'true',
-                'upcoming_chk' => $this->show_upcoming ? EVCHECKED : '',
-                'enable_reminders' => $_EV_CONF['enable_reminders'],
-                'rem_status_checked' => $this->enable_reminders == 1 ?
-                        EVCHECKED : '',
-                'commentsupport' => $_EV_CONF['commentsupport'],
-                'ena_cmt_' . $this->enable_comments => 'selected="selected"',
-                'recurring_format_options' =>
-                        EVLIST_GetOptions($LANG_EVLIST['rec_formats'], $this->recurring),
-                'recurring_weekday_options' => EVLIST_GetOptions(DateFunc::getWeekDays(), $recweekday, 1),
-                'dailystop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['day_by_date'], ''),
-                'monthlystop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
-                'yearlystop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['year'], $LANG_EVLIST['if_any']),
-                'listdaystop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['date_l'], $LANG_EVLIST['if_any']),
-                'intervalstop_label' => sprintf($LANG_EVLIST['stop_label'],
-                        $LANG_EVLIST['year_and_month'], $LANG_EVLIST['if_any']),
-                'listdays_label' => sprintf($LANG_EVLIST['custom_label'],
-                        $LANG_EVLIST['days_of_week'], ''),
-                'custom_label' => sprintf($LANG_EVLIST['custom_label'],
-                        $LANG_EVLIST['dates'], ''),
-                'datestart_note' => $LANG_EVLIST['datestart_note'],
-                'help_url' => EVLIST_getDocURL('event'),
-                'rsvp_cmt_chk' => $this->getOption('rsvp_comments') ? EVCHECKED : '',
-                'rsvp_cmt_prompts' => implode('|', $this->getOption('rsvp_cmt_prompts', array())),
-            ) );
-        }
-
-        $action_url = $this->isAdmin ? EVLIST_ADMIN_URL . '/index.php' : EVLIST_URL . '/event.php';
-        $delaction = 'delevent';
-        if (EVLIST_checkReturn()) {
-            $cancel_url = EVLIST_getReturn();
-        } elseif (isset($_GET['from']) && $_GET['from'] == 'admin') {
-            $cancel_url = EVLIST_ADMIN_URL . '/index.php';
-        } else {
-            $cancel_url = EVLIST_URL . '/index.php';
-        }
-        switch ($saveaction) {
-        case 'saverepeat':
-        case 'savefuturerepeat':
-        case 'saveevent':
-            break;
-        case 'moderate':
-            // Approving a submission
-            $saveaction = 'approve';
-            $delaction = 'disapprove';
-            $action_url = EVLIST_ADMIN_URL . '/index.php';
-            $cancel_url = $_CONF['site_admin_url'] . '/moderation.php';
-            break;
-        default:
-            $saveaction = 'saveevent';
-            break;
-        }
-
-        $retval = '';
-
-        $retval .= COM_startBlock($LANG_EVLIST['event_editor']);
-        $summary = $this->getDetail()->getSummary();
-        $full_description = $this->getDetail()->getDscp();
-        $location = $this->getDetail()->getLocation();
-        if (
-            ($this->isAdmin ||
-            ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)
-            )
-            && $this->postmode == 'html'
-        ) {
-            $postmode = 'html';      //html
-        } else {
-            $postmode = 'plaintext';            //plaintext
-            $summary = htmlspecialchars(
-                COM_undoClickableLinks(
-                    COM_undoSpecialChars(
-                        $this->getDetail()->getSummary()
-                    )
-                )
-            );
-            $full_description = htmlspecialchars(
-                COM_undoClickableLinks(
-                    COM_undoSpecialChars(
-                        $this->getDetail()->getDscp()
-                    )
-                )
-            );
-            $location = htmlspecialchars(
-                COM_undoClickableLinks(
-                    COM_undoSpecialChars(
-                        $this->getDetail()->getLocation()
-                    )
-                )
-            );
-         }
-
-        $starthour2 = '';
-        $startminute2 = '';
-        $endhour2 = '';
-        $endminute2 = '';
-
-        if ($this->date_end1 == '' || $this->date_end1 == '0000-00-00') {
-            $this->date_end1 = $this->date_start1;
-        }
-        if ($this->date_start1 != '' && $this->date_start1 != '0000-00-00') {
-            list($startmonth1, $startday1, $startyear1,
-                $starthour1, $startminute1) =
-                $this->DateParts($this->date_start1, $this->time_start1);
-        } else {
-            list($startmonth1, $startday1, $startyear1,
-                $starthour1, $startminute1) =
-                $this->DateParts(date('Y-m-d', time()), date('H:i', time()));
-        }
-
-        // The end date can't be before the start date
-        if ($this->date_end1 >= $this->date_start1) {
-            list($endmonth1, $endday1, $endyear1,
-                    $endhour1, $endminute1) =
-                    $this->DateParts($this->date_end1, $this->time_end1);
-            $days_interval = DateFunc::dateDiff(
-                    $endday1, $endmonth1, $endyear1,
-                    $startday1, $startmonth1, $startyear1);
-        } else {
-            $days_interval = 0;
-            $endmonth1  = $startmonth1;
-            $endday1    = $startday1;
-            $endyear1   = $startyear1;
-            $endhour1   = $starthour1;
-            $endminute1 = $startminute1;
-        }
-
-        // Skip weekends. Default to "no" if not already set for this event
-        $skip = empty($this->rec_data['skip']) ? 0 : $this->rec_data['skip'];
-
-        if (!empty($this->rec_data['freq'])) {
-            $freq = (int)$this->rec_data['freq'];
-            if ($freq < 1) $freq = 1;
-        } else {
-            $freq = 1;
-        }
-        $T->set_var(array(
-            'freq_text' => $LANG_EVLIST['rec_periods'][$this->recurring],
-            'rec_freq'  => $freq,
-            "skipnext{$skip}_checked" => EVCHECKED,
-        ) );
-
-        foreach ($LANG_EVLIST['rec_intervals'] as $key=>$str) {
-            $T->set_var('dom_int_txt_' . $key, $str);
-            if (isset($this->rec_data['interval']) &&
-                    is_array($this->rec_data['interval'])) {
-                if (in_array($key, $this->rec_data['interval'])) {
-                    $T->set_var('dom_int_chk_'.$key, EVCHECKED);
-                }
-            }
-        }
-
-        $start1 = DateFunc::TimeSelect('start1', $this->time_start1);
-        $start2 = DateFunc::TimeSelect('start2', $this->time_start2);
-        $end1 = DateFunc::TimeSelect('end1', $this->time_end1);
-        $end2 = DateFunc::TimeSelect('end2', $this->time_end2);
-        $cal_select = Calendar::optionList($this->cal_id, true, 3);
-        $navbar = new \navbar;
-        $cnt = 0;
-        foreach ($tabs as $id) {
-            $navbar->add_menuitem($LANG_EVLIST[$id],'showhideEventDiv("'.$id.'",'.$cnt.');return false;',true);
-            $cnt++;
-        }
-        $navbar->set_selected($LANG_EVLIST['ev_info']);
-
-        $T->set_var(array(
-            'is_admin'      => $this->isAdmin,
-            'action_url'    => $action_url,
-            'navbar'        => $navbar->generate(),
-            'alert_msg'     => $alert_msg,
-            'cancel_url'    => $cancel_url,
-            'eid'           => $this->id,
-            'rp_id'         => $rp_id,
-            'title'         => $this->getDetail()->getTitle(),
-            'summary'       => $summary,
-            'description'   => $full_description,
-            'location'      => $location,
-            //'status_checked' => $this->status == 1 ? EVCHECKED : '',
-            'status'        => $this->status,
-            'url'           => $this->getDetail()->getUrl(),
-            'street'        => $this->getDetail()->getStreet(),
-            'city'          => $this->getDetail()->getCity(),
-            'province'      => $this->getDetail()->getProvince(),
-            'country'       => $this->getDetail()->getCountry(),
-            'postal'        => $this->getDetail()->getPostal(),
-            'contact'       => $this->getDetail()->getContact(),
-            'email'         => $this->getDetail()->getEmail(),
-            'phone'         => $this->getDetail()->getPhone(),
-            'startdate1'    => $this->date_start1,
-            'enddate1'      => $this->date_end1,
-            'd_startdate1'  => EVLIST_formattedDate($this->date_start1),
-            'd_enddate1'    => EVLIST_formattedDate($this->date_end1),
-            // Don't need seconds in the time boxes
-            'hour_mode'     => $_CONF['hour_mode'],
-            /*'time_start1'   => DateFunc::conv24to12($this->time_start1),
-            'time_end1'     => DateFunc::conv24to12($this->time_end1),
-            'time_start2'   => DateFunc::conv24to12($this->time_start2),
-            'time_end2'     => DateFunc::conv24to12($this->time_end2),*/
-            'time_start1'   => substr($this->time_start1, 0, 5),
-            'time_end1'     => substr($this->time_end1, 0, 5),
-            'time_start2'   => substr($this->time_start2, 0, 5),
-            'time_end2'     => substr($this->time_end2, 0, 5),
-            'start_hour_options1'   => $start1['hour'],
-            'start_minute_options1' => $start1['minute'],
-            'startdate1_ampm'       => $start1['ampm'],
-            'end_hour_options1'     => $end1['hour'],
-            'end_minute_options1'   => $end1['minute'],
-            'enddate1_ampm'         => $end1['ampm'],
-            'start_hour_options2'   => $start2['hour'],
-            'start_minute_options2' => $start2['minute'],
-            'startdate2_ampm'       => $start2['ampm'],
-            'end_hour_options2'     => $end2['hour'],
-            'end_minute_options2'   => $end2['minute'],
-            'enddate2_ampm'         => $end2['ampm'],
-            'src'   => isset($_GET['src']) && $_GET['src'] == 'a' ? '1' : '0',
-
-            'del_button'    => $this->id == '' ? '' : 'true',
-            'saveaction'    => $saveaction,
-            'delaction'     => $delaction,
-            'owner_id'      => $this->owner_id,
-            'days_interval' => $days_interval,
-            'display_format' => $_CONF['shortdate'],
-            'ts_start'      => strtotime($this->date_start1),
-            'ts_end'        => strtotime($this->date_end1),
-            'cal_select'    => $cal_select,
-            'contactlink_chk' => $this->getOption('contactlink') == 1 ?
-                                EVCHECKED : '',
-            'lat'           => EVLIST_coord2str($this->getDetail()->getLatitude()),
-            'lng'           => EVLIST_coord2str($this->getDetail()->getLongitude()),
-            'perm_msg'      => $LANG_ACCESS['permmsg'],
-            'last'          => $LANG_EVLIST['rec_intervals'][5],
-            'doc_url'       => EVLIST_getDocURL('event'),
-            // If the event timezone is "local", just use some valid timezone
-            // for the selection. The checkbox will be checked which will
-            // hide the timezone selection anyway.
-            'tz_select'     => \Date::getTimeZoneDropDown(
-                        $this->tzid == 'local' ? $_CONF['timezone'] : $this->tzid,
-                        array('id' => 'tzid', 'name' => 'tzid')),
-            'tz_islocal'    => $this->tzid == 'local' ? EVCHECKED : '',
-            'isNew'         => (int)$this->isNew,
-            'fomat_opt'     => $this->recurring,
-            'owner_name' => COM_getDisplayName($this->owner_id),
-        ) );
-
-        if ($_EV_CONF['enable_rsvp'] && $rp_id == 0) {
-            $TickTypes = TicketType::GetTicketTypes();
-            $T->set_block('editor', 'Tickets', 'tTypes');
-            $tick_opts = '';
-            foreach ($TickTypes as $tick_id=>$TicketType) {
-                // Check enabled tickets. Ticket type 1 enabled by default
-                if (isset($this->options['tickets'][$tick_id]) || $tick_id == 1) {
-                    $checked = true;
-                    if (isset($this->options['tickets'][$tick_id])) {
-                        $fee = (float)$this->options['tickets'][$tick_id]['fee'];
-                    } else {
-                        $fee = 0;
-                    }
-                } else {
-                    $checked = false;
-                    $fee = 0;
-                }
-                $T->set_var(array(
-                    'tick_id' => $tick_id,
-                    'tick_dscp' => $TicketType->getDscp(),
-                    'tick_fee' => $fee,
-                    'tick_checked' => $checked,
-                ) ) ;
-                $T->parse('tTypes', 'Tickets', true);
-            }
-
-            if ($_EV_CONF['rsvp_print'] > 0) {
-                $rsvp_print_chk  = 'rsvp_print_chk' . (int)$this->getOption('rsvp_print');
-                $rsvp_print = 'true';
-            } else {
-                $rsvp_print = '';
-                $rsvp_print_chk = 'no_rsvp_print';
-            }
-
-            $T->set_var(array(
-                'enable_rsvp' => 'true',
-                'rsvp_enabled' => 'true',
-                'reg_chk'.(int)$this->getOption('use_rsvp') => EVCHECKED,
-                'rsvp_wait_chk' => $this->getOption('rsvp_waitlist') == 1 ?
-                                EVCHECKED : '',
-                'max_rsvp'   => $this->getOption('max_rsvp'),
-                'max_user_rsvp' => $this->getOption('max_user_rsvp'),
-                'rsvp_cutoff' => $this->getOption('rsvp_cutoff'),
-                'use_rsvp' => $this->getOption('use_rsvp'), // for javascript
-                'rsvp_waitlist' => $this->getOption('rsvp_waitlist'),
-                'rsvp_print'    => $rsvp_print,
-                $rsvp_print_chk => 'checked="checked"',
-            ) );
-
-        }   // if rsvp_enabled
-
-        // Split & All-Day settings
-        if ($this->allday == 1) {   // allday, can't be split, no times
-            $T->set_var(array(
-                'starttime1_show'   => 'style="display:none;"',
-                'endtime1_show'     => 'style="display:none;"',
-                'datetime2_show'    => 'style="display:none;"',
-                'allday_checked'    => EVCHECKED,
-                'split_checked'     => '',
-                'split_show'        => 'style="display:none;"',
-            ) );
-        } elseif ($this->split == '1') {
-            $T->set_var(array(
-                'split_checked'     => EVCHECKED,
-                'allday_checked'    => '',
-                'allday_show'       => 'style="display:none"',
-            ) );
-        } else {
-            $T->set_var(array(
-                'datetime2_show'    => 'style="display:none;"',
-            ) );
-        }
-
-        // Category fields. If $_POST['categories'] is set, then this is a
-        // form re-entry due to an error saving. Populate checkboxes from the
-        // submitted form. Include the user-added category, if any.
-        // If not from a form re-entry, get the checked categories from the
-        // evlist_lookup table.
-        // Both "select" and "checkbox"-type values are supplied so the
-        // can use either form element.
-        if ($_EV_CONF['enable_categories'] == '1') {
-            $cresult = DB_query("SELECT tc.id, tc.name
-                FROM {$_TABLES['evlist_categories']} tc
-                WHERE tc.status='1' ORDER BY tc.name");
-            $T->set_block('editor', 'catSelect', 'catSel');
-            $catlist = '';
-            while ($A = DB_fetchArray($cresult, false)) {
-                if (isset($_POST['categories']) && is_array($_POST['categories'])) {
-                    // Coming from a form re-entry
-                    $cat_array = $_POST['categories'];
-                } else {
-                    $cat_array = $this->categories;
-                }
-                if (in_array($A['id'], $cat_array)) {
-                    // category is currently selected
-                    $chk = EVCHECKED;
-                    $sel = EVSELECTED;
-                } else {
-                    $chk = '';
-                    $sel = '';
-                }
-                $catlist .= '<input type="checkbox" name="categories[]" ' .
-                    'value="' . $A['id'] . '" ' . $chk . ' />' .
-                    '&nbsp;' . $A['name'] . '&nbsp;&nbsp;';
-                $T->set_var(array(
-                    'cat_id'    => $A['id'],
-                    'cat_name'  => htmlspecialchars($A['name']),
-                    'cat_chk'   => $chk,
-                    'cat_sel'   => $sel,
-                ) );
-                $T->parse('catSel', 'catSelect', true);
-            }
-            $T->set_var('catlist', $catlist);
-
-            if (isset($_POST['newcat'])) {
-                $T->set_var('newcat', $_POST['newcat']);
-            }
-
-            if ($_USER['uid'] > 1 && $rp_id == 0) {
-                $T->set_var('category_section', 'true');
-                $T->set_var('add_cat_input', 'true');
-            }
-        }
-
-        // Enable the post mode selector if we allow HTML and the user is
-        // logged in, or if this user is an authorized editor
-        if (
-            $this->isAdmin ||
-            ($_EV_CONF['allow_html'] == '1' && $_USER['uid'] > 1)
-        ) {
-            $T->set_var(array(
-                'postmode_options' => EVLIST_GetOptions($LANG_EVLIST['postmodes'], $postmode),
-                'allowed_html' => COM_allowedHTML('evlist.submit'),
-                'postmode' => 'html',
-            ) );
-            if ($postmode == 'plaintext') {
-                // plaintext, hide postmode selector
-                $T->set_var(array(
-                    'postmode_show' => ' style="display:none"',
-                    'postmode' => 'html',
-                ) );
-            }
-            $T->parse('event_postmode', 'edit_postmode');
-        }
-
-        if ($this->isAdmin) {
-            $T->set_var(array(
-                //'owner_username' => COM_stripslashes($ownerusername),
-                'owner_dropdown' => COM_optionList(
-                    $_TABLES['users'], 'uid,username', $this->owner_id, 1
-                ),
-                'rsvp_view_grp_dropdown' => SEC_getGroupDropdown(
-                    (int)$this->getOption('rsvp_view_grp', 1), 3, 'rsvp_view_grp'
-                ),
-            ) );
-            if ($rp_id == 0) {  // can only change permissions on main event
-                $T->set_var('permissions_editor', SEC_getPermissionsHTML(
-                        $this->perm_owner, $this->perm_group,
-                        $this->perm_members, $this->perm_anon));
-            }
-        }
-
-        if ($rp_id == 0) {  // can only change permissions on main event
-            $T->set_var(array(
-                'permissions_editor' => SEC_getPermissionsHTML(
-                    $this->perm_owner, $this->perm_group,
-                    $this->perm_members, $this->perm_anon
-                ),
-                'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
-            ) );
-        }
-
-        // Latitude & Longitude part of location, if Location plugin is used
-        if ($_EV_CONF['use_locator']) {
-            $status = LGLIB_invokeService('locator', 'optionList', '',
-                $output, $svc_msg);
-            if ($status == PLG_RET_OK) {
-                $T->set_var(array(
-                    'use_locator'   => 'true',
-                    'loc_selection' => $output,
-                ) );
-            }
-        }
-
-        $T->parse('tooltipster_js', 'tips');
-        $T->parse('output', 'editor');
-        $retval .= $T->finish($T->get_var('output'));
-
-        $retval .= COM_endBlock();
-        return $retval;
-    }   // function Edit()
-
-
-    /**
      * Toggles a field to the opposite of the existing value.
      *
      * @param   integer $oldvalue   Original value
@@ -1992,7 +1351,7 @@ class Event
      * @param   string  $ev_id      Event record ID
      * @return  integer     New value, or old value upon failure
      */
-    private static function _toggle($oldvalue, $varname, $ev_id)
+    private static function _toggle(int $oldvalue, string $varname, string $ev_id) : int
     {
         global $_TABLES;
 
@@ -2000,18 +1359,20 @@ class Event
         if ($ev_id == '') return $oldvalue;
         $oldvalue = $oldvalue == 0 ? 0 : 1;
         $newvalue = $oldvalue == 1 ? 0 : 1;
-        $sql = "UPDATE {$_TABLES['evlist_events']} SET
-            $varname=$newvalue,
-            ev_revision = ev_revision + 1
-            WHERE id='" . DB_escapeString($ev_id) . "'";
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog("Event::_toggle SQL Error: $sql");
-            return $oldvalue;
-        } else {
+        try {
+            Database::getInstance()->conn->executeStatement(
+                "UPDATE {$_TABLES['evlist_events']} SET
+                $varname = ?,
+                ev_revision = ev_revision + 1
+                WHERE id = ?",
+                array($newvalue, $ev_id),
+                array(Database::INTEGER, Database::STRING)
+            );
             Cache::clear('events');
             return $newvalue;
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return $oldvalue;
         }
     }
 
@@ -2359,10 +1720,8 @@ class Event
     public function needRepeatUpdate($A)
     {
         $retval = 0;
-        $old_rec = is_array($this->old_schedule['rec_data']) ?
-            $this->old_schedule['rec_data'] : array();
-        $new_rec = is_array($this->rec_data) ?
-            $this->rec_data : array();
+        $old_rec = $this->old_schedule['rec_data'];
+        $new_rec = $this->rec_data;
 
         if (
             $this->old_schedule['date_start1'] != $this->date_start1 ||
@@ -2534,6 +1893,9 @@ class Event
             break;
         case EV_RECUR_DOM:
             $this->rec_data['weekday'] = (int)$A['weekday'];
+            if (!isset($A['interval'])) {
+                $A['interval'] = array(1);
+            }
             $this->rec_data['interval'] = is_array($A['interval']) ?
                     $A['interval'] : array($A['interval']);
             break;
@@ -2730,6 +2092,24 @@ class Event
 
 
     /**
+     * Set the options for the event.
+     *
+     * @param   string|array    JSON string or array
+     * @return  object  $this
+     */
+    public function setOptions($data) : self
+    {
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+        if (is_array($data)) {
+            $this->options = new EventOptions($data);
+        }
+        return $this;
+    }
+
+
+    /**
      * Set the recurring data for the event.
      *
      * @param   string|array    Serizlized string or array
@@ -2737,14 +2117,15 @@ class Event
      */
     public function setRecData($data)
     {
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
         if (is_array($data)) {
-            $this->rec_data = $data;
-        } else {
-            $this->rec_data = @unserialize($data);
+            $this->rec_data = new RecurData($data);
         }
-        if (!is_array($this->rec_data)) {
+        /*if (!is_array($this->rec_data)) {
             $this->rec_data = array();
-        }
+        }*/
         return $this;
     }
 

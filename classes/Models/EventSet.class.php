@@ -3,15 +3,17 @@
  * Class to handle retrieving event sets.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.0
+ * @version     v1.5.8
  * @since       v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist\Models;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\DateFunc;
 use Evlist\Cache;
 
@@ -71,17 +73,17 @@ class EventSet
      * @var string */
     private $order = 'ASC';
 
-    /** Fields to return. Created as a full field string.
-     * @var string */
-    private $selection = '';
+    /** Fields to return.
+     * @var array */
+    private $selection = array();
 
-    /** Extra fields to return. Appended to $selection.
+    /** Extra fields to return.
      * @var string */
-    private $extra_fields = '';
+    private $extra_fields = array();
 
     /** Group by for results.
      * @var string */
-    private $grp_by = 'rep.rp_id';
+    //private $grp_by = 'rep.rp_id';
 
     /** Showing upcoming events? TODO, duplicate of show_upcoming?
      * @var string */
@@ -271,7 +273,7 @@ class EventSet
      * @param   boolean $val    False to show all events, True to show only active
      * @return  object  $this
      */
-    public function withActiveOnly($val=true)
+    public function withActiveOnly(bool $val=true) : self
     {
         return $this->withStatus(Status::ENABLED);
     }
@@ -280,10 +282,10 @@ class EventSet
     /**
      * Set the fields to be selected in the query.
      *
-     * @param   string  $selection  SQL fields to retrieve
+     * @param   array   $selection  Array of fields to retrieve
      * @return  object  $this
      */
-    public function withSelection($selection)
+    public function withSelection(array $selection) : self
     {
         $this->selection = $selection;
         return $this;
@@ -298,7 +300,7 @@ class EventSet
      */
     public function withFields(array $flds) : self
     {
-        $this->extra_fields = implode(',', $flds);
+        $this->extra_fields = $flds;
         return $this;
     }
 
@@ -309,7 +311,7 @@ class EventSet
      * @param   boolean $flag   True for event ID, False for repeat ID
      * @return  object  $this
      */
-    public function withUnique($flag)
+    public function withUnique(bool $flag) : self
     {
         $this->grp_by = $flag ? 'ev.id' : 'rep.rp_id';
         return $this;
@@ -335,9 +337,12 @@ class EventSet
      *
      * @return string          SQL query to retrieve events
      */
-    public function getSql()
+    public function getQueryBuilder() : \Doctrine\DBAL\Query\QueryBuilder
     {
         global $_TABLES, $_EV_CONF, $_CONF, $_USER;
+
+        $db = Database::getInstance();
+        $qb = $db->conn->createQueryBuilder();
 
         $today = $_CONF['_now']->format('Y-m-d', true);
         // Set starting and ending dates if not set.
@@ -357,110 +362,101 @@ class EventSet
         if (!DateFunc::isValidDate($d, $m, $y)) {
             $this->end = $this->start;
         }
-        $db_start = DB_escapeString($this->start . ' 00:00:00');
-        $db_end = DB_escapeString($this->end . ' 23:59:59');
-
-        // Set up other search options.
-        $orderby = 'rep.rp_start';
-        $grp_by = 'rep.rp_id';
-        $cat_status = '';
-        $cat_join = '';
-        // default date range for fixed calendars, "upcoming" may be different
-        $dt_sql = "rep.rp_start <= '$db_end' AND rep.rp_end >= '$db_start'"; // AND rep.rp_end <= '$db_end'";
-        $ands = array();
-
-        // Create the SQL elements from the properties
-        if ($this->cal > 0) {
-            $ands[] = ' cal.cal_id = ' . $this->cal;
-        }
-        if ($this->eid != '') {
-            $ands[] = " ev.id = '" . DB_escapeString($this->eid) . "'";
-        }
-        if ($this->rp_id > 0) {
-            $ands[] = ' rep.rp_id = ' . $this->rp_id;
-        }
-        if ($this->ical > -1) {
-            $ands[] = ' cal.cal_ena_ical = ' . $this->ical;
-        }
-        if ($this->cat > 0) {
-            $ands[] = " (l.cid = '{$this->cat}' AND cat.status = 1) ";
-            $cat_join = "LEFT JOIN {$_TABLES['evlist_lookup']} l ON l.eid = ev.id " .
-                "LEFT JOIN {$_TABLES['evlist_categories']} cat ON cat.id = l.cid ";
-        }
-        if ($this->show_upcoming) {
-            $ands[] = ' ev.show_upcoming = 1 AND cal.cal_show_upcoming = 1 ';
-            // Alters the date range based on the setting for upcoming
-            // events.
-            switch ($_EV_CONF['event_passing']) {
-            case 1:     // include if start time has not passed
-                $dt_sql = "rep.rp_start >= '" . $_CONF['_now']->toMySQL(true) . "'";
-                break;
-            case 2:     // include if start date has not passed
-                $dt_sql = "rep.rp_start >= '$today'";
-                break;
-            case 3:     // include if end time has not passed
-                $dt_sql = "rep.rp_end >= '" . $_CONF['_now']->toMySQL(true) . "'";
-                break;
-            case 4:     // include if end date has not passed
-                $dt_sql = "rep.rp_end >= '$today'";
-                break;
-            }
-            // Always limit to events starting before the specified end date.
-            $dt_sql .= " AND rep.rp_start <= '{$this->end}'";
-            $dt_sql = ' (' . $dt_sql . ') ';
-        }
-        if ($this->show_cb) {
-            // Showing only centerblock items, limit the calendar selection.
-            $ands[] = ' cal.cal_show_cb = 1 ';
-        }
-        if ($this->status < Status::ALL) {
-            // Limit by event status if requested
-            $ands[] = " rep.rp_status = {$this->status} ";
-        }
 
         // By default, get all fields that the caller could possibly want. If
         // a selection option is specified, then that is used instead. It's up
         // to the caller to request the value properly, including table prefix.
-        if ($this->selection == '') {
-            //$this->selection = 'ev.*, rep.*, det.* ' .
-            $this->selection = 'ev.*, rep.*, cal.bgcolor, cal.fgcolor, cal.cal_icon';
-        }
-        if ($this->extra_fields != '') {
-            $this->extra_fields = ', ' . $this->extra_fields;
-        }
-        if (!empty($ands)) {
-            $ands = ' AND ' . implode(' AND ', $ands);
+        if (empty($this->selection)) {
+            $qb->select('ev.*', 'rep.*', 'cal.bgcolor', 'cal.fgcolor', 'cal.cal_icon');
         } else {
-            $ands = '';
-        }
-
-        // All the "*" queries may be ineffecient, but we need to read all
-        // fields that might be wanted by whoever calls this function
-        $sql = "SELECT {$this->selection} {$this->extra_fields}
-            FROM {$_TABLES['evlist_repeat']} rep
-            LEFT JOIN {$_TABLES['evlist_events']} ev
-                ON ev.id = rep.rp_ev_id
-            LEFT JOIN {$_TABLES['evlist_detail']} det
-                ON det.det_id = rep.rp_det_id
-            LEFT JOIN {$_TABLES['evlist_calendars']} cal
-                ON cal.cal_id = ev.cal_id
-            $cat_join
-            WHERE (cal.cal_status = 1 OR cal.cal_status IS NULL)
-            AND ($dt_sql)
-            $ands
-            $cat_status " .
-            COM_getPermSQL('AND', $this->uid, 2, 'ev') . ' ' .
-            COM_getPermSQL('AND', $this->uid, 2, 'cal') .
-            " ORDER BY $orderby {$this->order}";
-        if ($this->limit > 0) {
-            if ($this->page > 1) {
-                $sql .= ' LIMIT ' . (($this->page - 1) * $this->limit) . ',' . $this->limit;
-            } else {
-                // page 1 or 0, no starting offset
-                $sql .= " LIMIT {$this->limit}";
+            foreach ($this->selection as $fld) {
+                $qb->addSelect($fld);
             }
         }
-        return $sql;
+        if (!empty($this->extra_fields)) {
+            foreach ($this->extra_fields as $fld) {
+                $qb->addSelect($fld);
+            }
+        }
+        $qb->from($_TABLES['evlist_repeat'], 'rep')
+           ->leftJoin('rep', $_TABLES['evlist_events'], 'ev', 'ev.id = rep.rp_ev_id')
+           ->leftJoin('rep', $_TABLES['evlist_detail'], 'det', 'det.det_id = rep.rp_det_id')
+           ->leftJoin('ev', $_TABLES['evlist_calendars'], 'cal', 'cal.cal_id = ev.cal_id')
+           ->where('cal.cal_status = 1 OR cal.cal_status IS NULL')
+           ->andWhere($db->getPermSql('', $this->uid, 2, 'ev'))
+           ->andWhere($db->getPermSql('', $this->uid, 2, 'cal'))
+           ->orderBy('rep.rp_start', 'ASC');
+        if ($this->limit > 0) {
+            if ($this->page > 1) {
+                $qb->setFirstResult(($this->page - 1) * $this->limit);
+            }
+            $qb->setMaxResults($this->limit);
+        }
+
+        // Create the SQL elements from the properties
+        if ($this->cal > 0) {
+            $qb->andWhere('cal.cal_id = :cal_id')
+               ->setParameter('cal_id', $this->cal, Database::INTEGER);
+        }
+        if ($this->eid != '') {
+            $qb->andWhere('ev.id = :eid')
+               ->setParameter('eid', $this->eid, Database::STRING);
+        }
+        if ($this->rp_id > 0) {
+            $qb->andWhere('rep.rp_id = :rp_id')
+               ->setParameter('rp_id', $this->rp_id, Database::INTEGER);
+        }
+        if ($this->ical > -1) {
+            $qb->andWhere('cal.cal_ena_ical = :ena_ical')
+               ->setParameter('ena_ical', $this->ical, Database::INTEGER);
+        }
+        if ($this->cat > 0) {
+            $qb->andWhere('l.cid = :cat_id AND cat.status = 1')
+               ->setParameter('cat_id', $this->cat, Database::INTEGER)
+               ->leftJoin('ev', $_TABLES['evlist_lookup'], 'l', 'l.eid = ev.id');
+        }
+        if ($this->show_upcoming) {
+            $qb->andWhere('ev.show_upcoming = 1 AND cal.cal_show_upcoming = 1');
+            // Alters the date range based on the setting for upcoming
+            // events.
+            switch ($_EV_CONF['event_passing']) {
+            case 1:     // include if start time has not passed
+                $qb->andWhere('rep.rp_start >= :rp_start')
+                   ->setParameter('rp_start', $_CONF['_now']->toMySQL(true), Database::STRING);
+                break;
+            case 2:     // include if start date has not passed
+                $qb->andWhere('rep.rp_start >= :rp_start')
+                   ->setParameter('rp_start', $today, Database::STRING);
+                break;
+            case 3:     // include if end time has not passed
+                $qb->andWhere('rep.rp_end >= :rp_end')
+                   ->setParameter('rp_end', $_CONF['_now']->toMySQL(true), Database::STRING);
+                break;
+            case 4:     // include if end date has not passed
+                $qb->andWhere('rep.rp_end >= :rp_end')
+                   ->setParameter('rp_end', $today, Database::STRING);
+                break;
+            }
+            // Always limit to events starting before the specified end date.
+            $qb->andWhere('rep.rp_start <= :end')
+               ->setParameter('end', $this->end, Database::STRING);
+        } else {
+            $qb->andWhere('rep.rp_start <= :end')
+               ->andWhere('rep.rp_end >= :start')
+               ->setParameter('end', $this->end)
+               ->setParameter('start', $this->start);
+        }
+        if ($this->show_cb) {
+            // Showing only centerblock items, limit the calendar selection.
+            $qb->andWhere('cal.cal_show_cb = 1');
+        }
+        if ($this->status < Status::ALL) {
+            // Limit by event status if requested
+            $qb->andWhere('rep.rp_status = :status')
+               ->setParameter('status', $this->status, Database::INTEGER);
+        }
+
+        return $qb;
     }
 
 
@@ -475,15 +471,20 @@ class EventSet
     {
         global $_EV_CONF, $_USER;
 
-        $sql = $this->getSql();
-        $key = md5($sql);
+        $qb = $this->getQueryBuilder();
+        $key = md5(json_encode($qb->getParameters()));
         $events = Cache::get($key);
 
         if (is_null($events)) {     // not found in cache, read from DB
             $events = array();
-            $result = DB_query($sql, 1);
-            if ($result && !DB_error()) {
-                while ($A = DB_fetchArray($result, false))  {
+            try {
+                $stmt = $qb->execute();
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $stmt = false;
+            }
+            if ($stmt) {
+                while ($A = $stmt->fetchAssociative()) {
                     if (!isset($events[$A['rp_date_start']])) {
                         $events[$A['rp_date_start']] = array();
                     }

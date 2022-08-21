@@ -229,7 +229,7 @@ class Syndication
             ->withUid(1)            // Anonymous must be able to view feeds
             ->withStart($start->format('Y-m-d', true))
             ->withCalendar($F['topic'])
-            ->withSelection('rep.rp_id, rep.rp_revision, ev.ev_revision, det.det_revision')
+            ->withSelection(array('rep.rp_id', 'rep.rp_revision', 'ev.ev_revision', 'det.det_revision'))
             ->withStatus(Status::ALL)
             ->withLimit($limit);
         if ($end) {

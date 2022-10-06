@@ -1,7 +1,7 @@
 {# begin {templatelocation} #}
 <div id="calendar-wrap" style="clear:both;">
-    <div id="calendar">
-        <ul class="weekdays">
+    <div id="evcal">
+        <ul class="uk-grid uk-hidden-small uk-grid-width-medium-1-7 weekdays">
             <li>{dayname0}</li>
             <li>{dayname1}</li>
             <li>{dayname2}</li>
@@ -11,19 +11,19 @@
             <li>{dayname6}</li>
         </ul>
 
-<!-- BEGIN weekBlock -->
-        <ul class="days">
+        <ul class="uk-grid uk-grid-width-small-1-1 uk-grid-width-medium-1-7 days">
 <!-- BEGIN dayBlock -->
             <li class="day {cal_day_style}"
                 ondblclick="window.location.href='{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}';">
+				<div style="float:left;" class="uk-visible-small mon_day_name">{dayname}</div>
                 <div class="date"><a href="{pi_url}/index.php?view=day&amp;year={year}&amp;month={month}&amp;day={day}{urlfilt_event_type}">{day}</a></div>
 {!if cal_day_entries}
+				<div style="clear:both;"></div>
                 {cal_day_entries}
 {!endif}
             </li>
 <!-- END dayBlock -->
         </ul>
-<!-- END weekBlock -->
     </div>
 </div>
 

@@ -780,14 +780,20 @@ div.evCBouter {
     margin-bottom: 2px;
 }
 
-.uk-width-1-7,
-.uk-grid-width-1-7 > * {
-    width: 14.28%;
-}
 @media (min-width: 768px) {
-    .uk-grid-width-medium-1-7 > * {
-        width: 14.28%;
-    }
+	.uk-width-1-7,
+	.uk-width-medium-1-7,
+	.uk-grid-width-medium-1-7 > * {
+		width: 14.28%;
+	}
+	#evcal ul {
+		margin-left: 10px;
+	}
+}
+@media (max-width: 768px) {
+	#evcal ul {
+		margin-left: 10px;
+	}
 }
 div#evlist_signups {
     margin-top: 15px;
@@ -816,3 +822,81 @@ a.ev_icon {
 div.evlist_list_item {
 	clear:both;
 }
+
+div.Xevlist_spinner {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background: rgba(255,255,255,0.8) url("examples/images/loader.gif") center no-repeat;
+}
+body.Xloading .Xevlist_spinner{
+	display: block;
+}
+
+/** Calender Styles **/
+#evcal ul.weekdays {
+    height: 40px;
+    background: #325482;
+	margin-right: .5%;
+}
+
+#evcal ul.days {
+	margin-top:0px;
+}
+
+#evcal ul.weekdays li {
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 20px;
+    border: none !important;
+    padding: 10px 6px;
+    color: #fff;
+    /*font-size: 13px;*/
+}
+
+#evcal li {
+    display: block;
+    float: left;
+    box-sizing:border-box;
+    border: 1px solid #999;
+    margin-right: -1px;
+    margin-bottom: -1px;
+}
+
+#evcal .days li:hover {
+    background: #d3d3d3;
+}
+
+/*#evcal .day {
+    overflow-y: hidden;
+}*/
+
+#evcal .date {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 4px;
+    /*background: #333;*/
+    /*background: #325482;*/
+    background: #5387b5;
+    color: #fff;
+    width: 20px;
+    border-radius: 50%;
+    float: right;
+    cursor: default;
+}
+#evcal > ul.days > li > div.date > a {
+    color:white;
+}
+#evcal .other-month {
+    /*background: #f5f5f5;*/
+    background: #d4d4d4;
+    color: #666;
+}
+#evcal .days li {
+    min-height: 130px;
+}
+

@@ -100,7 +100,6 @@ class month extends \Evlist\View
         list($y, $m, $d) = explode('-', $starting_date);
         $weekOfYear = DateFunc::weekOfYear($d, $m, $y);
 
-        $T->set_block('monthview', 'weekBlock', 'wBlock');
         foreach ($calendarView as $weeknum => $weekdata) {
             list($weekYear, $weekMonth, $weekDay) = explode('-', $weekdata[0]);
             $T->set_var(array(
@@ -114,6 +113,7 @@ class month extends \Evlist\View
             ) );
             $weekOfYear++;
 
+            $dayidx = 0;
             foreach ($weekdata as $daynum => $daydata) {
                 list($y, $m, $d) = explode('-', $daydata);
                 if ($daydata == $_CONF['_now']->format('Y-m-d', true)) {
@@ -212,6 +212,7 @@ class month extends \Evlist\View
                     'cal_day_style' => $dayclass,
                     'pi_url'        => EVLIST_URL,
                     'cal_day_entries' => $dayentries,
+                    'dayname'       => $daynames[$dayidx],
                 ) );
 
                 if (EVLIST_canSubmit()) {
@@ -219,9 +220,12 @@ class month extends \Evlist\View
                     $T->set_var('can_add', 'true');
                 }
                 $T->parse('dBlock', 'dayBlock', true);
+                if ($dayidx == 6) {
+                    $dayidx = 0;
+                } else {
+                    $dayidx++;
+                }
             }
-            $T->parse('wBlock', 'weekBlock', true);
-            $T->clear_var('dBlock');
         }
 
         $this->prev_date = array(

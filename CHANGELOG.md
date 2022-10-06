@@ -5,6 +5,7 @@ Release TBD
 - Fix layout for Agenda view
 - Allow different displayblock settings for list vs. calendar views.
 - Add `DateFunc::cal_days_in_month` in case PHP doesn't have calendar support.
+- Use Uikit grid for monthly calendar, auto-scale for number of events. (#47)
 
 ## 1.5.7
 Release 2022-07-30

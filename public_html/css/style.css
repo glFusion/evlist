@@ -871,10 +871,6 @@ body.Xloading .Xevlist_spinner{
     background: #d3d3d3;
 }
 
-/*#evcal .day {
-    overflow-y: hidden;
-}*/
-
 #evcal .date {
     text-align: center;
     margin-bottom: 5px;
@@ -898,5 +894,6 @@ body.Xloading .Xevlist_spinner{
 }
 #evcal .days li {
     min-height: 130px;
+	padding-left: 5px;
 }
 

@@ -3,14 +3,16 @@
  * Class to manage categories.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.1
+ * @version     v1.5.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 
 /**
@@ -71,26 +73,29 @@ class Category
      *
      * @param   integer $cat_id Optional calendar ID, $this->cat_id used if 0
      */
-    public function Read($cat_id = 0)
+    public function Read(int $cat_id = 0) : bool
     {
         global $_TABLES;
 
         if ($cat_id > 0)
             $this->cat_id = $cat_id;
 
-        $sql = "SELECT *
-            FROM {$_TABLES['evlist_categories']}
-            WHERE id='{$this->cat_id}'";
-        //echo $sql;
-        $result = DB_query($sql);
-
-        if (!$result || DB_numRows($result) == 0) {
-            $this->cat_id = 0;
-            return false;
-        } else {
-            $row = DB_fetchArray($result, false);
+        try {
+            $row = Database::getInstance()->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_categories']} WHERE id = ?",
+                array($this->cat_id),
+                array(Database::INTEGER)
+            )->fetchAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $row = false;
+        }
+        if (is_array($row)) {
             $this->setVars($row, true);
             return true;
+        } else {
+            $this->cat_id = 0;
+            return false;
         }
     }
 
@@ -100,7 +105,7 @@ class Category
      *
      * @return  integer     Record ID
      */
-    public function getID()
+    public function getID() : int
     {
         return (int)$this->cat_id;
     }
@@ -111,7 +116,7 @@ class Category
      *
      * @return  intetger    1 if enabled, 2 if disabled
      */
-    public function getStatus()
+    public function getStatus() : int
     {
         return (int)$this->cat_status;
     }
@@ -123,7 +128,7 @@ class Category
      * @param   string  $name   Category name
      * @return  object  $this
      */
-    public function setName($name)
+    public function setName(string $name) : self
     {
         $this->cat_name = $name;
         return $this;
@@ -135,7 +140,7 @@ class Category
      *
      * @return  string      Category name
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->cat_name;
     }
@@ -146,11 +151,12 @@ class Category
      *
      * @param   array   $A      Array of fields
      */
-    public function setVars($A)
+    public function setVars(array $A) : self
     {
         $this->cat_id = isset($A['id']) ? (int)$A['id'] : 0;
         $this->cat_name = $A['name'];
         $this->cat_status = isset($A['status'])? (int)$A['status'] : 0;
+        return $this;
     }
 
 
@@ -159,7 +165,7 @@ class Category
      *
      * @return  string  HTML for editing form
      */
-    public function Edit()
+    public function Edit() : string
     {
         global $_SYSTEM;
 
@@ -182,7 +188,7 @@ class Category
      * @param   array   $A  Array of data to save, typically from form
      * @return  integer     Category ID, 0 on failure.
      */
-    public function Save($A=array())
+    public function Save(array $A=array()) : int
     {
         global $_TABLES, $_EV_CONF;
 
@@ -196,9 +202,15 @@ class Category
             $this->isNew = true;
         }
 
-        $fld_sql = "name = '" . DB_escapeString($this->cat_name) ."',
-            status = '{$this->cat_status}'";
-
+        $values = array(
+            'name' => $this->cat_name,
+            'status' => $this->cat_status,
+        );
+        $types = array(
+            Database::STRING,
+            Database::STRING,
+        );
+        $db = Database::getInstance();
         if ($this->isNew) {
             // If adding a record, make sure it doesn't already exist.
             // If it does, just return the existing ID.
@@ -206,24 +218,35 @@ class Category
             if ($id > 0) {
                 return $id;
             }
-            $sql = "INSERT INTO {$_TABLES['evlist_categories']} SET
-                    $fld_sql";
+            try {
+                $db->conn->insert(
+                    $_TABLES['evlist_categories'],
+                    $values,
+                    $types
+                );
+                $this->cat_id = $db->conn->lastInsertId();
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return 0;
+            }
         } else {
-            $sql = "UPDATE {$_TABLES['evlist_categories']} SET
-                    $fld_sql
-                    WHERE id='{$this->cat_id}'";
+            try {
+                $types[] = Database::INTEGER;
+                $db->conn->insert(
+                    $_TABLES['evlist_categories'],
+                    $values,
+                    array('id' => $this->cat_id),
+                    $types
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return 0;
+            }
         }
 
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (!DB_error()) {
-            if ($this->isNew) $this->cat_id = DB_insertId();
-            Cache::clear('categories');
-            return $this->cat_id;
-        } else {
-            return 0;
-        }
-    }   // function Save()
+        Cache::clear('categories');
+        return $this->cat_id;
+    }
 
 
     /**
@@ -231,13 +254,22 @@ class Category
      *
      * @param   integer $cat_id Category to delete
      */
-    public static function Delete($cat_id=0)
+    public static function Delete(int $cat_id=0) : void
     {
         global $_TABLES;
 
         $cat_id = (int)$cat_id;
-        DB_delete($_TABLES['evlist_categories'], 'id', $cat_id);
-        DB_delete($_TABLES['evlist_lookup'], 'cid', $cat_id);
+        $db = Database::getInstance();
+        $db->conn->delete(
+            $_TABLES['evlist_categories'],
+            array('id' => $cat_id),
+            array(Database::INTEGER)
+        );
+        $db->conn->delete(
+            $_TABLES['evlist_lookup'],
+            array('cid' => $cat_id),
+            array(Database::INTEGER)
+        );
         Cache::clear('categories');
     }
 
@@ -248,16 +280,21 @@ class Category
      * $param   boolean $enabled    True to get only enabled calendars
      * return   array       Array of calendar objects
      */
-    public static function getAll()
+    public static function getAll() : array
     {
         global $_TABLES;
 
         $cats = array();
-        $sql = "SELECT * FROM {$_TABLES['evlist_categories']}
-            ORDER BY id ASC";
-        $res = DB_query($sql);
-        if ($res && DB_numRows($res) > 0) {
-            while ($A = DB_fetchArray($res, false)) {
+        try {
+            $stmt = Database::getInstance()->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_categories']} ORDER BY id ASC"
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $stmt = false;
+        }
+        if ($stmt) {
+            while ($A = $stmt->fetchAssociative()) {
                 $cats[$A['id']] = new self($A);
             }
         }
@@ -305,12 +342,20 @@ class Category
      * @param   string  $cat_name   Category name
      * @return  integer     ID of record, 0 if it doesn't exist
      */
-    public static function Exists($cat_name)
+    public static function Exists(string $cat_name) : int
     {
         global $_TABLES;
 
-        $id = (int)DB_getItem($_TABLES['evlist_categories'], 'id',
-            "name = '" . DB_escapeString($cat_name) . "'");
+        try {
+            $id = Database::getInstance()->getItem(
+                $_TABLES['evlist_categories'],
+                'id',
+                array('name' => $cat_name)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $id = 0;
+        }
         return $id;
     }
 
@@ -440,4 +485,3 @@ class Category
 
 }
 
-?>

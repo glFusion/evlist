@@ -109,6 +109,7 @@ case 'today':
     $month = $_CONF['_now']->format('m');
     $day = $_CONF['_now']->format('d');
     $V = Evlist\View::getView('', $year, $month, $day, $category, $calendar);
+    $_EV_CONF['displayblocks'] = $V->getDisplayBlocks();
     $content .= $V->Render();
     break;
 

@@ -1546,7 +1546,7 @@ function plugin_loadlanguage_evlist($requested='')
 /**
  * Provides the getItemInfo function for this plugin.
  *
- * @param   string  $id         Product ID
+ * @param   string  $id         Occurrence ID
  * @param   string  $what       Comma-separated list of fields to return
  * @param   integer $uid        User ID
  * @param   array   $options    Not used
@@ -1563,26 +1563,23 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
     $rp_id = NULL;
     $eid = NULL;
     $link_to = 'repeat';
+    if (strpos($id, ':') !== false) {
+        list($eid, $rp_id) = explode(':', $id);
+        $rp_id = (int)$rp_id;
+        $fields[] = 'e.id';
+        if (!empty($rp_id)) {
+            $fields[] = 'r.rp_id';
+        } else {
+            $fields[] = '0 as rp_id';
+        }
+    } else {
+        $fields[] = 'r.rp_id';
+        $fields[] = 'e.id';
+        $rp_id = $id;
+    }
+
     foreach ($properties as $p) {
         switch ($p) {
-        case 'id':
-            if (strpos($id, ':') !== false) {
-                list($eid, $rp_id) = explode(':', $id);
-                $rp_id = (int)$rp_id;
-                $fields[] = 'e.id';
-                if (!empty($rp_id)) {
-                    $fields[] = 'r.rp_id';
-                    //$rp_id = $id;
-                } else {
-                    $fields[] = '0 as rp_id';
-                    //$eid = $id;
-                }
-            } else {
-                $fields[] = 'r.rp_id';
-                $fields[] = 'e.id';
-                $eid = $id;
-            }
-            break;
         case 'title':
             //$fields[] = 'MAX(d.title) AS title';
             $fields[] = 'd.title';
@@ -1733,6 +1730,7 @@ function plugin_getiteminfo_evlist($id, $what, $uid=0, $options=array())
                 break;
             }
         }
+
         if ($link_to == 'repeat' && $A['rp_id'] > 0) {
             $props['url'] = EVLIST_URL . '/view.php?&rid=' . $A['rp_id'];
         } else {

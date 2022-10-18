@@ -9,12 +9,14 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2015-2019 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.6
+ * @version     v1.5.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 
 /**
@@ -79,25 +81,30 @@ class TicketType
      *
      * @param   integer $id Optional type ID, $this->tt_id used if 0
      */
-    public function Read($id = 0)
+    public function Read(?int $id = NULL) : bool
     {
         global $_TABLES;
 
-        if ($id > 0)
-            $this->tt_id = $id;
+        if ($id > 0) {
+            $this->tt_id = (int)$id;
+        }
 
-        $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']}
-            WHERE tt_id='{$this->tt_id}'";
-        //echo $sql;
-        $result = DB_query($sql);
-
-        if (!$result || DB_numRows($result) == 0) {
+        try {
+            $data = Database::getInstance()->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_tickettypes']} WHERE tt_id = ?",
+                array($this->tt_id),
+                array(Database::INTEGER)
+            )->fetchAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data = false;
+        }
+        if (is_array($data)) {
+            $this->SetVars($data, true);
+            return true;
+        } else {
             $this->tt_id = 0;
             return false;
-        } else {
-            $row = DB_fetchArray($result, false);
-            $this->SetVars($row, true);
-            return true;
         }
     }
 
@@ -170,12 +177,13 @@ class TicketType
      *
      * @param   array    $A  Array of data to save, typically from form
      */
-    public function Save($A=array())
+    public function Save(?array $A=NULL) : bool
     {
         global $_TABLES, $_EV_CONF;
 
-        if (is_array($A) && !empty($A))
+        if (is_array($A) && !empty($A)) {
             $this->SetVars($A);
+        }
 
         if ($this->tt_id > 0) {
             $this->isNew = false;
@@ -183,32 +191,43 @@ class TicketType
             $this->isNew = true;
         }
 
-        $fld_sql = "shortcode = '" . DB_escapeString($this->shortcode) . "',
-            dscp = '" . DB_escapeString($this->dscp) ."',
-            enabled = '{$this->enabled}',
-            event_pass = '{$this->event_pass}'";
+        $values = array(
+            'shortcode' => $this->shortcode,
+            'dscp' => $this->dscp,
+            'enabled' => $this->enabled,
+            'event_pass' => $this->event_pass
+        );
+        $types = array(
+            Database::STRING,
+            Database::STRING,
+            Database::INTEGER,
+            Database::INTEGER,
+        );
+        $db = Database::getInstance();
 
-        if ($this->isNew) {
-            $sql = "INSERT INTO {$_TABLES['evlist_tickettypes']} SET
-                    $fld_sql";
-        } else {
-            $sql = "UPDATE {$_TABLES['evlist_tickettypes']} SET
-                    $fld_sql
-                    WHERE tt_id='{$this->tt_id}'";
-        }
-
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (!DB_error()) {
+        try {
             if ($this->isNew) {
-                $this->tt_id = DB_insertId();
+                $db->conn->insert(
+                    $_TABLES['evlist_tickettypes'],
+                    $values,
+                    $types
+                );
+                $this->tt_id = $db->conn->lastInsertId();
+            } else {
+                $types[] = Database::INTEGER;   // for tt_id
+                $db->conn->update(
+                    $_TABLES['evlist_tickettypes'],
+                    $values,
+                    array('tt_id' => $this->tt_id),
+                    $types
+                );
             }
             return true;
-        } else {
-            COM_errorLog("Evist\\TicketType::Save SQL Error: $sql");
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
             return false;
         }
-    }   // function Save()
+    }
 
 
     /**
@@ -227,7 +246,16 @@ class TicketType
             // Can't delete the default type, or one that has been used.
             return false;
         } else {
-            DB_delete($_TABLES['evlist_tickettypes'], 'tt_id', $id);
+            try {
+                Database::getInstance()->conn->delete(
+                    $_TABLES['evlist_tickettypes'],
+                    array('tt_id' => $id),
+                    array(Database::INTEGER)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return false;
+            }
             return true;
         }
     }
@@ -244,7 +272,12 @@ class TicketType
         global $_TABLES;
 
         $id = (int)$id;
-        $count = DB_count($_TABLES['evlist_tickets'], 'tic_type', $id);
+        $count = Database::getInstance()->getCount(
+            $_TABLES['evlist_tickets'],
+            array('tic_type'),
+            array($id),
+            array(Database::INTEGER)
+        );
         return $count == 0 ? false : true;
     }
 
@@ -255,7 +288,7 @@ class TicketType
      * @param   boolean $enabled    True to get only enabled, false for all
      * @return  array       Array of TicketType objects, indexed by ID
      */
-    public static function getTicketTypes($enabled = true)
+    public static function getTicketTypes(bool $enabled = true) : array
     {
         global $_TABLES;
 
@@ -267,11 +300,19 @@ class TicketType
             $sql = "SELECT * FROM {$_TABLES['evlist_tickettypes']}";
             if ($enabled) $sql .= " WHERE enabled = 1";
             $sql .= " ORDER BY orderby ASC";
-            $res = DB_query($sql, 1);
-            while ($A = DB_fetchArray($res, false)) {
-                // create empty objects and use SetVars to save DB lookups
-                $types[$key][$A['tt_id']] = new TicketType();
-                $types[$key][$A['tt_id']]->SetVars($A);
+            try {
+                $data = Database::getInstance()->conn->executeQuery($sql)
+                                                     ->fetchAllAssociative();
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $data = false;
+            }
+            if (is_array($data)) {
+                foreach ($data as $A) {
+                    // create empty objects and use SetVars to save DB lookups
+                    $types[$key][$A['tt_id']] = new TicketType();
+                    $types[$key][$A['tt_id']]->SetVars($A);
+                }
             }
         }
         return $types[$key];
@@ -362,7 +403,7 @@ class TicketType
             'query_fields' => array('dscp'),
         );
         $extra = array(
-            'tt_count' => DB_count($_TABLES[static::$TABLE]),
+            'tt_count' => Database::getInstance()->getCount($_TABLES[static::$TABLE]),
         );
 
         $retval .= COM_createLink(

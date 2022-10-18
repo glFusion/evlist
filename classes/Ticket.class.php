@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2015-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.6
+ * @version     v1.5.8
  * @since       v1.4.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -114,7 +114,7 @@ class Ticket
             Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
             $data = false;
         }
-        if (is_array($data) && count($data) == 1) {
+        if (is_array($data)) {
             $this->setVars($data, true);
             return true;
         } else {
@@ -423,52 +423,66 @@ class Ticket
     /**
      * Save the current ticket.
      *
-     * @return  string  Ticket identifier
+     * @return  string  Ticket identifier, NULL on error
      */
-    public function Save()
+    public function Save() : ?string
     {
         global $_TABLES, $_EV_CONF, $_USER;
 
-        if ($this->uid == 0) $this->uid = $_USER['uid'];
-        $rp_id = (int)$rp_id;
-        $fee = (float)$fee;
-        $type = (int)$type;
-
-        if ($this->tic_id == '') {
-            $this->tic_id = self::makeTicketId(
-                array(
-                    'event_id' => $this->ev_id,
-                    'repeat_id' => $this->rp_id,
-                    'fee' => $this->fee,
-                    'uid' => $this->uid,
-                )
-            );
-            $sql1 = "INSERT INTO {$_TABLES['evlist_tickets']} SET
-                tic_id = '" . DB_escapeString($this->tic_id) . "',
-                dt = UNIX_TIMESTAMP(), ";
-            $sql3 = '';
-        } else {
-            $sql1 = "UPDATE {$_TABLES['evlist_tickets']} SET ";
-            $sql3 = " WHERE tic_id = '{$this->tic_id}'";
+        if ($this->uid == 0) {
+            $this->uid = $_USER['uid'];
         }
+        $values = array(
+            'tic_type' => $this->tic_type,
+            'ev_id' => $this->ev_id,
+            'rp_id' => $this->rp_id,
+            'fee' => $this->fee,
+            'paid' => $this->paid,
+            'uid' => $this->uid,
+            'used' => $this->used,
+            'comment' => $this->comment,
+        );
+        $types = array(
+            Database::INTEGER,
+            Database::STRING,
+            Database::INTEGER,
+            Database::STRING,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::STRING,
+        );
 
-        $sql2 = "tic_type = {$this->tic_type},
-            ev_id = '" . DB_escapeString($this->ev_id) . "',
-            rp_id = {$this->rp_id},
-            fee = {$this->fee},
-            paid = {$this->paid},
-            uid = {$this->uid},
-            used = {$this->used},
-            comment = '" . DB_escapeString($this->comment) . "'";
-
-        $sql = $sql1 . $sql2 . $sql3;
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (!DB_error()) {
-            return $tic_id;
-        } else {
+        $db = Database::getInstance();
+        try {
+            if ($this->tic_id == '') {
+                $this->tic_id = self::makeTicketId(
+                    array(
+                        'event_id' => $this->ev_id,
+                        'repeat_id' => $this->rp_id,
+                        'fee' => $this->fee,
+                        'uid' => $this->uid,
+                    )
+                );
+                $values['tic_id'] = $this->tic_id;
+                $values['dt'] = time();
+                $types[] = Database::STRING;
+                $types[] = Database::INTEGER;
+                $db->conn->insert($_TABLES['evlist_tickets'], $values, $types);
+            } else {
+                $types[] = Database::STRING;
+                $db->conn->update(
+                    $_TABLES['evlist_tickets'],
+                    $values,
+                    array('tic_id' => $this->tic_id),
+                    $types
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
             return NULL;
         }
+        return $this->tic_id;
     }
 
 
@@ -477,33 +491,51 @@ class Ticket
      *
      * @param   array|string    $id Single or Array of ticket IDs to delete
      */
-    public static function Delete($id='')
+    public static function Delete($id='') : void
     {
         global $_TABLES;
 
-        if (is_array($id)) {
-            $key = $id[0];
-            foreach ($id as $idx=>$tic_id) {
-                $id[$idx] = DB_escapeString($tic_id);
-            }
-            $where = "IN ('" . implode("','", $id) . "')";
-        } else {
-            $key = $id;
-            $id = DB_escapeString($id);
-            $where = "= '$id'";
-        }
+        $db = Database::getInstance();
+
         // Grab a ticket to get the event information to find out if the
         // waitlist should be updated.
-        $tic = new self($key);
-        $Ev = new Event($tic->ev_id);
-        $max_rsvp = (int)$Ev->getOption('max_rsvp');
-        $sql = "DELETE FROM {$_TABLES['evlist_tickets']} WHERE tic_id $where";
-        DB_query($sql);
-        // Now that the tickets have been deleted, reset the waitlist if needed
-        if ($max_rsvp > 0 && $Ev->getOption('rsvp_waitlist')) {
-            self::resetWaitlist($max_rsvp, $Ev->getID(), $tic->getID());
+        if (is_array($id)) {
+            $key = $id[0];
+        } else {
+            $key = $id;
         }
-        Log::write('evlist', Log::INFO, __METHOD__ . ": Deleted tickets $where");
+        $tic = new self($key);
+
+        try {
+            if (is_array($id)) {
+                $key = $id[0];
+                $db->conn->executeStatement(
+                    "DELETE FROM {$_TABLES['evlist_tickets']} WHERE tic_id IN (?)",
+                    array($id),
+                    array(Database::PARAM_INT_ARRAY)
+                );
+                $tick_ids = implode(',', $id);
+            } else {
+                $key = $id;
+                $db->conn->delete(
+                    $_TABLES['evlist_tickets'],
+                    array('tic_id' => $id),
+                    array(Database::INTEGER)
+                );
+                $tick_ids = $id;
+            }
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return;
+        }
+
+        // Now that the tickets have been deleted, reset the waitlist if needed
+        $Ev = Event::getInstance($tic->ev_id);
+        $max_rsvp = (int)$Ev->getOption('max_rsvp');
+        if ($max_rsvp > 0 && $Ev->getOption('rsvp_waitlist')) {
+            self::resetWaitlist($max_rsvp, $Ev->getID(), $tic->getRepeatID());
+        }
+        Log::write('evlist', Log::INFO, __METHOD__ . ": Deleted tickets $tick_ids");
     }
 
 
@@ -512,23 +544,32 @@ class Ticket
      *
      * @param   integer $id     ID of ticket reset
      */
-    public static function Reset($id='')
+    public static function Reset($id='') : void
     {
         global $_TABLES;
 
-        if (is_array($id)) {
-            foreach ($id as $idx=>$tic_id) {
-                $id[$idx] = DB_escapeString($tic_id);
+        try {
+            if (is_array($id)) {
+                Database::getInstance()->conn->executeStatement(
+                    "UPDATE {$_TABLES['evlist_tickets']} SET used = 0 WHERE tic_id IN (?)",
+                    array($id),
+                    array(Database::PARAM_INT_ARRAY)
+                );
+                $tick_ids = implode(',', $id);
+            } else {
+                Database::getInstance()->conn->update(
+                    $_TABLES['evlist_tickets'],
+                    array('used' => 0),
+                    array('tic_id' => $id),
+                    array(Database::INTEGER, Database::INTEGER)
+                );
+                $tick_ids = $id;
             }
-            $where = "IN ('" . implode("','", $id) . "')";
-        } else {
-            $id = DB_escapeString($id);
-            $where = "= '$id'";
+            Log::write('evlist', Log::INFO, __METHOD__ . ": Reset usage for tickets $tick_ids");
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return;
         }
-        $sql = "UPDATE {$_TABLES['evlist_tickets']}
-                SET used = 0 WHERE tic_id $where";
-        DB_query($sql);
-        Log::write('evlist', Log::INFO, __METHOD__ . ": Reset usage for tickets $where");
     }
 
 
@@ -544,42 +585,44 @@ class Ticket
      * @param   string  $paid       'paid', 'unpaid', or empty for all
      * @return  array       Array of Ticket objects, indexed by ID
      */
-    public static function getTickets($ev_id, $rp_id = 0, $uid = 0, $paid='')
+    public static function getTickets(string $ev_id, ?int $rp_id = NULL, ?int $uid = NULL, ?int $paid=NULL) : array
     {
         global $_TABLES;
 
         $tickets = array();
+        $qb = Database::getInstance()->conn->createQueryBuilder();
 
-        $ev_id = DB_escapeString($ev_id);
-        $rp_id = (int)$rp_id;
-        $uid = (int)$uid;
-        $where = array('1 = 1');    // Initialize in case of no other clauses
+        $qb->select('*')
+           ->from($_TABLES['evlist_tickets'])
+           ->orderBy('waitlist', 'ASC')
+           ->addOrderBy('dt', 'ASC');
         if ($ev_id != '') {
-            $where[] = "ev_id = '$ev_id'";
+            $qb->andWhere('ev_id = :ev_id')
+               ->setParameter('ev_id', $ev_id, Database::STRING);
         }
         if ($rp_id > 0) {
-            $where[] = "(rp_id = 0 OR rp_id = $rp_id)";
+            $qb->andWhere('(rp_id = 0 OR rp_id = :rp_id)')
+               ->setParameter('rp_id', $rp_id, Database::INTEGER);
         }
         if ($uid > 0) {
             // for a user printing their own tickets
-            $where[] = "uid = $uid";
+            $qb->andWhere('uid = :uid')
+               ->setParameter('uid', $uid, Database::INTEGER);
         }
         if ($paid == 'paid') {
-            $where[] = "paid >= fee";
+            $qb->andWhere('paid >= fee');
         } elseif ($paid == 'unpaid') {
-            $where[] = "paid < fee";
+            $qb->andWhere('paid < fee');
         }
 
-        if (!empty($where)) {
-            $sql_where = implode(' AND ', $where);
-            $sql = "SELECT * FROM {$_TABLES['evlist_tickets']}
-                WHERE $sql_where
-                ORDER BY waitlist, dt ASC";
-            $res = DB_query($sql, 1);
-            while ($A = DB_fetchArray($res, false)) {
+        try {
+            $stmt = $qb->execute();
+            while ($A = $stmt->fetchAssociative()) {
                 // create empty objects and use setVars to save DB lookups
                 $tickets[$A['tic_id']] = new self($A);
             }
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
         }
         return $tickets;
     }
@@ -888,32 +931,37 @@ class Ticket
      * @param   integer $rp_id  Occurrence ID.
      * @return  integer Zero on success, Message ID on failure
      */
-    public function Checkin($rp_id)
+    public function Checkin(int $rp_id) : int
     {
         global $_TABLES;
+
+        $db = Database::getInstance();
 
         // Check that the ticket hasn't already been used
         if ($this->used > 0) return 51;
         if ($this->fee > 0 && $this->paid < $this->fee) return 50;
         $reg_cookie = EV_getVar($_COOKIE, 'evlist_register', 'array');
         $code = EV_getVar($reg_cookie, $this->ev_id);
-        $auth = (int)DB_getItem('gl_evlist_checkin_auth', 'auth', "ev_id = '{$this->ev_id}' AND code = '$code'");
+        /*$auth = (int)$db->getItem('gl_evlist_checkin_auth', 'auth', "ev_id = '{$this->ev_id}' AND code = '$code'");
         if ($auth != 1) {
             echo "Unauthorized";
             return 52;
-        }
+        }*/
 
         // Record the current timestamp in the DB
         $this->used = time();
-        $sql = "UPDATE {$_TABLES['evlist_tickets']}
-            SET used = {$this->used}
-            WHERE tic_id = '{$this->tic_id}'";
-        /*$sql = "INSERT INTO {$_TABLES['evlist_tickets_used']} SET
-                tic_id = '" . DB_escapeString($this->tic_id) . "',
-                rp_id = {$rp_id},
-                used = UNIX_TIMESTAMP()";*/
-        DB_query($sql, 1);
-        return DB_error() ? 51 : 0;
+        try {
+            $db->conn->update(
+                $_TABLES['evlist_tickets'],
+                array('used' => $this->used),
+                array('tic_id' => $this->tic_id),
+                array(Database::INTEGER, Database::STRING)
+            );
+            return 51;
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return 0;
+        }
     }
 
 
@@ -923,17 +971,21 @@ class Ticket
      * @param   string  $tick_id    ID of ticket to update
      * @param   float   $amt        Amount paid
      */
-    public static function AddPayment($tick_id, $amt)
+    public static function AddPayment(string $tick_id, float $amt) : void
     {
         global $_TABLES;
 
         // Use US floating point format for MySQL
         $amt = number_format((float)$amt, 2, '.', '');
-        $tick_id = DB_escapeString($tick_id);
-        $sql = "UPDATE {$_TABLES['evlist_tickets']}
-                SET paid = paid + $amt
-                WHERE tic_id = '$tick_id'";
-        DB_query($sql, 1);
+        try {
+            Database::getInstance()->conn->executeStatement(
+                "UPDATE {$_TABLES['evlist_tickets']} SET paid = paid + ? WHERE tic_id = ?",
+                array($amt, $tick_id),
+                array(Database::STRING, Database::STRING)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
     }
 
 
@@ -979,22 +1031,33 @@ class Ticket
      * @param   integer $uid        User ID, default to current user
      * @return  integer     Number of unpaid tickets
      */
-    public static function CountUnpaid($ev_id, $rp_id=0, $uid=0)
+    public static function CountUnpaid(string $ev_id, ?int $rp_id=NULL, ?int $uid=NULL)
     {
         global $_TABLES, $_USER;
 
-        if ($uid == 0) $uid = $_USER['uid'];
+        if (empty($uid)) $uid = $_USER['uid'];
         $uid = (int)$uid;
         $rp_id = (int)$rp_id;
-        $ev_id = DB_escapeString($ev_id);
 
         $vars = array('ev_id', 'uid');
         $vals = array($ev_id, $uid);
+        $types = array(Database::STRING, Database::INTGER);
         if ($rp_id > 0) {
             $vars[] = 'rp_id';
             $vals[] = $rp_id;
+            $types[] = Database::INTEGER;
         }
-        $count = DB_count($_TABLES['evlist_tickets'], $vars, $vals);
+        try {
+            $count = Database::getInstance()->getCount(
+                $_TABLES['evlist_tickets'],
+                $vars,
+                $vals,
+                $types
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $count = 0;
+        }
         return $count;
     }
 
@@ -1009,22 +1072,31 @@ class Ticket
      * @param   integer $uid        User ID, default to current user
      * @return  integer     Number of user/event tickets remainint unpaid
      */
-    public static function MarkPaid($count, $ev_id, $rp_id=0, $uid=0)
+    public static function MarkPaid(int $count, string $ev_id, ?int $rp_id=0, ?int $uid=0) : int
     {
         global $_TABLES, $_USER;
 
-        $count = (int)$count;
-        if ($uid == 0) $uid = $_USER['uid'];
+        if (empty($uid)) $uid = $_USER['uid'];
         $uid = (int)$uid;
         $rp_id = (int)$rp_id;
-        $ev_id = DB_escapeString($ev_id);
 
-        $sql = "UPDATE {$_TABLES['evlist_tickets']}
-                SET paid = fee
-                WHERE ev_id = '$ev_id' AND uid = $uid AND paid=0";
-        if ($rp_id > 0) $sql .= " AND rp_id = $rp_id";
-        $sql .= " LIMIT $count";
-        DB_query($sql);
+        $sql = "UPDATE {$_TABLES['evlist_tickets']} SET paid = fee
+            WHERE ev_id = ? AND uid = ? AND paid = 0";
+        $values = array($ev_id, $uid);
+        $types = array(Database::STRING, Database::INTEGER);
+        if ($rp_id > 0) {
+            $sql .= ' AND rp_id = ?';
+            $values[] = $rp_id;
+            $types[] = Database::INTEGER;
+        }
+        $sql .= " LIMIT ?";
+        $values[] = $count;
+        $types[] = Database::INTEGER;
+        try {
+            Database::getInstance()->conn->executeStatement($sql, $values, $types);
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
         return self::CountUnpaid($ev_id, $rp_id, $uid);
     }
 
@@ -1039,28 +1111,40 @@ class Ticket
      * @param   integer $rp_id      Instance ID
      * @return  array               Array of updated ticket IDs
      */
-    public static function resetWaitlist($max_rsvp, $ev_id, $rp_id)
+    public static function resetWaitlist(int $max_rsvp, string $ev_id, int $rp_id) : array
     {
         global $_TABLES;
 
-        if ($max_rsvp == 0) return array();   // no max, nothing to change
         $upd = array();
+        if ($max_rsvp == 0) {
+            return $upd;   // no max, nothing to change
+        }
+
+        // Get all the tickets for the event and mark the first "x" as not
+        // waitlisted, where "x" is the max_rsvp value.
         $tickets = self::getTickets($ev_id, $rp_id);
         $i = 0;
         foreach ($tickets as $tic_id=>$ticket) {
-            if ($i < $max_rsvp) {
-                if ($ticket->waitlist == 1) {
-                    $upd[] = DB_escapeString($tic_id);
-                }
+            if ($i >= $max_rsvp) {
+                break;
+            }
+            if ($ticket->waitlist == 1) {
+                $upd[] = $tic_id;
             }
             $i++;
         }
         if (!empty($upd)) {
-            $sql_str = "'" . implode("','", $upd) . "'";
-            $sql = "UPDATE {$_TABLES['evlist_tickets']}
-                    SET waitlist = 0
-                    WHERE tic_id IN ($sql_str)";
-            DB_query($sql);
+            try {
+                Database::getInstance()->conn->executeStatement(
+                    "UPDATE {$_TABLES['evlist_tickets']} SET waitlist = 0
+                    WHERE tic_id IN (?)",
+                    array($upd),
+                    array(Database::PARAM_STR_ARRAY)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return array();
+            }
         }
         return $upd;
     }
@@ -1197,7 +1281,18 @@ class Ticket
             return '';
         }
 
-        $sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
+        $qb = Database::getInstance()->conn->createQueryBuilder();
+        $qb->select('tk.dt', 'tk.tic_id', 'tk.tic_type', 'tk.rp_id', 'tk.fee', 'tk.paid',
+                    'tk.uid', 'tk.used', 'tt.dscp', 'tk.waitlist', 'tk.comment',
+                    'u.fullname',
+                    "{$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp")
+           ->from($_TABLES['evlist_tickets'], 'tk')
+           ->leftJoin('tk', $_TABLES['evlist_tickettypes'], 'tt', 'tt.tt_id = tk.tic_type')
+           ->leftJoin('tk', $_TABLES['users'], 'u', 'u.uid = tk.uid')
+           ->where('tk.ev_id = :ev_id')
+           ->setParameter('ev_id', $Ev->getEvent()->getID(), Database::STRING);
+
+        /*$sql = "SELECT tk.dt, tk.tic_id, tk.tic_type, tk.rp_id, tk.fee, tk.paid,
                     tk.uid, tk.used, tt.dscp, tk.waitlist, tk.comment,
                     u.fullname,
                     {$Ev->getEvent()->getOption('max_rsvp')} as max_rsvp
@@ -1206,10 +1301,11 @@ class Ticket
                 ON tt.tt_id = tk.tic_type
             LEFT JOIN {$_TABLES['users']} u
                 ON u.uid = tk.uid
-            WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";
+                WHERE tk.ev_id = '{$Ev->getEvent()->getID()}' ";*/
 
         if ($Ev->getEvent()->getOption('use_rsvp') == EV_RSVP_REPEAT) {
-            $sql .= " AND rp_id = '{$Ev->getID()}' OR rp_id = 0 ";
+            $qb->andWhere('rp_id = :ev_id OR rp_id = 0)');
+            //$sql .= " AND rp_id = '{$Ev->getID()}' OR rp_id = 0 ";
         }
 
         $text_arr = array(
@@ -1242,20 +1338,26 @@ class Ticket
         }
 
         $data_arr = array();
-        $res = DB_query($sql);
-        $i = 0;
-        while ($A = DB_fetchArray($res, false)) {
-            $data_arr[$i] = array(
-                'fullname' => $A['fullname'],
-            );
-            $cmts = json_decode($A['comment'], true);
-            $j = 0;
-            foreach ($cmts as $p=>$val) {
-                $data_arr[$i]['cmt_' . $j++] = $val;
-            }
-            $i++;
+        try {
+            $stmt = $qb->execute();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $stmt = false;
         }
-
+        if ($stmt) {
+            $i = 0;
+            while ($A = $stmt->fetchAssociative()) {
+                $data_arr[$i] = array(
+                    'fullname' => $A['fullname'],
+                );
+                $cmts = json_decode($A['comment'], true);
+                $j = 0;
+                foreach ($cmts as $p=>$val) {
+                    $data_arr[$i]['cmt_' . $j++] = $val;
+                }
+                $i++;
+            }
+        }
         $options_arr = array();
 
         $retval = '';

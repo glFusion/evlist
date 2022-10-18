@@ -69,7 +69,7 @@ class Occurrence
      *
      *  @param integer $rp_id   Optional repeat ID
      */
-    public function __construct(?int $rp_id=0)
+    public function __construct(?int $rp_id=NULL)
     {
         $this->_is_admin = plugin_ismoderator_evlist();
         $this->_referer = EVLIST_URL . '/index.php';    // default

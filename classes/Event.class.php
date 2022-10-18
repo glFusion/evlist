@@ -359,7 +359,7 @@ class Event
      *
      * @return  boolean     True for administrators, False for regular users
      */
-    public function isAdmin()
+    public function isAdmin() : bool
     {
         return $this->isAdmin ? true : false;
     }
@@ -371,7 +371,7 @@ class Event
      * @param   string  $id     Event record ID
      * @return  object  $this
      */
-    public function setID($id)
+    public function setID(string $id) : self
     {
         $this->id = COM_sanitizeID($id);
         return $this;
@@ -383,7 +383,7 @@ class Event
      *
      * @return  string      Event ID
      */
-    public function getID()
+    public function getID() : string
     {
         return $this->id;
     }
@@ -395,7 +395,7 @@ class Event
      * @param   string|array    $value  Comma-separated string or array
      * @return  object  $this
      */
-    private function setCategories($value)
+    private function setCategories($value) : self
     {
         if (is_array($value)) {
             $this->categories= $value;
@@ -502,7 +502,7 @@ class Event
      * @param   mixed   $default    Default value to return if not set
      * @return  mixed   Single value from the options array
      */
-    public function getOption($key, $default=NULL)
+    public function getOption(string $key, $default=NULL)
     {
         if (isset($key, $this->options)) {
             return $this->options[$key];
@@ -517,7 +517,7 @@ class Event
      *
      * @return  boolean     True if submission, False if production
      */
-    public function isSubmission()
+    public function isSubmission() : bool
     {
         return $this->table == 'evlist_submissions';
     }
@@ -617,12 +617,12 @@ class Event
         );
     }
 
-    public function getGroupID()
+    public function getGroupID() : int
     {
         return (int)$this->group_id;
     }
 
-    public function getStatus()
+    public function getStatus() : int
     {
         return (int)$this->status;
     }
@@ -649,13 +649,9 @@ class Event
      * @param   boolean $fromDB     True if read from DB, false if from $_POST
      * @return  object  $this
      */
-    public function setVars($row, $fromDB=false)
+    public function setVars(array $row, ?bool $fromDB=NULL) : self
     {
         global $_EV_CONF;
-
-        if (!is_array($row)) {
-            return $this;
-        }
 
         if (isset($row['date_start1']) && !empty($row['date_start1'])) {
             $this->date_start1 = $row['date_start1'];
@@ -899,11 +895,11 @@ class Event
      * Appends error messages to the $Errors property.
      *
      * @param   array   $A      Optional array of values from $_POST
-     * @return  string      Error text, or empty string on success
+     * @return  boolean     True on success, False on failure
      */
-    public function Save($A = '')
+    public function Save(?array $A = NULL) : bool
     {
-        global $_TABLES, $LANG_EVLIST, $_EV_CONF, $_CONF;
+        global $_TABLES, $LANG_EVLIST, $_CONF;
 
         // This is a bit of a hack, but we're going to save the old schedule
         // first before changing our own values.  This is done so that we

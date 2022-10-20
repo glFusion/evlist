@@ -11,8 +11,8 @@
 
 .evlistCalendarDialogClose {
     position: absolute;
-    right: 0px;
-    top: 0px;
+    right: 0;
+    top: 0;
 }
 
 .evlistCalendarDialogClose .legacy {
@@ -83,7 +83,7 @@
     float: left;
 }
 
-div.#evlistPrtEventDetail {
+div#evlistPrtEventDetail {
     clear: left;
     position: relative;
     float: left;
@@ -97,7 +97,7 @@ div.evEventItem {
 }
 * + div.evEventItem {
 	/* Override uk-margin setting */
-	margin-top: 0px !important;
+	margin-top: 0 !important;
 }
 div.evEventItem div.evEventElement {
 	margin-left:120px;
@@ -141,7 +141,7 @@ div.evEventItem label,
 #action_dialog,
 #subscribe_dialog {
     position: absolute;
-    right: 0px;
+    right: 0;
     background-color: #dedede;
     border: solid 1px #000000;
     width: 200px;
@@ -159,7 +159,7 @@ div.evEventItem label,
 #subscribe_dialog img {
     width: 16px;
     height: 16px;
-    border: 0px;
+    border: 0;
     margin-right: 1em;
 }
 
@@ -316,7 +316,7 @@ a.cal-event {
     text-decoration: none;
     width: 14%;
     height: 1.5em;
-    text-align: center;*/
+    text-align: center;
   background:transparent;
   border-bottom:#F7F7F7 1px dashed;
   border-left:#F7F7F7 1px dashed;
@@ -534,7 +534,7 @@ table.evlist_month .monthview_events {
 #evlist_nav_left {
     border: none;
     margin: 0;
-    padding: 0px;
+    padding: 0;
     width: 50%;
     vertical-align: top;
 }
@@ -685,7 +685,7 @@ table.smallmonthtable a.day-noevents {
 }
 .evlist_blk_day h3 {
     margin-top: 1em !important;
-    margin-bottom: 0px !important;
+    margin-bottom: 0 !important;
     font-style: italic;
 }
 
@@ -783,6 +783,7 @@ div.evCBouter {
 @media (min-width: 768px) {
 	.uk-width-1-7,
 	.uk-width-medium-1-7,
+	.uk-child-width-medium-1-7 > *,
 	.uk-grid-width-medium-1-7 > * {
 		width: 14.28%;
 	}

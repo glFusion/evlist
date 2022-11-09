@@ -329,6 +329,7 @@ class Event
                     // Normal, load our own detail object
                     $this->Detail = Detail::getInstance($this->det_id);
                 }
+                $this->getCategories();
                 $this->isNew = 0;
             }
         }

@@ -343,9 +343,8 @@ function toggleRSVPdetail(val)
 						<span id="title" class="tooltip_cfg tooltipstered"></span>
 					</label>
 					<div class="uk-form-controls">
-						<input required type="text" name="title" class="uk-input required"
-							id="title" style="width:50%;" maxlength="255"
-							value="{title}" />
+						<input required type="text" name="title" class="uk-input uk-form-width-large required"
+							id="title" maxlength="255" value="{title}" />
 						<i class="uk-icon-triangle-exclamation uk-text-danger tooltip" title="{$LANG_EVLIST['required']}"></i>
 						<span class="evFieldNote">{title_note}</span>
 					</div>
@@ -399,7 +398,7 @@ function toggleRSVPdetail(val)
 							onchange="checkDate1();" />
 						&nbsp;&nbsp;
 						<span id="starttime1" {starttime1_show}>
-							<input class="uk-input uk-form-width-small" type="text" id="f_timestart1" name="time_start1" size="10" value="{time_start1}" data-ev-timepicker />
+							<input class="uk-input uk-form-width-small" type="text" id="f_timestart1" name="time_start1" value="{time_start1}" data-ev-timepicker />
 						</span>
 					</div>
 				</div>
@@ -413,7 +412,7 @@ function toggleRSVPdetail(val)
 						<input class="uk-input uk-form-width-small"type="text" name="date_end1" id="f_enddate1" data-ev-datepicker value="{enddate1}" onchange="checkDate2();" />
 						&nbsp;&nbsp;
 						<span id="endtime1" {endtime1_show}>
-							<input class="uk-input uk-form-width-small"type="text" id="f_timeend1" data-ev-timepicker name="time_end1" size="10" value="{time_end1}" />
+							<input class="uk-input uk-form-width-small"type="text" id="f_timeend1" data-ev-timepicker name="time_end1" value="{time_end1}" />
 						</span>
 					</div>
 				</div>
@@ -449,14 +448,14 @@ function toggleRSVPdetail(val)
 					<div class="uk-form-row uk-margin">
 						<label class="uk-form-label">{$LANG_EVLIST['start_time']} 2:</label>
 						<div class="uk-form-controls">
-							<input class="uk-input uk-form-width-small" type="text" id="f_timestart2" name="time_start2" size="10" value="{time_start2}" class="ev_timepicker" />
+							<input class="uk-input uk-form-width-small" type="text" id="f_timestart2" name="time_start2" value="{time_start2}" class="ev_timepicker" />
 						</div>
 					</div>
 
 					<div class="uk-form-row uk-margin">
 						<label class="uk-form-label">{$LANG_EVLIST['end_time']} 2:</label>
 						<div class="uk-form-controls">
-							<input  class="uk-input uk-form-width-small" type="text" name="time_end2" size="10" value="{time_end2}" class="ev_timepicker" />
+							<input  class="uk-input uk-form-width-small" type="text" name="time_end2" value="{time_end2}" class="ev_timepicker" />
 						</div>
 					</div>
 				</div>
@@ -611,7 +610,7 @@ function toggleRSVPdetail(val)
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label"><strong>{$LANG_EVLIST['new_category']}</strong>:</label>
 					<div class="uk-form-controls">
-						<input class="uk-input uk-form-width-medium" type="text" name="newcat" id="addcat" size="32" maxlength="32" value="{newcat}" />
+						<input class="uk-input uk-form-width-medium" type="text" name="newcat" id="addcat" maxlength="32" value="{newcat}" />
 					</div>
 				</div>
 {!endif}
@@ -739,7 +738,7 @@ function toggleRSVPdetail(val)
 				<div class="uk-form-row uk-margin">
 					<label class="uk-form-label">{$LANG_EVLIST['zip']}:</label>
 					<div class="uk-form-controls">
-						<input class="uk-input uk-form-width-small" type="text" name="postal" id="postal" size="10" maxlength="25"
+						<input class="uk-input uk-form-width-small" type="text" name="postal" id="postal" maxlength="25"
 							value="{postal}" />
 					</div>
 				</div>

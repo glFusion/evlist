@@ -18,10 +18,12 @@ require_once '../../../lib-common.php';
 // so don't try to display a message
 if (!plugin_isadmin_evlist()) {
     COM_accessLog("User {$_USER['username']} tried to illegally access the evlist admin ajax function.");
-    exit;
+    $action = 'unauthorized';
+} else {
+    $action = $_POST['action'];
 }
 
-switch ($_POST['action']) {
+switch ($action) {
 case 'setStatus':
     $newval = (int)$_POST['newval'];
     $oldval = (int)$_POST['oldval'];
@@ -100,6 +102,17 @@ case 'toggle':
         'component' => $_POST['component'],
         'baseurl'   => EVLIST_ADMIN_URL,
         'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
+    );
+    echo json_encode($response);
+    break;
+
+case 'unauthorized':
+    $response = array(
+        'newval' => 0,
+        'id'    => 0,
+        'type'  => 'none',
+        'baseurl'   => EVLIST_ADMIN_URL,
+        'statusMessage' => 'Unauthorized Access',
     );
     echo json_encode($response);
     break;

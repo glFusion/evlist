@@ -16,6 +16,7 @@ use glFusion\Database\Database;
 use glFusion\Log\Log;
 use Evlist\DateFunc;
 use Evlist\Cache;
+use Evlist\Config;
 
 
 /**
@@ -339,7 +340,7 @@ class EventSet
      */
     public function getQueryBuilder() : \Doctrine\DBAL\Query\QueryBuilder
     {
-        global $_TABLES, $_EV_CONF, $_CONF, $_USER;
+        global $_TABLES, $_CONF, $_USER;
 
         $db = Database::getInstance();
         $qb = $db->conn->createQueryBuilder();
@@ -367,7 +368,7 @@ class EventSet
         // a selection option is specified, then that is used instead. It's up
         // to the caller to request the value properly, including table prefix.
         if (empty($this->selection)) {
-            $qb->select('ev.*', 'rep.*', 'cal.bgcolor', 'cal.fgcolor', 'cal.cal_icon');
+            $qb->select('ev.*', 'rep.*', 'det.*', 'cal.bgcolor', 'cal.fgcolor', 'cal.cal_icon');
         } else {
             foreach ($this->selection as $fld) {
                 $qb->addSelect($fld);
@@ -419,20 +420,20 @@ class EventSet
             $qb->andWhere('ev.show_upcoming = 1 AND cal.cal_show_upcoming = 1');
             // Alters the date range based on the setting for upcoming
             // events.
-            switch ($_EV_CONF['event_passing']) {
-            case 1:     // include if start time has not passed
+            switch (Config::get('event_passing')) {
+            case TimeRange::START_TIME_PASSED:  // include if start time has not passed
                 $qb->andWhere('rep.rp_start >= :rp_start')
                    ->setParameter('rp_start', $_CONF['_now']->toMySQL(true), Database::STRING);
                 break;
-            case 2:     // include if start date has not passed
+            case TimeRange::START_DATE_PASSED:  // include if start date has not passed
                 $qb->andWhere('rep.rp_start >= :rp_start')
                    ->setParameter('rp_start', $today, Database::STRING);
                 break;
-            case 3:     // include if end time has not passed
+            case TimeRange::END_TIME_PASSED:    // include if end time has not passed
                 $qb->andWhere('rep.rp_end >= :rp_end')
                    ->setParameter('rp_end', $_CONF['_now']->toMySQL(true), Database::STRING);
                 break;
-            case 4:     // include if end date has not passed
+            case TimeRange::END_DATE_PASSED:    // include if end date has not passed
                 $qb->andWhere('rep.rp_end >= :rp_end')
                    ->setParameter('rp_end', $today, Database::STRING);
                 break;
@@ -455,6 +456,7 @@ class EventSet
             $qb->andWhere('rep.rp_status = :status')
                ->setParameter('status', $this->status, Database::INTEGER);
         }
+        //var_dump($qb->getSQL());die;
 
         return $qb;
     }
@@ -469,7 +471,7 @@ class EventSet
      */
     public function getEvents()
     {
-        global $_EV_CONF, $_USER;
+        global $_USER;
 
         $qb = $this->getQueryBuilder();
         $key = md5(json_encode($qb->getParameters()));

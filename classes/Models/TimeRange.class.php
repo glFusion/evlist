@@ -23,4 +23,10 @@ class TimeRange
     const UPCOMING = 2;
     const WEEK = 3;
     const MONTH = 4;
+
+    // Settings to check if an event is in the past.
+    const START_TIME_PASSED = 1;
+    const START_DATE_PASSED = 2;
+    const END_TIME_PASSED = 3;
+    const END_DATE_PASSED = 4;
 }

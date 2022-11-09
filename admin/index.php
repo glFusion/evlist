@@ -251,6 +251,8 @@ case 'import_cal':
             1,
             true
         );
+    } elseif (!empty($result['message'])) {
+        COM_setMsg($result['message'], 0, true);
     } else {
         COM_setMsg(
             sprintf($LANG_EVLIST['result_cal_import'], $result['successes'], $result['dups'], $result['errors']),
@@ -264,11 +266,12 @@ case 'import_cal':
 case 'import_csv':
     // Import events from CSV file
     $result = Evlist\Util\Import::do_csv();
-    COM_setMsg(
-        sprintf($LANG_EVLIST['result_cal_import'], $result['successes'], $result['dups'], $result['errors']),
-        0,
-        true
-    );
+    if (!empty($result['message'])) {
+        $msg = $result['message'];
+    } else {
+        $msg = sprintf($LANG_EVLIST['result_cal_import'], $result['successes'], $result['dups'], $result['errors']);
+    }
+    COM_setMsg($msg, 0, true);
     echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     break;
 

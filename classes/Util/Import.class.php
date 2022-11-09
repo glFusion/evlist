@@ -44,6 +44,10 @@ class Import
             'message' => '',    // verbatim error message to return
         );
 
+        if (!isset($_FILES['importfile']) || empty($_FILES['importfile']['name'])) {
+            $retval['message'] = 'No file uploaded';
+            return $retval;
+        }
         // First, upload the file
         USES_class_upload();
 
@@ -237,7 +241,7 @@ class Import
                     'show_upcoming' => 1,
                     'status'        => $A['status'] == 1 ? 1 : 0,
                     'hits'          => (int)$A['hits'],
-                    'cal_id'        => 1,
+                    'cal_id'        => $_POST['dest_cal'],
                     'recurring'     => 0,
                 );
 
@@ -302,10 +306,19 @@ class Import
      */
     public static function showForm() : string
     {
+        global $_TABLES;
+
         $T = new \Template(EVLIST_PI_PATH . '/templates/');
         $T->set_file(array(
             'form'  => 'import.thtml',
             'instr' => 'import_csv_instr.thtml',
+        ) );
+        $T->set_var(array(
+            'cal_options' => COM_optionList(
+                $_TABLES['evlist_calendars'],
+                'cal_id,cal_name',
+                1
+            ),
         ) );
         $T->parse('import_csv_instr', 'instr');
         $T->parse('output', 'form');

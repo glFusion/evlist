@@ -418,6 +418,9 @@ $LANG_EVLIST = array(
 'click_for_details' => 'Click for details.',
 'logo_image' => 'Logo Image',
 'result_cal_import' => 'Calender Import:<br />%d successful<br />%d duplicates<br />%d errors',
+'import_to' => 'Import to',
+'batch_import_events' => 'Batch Import of Events from a File',
+'import_from_calendar' => 'Import from Calendar Plugin',
 );
 
 $LANG_EVLIST_HELP = array(

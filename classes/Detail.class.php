@@ -12,6 +12,8 @@
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\Models\Status;
 
 
@@ -123,7 +125,7 @@ class Detail
         } else {
             $this->det_id = $det_id;
             if (!$this->Read()) {
-                $this->det_id = '';
+                $this->det_id = 0;
             }
         }
     }
@@ -424,24 +426,30 @@ class Detail
      * @param   integer $det_id Optional ID. Current ID is used if zero.
      * @return  boolean     True if a record was read, False on failure.
      */
-    public function Read($det_id = '')
+    public function Read(?int $det_id = NULL) : bool
     {
         global $_TABLES;
 
-        if ($det_id != '') {
+        if (!empty($det_id)) {
             $this->det_id = $det_id;
         }
 
-        $result = DB_query("SELECT *
-                    FROM {$_TABLES['evlist_detail']}
-                    WHERE det_id='{$this->det_id}'");
-        if (!$result || DB_numRows($result) != 1) {
-            return false;
-        } else {
-            $row = DB_fetchArray($result, false);
+        try {
+            $row = Database::getInstance()->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_detail']} WHERE det_id = ?",
+                array($this->det_id),
+                array(Database::INTEGER)
+            )->fetchAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $row = false;
+        }
+        if (is_array($row)) {
             $this->SetVars($row, true);
             $this->isNew = false;
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -451,11 +459,11 @@ class Detail
      * Appends error messages to the $Errors property.
      *
      * @param   array   $A      Optional array of values from $_POST
-     * @return  boolean         True if no errors, False otherwise
+     * @return  integer     Detail record ID
      */
-    public function Save($A = '')
+    public function Save(?array $A=NULL) : int
     {
-        global $_TABLES, $_EV_CONF;
+        global $_TABLES;
 
         if (is_array($A)) {
             $this->SetVars($A);
@@ -466,7 +474,7 @@ class Detail
         // the coordinates to be used when displaying the event.
         // At least a city and state/province is required.
         if (
-            $_EV_CONF['use_locator'] == 1 &&
+            Config::get('use_locator') == 1 &&
             $this->city != '' &&
             $this->province != ''
         ) {
@@ -490,32 +498,38 @@ class Detail
         $lat = EVLIST_coord2str($this->lat, true);
         $lng = EVLIST_coord2str($this->lng, true);
 
-        $fld_set = array();
-        foreach ($this->fields as $fld_name) {
-            $fld_set[] = "$fld_name='" . DB_escapeString($this->$fld_name) . "'";
-        }
-        $fld_sql = implode(',', $fld_set);
-
-        // Insert or update the record, as appropriate
-        if (!$this->isNew) {
-            // For updates, delete the event from the cache table.
-           $sql = "UPDATE {$_TABLES['evlist_detail']}
-                SET $fld_sql,
-                lat = '{$lat}',
-                lng = '{$lng}',
-                det_revision = det_revision + 1
-                WHERE det_id='" . (int)$this->det_id . "'";
-            //echo $sql;die;
-            DB_query($sql);
-        } else {
-            $sql = "INSERT INTO {$_TABLES['evlist_detail']} SET
-                det_id = 0,
-                lat = '{$lat}',
-                lng = '{$lng}',
-                $fld_sql";
-            //echo $sql;die;
-            DB_query($sql);
-            $this->det_id = DB_insertID();
+        $db = Database::getInstance();
+        $qb = $db->conn->createQueryBuilder();
+        $qb->setParameter('lng', $lng, Database::STRING)
+           ->setParameter('lat', $lat, Database::STRING);
+        try {
+            // Insert or update the record, as appropriate
+            if (!$this->isNew) {
+                $qb->update($_TABLES['evlist_detail'])
+                   ->set('lat', ':lng')
+                   ->set('lng', ':lng')
+                   ->set('det_revision', 'det_revision + 1')
+                   ->where('det_id = :det_id')
+                   ->setParameter('det_id', $this->det_id, Database::INTEGER);
+                foreach ($this->fields as $fld_name) {
+                    $qb->set($fld_name, ':' . $fld_name)
+                       ->setParameter($fld_name, $this->$fld_name, Database::STRING);
+                }
+                $qb->execute();
+            } else {
+                $qb->insert($_TABLES['evlist_detail'])
+                   ->setValue('lat', ':lng')
+                   ->setValue('lng', ':lng')
+                   ->setValue('det_revision', 0);
+                foreach ($this->fields as $fld_name) {
+                    $qb->setValue($fld_name, ':' . $fld_name)
+                       ->setParameter($fld_name, $this->$fld_name, Database::STRING);
+                }
+                $qb->execute();
+                $this->det_id = $db->conn->lastInsertId();
+            }
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
         }
         return $this->det_id;
     }
@@ -524,21 +538,32 @@ class Detail
     /**
      * Delete the current detail record from the database.
      */
-    public function Delete()
+    public function Delete() : bool
     {
-        global $_TABLES, $_EV_CONF;
+        global $_TABLES;
 
         if ($this->det_id == '') {
             return false;
         }
 
-        if ($_EV_CONF['purge_cancelled_days'] < 1) {
-            DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
-        } else {
-            $sql = "UPDATE {$_TABLES['evlist_detail']}
-                SET det_status = " . Status::CANCELLED .
-                " WHERE det_id = {$this->det_id}";
-            DB_query($sql);
+        try {
+            if (Config::get('purge_cancelled_days') < 1) {
+                Database::getInstance()->conn->delete(
+                    $_TABLES['evlist_repeat'],
+                    array('rp_id' => $this->rp_id),
+                    array(Database::INTEGER)
+                );
+            } else {
+                Database::getInstance()->conn->update(
+                    $_TABLES['evlist_detail'],
+                    array('det_status' => Status::CANCELLED),
+                    array('det_id' => $this->det_id),
+                    array(Database::INTEGER, Database::INTEGER)
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return false;
         }
         return true;
     }
@@ -547,15 +572,21 @@ class Detail
     /**
      * Delete cancelled events that have not been updated in some time.
      */
-    public static function purgeCancelled()
+    public static function purgeCancelled() : void
     {
-        global $_TABLES, $_EV_CONF;
+        global $_TABLES;
 
-        $days = (int)$_EV_CONF['purge_cancelled_days'];
-        $sql = "DELETE FROM {$_TABLES['evlist_detail']}
-                WHERE det_status = " . Status::CANCELLED .
-                " AND det_last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
-        DB_query($sql);
+        $days = (int)Config::get('purge_cancelled_days');
+        try {
+            Database::getInstance()->conn->executeQuery(
+                "DELETE FROM {$_TABLES['evlist_detail']}
+                WHERE det_status = ? AND det_last_mod < DATE_SUB(NOW(), INTERVAL ? days DAY)",
+                array(Status::CANCELLED, $days),
+                array(Database::INTEGER, Database::INTEGER)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
     }
 
 
@@ -564,31 +595,37 @@ class Detail
      *
      * @param   string  $ev_id  Event ID
      * @param   array   $args   Fieldname=>value pairs to update
-     * @param   string  $ands   Additional conditions as "AND ... AND ..."
+     * @param   array   $ands   Additional conditions as array(clause, clause)
      */
-    public static function updateEvent(string $ev_id, array $args=array(), string $ands='') : void
+    public static function updateEvent(string $ev_id, ?array $args=NULL, ?array $ands=NULL) : void
     {
         global $_TABLES;
 
-        $sql_args = array();
-        foreach ($args as $key=>$val) {
-            if (is_string($val)) {
-                $val = DB_escapeString($val);
-            } elseif (is_integer($val)) {
-                $val = (int)$val;
+        $qb = Database::getInstance()->conn->createQueryBuilder();
+        $qb->update($_TABLES['evlist_detail'])
+           ->set('det_revision', 'det_revision + 1')
+           ->where('ev_id = :ev_id')
+           ->setParameter('ev_id', $ev_id, Database::STRING);
+        if (is_array($args)) {
+            foreach ($args as $key=>$val) {
+                $qb->set($key, ':' . $key);
+                if (is_string($val)) {
+                    $qb->setParameter(':' . $key, $val, Database::STRING);
+                } elseif (is_integer($val)) {
+                    $qb->setParameter(':' . $key, $val, Database::INTEGER);
+                }
             }
-            $sql_args[] = "$key = '$val'";
         }
-        if (!empty($sql_args)) {
-            $sql_args = implode(', ', $sql_args) . ',';
-        } else {
-            $sql_args = '';
+        if (is_array($ands)) {
+            foreach ($ands as $clause) {
+                $qb->andWhere($clause);
+            }
         }
-        $sql = "UPDATE {$_TABLES['evlist_detail']} SET
-            $sql_args
-            det_revision = det_revision + 1
-            WHERE ev_id = '" . DB_escapeString($ev_id) . "' $ands";
-        DB_query($sql);
+        try {
+            $qb->execute();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
     }
 
 
@@ -597,15 +634,19 @@ class Detail
      *
      * @param   string  $ev_id  Event ID
      * @param   integer $status New status value
-     * @param   string  $ands   Additional WHERE conditions as "AND ... AND ..."
+     * @param   array   $ands   Additional SQL "and" clauses
      */
     public static function updateEventStatus(string $ev_id, int $status, string $ands='') : void
     {
         $status = (int)$status;
+        $and_opts = array('det_status <> ' . $status);
+        if (is_array($ands) && !empty($ands)) {
+            $and_opts = array_merge($and_opts, $ands);
+        }
         self::updateEvent(
             $ev_id,
-            array('det_status'=>$status),
-            " AND det_status <> $status $ands"
+            array('det_status'=> $status),
+            $and_opts
         );
     }
 
@@ -706,15 +747,20 @@ class Detail
      * detail causes a new record to be created to protect any other instances
      * that share the record.
      */
-    public static function cleanOrphans()
+    public static function cleanOrphans() : void
     {
         global $_TABLES;
 
-        $sql = "DELETE FROM {$_TABLES['evlist_detail']} d
-            LEFT JOIN {$_TABLES['evlist_events']} e ON d.ev_id = e.id
-            LEFT JOIN {$_TABLES['evlist_repeat']} r ON d.det_id = r.rp_det_id
-            WHERE e.det_id IS NULL AND r.rp_det_id IS NULL";
-        DB_query($sql);
+        $qb = Database::getInstance();
+        try {
+            $qb->delete($_TABLES['evlist_detail'], 'd')
+               ->leftJoin('d', $_TABLES['evlist_events'], 'e', 'd.ev_id = e.id')
+               ->leftJoin('d', $_TABLES['evlist_repeat'], 'r', 'd.det_id = r.rp_det_id')
+               ->where('e.det_id IS NULL')
+               ->andWhere('r.rp_det_id IS NULL');
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
     }
 
 }

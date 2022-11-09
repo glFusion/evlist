@@ -3,14 +3,16 @@
  * Class to manage event repeats or single instances for the EvList plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.0
+ * @version     v1.5.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\Models\Status;
 
 
@@ -150,7 +152,7 @@ class Repeat
      * @param   integer $rp_id  Repeat ID
      * @return  object          Repeat object
      */
-    public static function getInstance($rp_id)
+    public static function getInstance(int $rp_id) : self
     {
         static $repeats = array();
         if (!isset($repeats[$rp_id])) {
@@ -403,14 +405,17 @@ class Repeat
             $this->rp_id = (int)$rp_id;
         }
 
-        $sql = "SELECT *
-                FROM {$_TABLES['evlist_repeat']}
-                WHERE rp_id='{$this->rp_id}'";
-        $result = DB_query($sql);
-        if (!$result || DB_numRows($result) != 1) {
-            return false;
-        } else {
-            $A = DB_fetchArray($result, false);
+        try {
+            $A = Database::getInstance()->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_repeat']} WHERE rp_id = ?",
+                array($this->rp_id),
+                array(Database::INTEGER)
+            )->fetchAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $A = false;
+        }
+        if (is_array($A)) {
             $this->ev_id        = $A['rp_ev_id'];
             $this->det_id       = (int)$A['rp_det_id'];
             $this->date_start   = $A['rp_date_start'];
@@ -485,6 +490,8 @@ class Repeat
             return false;
         }
 
+        $db = Database::getInstance();
+
         /* If a form was submitted, check what to do with the submitted detail,
          * if it is different from the existing one. If no detail update, then
          * no action is needed.
@@ -527,11 +534,18 @@ class Repeat
                         // New detail is used by prior repeats, creat a new one
                         // and propagate it to all future repeats.
                         $this->det_id = (int)$this->newDetail->Save();
-                        $sql = "UPDATE {$_TABLES['evlist_repeat']}
-                            SET rp_det_id = '{$this->det_id}'
-                            WHERE rp_date_start >= '{$this->date_start}'
-                            AND rp_ev_id = '{$this->ev_id}'";
-                        DB_query($sql);
+                        try {
+                            $db->conn->executeStatement(
+                                "UPDATE {$_TABLES['evlist_repeat']}
+                                SET rp_det_id = ?'{$this->det_id}'
+                                WHERE rp_date_start >= ?'{$this->date_start}'
+                                AND rp_ev_id = ?'{$this->ev_id}'",
+                                array($this->det_id, $this->date_start, $this->ev_id),
+                                array(Database::INTEGER, Database::STRING, Database::STRING)
+                            );
+                        } catch (\Throwable $e) {
+                            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                        }
                     }
                 }
             }
@@ -552,20 +566,52 @@ class Repeat
         } else {
             $t_end = $time_end1;
         }
-        $sql = "UPDATE {$_TABLES['evlist_repeat']} SET
-            rp_date_start = '$date_start',
-            rp_date_end= '$date_end',
-            rp_time_start1 = '$time_start1',
-            rp_time_end1 = '$time_end1',
-            rp_time_start2 = '$time_start2',
-            rp_time_end2 = '$time_end2',
-            rp_start = '$date_start $time_start1',
-            rp_end = '$date_end $t_end',
-            rp_det_id='" . (int)$this->det_id . "',
-            rp_revision = rp_revision + 1,
-            rp_status = " . (int)$this->rp_status . "
-            WHERE rp_id = {$this->rp_id}";
-        DB_query($sql);
+        try {
+            $db->conn->executeStatement(
+                "UPDATE {$_TABLES['evlist_repeat']} SET
+                    rp_date_start = ?,
+                    rp_date_end= ?,
+                    rp_time_start1 = ?,
+                    rp_time_end1 = ?,
+                    rp_time_start2 = ?,
+                    rp_time_end2 = ?,
+                    rp_start = ?,
+                    rp_end = ?,
+                    rp_det_id = ?,
+                    rp_revision = rp_revision + 1,
+                    rp_status = ?,
+                    WHERE rp_id = ?",
+                array(
+                    $date_start,
+                    $date_end,
+                    $time_start1,
+                    $time_end1,
+                    $time_start2,
+                    $time_end2,
+                    $date_start . ' ' . $time_start1,
+                    $date_end . ' ' . $t_end,
+                    $this->det_id,
+                    $this->rp_status,
+                    $this->rp_id,
+                ),
+                array(
+                    Database::STRING,
+                    Database::STRING,
+                    Database::STRING,
+                    Database::STRING,
+                    Database::STRING,
+                    Database::STRING,
+                    Database::STRING,
+                    Database::STRING,
+                    Database::INTEGER,
+                    Database::INTEGER,
+                    Database::INTEGER,
+                )
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            return false;
+        }
         Cache::clear();
         PLG_itemSaved($this->rp_id, 'evlist');
         COM_rdfUpToDateCheck('evlist', 'events', $this->rp_id);
@@ -599,13 +645,19 @@ class Repeat
         }
 
         if ($_EV_CONF['purge_cancelled_days'] < 1) {
-            DB_delete($_TABLES['evlist_repeat'], 'rp_id', (int)$this->rp_id);
+            Database::getInstance()->conn->delete(
+                $_TABLES['evlist_repeat'],
+                array('rp_id' => $this->rp_id),
+                array(Database::INTEGER)
+            );
         } else {
-            $sql = "UPDATE {$_TABLES['evlist_repeat']}
-                SET rp_status = " . Status::CANCELLED .
-                ", rp_revision = rp_revision + 1
-                WHERE rp_id = {$this->rp_id}";
-            DB_query($sql);
+            Database::getInstance()->conn->executeStatement(
+                "UPDATE {$_TABLES['evlist_repeat']}
+                SET rp_status = ?, rp_revision = rp_revision + 1
+                WHERE rp_id = ?",
+                array(Status::CANCELLED, $this->rp_id),
+                array(Database::INTEGER, Database::INTEGER)
+            );
         }
         Cache::clear();
         return true;
@@ -641,7 +693,11 @@ class Repeat
             $sql_args
             rp_revision = rp_revision + 1
             WHERE rp_ev_id = '" . DB_escapeString($ev_id) . "' $ands";
-        DB_query($sql);
+        try {
+            Database::getInstance()->conn->executeStatement($sql);
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
         //Cache::clear('repeats', 'event_' . $ev_id);
     }
 
@@ -653,7 +709,7 @@ class Repeat
      * @param   integer $status New status value
      * @param   string  $ands   Additional WHERE conditions as "AND ... AND ..."
      */
-    public static function updateEventStatus($ev_id, $status, $ands='')
+    public static function updateEventStatus(string $ev_id, int $status, string $ands='') : void
     {
         global $_TABLES;
 
@@ -678,15 +734,21 @@ class Repeat
     /**
      * Delete cancelled events that have not been updated in some time.
      */
-    public static function purgeCancelled()
+    public static function purgeCancelled() : void
     {
         global $_TABLES, $_EV_CONF;
 
         $days = (int)$_EV_CONF['purge_cancelled_days'];
-        $sql = "DELETE FROM {$_TABLES['evlist_repeat']}
-                WHERE rp_status = " . Status::CANCELLED .
-                " AND rp_last_mod < DATE_SUB(NOW(), INTERVAL $days DAY)";
-        DB_query($sql);
+        try {
+            Database::getInstance()->conn->executeStatement(
+                "DELETE FROM {$_TABLES['evlist_repeat']}
+                WHERE rp_status = ? AND rp_last_mod < DATE_SUB(NOW(), INTERVAL ? DAY)",
+                array(Status::CANCELLED, $days),
+                array(Database::INTEGER, Database::INTEGER)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+        }
     }
 
 

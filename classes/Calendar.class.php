@@ -5,12 +5,15 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2011-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.4
+ * @version     v1.5.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
+
 
 /**
  * Class for calendars.
@@ -150,26 +153,31 @@ class Calendar
      *
      * @param   integer $cal_id Optional calendar ID, $this->cal_id used if 0
      */
-    public function Read($cal_id = 0)
+    public function Read(?int $cal_id = NULL) : bool
     {
         global $_TABLES;
 
-        if ($cal_id != 0)
+        if ($cal_id) {
             $this->cal_id = $cal_id;
+        }
 
-        $sql = "SELECT *
-            FROM {$_TABLES['evlist_calendars']}
-            WHERE cal_id='{$this->cal_id}'";
-        //echo $sql;
-        $result = DB_query($sql);
-
-        if (!$result || DB_numRows($result) == 0) {
+        try {
+            $data = Database::getInstance()->conn->executeQuery(
+                "SELECT * FROM {$_TABLES['evlist_calendars']}
+                WHERE cal_id = ?",
+                array($this->cal_id),
+                array(Database::INTEGER)
+            )->fetchAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data =- false;
+        }
+        if (is_array($data)) {
+            $this->setVars($data, true);
+            return true;
+        } else {
             $this->cal_id = 0;
             return false;
-        } else {
-            $row = DB_fetchArray($result, false);
-            $this->setVars($row, true);
-            return true;
         }
     }
 
@@ -417,7 +425,7 @@ class Calendar
      *
      * @param   array    $A  Array of data to save, typically from form
      */
-    public function Save($A=array())
+    public function Save(?array $A = NULL) : bool
     {
         global $_TABLES, $_EV_CONF;
 
@@ -457,51 +465,76 @@ class Calendar
             $this->deleteImage();
         }
 
-        $fld_sql = "cal_name = '" . DB_escapeString($this->cal_name) ."',
-            fgcolor = '" . DB_escapeString($this->fgcolor) . "',
-            bgcolor = '" . DB_escapeString($this->bgcolor) . "',
-            cal_status = '{$this->cal_status}',
-            cal_ena_ical = '{$this->cal_ena_ical}',
-            cal_show_upcoming = '{$this->cal_show_upcoming}',
-            cal_show_cb = '{$this->cal_show_cb}',
-            perm_owner = '{$this->perm_owner}',
-            perm_group = '{$this->perm_group}',
-            perm_members = '{$this->perm_members}',
-            perm_anon = '{$this->perm_anon}',
-            owner_id = '{$this->owner_id}',
-            group_id = '{$this->group_id}',
-            cal_icon = '" . DB_escapeString($this->cal_icon) . "',
-            cal_image = '" . DB_escapeString($this->cal_image) . "',
-            orderby = '{$this->orderby}'";
+        $values = array(
+            'cal_name' => $this->cal_name,
+            'fgcolor' => $this->fgcolor,
+            'bgcolor' => $this->bgcolor,
+            'cal_status' => $this->cal_status,
+            'cal_ena_ical' => $this->cal_ena_ical,
+            'cal_show_upcoming' => $this->cal_show_upcoming,
+            'cal_show_cb' => $this->cal_show_cb,
+            'perm_owner' => $this->perm_owner,
+            'perm_group' => $this->perm_group,
+            'perm_members' => $this->perm_members,
+            'perm_anon' => $this->perm_anon,
+            'owner_id' => $this->owner_id,
+            'group_id' => $this->group_id,
+            'cal_icon' => $this->cal_icon,
+            'cal_image' => $this->cal_image,
+            'orderby' => $this->orderby,
+        );
+        $types = array(
+            Database::STRING,
+            Database::STRING,
+            Database::STRING,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::STRING,
+            Database::STRING,
+            Database::INTEGER,
+        );
 
-        if ($this->isNew) {
-            $sql = "INSERT INTO {$_TABLES['evlist_calendars']} SET
-                    $fld_sql";
-        } else {
-            $sql = "UPDATE {$_TABLES['evlist_calendars']} SET
-                    $fld_sql
-                    WHERE cal_id='{$this->cal_id}'";
-        }
-
-        //echo $sql;die;
-        DB_query($sql, 1);
-        if (!DB_error()) {
-            $this->cal_id = DB_insertId();
-            // Saving from a form, add 5 to the orderby value so it goes between
-            // existing calendars. First check if the order was changed.
-            if (isset($_POST['old_orderby']) && $_POST['old_orderby'] != $this->orderby) {
-                self::reOrder();
+        $db = Database::getInstance();
+        try {
+            if ($this->isNew) {
+                $db->conn->insert(
+                    $_TABLES['evlist_calendars'],
+                    $values,
+                    $types
+                );
+                $this->cal_id = $db->conn->lastInsertId();
+            } else {
+                $types[] = Database::INTEGER;   // for cal_id
+                $db->conn->update(
+                    $_TABLES['evlist_calendars'],
+                    $values,
+                    array('cal_id' => $this->cal_id),
+                    $types
+                );
             }
-            if (!$this->isNew) {
-                // Clear events to force re-reading of permissions.
-                Cache::clear('events');
-            }
-            // Clear the cache if updating an existing calendar.
-            Cache::clear('calendars');
-            return true;
-        } else {
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
             return false;
         }
+
+        if (isset($_POST['old_orderby']) && $_POST['old_orderby'] != $this->orderby) {
+            self::reOrder();
+        }
+        if (!$this->isNew) {
+            // Clear events to force re-reading of permissions.
+            Cache::clear('events');
+        }
+        // Clear the cache if updating an existing calendar.
+        Cache::clear('calendars');
+        return true;
     }
 
 
@@ -512,7 +545,7 @@ class Calendar
      *
      * @param   integer $newcal ID of new calendar to use for events, etc.
      */
-    public function Delete($newcal = 0)
+    public function Delete(?int $newcal = NULL) : bool
     {
         global $_TABLES;
 
@@ -523,31 +556,53 @@ class Calendar
             return false;
         }
 
+        $db = Database::getInstance();
         $newcal = (int)$newcal;
         if ($newcal != 0) {
             // Make sure the new calendar exists
-            if (DB_count($_TABLES['evlist_calendars'], 'cal_id', $newcal) != 1) {
+            if ($db->getCount(
+                $_TABLES['evlist_calendars'],
+                array('cal_id'),
+                array($newcal),
+                array(Database::INTEGER)
+            ) != 1) {
                 return false;
             }
 
             // Update all the existing events with the new calendar ID
-            $sql = "UPDATE {$_TABLES['evlist_events']}
-                    SET cal_id = '$newcal'
-                    WHERE cal_id='{$this->cal_id}'";
-            DB_query($sql, 1);
+            try {
+                $db->conn->update(
+                    $_TABLES['evlist_events'],
+                    array('cal_id' => $newcal),
+                    array('cal_id' => $this->cal_id),
+                    array(Database::INTEGER, Database::INTEGER)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return false;
+            }
         } else {
             // Not changing to a new calendar, delete all events for this one
-            $sql = "SELECT id FROM {$_TABLES['evlist_events']}
-                    WHERE cal_id = '{$this->cal_id}'";
-            $result = DB_query($sql);
-            while ($A = DB_fetchArray($result, false)) {
-                DB_delete($_TABLES['evlist_repeat'], 'ev_id', $A['id']);
-                DB_delete($_TABLES['evlist_detail'], 'ev_id', $A['id']);
-                DB_delete($_TABLES['evlist_events'], 'id', $A['id']);
+            try {
+                $stmt = $db->conn->executeQuery(
+                    "SELECT id FROM {$_TABLES['evlist_events']} WHERE cal_id = ?",
+                    array($this->cal_id),
+                    array(Database::INTEGER)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return false;
+            }
+            if (is_array($stmt)) {
+                while ($A = $stmt->fetchAssociative()) {
+                    $db->conn->delete($_TABLES['evlist_repeat'], array('ev_id' => $A['id']), array(Database::INTEGER));
+                    $db->conn->delete($_TABLES['evlist_detail'], array('ev_id' => $A['id']), array(Database::INTEGER));
+                    $db->conn->delete($_TABLES['evlist_events'], array('id' =>$A['id']), array(Database::INTEGER));
+                }
             }
         }
         $this->deleteImage();
-        DB_delete($_TABLES['evlist_calendars'], 'cal_id', $this->cal_id);
+        $db->conn->delete($_TABLES['evlist_calendars'], array('cal_id' =>$A['id']), array(Database::INTEGER));
         Cache::clear();     // Just clear all cache items
     }
 
@@ -570,7 +625,12 @@ class Calendar
             'cal_id'    => $this->cal_id,
             'cal_name'  => $this->cal_name,
         ) );
-        $events = DB_count($_TABLES['evlist_events'], 'cal_id', $this->cal_id);
+        $events = Database::getInstance()->getCount(
+            $_TABLES['evlist_events'],
+            array('cal_id'),
+            array($this->cal_id),
+            array(Database::INTEGER)
+        );
         if ($events > 0) {
             $cal_select = COM_optionList($_TABLES['evlist_calendars'],
                     'cal_id,cal_name', '1', 1, "cal_id <> {$this->cal_id}");
@@ -595,7 +655,12 @@ class Calendar
     {
         global $_TABLES;
 
-        $cnt = DB_count($_TABLES['evlist_events'], 'cal_id', $this->cal_id);
+        $cnt = Database::getInstance()->getCount(
+            $_TABLES['evlist_events'],
+            array('cal_id'),
+            array($this->cal_id),
+            array(Database::INTEGER)
+        );
         if ($cnt > 0) {
             return $cnt;
         } else {
@@ -695,9 +760,17 @@ class Calendar
             $sql .= "WHERE cal_status = 1 ";
         }
         $sql .= "ORDER BY orderby ASC";
-        $res = DB_query($sql);
-        while ($A = DB_fetchArray($res, false)) {
-            $cals[$A['cal_id']] = new self($A);
+        try {
+            $data = Database::getInstance()->conn->executeQuery($sql)
+                                                 ->fetchAllAssociative();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data = false;
+        }
+        if (is_array($data)) {
+            foreach ($data as $A) {
+                $cals[$A['cal_id']] = new self($A);
+            }
         }
         return $cals;
     }

@@ -5,13 +5,15 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2021 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.5.0
+ * @version     v1.5.8
  * @since       v1.5.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Evlist\Views;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\Models\Status;
 use Evlist\Event;
 use Evlist\Repeat;
@@ -635,46 +637,49 @@ class Editor
         // Both "select" and "checkbox"-type values are supplied so the
         // can use either form element.
         if ($_EV_CONF['enable_categories'] == '1') {
-            $cresult = DB_query("SELECT tc.id, tc.name
-                FROM {$_TABLES['evlist_categories']} tc
-                WHERE tc.status='1' ORDER BY tc.name");
+            try {
+                $cresult = Database::getInstance()->conn->executeQuery(
+                    "SELECT tc.id, tc.name FROM {$_TABLES['evlist_categories']} tc
+                    WHERE tc.status='1' ORDER BY tc.name"
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $cresult = false;
+            }
+
             $T->set_block('editor', 'catSelect', 'catSel');
-            $catlist = '';
-            while ($A = DB_fetchArray($cresult, false)) {
+            if ($cresult) {
                 if (isset($_POST['categories']) && is_array($_POST['categories'])) {
                     // Coming from a form re-entry
                     $cat_array = $_POST['categories'];
                 } else {
                     $cat_array = $this->Event->getCategories();
                 }
-                if (in_array($A['id'], $cat_array)) {
-                    // category is currently selected
-                    $chk = EVCHECKED;
-                    $sel = EVSELECTED;
-                } else {
-                    $chk = '';
-                    $sel = '';
+                while ($A = $cresult->fetchAssociative()) {
+                    if (array_search($A['id'], array_column($cat_array, 'id')) !== false) {
+                        // category is currently selected
+                        $chk = EVCHECKED;
+                        $sel = EVSELECTED;
+                    } else {
+                        $chk = '';
+                        $sel = '';
+                    }
+                    $T->set_var(array(
+                        'cat_id'    => $A['id'],
+                        'cat_name'  => htmlspecialchars($A['name']),
+                        'cat_chk'   => $chk,
+                        'cat_sel'   => $sel,
+                    ) );
+                    $T->parse('catSel', 'catSelect', true);
                 }
-                $catlist .= '<input type="checkbox" name="categories[]" ' .
-                    'value="' . $A['id'] . '" ' . $chk . ' />' .
-                    '&nbsp;' . $A['name'] . '&nbsp;&nbsp;';
-                $T->set_var(array(
-                    'cat_id'    => $A['id'],
-                    'cat_name'  => htmlspecialchars($A['name']),
-                    'cat_chk'   => $chk,
-                    'cat_sel'   => $sel,
-                ) );
-                $T->parse('catSel', 'catSelect', true);
-            }
-            $T->set_var('catlist', $catlist);
+                if (isset($_POST['newcat'])) {
+                    $T->set_var('newcat', $_POST['newcat']);
+                }
 
-            if (isset($_POST['newcat'])) {
-                $T->set_var('newcat', $_POST['newcat']);
-            }
-
-            if ($_USER['uid'] > 1 && $rp_id == 0) {
-                $T->set_var('category_section', 'true');
-                $T->set_var('add_cat_input', 'true');
+                if ($_USER['uid'] > 1 && $rp_id == 0) {
+                    $T->set_var('category_section', 'true');
+                    $T->set_var('add_cat_input', 'true');
+                }
             }
         }
 

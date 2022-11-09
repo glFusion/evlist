@@ -244,27 +244,32 @@ case 'delrsvp':
     break;
 
 case 'import_cal':
-    $errors = Evlist\Util\Import::do_calendar();
-    if ($errors == -1) {
-        $content .= COM_showMessageText(
+    $result = Evlist\Util\Import::do_calendar();
+    if ($result['errors'] == -1) {
+        COM_setMsg(
             $LANG_EVLIST['err_cal_notavail'],
-            '',
+            1,
             true
         );
-    } elseif ($errors > 0) {
-        $content .= COM_showMessageText(
-            sprintf($LANG_EVLIST['err_cal_import'], $errors),
-            '',
+    } else {
+        COM_setMsg(
+            sprintf($LANG_EVLIST['result_cal_import'], $result['successes'], $result['dups'], $result['errors']),
+            0,
             true
         );
     }
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     break;
 
 case 'import_csv':
     // Import events from CSV file
-    $status = Evlist\Util\Import::do_csv();
-    $content .= COM_showMessageText($status, '', true, 'error');
-    $view = '';
+    $result = Evlist\Util\Import::do_csv();
+    COM_setMsg(
+        sprintf($LANG_EVLIST['result_cal_import'], $result['successes'], $result['dups'], $result['errors']),
+        0,
+        true
+    );
+    echo COM_refresh(EVLIST_ADMIN_URL . '/index.php');
     break;
 
 case 'printtickets':

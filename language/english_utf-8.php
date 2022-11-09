@@ -399,6 +399,7 @@ $LANG_EVLIST = array(
 'cal_has_no_events' => 'This calendar has no events.',
 'click_for_details' => 'Click for details.',
 'logo_image' => 'Logo Image',
+'result_cal_import' => 'Calender Import:<br />%d successful<br />%d duplicates<br />%d errors',
 );
 
 $LANG_EVLIST_HELP = array(

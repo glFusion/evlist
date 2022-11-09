@@ -417,6 +417,7 @@ $LANG_EVLIST = array(
 'free_caps'     => 'FREE',
 'click_for_details' => 'Click for details.',
 'logo_image' => 'Logo Image',
+'result_cal_import' => 'Calender Import:<br />%d successful<br />%d duplicates<br />%d errors',
 );
 
 $LANG_EVLIST_HELP = array(

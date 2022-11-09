@@ -688,6 +688,8 @@ function EVLIST_remove_old_files()
             'calendar_import.php',
             // 1.5.6
             'templates/monthview.thtml',
+            // 1.5.8
+            'templates/import_events.thtml',
         ),
         // public_html/evlist
         $_CONF['path_html'] . 'evlist' => array(

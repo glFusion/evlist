@@ -110,10 +110,9 @@ class AdminList
         $sql = "SELECT DISTINCT(ev.id), det.title, ev.date_start1, ev.status
                 FROM {$_TABLES['evlist_events']} ev
                 LEFT JOIN {$_TABLES['evlist_detail']} det
-                    ON det.ev_id = ev.id
-                WHERE ev.det_id = det.det_id ";
+                    ON det.ev_id = ev.id WHERE 1=1";
         if ($cal_id != 0) {
-            $sql .= "AND cal_id = $cal_id";
+            $sql .= " AND cal_id = $cal_id";
         }
 
         $filter = $LANG_EVLIST['calendar']

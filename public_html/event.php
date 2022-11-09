@@ -268,7 +268,7 @@ case 'tickreset_x':
 case 'tickreset':
     // Reset the usage flag for one or more tickets if admin or owner
     $rp = Evlist\Repeat::getInstance($_GET['rp_id']);
-    if ($rp->isAdmin) {
+    if ($rp->isAdmin()) {
         if (isset($_POST['delrsvp']) && is_array($_POST['delrsvp'])) {
             Evlist\Ticket::Reset($_POST['delrsvp']);
         }

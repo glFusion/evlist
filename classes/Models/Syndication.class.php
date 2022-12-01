@@ -12,6 +12,8 @@
  * @filesource
  */
 namespace Evlist\Models;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 use Evlist\Calendar;
 use Evlist\Event;
 
@@ -75,20 +77,34 @@ class Syndication
             $limit = 500;
         }
 
-        // Get all upcoming events
-        $now_ts = $_CONF['_now']->toUnix(true);
-        $events = EventSet::create()
+        // Get all upcoming eventsa
+        $Dt = clone ($_CONF['_now']);
+        $start_date = $Dt->format('Y-m-d');
+        $Dt->setTimestamp($Dt->toUnix() + (365 * 86400));
+        $end_date = $Dt->format('Y-m-d');
+        $ES = EventSet::create()
             ->withUid(1)
             ->withIcal(true)
-            ->withStart($now_ts)
-            ->withEnd($now_ts + (365 * 86400))
-            ->withCategory($F['topic'])
+            ->withStatus(Status::ALL)
+            ->withStart($start_date)
+            ->withEnd($end_date)
             ->withLimit($limit)
             ->withFields(array(
                 'det.det_revision', 'det.title', 'det.det_last_mod', 'det.lat', 'det.lng',
-                'det.summary', 'det.full_description', 'det.location',
-            ))
-            ->getEvents();
+                'det.summary', 'det.full_description', 'det.location', 'det.street',
+                'det.city', 'det.province', 'det.postal'
+            ));
+        $dscp = empty($F['description']) ? $LANG_EVLIST['events'] : $F['description'];
+        if (isset($F['topic']) && !empty($F['topic'])) {
+            // Get only a specific calendar, and set the description to tne
+            // calendar name
+            $ES->withCalendar($F['topic']);
+            $Cal = Calendar::getInstance($F['topic']);
+            if ($Cal) {
+                $dscp = $Cal->getName();
+            }
+        }
+        $events = $ES->getEvents();
 
         $domain = '@' . preg_replace('/^https?\:\/\//', '', $_CONF['site_url']);
         $rp_shown = array();    // Store repeat ids to avoid dups
@@ -235,14 +251,23 @@ class Syndication
         if ($end) {
             $ES->withEnd($end->format('Y-m-d', true));
         }
-        $sql = $ES->getSql();
-        $result = DB_query($sql, 1);
-        while ($A = DB_fetchArray($result, false)) {
-            $rev = $A['ev_revision'] + $A['det_revision'] + $A['rp_revision'];
-            $eids[] = $A['rp_id'] . '.' . $rev;
+        $qb = $ES->getQueryBuilder();
+        try {
+            $stmt = $qb->execute();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $stmt = false;
         }
-        $current = implode (',', $eids);
-        return ($current != $F['update_info']) ? false : true;
+        if ($stmt) {
+            while ($A = $stmt->fetchAssociative()) {
+                $rev = $A['ev_revision'] + $A['det_revision'] + $A['rp_revision'];
+                $eids[] = $A['rp_id'] . '.' . $rev;
+            }
+            $current = implode (',', $eids);
+            return ($current != $F['update_info']) ? false : true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -518,6 +543,10 @@ class Syndication
             array(
                 'name' => 'ICS',
                 'version' => '1.0',
+            ),
+            array(
+                'name' => 'RSS',
+                'version' => '2.0',
             ),
         );
     }

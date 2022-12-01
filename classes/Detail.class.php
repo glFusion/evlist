@@ -580,7 +580,7 @@ class Detail
         try {
             Database::getInstance()->conn->executeQuery(
                 "DELETE FROM {$_TABLES['evlist_detail']}
-                WHERE det_status = ? AND det_last_mod < DATE_SUB(NOW(), INTERVAL ? days DAY)",
+                WHERE det_status = ? AND det_last_mod < DATE_SUB(NOW(), INTERVAL ? DAY)",
                 array(Status::CANCELLED, $days),
                 array(Database::INTEGER, Database::INTEGER)
             );

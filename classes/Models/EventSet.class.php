@@ -84,11 +84,7 @@ class EventSet
 
     /** Group by for results.
      * @var string */
-    //private $grp_by = 'rep.rp_id';
-
-    /** Showing upcoming events? TODO, duplicate of show_upcoming?
-     * @var string */
-    private $upcoming = false;
+    private $grp_by = 'rep.rp_id';
 
     /** Set required status, default is "enabled".
      * @var integer */
@@ -104,7 +100,7 @@ class EventSet
      *
      * @return  object      EventSet object
      */
-    public static function create()
+    public static function create() : self
     {
         return new self;
     }
@@ -116,7 +112,7 @@ class EventSet
      * @param   string  $eid    Event ID
      * @return  object  $this
      */
-    public function withEvent($eid)
+    public function withEvent(int $eid) : self
     {
         $this->eid = $eid;
         return $this;
@@ -128,7 +124,7 @@ class EventSet
      * @param   integer $rp_id  Instance ID
      * @return  object  $this
      */
-    public function withRepeat($rp_id)
+    public function withRepeat(int $rp_id) : self
     {
         $this->rp_id = (int)$rp_id;
         return $this;
@@ -141,7 +137,7 @@ class EventSet
      * @param   integer $cat_id Category ID
      * @return  object  $this
      */
-    public function withCategory($cat_id)
+    public function withCategory(int $cat_id) : self
     {
         $this->cat = (int)$cat_id;
         return $this;
@@ -154,7 +150,7 @@ class EventSet
      * @param   integer $cal_id Calender ID
      * @return  object  $this
      */
-    public function withCalendar($cal_id)
+    public function withCalendar(int $cal_id) : self
     {
         $this->cal = (int)$cal_id;
         return $this;
@@ -167,10 +163,9 @@ class EventSet
      * @param   boolean $flag   True = show upcoming, False = show all
      * @return  object  $this
      */
-    public function withUpcoming($flag)
+    public function withUpcoming(bool $flag=true) : self
     {
         $this->show_upcoming = $flag ? 1 : 0;
-        $this->upcoming = $flag ? 1 : 0;
         return $this;
     }
 
@@ -196,7 +191,7 @@ class EventSet
      * @param   integer $limit  Number of results to retrieve
      * @return  object  $this
      */
-    public function withLimit($limit)
+    public function withLimit(int $limit) : self
     {
         $this->limit = (int)$limit;
         return $this;
@@ -209,7 +204,7 @@ class EventSet
      * @param   integer $page   Page number, 0 = all
      * @return  object  $this
      */
-    public function withPage($page)
+    public function withPage(int $page) : self
     {
         $this->page = (int)$page;
         return $this;
@@ -222,7 +217,7 @@ class EventSet
      * @param   string  $dt     Date string (YYYY-MM-DD)
      * @return  object  $this
      */
-    public function withStart($dt)
+    public function withStart(string $dt) : self
     {
         $this->start = $dt;
         return $this;
@@ -235,7 +230,7 @@ class EventSet
      * @param   string  $dt     Date string (YYYY-MM-DD)
      * @return  object  $this
      */
-    public function withEnd($dt)
+    public function withEnd(string $dt) : self
     {
         $this->end = $dt;
         return $this;
@@ -248,7 +243,7 @@ class EventSet
      * @param   integer $val    Flag value
      * @return  object  $this
      */
-    public function withIcal($val)
+    public function withIcal(int $val) : self
     {
         $this->ical = $val ? 1 : 0;
         return $this;
@@ -261,7 +256,7 @@ class EventSet
      * @param   integer|null    $val    Value for status flag
      * @return  object  $this
      */
-    public function withStatus($val)
+    public function withStatus(?int $val=NULL) : self
     {
         $this->status = $val;
         return $this;
@@ -469,7 +464,7 @@ class EventSet
      *
      * @return array           Array of matching events, keyed by date
      */
-    public function getEvents()
+    public function getEvents() : array
     {
         global $_USER;
 

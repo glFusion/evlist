@@ -44,8 +44,6 @@ class Centerblock
      */
     public function Render(string $where, string $page, ?string $topic = NULL) : string
     {
-        global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
-
         if (
             Config::get('pos_centerblock') != $where ||
             !EVLIST_canView()
@@ -103,7 +101,7 @@ class Centerblock
      */
     private function getContent() : string
     {
-        global $_CONF, $_USER, $_TABLES, $LANG_EVLIST;
+        global $_CONF, $LANG_EVLIST;
 
         $retval = '';
 

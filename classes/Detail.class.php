@@ -506,7 +506,7 @@ class Detail
             // Insert or update the record, as appropriate
             if (!$this->isNew) {
                 $qb->update($_TABLES['evlist_detail'])
-                   ->set('lat', ':lng')
+                   ->set('lat', ':lat')
                    ->set('lng', ':lng')
                    ->set('det_revision', 'det_revision + 1')
                    ->where('det_id = :det_id')
@@ -518,7 +518,7 @@ class Detail
                 $qb->execute();
             } else {
                 $qb->insert($_TABLES['evlist_detail'])
-                   ->setValue('lat', ':lng')
+                   ->setValue('lat', ':lat')
                    ->setValue('lng', ':lng')
                    ->setValue('det_revision', 0);
                 foreach ($this->fields as $fld_name) {

@@ -3,9 +3,9 @@
  * Common AJAX functions.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2022 Lee Garner <lee@leegarner.com>
  * @package     evlist
- * @version     v1.4.2
+ * @version     v1.5.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -15,20 +15,20 @@
 require_once __DIR__ . '/../lib-common.php';
 
 $content = '';
+$Request = Evlist\Models\Request::getInstance();
 
-switch ($_POST['action']) {
+switch ($Request->getString('action')) {
 case 'setStatus':
-    $newval = (int)$_POST['newval'];
-    $oldval = (int)$_POST['oldval'];
+    $newval = $Request->getInt('newval');
+    $oldval = $Request->getInt('oldval');
     $uid = (int)$_USER['uid'];
-    if ($_POST['type'] == 'event') {
-        $newval = Evlist\Event::setEventStatus($_POST['id'], $newval, $oldval, $uid);
+    if ($Request->getString('type') == 'event') {
+        $newval = Evlist\Event::setEventStatus($Request->getString('id'), $newval, $oldval, $uid);
     }
-    COM_errorLog(var_export($_POST,true));
     $response = array(
         'newval' => $newval,
-        'id'    => $_POST['id'],
-        'type'  => $_POST['type'],
+        'id'    => $Request->getString('id'),
+        'type'  => $Request->getString('type'),
         'baseurl'   => EVLIST_URL,
         'statusMessage' => $newval != $oldval ? $LANG_EVLIST['msg_item_updated'] : $LANG_EVLIST['msg_item_nochange'],
     );
@@ -38,11 +38,12 @@ case 'setStatus':
     break;
 
 case 'savecalpref':
-    if (!isset($_POST['id']) || empty($_POST['id'])) {
+    $id = $Request->getInt('id');
+    if (empty($id)) {
         break;
     }
-    $cal_id = str_replace('cal', '', $_POST['id']);
-    $state = isset($_POST['state']) ? (int)$_POST['state'] : 1;
+    $cal_id = str_replace('cal', '', $id);
+    $state = $Request->getInt('state', 1);
     $cals = SESS_getVar('evlist.calshowpref');
     if (empty($cals)) $cals = array();
     $cals[$cal_id] = $state;
@@ -67,8 +68,7 @@ case 'getloc':
         'lng'       => '',
     );
 
-    $id = isset($_POST['id']) && !empty($_POST['id']) ?
-                    COM_sanitizeID($_POST['id']) : '';
+    $id = $Request->getString('id');
     $status = LGLIB_invokeService('locator', 'getInfo',
             array('id' => $id), $A, $svc_msg);
     if ($status == PLG_RET_OK) {
@@ -87,12 +87,12 @@ case 'getloc':
     break;
 
 case 'addreminder':
-    $rp_id = (int)$_POST['rp_id'];
+    $rp_id = $Request->getInt('rp_id');
     $status = array();
-    $R = new Evlist\Reminder($_POST['rp_id']);
-    $status['reminder_set'] = $R->Add($_POST['notice'], $_POST['rem_email']);
+    $R = new Evlist\Reminder($rp_id);
+    $status['reminder_set'] = $R->Add($Request->getInt('notice'), $Request->getString('rem_email'));
     if ($status['reminder_set']) {
-        $status['message'] = sprintf($LANG_EVLIST['you_are_subscribed'], $_POST['notice']);
+        $status['message'] = sprintf($LANG_EVLIST['you_are_subscribed'], $Request->getInt('notice'));
     } else {
         $status['message'] = '';
     }
@@ -101,7 +101,7 @@ case 'addreminder':
     break;
 
 case 'delreminder':
-    Evlist\Reminder::Delete($_POST['eid'], $_POST['rp_id'], $_USER['uid']);
+    Evlist\Reminder::Delete($Request->getString('eid'), $Request->getInt('rp_id'), $_USER['uid']);
     echo json_encode(array('reminder_set' => false));
     exit;
     break;
@@ -112,13 +112,13 @@ case 'month':
 case 'year':
 case 'list':
 case 'agenda':
-    $day = isset($_POST['day']) ? (int)$_POST['day'] : 0;
-    $month = isset($_POST['month']) ? (int)$_POST['month'] : 0;
-    $year = isset($_POST['year']) ? (int)$_POST['year'] : 0;
-    $cat = isset($_POST['cat']) ? (int)$_POST['cat'] : 0;
-    $cal = isset($_POST['cal']) ? (int)$_POST['cal'] : 0;
-    $opt = isset($_POST['opt']) ? $_POST['opt'] : '';
-    $V = Evlist\View::getView($_POST['action'], $year, $month, $day, $cat, $cal, $opt);
+    $day = $Request->getInt('day');
+    $month = $Request->getInt('month');
+    $year = $Request->getInt('year');
+    $cat = $Request->getInt('cat');
+    $cal = $Request->getInt('cal');
+    $opt = $Request->getString('opt');
+    $V = Evlist\View::getView($Request->getString('action'), $year, $month, $day, $cat, $cal, $opt);
     $retval = array(
         'content' => $V->Content(),
         'header' => $V->Header(),
@@ -132,17 +132,17 @@ case 'toggle':
     // This is the same as the admin ajax function and takes the same $_REQUEST
     // parameters, but checks that the user is the event owner or other
     // authorized user before acting.
-    $oldval = isset($_POST['oldval']) && $_POST['oldval'] == 1 ? 1 : 0;
-    switch($_POST['component']) {
+    $oldval = $Request->getInt('oldval');
+    switch($Request->getString('component')) {
     case 'event':
-        $Ev = new Evlist\Event($_POST['id']);
+        $Ev = new Evlist\Event($Request->getString('id'));
         if ( (!plugin_ismoderator_evlist() && !$Ev->isOwner() ) || $Ev->isNew ) {
             $newval = $oldval;
             break;
         }
-        switch ($_POST['type']) {
+        switch ($Request->getString('type')) {
         case 'enabled':
-            $newval = Evlist\Event::toggleEnabled($oldval, $_POST['id']);
+            $newval = Evlist\Event::toggleEnabled($oldval, $Ev->getID());
             break;
 
          default:
@@ -151,9 +151,9 @@ case 'toggle':
     }
     $response = array(
         'newval' => $newval,
-        'id'    => $_POST['id'],
-        'type'  => $_POST['type'],
-        'component' => $_POST['component'],
+        'id'    => $Request->getString('id'),
+        'type'  => $Request->getString('type'),
+        'component' => $Request->getString('component'),
         'baseurl'   => EVLIST_URL,
         'statusMessage' => $newval != $oldval ?
                     $LANG_EVLIST['msg_item_updated'] :
@@ -162,5 +162,3 @@ case 'toggle':
     echo json_encode($response);
     break;
 }
-
-?>

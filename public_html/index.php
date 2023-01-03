@@ -28,9 +28,8 @@ if (!EVLIST_canView()) {
 }
 
 
-/*
-*   MAIN
-*/
+// Get URL parameters. Done this way to give preference to $_GET.
+$Request = Evlist\Models\Request::getInstance();
 COM_setArgNames(array('view','cat', 'id'));
 if (isset($_GET['view'])) {
     $view = COM_applyFilter($_GET['view']);
@@ -64,26 +63,25 @@ if (!empty($category)) {
     );
 }
 
-if (!empty($_REQUEST['msg'])) {
-    $msg = COM_applyFilter($_REQUEST['msg'], true);
-} else $msg = '';
-
-if (isset($_GET['date']) && !empty($_GET['date'])) {
-    list($year, $month, $day) = explode('-', $_GET['date']);
+$msg = $Request->getString('msg');
+$date = $Request->getString('date');
+$year = $day = $month = 0;
+if (!empty($date)) {
+    list($year, $month, $day) = explode('-', $date);
 }
 if (empty($year)) {
-    $year = isset($_REQUEST['year']) ? (int)$_REQUEST['year'] : 0;
+    $year = $Request->getInt('year');
 }
 if (empty($month)) {
-    $month = isset($_REQUEST['month']) ? (int)$_REQUEST['month'] : 0;
+    $month = $Request->getInt('month');
 }
 if (empty($day)) {
-    $day = isset($_REQUEST['day']) ? (int)$_REQUEST['day'] : 0;
+    $day = $Request->getInt('day');
 }
 
 // If deleting events from the "myevents" page, handle them first.
-if (isset($_POST['delevent']) && is_array($_POST['delevent'])) {
-    foreach ($_POST['delevent'] as $eid) {
+if (isset($Request['delevent']) && is_array($Request['delevent'])) {
+    foreach ($Request->getArray('delevent') as $eid) {
         Evlist\Event::Delete($eid);
         Evlist\Cache::clear();
     }
@@ -128,7 +126,7 @@ case 'agenda':
 case 'printtickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        $eid = COM_sanitizeID($_GET['eid'], false);
+        $eid = $Request->getString('eid');
         $doc = Evlist\Ticket::printEvent($eid);
         if ($doc !== false) {
             echo $doc;
@@ -145,7 +143,7 @@ case 'printtickets':
 case 'exporttickets':
     // Print all tickets for an event, for all users
     if ($_EV_CONF['enable_rsvp']) {
-        $eid = COM_sanitizeID($_GET['eid'], false);
+        $eid = $Request->getString('eid');
         $doc = Evlist\Ticket::ExportTickets($eid);
         header('Content-type: text/csv');
         header('Content-Disposition: attachment; filename="event-'.$eid.'.csv');

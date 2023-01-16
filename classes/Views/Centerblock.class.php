@@ -198,13 +198,13 @@ class Centerblock
         }
 
         // Find all the autotags that need to be stripped from the summary.
-        $tmp = PLG_collectTags();
+        /*$tmp = PLG_collectTags();
         $patterns = array();
         if (is_array($tmp)) {
             foreach ($tmp as $tag=>$plugin) {
                 $patterns[] = '/\[' . $tag . ':.*\]/';
             }
-        }
+        }*/
 
         $T = new \Template(EVLIST_PI_PATH . '/templates');
         $T->set_file('centerblock', $tpl_file);
@@ -246,14 +246,12 @@ class Centerblock
                     break;
                 }
 
-                // Prepare the summary for display. Remove links and autotags
+                // Prepare the summary for display.
+                // Process autotags and then strip disallowed tags.
                 $summary = empty($A['summary']) ? $A['title'] : $A['summary'];
+                $summary = PLG_replaceTags($summary);
                 if ($strip_tags) {
                     $summary = strip_tags($summary, $allowed_tags);
-                }
-                //$summary = preg_replace('!^<p>(.*?)</p>$!i', '$1', $summary);
-                if (!empty($patterns)) {
-                    $summary = preg_replace($patterns, '', $summary);
                 }
 
                 if (!empty($length) && $length >= 1) {

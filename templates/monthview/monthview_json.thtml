@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
+<div id="evlist_calendar">
 <div id="calendar-wrap" style="clear:both;">
-    <div id="evcal">
         <ul class="uk-grid uk-hidden-small uk-grid-width-medium-1-7 uk-child-width-1-7@m uk-child-width-1-1@s weekdays">
             <li>{dayname0}</li>
             <li>{dayname1}</li>
@@ -34,5 +34,6 @@
 </div>
 <div id="evlistCalendarFooter">
     {cal_footer}
+</div>
 </div>
 {# end {templatelocation} #}

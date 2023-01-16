@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<table style="width:100%;">
+<table id="evlist_calendar" style="width:100%;">
 <!-- BEGIN dayBlock -->
   <tr class="{dayclass}">
     <td style="width:80%;" class="cal-weekview-dayformat">{dayinfo}

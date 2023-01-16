@@ -1,4 +1,5 @@
 {# begin {templatelocation} #}
+<div id="evlist_calendar">
 <table class="cal-dayx-body">
     <tr>
         <td class="cal-dayx-weekevent"><div align="right"><?php global $LANG_EVLIST; echo $LANG_EVLIST['periods']['week'];?> {week_num}</div></td>
@@ -112,5 +113,6 @@
 </div>
 <div id="evlistCalendarFooter">
   {cal_footer}
+</div>
 </div>
 {# end {templatelocation} #}

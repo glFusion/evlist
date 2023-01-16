@@ -57,6 +57,7 @@ function ChangeDate(year, month, day, view)
 		data: data,
 		beforeSend: function() {
 	        $(".evlist_spinner").show();
+			$("#evcal").css("opacity",0.5);
 		},
 		success: function(result) {
 			try {

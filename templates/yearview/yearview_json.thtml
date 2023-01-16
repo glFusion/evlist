@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div class="uk-grid calcontainer" style="margin:auto;">
+<div id="evlist_calendar" class="uk-grid calcontainer" style="margin:auto;">
 <!-- BEGIN month -->
     <div class="year_smallmonth">{month}</div>
 <!-- END month -->

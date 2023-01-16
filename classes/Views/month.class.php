@@ -156,7 +156,7 @@ class month extends \Evlist\View
                     $summary = htmlentities(strip_tags($Det->getSummary()));
 
                     // add the calendar to the array to create the JS checkboxes
-                    $this->addCalUsed($event['cal_id']);
+                    $this->addCalUsed((int)$event['cal_id']);
 
                     // Create the hover tooltip.  Timed events show the times first
                     if ($event['allday'] == 0) {

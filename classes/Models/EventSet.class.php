@@ -451,8 +451,6 @@ class EventSet
             $qb->andWhere('rep.rp_status = :status')
                ->setParameter('status', $this->status, Database::INTEGER);
         }
-        //var_dump($qb->getSQL());die;
-
         return $qb;
     }
 
